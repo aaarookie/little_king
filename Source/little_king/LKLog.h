@@ -1,0 +1,8 @@
+#pragma once
+
+#include "CoreMinimal.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogLK, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogLKBattle, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogLKUnit, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogLKEconomy, Log, All);

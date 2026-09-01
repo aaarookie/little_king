@@ -1,0 +1,23 @@
+# ===== Visual Studio =====
+.vs/
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.VC.db
+*.VC.opendb
+
+# ===== Unreal Engine =====
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.opensdf
+*.sdf
+*.xcodeproj
+*.xcworkspace
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
