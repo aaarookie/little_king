@@ -9,6 +9,7 @@
 #include "Engine/OverlapResult.h"
 #include "Engine/World.h"
 #include "GameFramework/GameModeBase.h"
+#include "Math/RotationMatrix.h"
 #include "PaperSprite.h"
 #include "PaperSpriteComponent.h"
 
@@ -28,6 +29,16 @@ ALKUnitBase::ALKUnitBase()
 	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
 	SetRootComponent(SpriteComponent);
 	SpriteComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Paper2D 精灵默认"立着"（纸片竖在 XZ 平面、正面朝 +Y——为横版游戏设计）。
+	// 本项目是俯视战场（相机 Pitch=-90 从 +Z 俯视），必须把精灵放倒：
+	//   精灵正面 → 世界 +Z（朝向相机）
+	//   精灵宽边 → 世界 +Y（屏幕右）
+	//   精灵"头"  → 世界 +X（屏幕上方）
+	// 若实际效果头朝下/镜像，把下面第一个向量的 Y 取反即可（-1,0,0→用 0,-1,0）。
+	const FVector SpriteWidthDir(0.f, 1.f, 0.f);
+	const FVector SpriteFaceDir(0.f, 0.f, 1.f);
+	SpriteComponent->SetRelativeRotation(FRotationMatrix::MakeFromXY(SpriteWidthDir, SpriteFaceDir).Rotator());
 
 	BodyCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
 	BodyCollision->SetupAttachment(SpriteComponent);
@@ -84,7 +95,11 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData)
 		if (UPaperSprite* Sprite = Row.Sprite.LoadSynchronous())
 		{
 			SpriteComponent->SetSprite(Sprite);
-			SetActorScale3D(FVector(Row.SpriteScale.X, Row.SpriteScale.Y, 1.f));
+
+			// 精灵缩放必须作用在【组件本地坐标】上（宽=本地X、高=本地Z），
+			// 且要在组件旋转【之前】生效——否则旋转后宽高与世界轴错位、非等比缩放会变形。
+			// 不能缩 Actor：Actor 缩放沿世界轴，会把宽高缩反并连带缩放碰撞体。
+			SpriteComponent->SetRelativeScale3D(FVector(Row.SpriteScale.X, 1.f, Row.SpriteScale.Y));
 		}
 	}
 
@@ -351,7 +366,7 @@ void ALKUnitBase::Die()
 
 void ALKUnitBase::DrawDebugShape() const
 {
-	if (!GameDataCached || !GameDataCached->bDrawDebugShapes || SpriteComponent->GetSprite())
+	if (!GameDataCached)
 	{
 		return;
 	}
@@ -363,11 +378,28 @@ void ALKUnitBase::DrawDebugShape() const
 	}
 
 	const FColor Color = (Team == ELKTeam::Player) ? FColor::Green : FColor::Red;
-	DrawDebugBox(World, GetActorLocation() + FVector(0.f, 0.f, 10.f),
-		FVector(BodyRadius, BodyRadius, 10.f), Color, false, -1.f, 0, 2.f);
+	const bool bHasSprite = (SpriteComponent->GetSprite() != nullptr);
 
-	// 索敌线：单位 -> 当前目标（调试 AI 行为用）
-	if (TargetActor.IsValid())
+	// 1) 调试色块：仅"无精灵 + 开启调试形状"时显示（占位期可视化）
+	if (!bHasSprite && GameDataCached->bDrawDebugShapes)
+	{
+		DrawDebugBox(World, GetActorLocation() + FVector(0.f, 0.f, 10.f),
+			FVector(BodyRadius, BodyRadius, 10.f), Color, false, -1.f, 0, 2.f);
+	}
+
+	// 2) 脚下阵营色环：有精灵/无精灵都显示（精灵上线后的敌我标识，绿=玩家/红=敌方）
+	//    无精灵时随 bDrawDebugShapes，有精灵时随 bDrawTeamRing
+	const bool bShowRing = bHasSprite ? GameDataCached->bDrawTeamRing : GameDataCached->bDrawDebugShapes;
+	if (bShowRing)
+	{
+		const FVector RingCenter = GetActorLocation() + FVector(0.f, 0.f, 8.f);
+		// 平面参数：YAxis=(1,0,0)、ZAxis=(0,1,0) → 圆环画在 XY 平面（贴地），否则默认是竖立的
+		DrawDebugCircle(World, RingCenter, BodyRadius, 24, Color, false, -1.f, 0, 3.f,
+			FVector(1.f, 0.f, 0.f), FVector(0.f, 1.f, 0.f), false);
+	}
+
+	// 3) 索敌线：单位 -> 当前目标（调试 AI 行为用，随调试形状开关）
+	if (GameDataCached->bDrawDebugShapes && TargetActor.IsValid())
 	{
 		DrawDebugLine(World,
 			GetActorLocation() + FVector(0.f, 0.f, 20.f),

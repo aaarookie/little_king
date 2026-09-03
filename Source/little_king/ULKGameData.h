@@ -88,6 +88,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug")
 	bool bDrawDebugShapes = true;
 
+	/** 脚下阵营色环（绿=玩家/红=敌方）：有精灵的单位靠它区分敌我；关闭调试形状后仍可单独保留 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug")
+	bool bDrawTeamRing = true;
+
 	// ---------- 数据表（编辑器里指定） ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSoftObjectPtr<class UDataTable> UnitTable;

@@ -3,12 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "LKTypes.h"
+#include "ULKCardDefinition.h"
 #include "ALKBattleGameMode.generated.h"
 
 class ULKGameData;
 class ULKDeckState;
 class ULKSilverComponent;
-class ULKCardDefinition;
 class ULKBattleHUDWidget;
 class ALKBattleGameState;
 class ALKOpponentBrain;
@@ -35,6 +35,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LK|Battle")
 	void ForceStartBattle();
 
+	/** 强制结束对局（调试/剧情用） */
+	UFUNCTION(BlueprintCallable, Category = "LK|Battle")
+	void ForceEndMatch(ELKTeam Winner);
+
+	/** 法术锁定状态变化（开战/法师英雄阵亡时广播，HUD 据此刷新手牌锁定态） */
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpellLockChanged, bool, bUnlocked);
+	UPROPERTY(BlueprintAssignable, Category = "LK|Battle")
+	FOnSpellLockChanged OnSpellLockChanged;
+
 	UFUNCTION(BlueprintPure, Category = "LK|Battle")
 	ELKGamePhase GetPhase() const { return Phase; }
 
@@ -51,6 +60,7 @@ public:
 	// ---------- 单位 ----------
 	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier);
 	const FLKUnitRow* GetUnitRow(FName UnitId) const;
+	UFUNCTION(BlueprintPure, Category = "LK|Battle")
 	ULKCardDefinition* FindCard(FName CardId) const;
 	int32 GetCardCost(FName CardId) const;
 	bool HasMage(ELKTeam Team) const;

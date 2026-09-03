@@ -20,6 +20,8 @@ class ALKPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	ALKPlayerController();
+
 	virtual void BeginPlay() override;
 
 	// ---------- 放置状态机 ----------

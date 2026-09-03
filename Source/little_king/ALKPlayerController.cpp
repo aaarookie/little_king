@@ -10,8 +10,16 @@
 #include "ALKBattleGameMode.h"
 #include "ALKPlayerState.h"
 #include "LKLog.h"
+#include "ULKCheatManager.h"
 #include "ULKDeckState.h"
 #include "ULKSilverComponent.h"
+
+ALKPlayerController::ALKPlayerController()
+{
+	// 调试命令（PIE 中按 `~` 输入）：AddSilver/DrawCard/SpawnUnit/KillAll/WinMatch/StartBattle/ListUnits
+	// 注：UE5.8 中 CheatClass 位于 APlayerController（旧版本在 GameMode 上）
+	CheatClass = ULKCheatManager::StaticClass();
+}
 
 void ALKPlayerController::BeginPlay()
 {

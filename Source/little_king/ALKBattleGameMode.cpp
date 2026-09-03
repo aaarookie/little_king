@@ -270,6 +270,12 @@ void ALKBattleGameMode::SetPhase(ELKGamePhase NewPhase)
 	// 部署阶段冻结单位（不能移动/攻击/放技能），开战才解冻
 	ApplyCombatEnabledToAllUnits(NewPhase == ELKGamePhase::Battle);
 
+	// 开战瞬间广播法术锁定状态（HUD 刷新手牌）
+	if (NewPhase == ELKGamePhase::Battle)
+	{
+		OnSpellLockChanged.Broadcast(CanCastSpell(ELKTeam::Player));
+	}
+
 	if (ALKBattleGameState* GS = GetGameState<ALKBattleGameState>())
 	{
 		GS->SetPhase(NewPhase);
@@ -316,6 +322,11 @@ void ALKBattleGameMode::ForceStartBattle()
 	}
 }
 
+void ALKBattleGameMode::ForceEndMatch(ELKTeam Winner)
+{
+	EndMatch(Winner);
+}
+
 void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 {
 	if (Phase == ELKGamePhase::Result)
@@ -355,6 +366,12 @@ void ALKBattleGameMode::HandleUnitDied(ALKUnitBase* Unit)
 			const ELKTeam Winner = (TeamIdx == 0) ? ELKTeam::Enemy : ELKTeam::Player;
 			UE_LOG(LogLKBattle, Log, TEXT("[Battle] 一方英雄全灭，胜者: %d"), (int32)Winner);
 			EndMatch(Winner);
+		}
+
+		// 法师英雄阵亡 -> 法术可能被锁定，通知 HUD 刷新
+		if (Unit->IsMage())
+		{
+			OnSpellLockChanged.Broadcast(HasMage(ELKTeam::Player));
 		}
 	}
 
@@ -474,6 +491,14 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	}
 
 	const FLKUnitRow* Row = GetUnitRow(UnitId);
+	if (!Row)
+	{
+		// 自诊断：行找不到（DT_Units 无此行 / 行名与引用不一致）→ 使用默认值生成，并明确告警
+		UE_LOG(LogLKUnit, Warning,
+			TEXT("[Unit] 单位行 '%s' 未找到（检查 DT_Units 行名，或卡牌 SpawnUnitId/波次 UnitId 是否一致），已用默认值生成"),
+			*UnitId.ToString());
+	}
+
 	FLKUnitRow Fallback;
 	Fallback.UnitId = UnitId;
 	Fallback.UnitClass = FallbackClass;

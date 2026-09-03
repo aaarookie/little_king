@@ -8,6 +8,7 @@
 class ALKPlayerController;
 class ALKBattleGameState;
 class ALKBattleGameMode;
+class ULKCardDefinition;
 class ULKDeckState;
 class ULKSilverComponent;
 
@@ -32,8 +33,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnPhaseChanged(ELKGamePhase NewPhase);
 
+	/** bPlayable[i] = false 表示该卡当前不可打出（银币不足/法术门锁定/阶段错误） */
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
-	void OnHandChanged(const TArray<FName>& Hand, const TArray<int32>& Costs);
+	void OnHandChanged(const TArray<FName>& Hand, const TArray<int32>& Costs, const TArray<bool>& bPlayable);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnSilverChanged(float Silver, float Cap, float Delta);
@@ -63,6 +65,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LK|HUD")
 	ALKBattleGameMode* GetBattleGameMode() const;
 
+	/** 按 CardId 查卡牌定义（图标/名称/费用），HUD 显示卡面用 */
+	UFUNCTION(BlueprintPure, Category = "LK|HUD")
+	ULKCardDefinition* GetCardDefinition(FName CardId) const;
+
+	/** 按 CardId 直接取卡牌图标（已加载的 Texture2D；无卡/无图标返回空）——免去蓝图软引用加载 */
+	UFUNCTION(BlueprintPure, Category = "LK|HUD")
+	class UTexture2D* GetCardIcon(FName CardId) const;
+
 protected:
 	// ---------- C++ 事件转发（绑定引擎/游戏事件 -> 调用蓝图事件） ----------
 	UFUNCTION()
@@ -70,6 +80,9 @@ protected:
 
 	UFUNCTION()
 	void HandleHandChanged();
+
+	UFUNCTION()
+	void HandleSpellLockChanged(bool bUnlocked);
 
 	UFUNCTION()
 	void HandleSilverChanged(float NewSilver, float Delta);

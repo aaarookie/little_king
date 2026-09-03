@@ -53,13 +53,29 @@ FName ULKDeckState::PlayCard(int32 HandIndex)
 	}
 
 	const FName CardId = Hand[HandIndex];
-	Hand.RemoveAt(HandIndex);
 	DiscardPile.Add(CardId);
 
-	// 补抽一张（手牌满则放弃）
-	DrawCard();
+	// 原地补牌：打出的位置直接替换为牌堆顶的新牌（皇室战争式，其他手牌位置不动）。
+	// 不能用 RemoveAt+Append——那会导致手牌左移、新牌固定出现在末尾。
+	if (DrawPile.Num() == 0)
+	{
+		RefillDrawFromDiscard();
+	}
 
-	UE_LOG(LogLKEconomy, Log, TEXT("[Deck] Play %s, 手牌剩余 %d"), *CardId.ToString(), Hand.Num());
+	if (DrawPile.Num() > 0)
+	{
+		Hand[HandIndex] = DrawPile[0];
+		DrawPile.RemoveAt(0);
+	}
+	else
+	{
+		// 理论上不会发生（弃牌堆含刚打出的牌，洗回后必有牌）；保险起见清空槽位
+		Hand[HandIndex] = NAME_None;
+	}
+
+	BroadcastHandChanged();
+
+	UE_LOG(LogLKEconomy, Log, TEXT("[Deck] Play %s -> 原位补入新牌，手牌 %d 张"), *CardId.ToString(), Hand.Num());
 	return CardId;
 }
 

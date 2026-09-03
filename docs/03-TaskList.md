@@ -59,16 +59,21 @@
 - [x] BP_ALKBattleGameMode 类默认值 → HUDWidgetClass = WBP_BattleHUD
 - [x] 验证：可部署英雄、可打牌、银币增长、右键取消、胜负结算+重开（PIE 可玩）
 - [x] 单位 FSM 走查完成，修复 4 个问题（详见 [05-BugLog.md](05-BugLog.md)：哨塔目标卡死 / 射程抖动滞回 / 战场边界钳制 / 攻击已死目标）+ 新增索敌线调试
-- [ ] **Git 首次提交**：git init + .gitignore（Binaries/Intermediate/Saved/DerivedDataCache）+ 首次 commit + tag v0.1（原型骨架）
-- [ ] 每 Sprint 结束：Git tag + 3 行技术复盘
+- [x] **Git 首次提交并推送 GitHub**：git init + .gitignore + 首次 commit（2dea2c6，206 文件）+ tag **v0.1** + push 到 https://github.com/aaarookie/little_king（走本机代理 127.0.0.1:18081，已写入仓库 git config）
+- [ ] 每 Sprint 结束：Git tag + 3 行技术复盘（**下次提交前：git add -A → commit → push（代理开着时）**）
 
 ## 🪙 Sprint 2：经济与卡牌完整化（1 周）
 
-- [ ] HUD：银币数字（绑定 `OnSilverChanged`）、手牌 4 格（图标+费用）、可放置区高亮、右键取消
-- [ ] 卡牌循环验证：打牌→入弃牌→洗回（`ULKDeckState` 已实现，补 UI 绑定）
-- [ ] 建筑：哨塔/兵营行为验证（`BuildingBehavior` 已实现，补数值与精灵）
-- [ ] 法术门：法师在场/阵亡时手牌锁定态显示（`CanCastSpell` 已实现，补 UI）
-- [ ] 调试命令（CheatManager）：`AddSilver` / `DrawCard` / `SpawnUnit` / `KillAll` / `WinMatch`
+**教程**：[06-Sprint2Guide.md](06-Sprint2Guide.md)（C++ 已完成说明 + A 卡牌图标 / B 单位精灵 / C 法术门 UI / D 波次表 四个教程）
+
+- [x] **C++（已编译）**：调试命令 `ULKCheatManager`（AddSilver/DrawCard/SpawnUnit/KillAll/WinMatch/StartBattle/ListUnits，PIE 按 `~` 使用；5.8 中 CheatClass 在 PlayerController 上）；`OnSpellLockChanged` 事件（开战/法师阵亡广播）；`OnHandChanged` 升级 3 参数（+bPlayable 可打出标记）；`GetCardDefinition` 卡牌查询
+- [ ] **教程 A**：卡牌图标（AI 生成 → 导入 → 7 张 `ULKCardDefinition` 资产 → DA_GameData.CardLibrary → HUD 卡槽显示图标）
+- [ ] **教程 B**：单位精灵（AI 透明底出图 → Paper Sprite → DT_Units.Sprite）
+- [ ] **教程 C**：法术门锁定 UI（用 `bPlayable` 给卡槽变灰）——**先重连 OnHandChanged（3 参数）**
+- [ ] **教程 D**：DT_Waves 波次表（9 行，接 DA_GameData.WaveTable）
+- [ ] 卡牌循环验证：打牌→入弃牌→洗回（已实现，随 HUD 验证）
+- [ ] 建筑：哨塔/兵营行为验证（已实现，补数值与精灵）
+- [ ] Git 提交 Sprint 2
 
 ## 🦸 Sprint 3：英雄与胜负打磨（1 周）
 
