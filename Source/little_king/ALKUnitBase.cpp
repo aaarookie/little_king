@@ -72,11 +72,20 @@ UAbilitySystemComponent* ALKUnitBase::GetAbilitySystemComponent() const
 	return AbilitySystem;
 }
 
-void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData)
+void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId)
 {
 	GameDataCached = InGameData;
 
-	UnitId = Row.UnitId;
+	// UnitId 以行内字段为准；为空时用行名兜底（并告警提示补齐数据表）
+	const FName RowUnitId = Row.UnitId;
+	UnitId = RowUnitId.IsNone() ? FallbackUnitId : RowUnitId;
+	if (RowUnitId.IsNone() && !FallbackUnitId.IsNone())
+	{
+		UE_LOG(LogLKUnit, Warning,
+			TEXT("[Unit] 行 '%s' 的 UnitId 字段为空，已用行名兜底（建议把 DT_Units 该行的 UnitId 填成行名）"),
+			*FallbackUnitId.ToString());
+	}
+
 	UnitClass = Row.UnitClass;
 	bIsMage = Row.bIsMage;
 	AttackType = Row.AttackType;
@@ -105,8 +114,16 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData)
 
 	ApplyRowAttributes(Row);
 
+	// 数据就绪回调（英雄在此授予数据驱动技能等）
+	OnUnitInitialized(Row);
+
 	UE_LOG(LogLKUnit, Log, TEXT("[Unit] Spawn %s (class=%d, team=%d) @ %s"),
 		*UnitId.ToString(), (int32)UnitClass, (int32)Team, *GetActorLocation().ToString());
+}
+
+void ALKUnitBase::OnUnitInitialized(const FLKUnitRow& Row)
+{
+	// 基类无额外逻辑；子类覆写
 }
 
 void ALKUnitBase::ApplyRowAttributes(const FLKUnitRow& Row)
@@ -131,6 +148,18 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 	if (bDead)
 	{
 		return;
+	}
+
+	// 无敌计时（部署阶段也走表，不影响开战冻结逻辑）
+	if (bInvulnerable && InvulnerableRemaining > 0.f)
+	{
+		InvulnerableRemaining -= DeltaSeconds;
+		if (InvulnerableRemaining <= 0.f)
+		{
+			bInvulnerable = false;
+			InvulnerableRemaining = 0.f;
+			UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 无敌结束"), *UnitId.ToString());
+		}
 	}
 
 	DrawDebugShape();
@@ -348,6 +377,24 @@ float ALKUnitBase::GetMoveSpeed() const
 	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMoveSpeedAttribute(), 0.f);
 }
 
+void ALKUnitBase::SetInvulnerable(float DurationSeconds)
+{
+	if (DurationSeconds == 0.f)
+	{
+		bInvulnerable = false;
+		InvulnerableRemaining = 0.f;
+		UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 解除无敌"), *UnitId.ToString());
+		return;
+	}
+
+	bInvulnerable = true;
+	InvulnerableRemaining = (DurationSeconds > 0.f) ? DurationSeconds : -1.f;
+	const FString DurationText = (DurationSeconds > 0.f)
+		? FString::Printf(TEXT("%.1f 秒"), DurationSeconds)
+		: FString(TEXT("永久"));
+	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 进入无敌（%s）"), *UnitId.ToString(), *DurationText);
+}
+
 void ALKUnitBase::Die()
 {
 	if (bDead)
@@ -377,7 +424,10 @@ void ALKUnitBase::DrawDebugShape() const
 		return;
 	}
 
-	const FColor Color = (Team == ELKTeam::Player) ? FColor::Green : FColor::Red;
+	// 无敌期用金色标识（普通绿/红之外一眼可辨）
+	const FColor Color = bInvulnerable
+		? FColor(255, 200, 0)
+		: (Team == ELKTeam::Player) ? FColor::Green : FColor::Red;
 	const bool bHasSprite = (SpriteComponent->GetSprite() != nullptr);
 
 	// 1) 调试色块：仅"无精灵 + 开启调试形状"时显示（占位期可视化）

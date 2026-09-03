@@ -17,8 +17,8 @@ namespace LKGameplay
 	/** 获取 Actor 的 ASC */
 	UAbilitySystemComponent* GetASC(const AActor* Actor);
 
-	/** 瞬时伤害（负数修正 Health） */
-	void ApplyDamage(AActor* Target, float Amount, AActor* Instigator);
+	/** 瞬时伤害（负数修正 Health）。bBypassInvulnerability=true 时无视无敌状态（"真伤"，超时虚弱用） */
+	void ApplyDamage(AActor* Target, float Amount, AActor* Instigator, bool bBypassInvulnerability = false);
 
 	/** 瞬时治疗 */
 	void ApplyHeal(AActor* Target, float Amount, AActor* Instigator);

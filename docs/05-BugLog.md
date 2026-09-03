@@ -114,6 +114,15 @@
 - **验证**：`SpawnUnit Unit_Swordsman 1 0 -300` → 日志提示镜像，单位出现在敌方半场；`0 0 -300` → 玩家半场不变。
 - **教训**：调试工具的"坐标约定"也要文档化并给出正确示例；有精灵后建议尽快加阵营标识（如脚下光环），否则分不清敌我。
 
+## BUG-014：超时虚弱结算导致 EnsureFailed（"Array has changed during ranged-for"）
+
+- **现象**：战斗进入超时一段时间后（虚弱反复扣血把英雄打死时），日志报 `EnsureFailed: Array has changed during ranged-for iteration`（`ALKBattleGameMode.cpp` TickOvertime），场上己方英雄"突然消失"、结算行为错乱。
+- **原因**：`TickOvertime` 用 range-for 直接遍历 `AliveHeroes[TeamIdx]`，循环内 `ApplyMaxHealthPercentDamage` 把英雄打死 → 同步触发死亡回调 `HandleUnitDied` → 从**同一个数组** `Remove` 该英雄 → 遍历中途数组被修改，checked 迭代器检测报错（英雄消失其实是死亡后 0.5s 销毁，ensure 让本次结算循环漏结算/错乱）。
+- **修复**：遍历前先复制快照 `const TArray<ALKUnitBase*> HeroesSnapshot = AliveHeroes[TeamIdx];` 再遍历副本——循环内删原数组安全。同类隐患自查：其余 `AliveHeroes` 使用点（HasMage/GetTeamHeroHealthRatio/GetRandomAliveHero）均为只读，无此问题。
+- **涉及文件**：`ALKBattleGameMode.cpp`（TickOvertime）
+- **验证**：`BattleTimeLimit=60` 拖到超时，双方英雄陆续被虚弱磨死（日志 `[Unit] xxx 阵亡` 正常、无 ensure），一方全灭判负。
+- **教训**（面试可讲）：UE 里"回调同步修改容器"是最常见的迭代陷阱——凡是循环体里可能触发广播/回调的遍历，先拷快照（或延迟处理）；开发版 checked 迭代器会替你抓出来，发行版则是静默 UB，务必修在源头。
+
 ---
 
 ## 附：调试工具（同批加入）

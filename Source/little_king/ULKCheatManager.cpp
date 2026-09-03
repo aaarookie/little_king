@@ -131,11 +131,39 @@ void ULKCheatManager::ListUnits()
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		const ALKUnitBase* Unit = *It;
-		UE_LOG(LogLK, Log, TEXT("[Cheat] %s | 阵营%d | 生命 %.0f/%.0f | 状态%d | @ %s"),
+		UE_LOG(LogLK, Log, TEXT("[Cheat] %s | 阵营%d | 生命 %.0f/%.0f | 状态%d%s | @ %s"),
 			*Unit->GetUnitId().ToString(), (int32)Unit->GetTeam(),
 			Unit->GetHealth(), Unit->GetMaxHealth(), (int32)Unit->GetState(),
+			Unit->IsInvulnerable() ? TEXT(" | 无敌中") : TEXT(""),
 			*Unit->GetActorLocation().ToString());
 		++Count;
 	}
 	UE_LOG(LogLK, Log, TEXT("[Cheat] === 共 %d 个单位 ==="), Count);
+}
+
+void ULKCheatManager::InvulnerableHeroes(float Seconds)
+{
+	if (Seconds <= 0.f)
+	{
+		Seconds = 10.f; // 省略参数 = 默认 10 秒
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	int32 Affected = 0;
+	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+	{
+		ALKUnitBase* Unit = *It;
+		if (Unit->GetTeam() == ELKTeam::Player && Unit->IsHero() && Unit->IsAlive())
+		{
+			Unit->SetInvulnerable(Seconds);
+			++Affected;
+		}
+	}
+	UE_LOG(LogLK, Log, TEXT("[Cheat] InvulnerableHeroes %.1f 秒：己方 %d 个在场英雄进入无敌（虚弱仍会扣血）"),
+		Seconds, Affected);
 }

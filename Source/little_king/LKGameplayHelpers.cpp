@@ -3,6 +3,7 @@
 #include "AbilitySystemInterface.h"
 #include "AttributeSet.h"
 #include "GameplayEffect.h"
+#include "ALKUnitBase.h"
 #include "ULKUnitAttributeSet.h"
 #include "LKLog.h"
 
@@ -93,12 +94,28 @@ namespace LKGameplay
 		return const_cast<UAbilitySystemComponent*>(Cast<UAbilitySystemComponent>(Comp));
 	}
 
-	void ApplyDamage(AActor* Target, float Amount, AActor* Instigator)
+	void ApplyDamage(AActor* Target, float Amount, AActor* Instigator, bool bBypassInvulnerability)
 	{
 		if (Amount <= 0.f)
 		{
 			return;
 		}
+
+		// 无敌拦截：普通伤害一律挡下；只有显式"真伤"（bBypassInvulnerability，超时虚弱用）能穿透。
+		// 所有敌方伤害（近战/弹道/法术/技能）都汇聚到这里，所以在此拦截一处生效全局。
+		if (!bBypassInvulnerability)
+		{
+			if (const ALKUnitBase* Unit = Cast<ALKUnitBase>(Target))
+			{
+				if (Unit->IsInvulnerable())
+				{
+					UE_LOG(LogLK, Verbose, TEXT("[LKGameplay] %s 处于无敌，免疫 %.1f 点伤害"),
+						*Unit->GetUnitId().ToString(), Amount);
+					return;
+				}
+			}
+		}
+
 		ApplyHealthDelta(Target, DamageDataName, -Amount, Instigator);
 	}
 
@@ -122,7 +139,8 @@ namespace LKGameplay
 		const float MaxHp = ASC->GetNumericAttribute(ULKUnitAttributeSet::GetMaxHealthAttribute());
 		if (MaxHp > 0.f)
 		{
-			ApplyDamage(Target, MaxHp * Percent, Instigator);
+			// 超时虚弱 = 真伤：穿透无敌（无敌单位也会被虚弱磨死，保证无平局）
+			ApplyDamage(Target, MaxHp * Percent, Instigator, true);
 		}
 	}
 

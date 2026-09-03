@@ -6,6 +6,17 @@
 #include "ULKGameData.generated.h"
 
 class ULKCardDefinition;
+class UGameplayAbility;
+
+/** 单个英雄的技能列表（包装结构：UHT 不支持 TMap 值直接嵌套 TArray<TSubclassOf>） */
+USTRUCT(BlueprintType)
+struct FLKHeroSkillEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skills")
+	TArray<TSubclassOf<UGameplayAbility>> Abilities;
+};
 
 /**
  * 全局配置 DataAsset（DA_GameData）。
@@ -91,6 +102,11 @@ public:
 	/** 脚下阵营色环（绿=玩家/红=敌方）：有精灵的单位靠它区分敌我；关闭调试形状后仍可单独保留 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug")
 	bool bDrawTeamRing = true;
+
+	// ---------- 英雄技能（S3：BP 技能资产按英雄授予） ----------
+	/** 英雄 UnitId -> 技能 GA 资产列表；不配 = 该英雄无技能 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skills")
+	TMap<FName, FLKHeroSkillEntry> HeroAbilityMap;
 
 	// ---------- 数据表（编辑器里指定） ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")

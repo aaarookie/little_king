@@ -67,6 +67,10 @@ public:
 	int32 GetHeroCount(ELKTeam Team) const;
 	ALKUnitBase* GetRandomAliveHero(ELKTeam Team) const;
 	bool CanCastSpell(ELKTeam Team) const;
+
+	/** 顶部英雄血条：存活英雄当前血量合计 / 满血合计（0~1）；无存活英雄返回 0 */
+	UFUNCTION(BlueprintPure, Category = "LK|Battle")
+	float GetTeamHeroHealthRatio(ELKTeam Team) const;
 	bool IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType,
 		FName BuildingUnitId = NAME_None, int32 BuildingLimit = -1) const;
 	bool IsInsideField(const FVector& Location) const;

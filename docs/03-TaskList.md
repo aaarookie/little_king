@@ -62,42 +62,58 @@
 - [x] **Git 首次提交并推送 GitHub**：git init + .gitignore + 首次 commit（2dea2c6，206 文件）+ tag **v0.1** + push 到 https://github.com/aaarookie/little_king（走本机代理 127.0.0.1:18081，已写入仓库 git config）
 - [ ] 每 Sprint 结束：Git tag + 3 行技术复盘（**下次提交前：git add -A → commit → push（代理开着时）**）
 
-## 🪙 Sprint 2：经济与卡牌完整化（1 周）
+## 🪙 Sprint 2：经济与卡牌完整化 —— ✅ 完成（commit de5b00c，tag v0.2）
 
 **教程**：[06-Sprint2Guide.md](06-Sprint2Guide.md)（C++ 已完成说明 + A 卡牌图标 / B 单位精灵 / C 法术门 UI / D 波次表 四个教程）
 
-- [x] **C++（已编译）**：调试命令 `ULKCheatManager`（AddSilver/DrawCard/SpawnUnit/KillAll/WinMatch/StartBattle/ListUnits，PIE 按 `~` 使用；5.8 中 CheatClass 在 PlayerController 上）；`OnSpellLockChanged` 事件（开战/法师阵亡广播）；`OnHandChanged` 升级 3 参数（+bPlayable 可打出标记）；`GetCardDefinition` 卡牌查询
-- [ ] **教程 A**：卡牌图标（AI 生成 → 导入 → 7 张 `ULKCardDefinition` 资产 → DA_GameData.CardLibrary → HUD 卡槽显示图标）
-- [ ] **教程 B**：单位精灵（AI 透明底出图 → Paper Sprite → DT_Units.Sprite）
-- [ ] **教程 C**：法术门锁定 UI（用 `bPlayable` 给卡槽变灰）——**先重连 OnHandChanged（3 参数）**
-- [ ] **教程 D**：DT_Waves 波次表（9 行，接 DA_GameData.WaveTable）
-- [ ] 卡牌循环验证：打牌→入弃牌→洗回（已实现，随 HUD 验证）
-- [ ] 建筑：哨塔/兵营行为验证（已实现，补数值与精灵）
-- [ ] Git 提交 Sprint 2
+- [x] **C++（已编译）**：调试命令 `ULKCheatManager`（7 条命令，PIE 按 `~` 使用；5.8 中 CheatClass 在 PlayerController 上；SpawnUnit 半场自动镜像）；`OnSpellLockChanged` 事件；`OnHandChanged` 3 参数（+bPlayable）；`GetCardDefinition`/`GetCardIcon`；手牌原地补牌（BUG-010）；精灵朝向（BUG-011）+ SpriteScale 组件缩放（BUG-012）；单位行缺失自诊断；脚下阵营色环 `bDrawTeamRing`；ForceEndMatch/FindCard BP 可调
+- [x] **教程 A**：卡牌图标（7 张卡资产 + CardLibrary + HUD 卡槽图标显示）
+- [x] **教程 B**：单位精灵（抠图流程 + Paper Sprite + DT_Units.Sprite；佣兵行已核对）
+- [x] **教程 C**：法术门锁定 UI（bPlayable 卡槽变灰）
+- [x] **教程 D**：DT_Waves 波次表
+- [x] 卡牌循环验证（原地补牌）+ 建筑行为验证
+- [x] Git 提交 Sprint 2（tag v0.2）
 
-## 🦸 Sprint 3：英雄与胜负打磨（1 周）
+## 🦸 Sprint 3：英雄技能与对局反馈（完成 ✅，tag v0.3）
 
-- [ ] 英雄技能：按 `DT_Skills` 配 GAS Ability（BP 技能 + CooldownGameplayEffect），英雄 AI 施放（`TryCastAbilities` 已接 LK.Ability 标签）
-- [ ] 胜负判定端到端验证（含超时虚弱数值手感）
-- [ ] 顶部双方英雄血条 UI
+**指南**：[08-Sprint3Guide.md](08-Sprint3Guide.md)（分工 + C++ 设计 + 新手教程 A~F）
 
-## 🤖 Sprint 4：敌方 AI 与内容（1 周）
+- [x] **C++（我）**：`ULKGameplayLibrary`（BP 技能用范围伤害/治疗/索敌/读血）→ `HeroAbilityMap`（FLKHeroSkillEntry）+ 英雄技能授予与简单冷却 + `FLKUnitRow::SkillCooldown` → `GetTeamHeroHealthRatio` + `GetTarget` BP 暴露 + 原生注册标签 `LK.Ability` → 编译通过（含 2 次修复：UHT 嵌套容器、漏包含头文件）
+- [x] **C++（我，追加）**：通用**无敌**状态 `SetInvulnerable`（英雄/佣兵/建筑，免疫普通伤害、虚弱真伤穿透、金色标识）+ 控制台 `InvulnerableHeroes 秒数`（教程 F）→ 编译通过
+- [x] **教程 A~B（你）**：创建 GA_KnightHeal / GA_MageNova / GA_RangerShot（父类 UGameplayAbility，**AssetTags 必须 = LK.Ability**，连 LK_ApplyHealInRadius/LK_ApplyDamageInRadius + End Ability）→ DA_GameData.HeroAbilityMap 挂给 3 英雄
+- [x] **教程 C（你）**：顶部双方英雄血条（PlayerHeroBar/EnemyHeroBar + Event Tick + Set Percent，每帧读 GetTeamHeroHealthRatio）
+- [x] **教程 D（你）**：DT_Units 填 SkillCooldown（8/6/5）+ 技能数值 + BattleTimeLimit=60 快速验证超时虚弱手感
+- [x] 教程 F：无敌调试（InvulnerableHeroes）验证"虚弱穿透无敌"
+- [x] 验收 + BugLog（BUG-014：虚弱结算遍历快照修复）+ Git 提交（tag v0.3）
 
-- [ ] AI 升级：集火英雄指令（TargetOverride）、反制玩家兵种、爆发时机
-- [ ] 内容填充：3 英雄 / 6 佣兵 / 2 法术 / 2 建筑数据表完整数值 + 首次平衡
-- [ ] 特性系统：`DT_Traits` + 光环 GE（`ApplyAttributeModifier` 已就绪）
+## 🤖 Sprint 4：敌方 AI 与内容（规划完成，未开工）
 
-## ✨ Sprint 5：体验打磨（1~2 周）
+**指南**：[09-Sprint4Guide.md](09-Sprint4Guide.md)（AI 集火/反制/爆发 + DT_Traits 特性 + 首次平衡）
 
-- [ ] 打击感：攻击前摇/停顿/震屏/飘字/粒子（程序动画）
-- [ ] 占位音效接入；HUD 全面美化
-- [ ] 性能粗查：单位数量上限、对象池（弹道先行）
+- [ ] **C++（我）**：AI 集火指令（ForcedTarget）/反制兵种/爆发时机/法术智能目标；特性运行时（Self 修饰 + 光环组件 + Taunt 嘲讽）；`MaxUnitsPerTeam` 上限
+- [ ] **教程 A（你）**：DT_Traits 建表（骑士光环/法师威能/Taunt）+ DA_GameData.TraitTable + DT_Units.HeroTraits
+- [ ] **教程 B/C（你）**：AI 手感验证 + 首次平衡（杠杆表 + 记录模板）
+- [ ] 验收清单 + BugLog + Git tag v0.4
 
-## ⚖️ Sprint 6：工具与平衡（1 周）
+## ✨ Sprint 5：体验打磨（规划完成，未开工）
 
-- [ ] 数值平衡 3 连测（每局记录 DPS/时长，日志已带）
-- [ ] 修阻塞 Bug、崩溃路径走查
-- [ ] 验收：连打 3 局无阻塞问题
+**指南**：[10-Sprint5Guide.md](10-Sprint5Guide.md)（攻击前摇/闪白/飘字/震屏/音效/对象池，体感迭代）
+
+- [ ] **C++（我）**：AttackWindup 前摇 + 攻击缩放脉冲；受击闪白 + 死亡缩放淡出 + 震屏 + 命中停顿；伤害事件 OnDamageEvent 透传 HUD；SoundMap 播放器与触发点；弹道对象池
+- [ ] **教程 A（你）**：WBP_DamageText 飘字（上浮动画 + 事件绑定）
+- [ ] **教程 B（你）**：音效素材导入 + DA_GameData.SoundMap 填表（6~8 键配 3 个起）
+- [ ] **教程 C（你）**：HUD 美化（按 07-ArtStyleGuide 统一）
+- [ ] 验收清单 + BugLog + Git tag v0.5
+
+## ⚖️ Sprint 6：工具与平衡（规划完成，未开工）—— 原型验收
+
+**指南**：[11-Sprint6Guide.md](11-Sprint6Guide.md)（对局统计/3 连测/稳定性走查/打包冒烟/阶段复盘）
+
+- [ ] **C++（我）**：对局统计（[MatchStats] 日志 + 结算查询）；稳定性代码侧检查清单
+- [ ] **教程 A（你）**：Windows 打包（文件→打包项目→运行 exe 冒烟）
+- [ ] **教程 B/C（你）**：结算面板接统计 + 3 连测平衡
+- [ ] **教程 D（共同）**：阶段复盘文档（docs/12-Phase1Review.md，简历素材）
+- [ ] 验收：3 连测通过 + 稳定性清单全过 + 打包可玩 + Git tag v0.6（**阶段 1 完成**）
 
 ---
 

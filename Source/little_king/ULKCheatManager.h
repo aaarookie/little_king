@@ -18,6 +18,8 @@ class ALKBattleGameMode;
  *   WinMatch 阵营               直接结束对局并指定胜者
  *   StartBattle                 跳过部署直接开战
  *   ListUnits                   列出场上所有单位
+ *   InvulnerableHeroes 秒数     让己方（玩家）在场英雄无敌 N 秒（省略 = 10 秒；
+ *                               无敌免疫敌方伤害，但超时虚弱仍会扣血——可用来拖到超时观察虚弱）
  */
 UCLASS()
 class ULKCheatManager : public UCheatManager
@@ -45,6 +47,9 @@ public:
 
 	UFUNCTION(Exec)
 	void ListUnits();
+
+	UFUNCTION(Exec)
+	void InvulnerableHeroes(float Seconds);
 
 private:
 	ALKBattleGameMode* GetGameMode() const;

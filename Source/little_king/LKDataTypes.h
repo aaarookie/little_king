@@ -65,6 +65,10 @@ struct FLKUnitRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsMage = false;
 
+	/** 英雄技能冷却（秒）；0 = 用英雄类默认值（ALKUnitHero::SkillCooldownSeconds=5） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0"))
+	float SkillCooldown = 0.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ELKBuildingBehavior BuildingBehavior = ELKBuildingBehavior::None;
 

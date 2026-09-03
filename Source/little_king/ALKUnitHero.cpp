@@ -4,7 +4,9 @@
 #include "GameplayAbilitySpec.h"
 #include "GameplayTagContainer.h"
 
+#include "LKDataTypes.h"
 #include "LKLog.h"
+#include "ULKGameData.h"
 
 ALKUnitHero::ALKUnitHero()
 {
@@ -15,7 +17,7 @@ void ALKUnitHero::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 授予技能
+	// 授予类默认技能（BP 子类在 Abilities 里配置的技能；单位是 C++ 直接生成时一般为空）
 	if (AbilitySystem)
 	{
 		for (const TSubclassOf<UGameplayAbility>& AbilityClass : Abilities)
@@ -24,7 +26,8 @@ void ALKUnitHero::BeginPlay()
 			{
 				FGameplayAbilitySpec Spec(AbilityClass, 1, INDEX_NONE, this);
 				AbilitySystem->GiveAbility(Spec);
-				UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 授予技能 %s"), *UnitId.ToString(), *AbilityClass->GetName());
+				UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 授予技能(类默认) %s"),
+					*UnitId.ToString(), *AbilityClass->GetName());
 			}
 		}
 	}
@@ -39,6 +42,9 @@ void ALKUnitHero::Tick(float DeltaSeconds)
 		return;
 	}
 
+	// 冷却自然流逝（简单冷却：一个计时字段，不用 GE 冷却资产）
+	SkillCooldownRemaining = FMath::Max(0.f, SkillCooldownRemaining - DeltaSeconds);
+
 	AbilityCheckTimer -= DeltaSeconds;
 	if (AbilityCheckTimer <= 0.f)
 	{
@@ -47,19 +53,81 @@ void ALKUnitHero::Tick(float DeltaSeconds)
 	}
 }
 
-void ALKUnitHero::TryCastAbilities()
+void ALKUnitHero::OnUnitInitialized(const FLKUnitRow& Row)
 {
-	if (!AbilitySystem)
+	Super::OnUnitInitialized(Row);
+
+	// 数据行可覆盖冷却（0 = 用类默认值 5 秒）
+	if (Row.SkillCooldown > 0.f)
+	{
+		SkillCooldownSeconds = Row.SkillCooldown;
+	}
+
+	if (bAbilitiesResolved)
+	{
+		return;
+	}
+	bAbilitiesResolved = true;
+
+	// 类默认技能优先（BeginPlay 已授予）；为空才走数据资产
+	if (Abilities.Num() > 0)
 	{
 		return;
 	}
 
-	// 原型规则：自动激活带 LK.Ability 标签且未在冷却中的技能
-	// （S3 起：技能由 DT_Skills 驱动，配合 CooldownGameplayEffect 控制节奏）
-	FGameplayTagContainer AbilityTags;
-	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("LK.Ability"), false));
-	if (!AbilityTags.IsEmpty())
+	if (!AbilitySystem || !GameDataCached)
 	{
-		AbilitySystem->TryActivateAbilitiesByTag(AbilityTags);
+		return;
+	}
+
+	if (const FLKHeroSkillEntry* Entry = GameDataCached->HeroAbilityMap.Find(UnitId))
+	{
+		for (const TSubclassOf<UGameplayAbility>& AbilityClass : Entry->Abilities)
+		{
+			if (AbilityClass)
+			{
+				FGameplayAbilitySpec Spec(AbilityClass, 1, INDEX_NONE, this);
+				AbilitySystem->GiveAbility(Spec);
+				UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 授予技能(数据驱动) %s"),
+					*UnitId.ToString(), *AbilityClass->GetName());
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 未配置技能（HeroAbilityMap 无此英雄条目，不影响战斗）"),
+			*UnitId.ToString());
+	}
+}
+
+void ALKUnitHero::TryCastAbilities()
+{
+	if (!AbilitySystem || !bAbilitiesResolved)
+	{
+		return;
+	}
+
+	// 冷却中不尝试
+	if (SkillCooldownRemaining > 0.f)
+	{
+		return;
+	}
+
+	const FGameplayTag AbilityTag = FGameplayTag::RequestGameplayTag(TEXT("LK.Ability"), false);
+	if (!AbilityTag.IsValid())
+	{
+		return;
+	}
+
+	FGameplayTagContainer AbilityTags;
+	AbilityTags.AddTag(AbilityTag);
+
+	// 激活成功才进入冷却（技能没配/正在激活中返回 false，不扣冷却、下个周期重试）
+	const bool bActivated = AbilitySystem->TryActivateAbilitiesByTag(AbilityTags);
+	if (bActivated)
+	{
+		SkillCooldownRemaining = SkillCooldownSeconds;
+		UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 施放技能，进入冷却 %.1f 秒"),
+			*UnitId.ToString(), SkillCooldownSeconds);
 	}
 }

@@ -227,7 +227,10 @@ void ALKBattleGameMode::TickOvertime(float DeltaSeconds)
 
 	for (int32 TeamIdx = 0; TeamIdx < 2; ++TeamIdx)
 	{
-		for (ALKUnitBase* Hero : AliveHeroes[TeamIdx])
+		// 遍历【快照副本】：ApplyDamage 可能把英雄打死 -> 同步回调 HandleUnitDied -> Remove 原数组，
+		// 直接 range-for 原数组会在 checked 构建触发 "Array has changed during ranged-for iteration"
+		const TArray<ALKUnitBase*> HeroesSnapshot = AliveHeroes[TeamIdx];
+		for (ALKUnitBase* Hero : HeroesSnapshot)
 		{
 			if (Hero && Hero->IsAlive())
 			{
@@ -526,7 +529,7 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	}
 
 	Unit->SetTeam(Team);
-	Unit->InitUnit(Data, GameData);
+	Unit->InitUnit(Data, GameData, UnitId);
 	Unit->SetCombatEnabled(Phase == ELKGamePhase::Battle);
 	Unit->OnUnitDied.AddDynamic(this, &ALKBattleGameMode::HandleUnitDied);
 
@@ -614,6 +617,33 @@ ALKUnitBase* ALKBattleGameMode::GetRandomAliveHero(ELKTeam Team) const
 bool ALKBattleGameMode::CanCastSpell(ELKTeam Team) const
 {
 	return !GameData->bRequireMageForSpells || HasMage(Team);
+}
+
+float ALKBattleGameMode::GetTeamHeroHealthRatio(ELKTeam Team) const
+{
+	const TArray<ALKUnitBase*>& Heroes = AliveHeroes[(int32)Team];
+	if (Heroes.Num() == 0)
+	{
+		return 0.f;
+	}
+
+	float SumHealth = 0.f;
+	float SumMaxHealth = 0.f;
+	for (const ALKUnitBase* Hero : Heroes)
+	{
+		if (!Hero || Hero->IsDead())
+		{
+			continue;
+		}
+		SumHealth += Hero->GetHealth();
+		SumMaxHealth += Hero->GetMaxHealth();
+	}
+
+	if (SumMaxHealth <= 0.f)
+	{
+		return 0.f;
+	}
+	return FMath::Clamp(SumHealth / SumMaxHealth, 0.f, 1.f);
 }
 
 bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType,

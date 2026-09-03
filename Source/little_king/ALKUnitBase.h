@@ -34,8 +34,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "LK|Unit")
 	FOnUnitDied OnUnitDied;
 
-	/** 用数据表行初始化（GameMode 生成后调用） */
-	void InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData);
+	/** 用数据表行初始化（GameMode 生成后调用）；FallbackUnitId 在行内 UnitId 为空时兜底（行名） */
+	void InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId = NAME_None);
 
 	/** 阵营由 GameMode 生成时指定（InitUnit 之后调用） */
 	void SetTeam(ELKTeam InTeam) { Team = InTeam; }
@@ -97,7 +97,22 @@ public:
 
 	/** 设置/获取索敌目标 */
 	void SetTarget(AActor* NewTarget) { TargetActor = NewTarget; }
+
+	/** 当前索敌目标（技能蓝图可用：单体技能找当前攻击对象） */
+	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	AActor* GetTarget() const { return TargetActor.Get(); }
+
+	/**
+	 * 无敌状态（通用效果，英雄/佣兵/建筑都可用，未来技能/法术直接调用）：
+	 *  免疫所有普通伤害（敌方攻击/弹道/法术/技能），但【不免疫"真伤"】（超时虚弱会穿透无敌）。
+	 * DurationSeconds：>0 = 持续秒数；0 = 立即解除；<0 = 永久（直到再调解除）。
+	 * 视觉：无敌期间脚下/调试框变为金色。
+	 */
+	UFUNCTION(BlueprintCallable, Category = "LK|Unit")
+	void SetInvulnerable(float DurationSeconds = -1.f);
+
+	UFUNCTION(BlueprintPure, Category = "LK|Unit")
+	bool IsInvulnerable() const { return bInvulnerable; }
 
 	/** 战斗开关：部署阶段关闭（不能移动/攻击/放技能），开战由 GameMode 统一打开 */
 	void SetCombatEnabled(bool bEnabled) { bCombatEnabled = bEnabled; }
@@ -145,6 +160,10 @@ protected:
 	bool bCombatEnabled = false;
 	float BodyRadius = 50.f;
 
+	/** 无敌：>0 = 剩余秒数；<0 = 永久（不倒数）；0 = 不在无敌 */
+	bool bInvulnerable = false;
+	float InvulnerableRemaining = 0.f;
+
 	/** 缓存全局配置（InitUnit 时注入） */
 	UPROPERTY(Transient)
 	TObjectPtr<ULKGameData> GameDataCached;
@@ -159,5 +178,9 @@ protected:
 	void ApplyRowAttributes(const FLKUnitRow& Row);
 	void DrawDebugShape() const;
 
+	/** InitUnit 末尾回调：子类可在数据就绪后做初始化（英雄技能授予/冷却读取等） */
+	virtual void OnUnitInitialized(const FLKUnitRow& Row);
+
 	friend class ULKUnitAttributeSet;
+	friend class ULKGameplayLibrary;
 };
