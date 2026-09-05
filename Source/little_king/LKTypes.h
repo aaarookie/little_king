@@ -78,6 +78,7 @@ enum class ELKPlayResult : uint8
 	WrongPhase			UMETA(DisplayName = "阶段错误"),
 	HeroLimitReached	UMETA(DisplayName = "英雄数量已达上限"),
 	AlreadyDeployed		UMETA(DisplayName = "该英雄已部署"),
+	UnitLimitReached	UMETA(DisplayName = "单位数量已达上限"),
 	Unknown				UMETA(DisplayName = "未知错误")
 };
 

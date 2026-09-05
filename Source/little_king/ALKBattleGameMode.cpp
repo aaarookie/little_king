@@ -440,6 +440,14 @@ ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, 
 		{
 			return ELKPlayResult::InvalidLocation;
 		}
+
+		// 单阵营单位总数上限（防单位海卡顿）；法术不占名额
+		if (GameData->MaxUnitsPerTeam > 0 && CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam)
+		{
+			UE_LOG(LogLKBattle, Log, TEXT("[Battle] %s 单位已达上限 %d，拒绝出牌 %s"),
+				Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), GameData->MaxUnitsPerTeam, *CardId.ToString());
+			return ELKPlayResult::UnitLimitReached;
+		}
 	}
 
 	if (!Silver->TrySpend(Cost))
@@ -490,6 +498,15 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	UWorld* World = GetWorld();
 	if (!World)
 	{
+		return nullptr;
+	}
+
+	// 战斗期单位总数上限（波次出兵/兵营出兵同样受控；部署期英雄不受限）
+	if (Phase == ELKGamePhase::Battle && GameData->MaxUnitsPerTeam > 0
+		&& CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam)
+	{
+		UE_LOG(LogLKUnit, Warning, TEXT("[Unit] %s 单位已达上限 %d，拒绝生成 %s"),
+			Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), GameData->MaxUnitsPerTeam, *UnitId.ToString());
 		return nullptr;
 	}
 
@@ -644,6 +661,145 @@ float ALKBattleGameMode::GetTeamHeroHealthRatio(ELKTeam Team) const
 		return 0.f;
 	}
 	return FMath::Clamp(SumHealth / SumMaxHealth, 0.f, 1.f);
+}
+
+int32 ALKBattleGameMode::CountAliveUnits(ELKTeam Team) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return 0;
+	}
+
+	int32 Count = 0;
+	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+	{
+		if ((*It)->GetTeam() == Team && !(*It)->IsDead())
+		{
+			++Count;
+		}
+	}
+	return Count;
+}
+
+int32 ALKBattleGameMode::CountCombatUnitsOfAttackType(ELKTeam Team, ELKAttackType Type) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return 0;
+	}
+
+	int32 Count = 0;
+	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+	{
+		const ALKUnitBase* Unit = *It;
+		if (Unit->GetTeam() == Team && !Unit->IsDead() && !Unit->IsBuilding()
+			&& Unit->GetAttackType() == Type)
+		{
+			++Count;
+		}
+	}
+	return Count;
+}
+
+ALKUnitBase* ALKBattleGameMode::GetWeakestAliveHero(ELKTeam Team) const
+{
+	const TArray<ALKUnitBase*>& Heroes = AliveHeroes[(int32)Team];
+	ALKUnitBase* Weakest = nullptr;
+	float WorstRatio = TNumericLimits<float>::Max();
+
+	for (ALKUnitBase* Hero : Heroes)
+	{
+		if (!Hero || Hero->IsDead())
+		{
+			continue;
+		}
+		const float MaxHp = Hero->GetMaxHealth();
+		const float Ratio = (MaxHp > 0.f) ? (Hero->GetHealth() / MaxHp) : 0.f;
+		if (Ratio < WorstRatio)
+		{
+			WorstRatio = Ratio;
+			Weakest = Hero;
+		}
+	}
+	return Weakest;
+}
+
+void ALKBattleGameMode::ForcedTargetAllUnits(ELKTeam Team, AActor* Target, float Duration)
+{
+	UWorld* World = GetWorld();
+	if (!World || !IsValid(Target) || Duration <= 0.f)
+	{
+		return;
+	}
+
+	int32 Affected = 0;
+	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+	{
+		ALKUnitBase* Unit = *It;
+		if (Unit->GetTeam() == Team && !Unit->IsDead() && !Unit->IsBuilding())
+		{
+			Unit->SetForcedTarget(Target, Duration);
+			++Affected;
+		}
+	}
+	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 集火指令：%s 全体 %d 个单位 -> %s（%.0f 秒）"),
+		Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), Affected, *Target->GetName(), Duration);
+}
+
+bool ALKBattleGameMode::FindBestSpellTarget(ELKTeam CasterTeam, float Radius, FVector& OutLocation) const
+{
+	UWorld* World = GetWorld();
+	if (!World || Radius <= 0.f)
+	{
+		return false;
+	}
+
+	// 敌方单位 = 施法者的敌人
+	const ELKTeam TargetTeam = (CasterTeam == ELKTeam::Player) ? ELKTeam::Enemy : ELKTeam::Player;
+
+	// 收集候选（敌方存活单位）
+	TArray<ALKUnitBase*> Candidates;
+	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+	{
+		ALKUnitBase* Unit = *It;
+		if (Unit->GetTeam() == TargetTeam && !Unit->IsDead())
+		{
+			Candidates.Add(Unit);
+		}
+	}
+
+	// 对每个候选统计其半径内"敌人数"（聚集度），取最高点作为落点
+	ALKUnitBase* Best = nullptr;
+	int32 BestCluster = 0;
+	for (ALKUnitBase* Candidate : Candidates)
+	{
+		int32 Cluster = 0;
+		const FVector Center = Candidate->GetActorLocation();
+		for (ALKUnitBase* Other : Candidates)
+		{
+			if (Other != Candidate && FVector::Dist2D(Center, Other->GetActorLocation()) <= Radius)
+			{
+				++Cluster;
+			}
+		}
+		if (Cluster > BestCluster)
+		{
+			BestCluster = Cluster;
+			Best = Candidate;
+		}
+	}
+
+	if (!Best)
+	{
+		return false;
+	}
+
+	OutLocation = Best->GetActorLocation();
+	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 法术目标：%s 处聚集 %d 个单位（半径 %.0f）"),
+		*Best->GetUnitId().ToString(), BestCluster, Radius);
+	return true;
 }
 
 bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType,

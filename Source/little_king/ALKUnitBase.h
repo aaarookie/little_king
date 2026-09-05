@@ -11,6 +11,7 @@ class ULKUnitAttributeSet;
 class UPaperSpriteComponent;
 class UBoxComponent;
 class ULKUnitMovementComponent;
+class ULKTraitAuraComponent;
 class ULKGameData;
 struct FLKUnitRow;
 
@@ -118,6 +119,18 @@ public:
 	void SetCombatEnabled(bool bEnabled) { bCombatEnabled = bEnabled; }
 	bool IsCombatEnabled() const { return bCombatEnabled; }
 
+	// ---------- S4：索敌优先级（ForcedTarget > 嘲讽者 > 最近敌人） ----------
+	/** 强制目标（AI 集火指令）：优先级最高的索敌目标；DurationSeconds <= 0 立即清除 */
+	void SetForcedTarget(AActor* InTarget, float DurationSeconds);
+
+	bool HasForcedTarget() const { return ForcedTargetActor.IsValid(); }
+
+	/** 嘲讽标记（特性 Taunt）：敌方索敌优先攻击本单位 */
+	bool IsTaunting() const { return bTaunting; }
+
+	UFUNCTION(BlueprintPure, Category = "LK|Unit")
+	ELKAttackType GetAttackType() const { return AttackType; }
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<UPaperSpriteComponent> SpriteComponent;
@@ -164,6 +177,17 @@ protected:
 	bool bInvulnerable = false;
 	float InvulnerableRemaining = 0.f;
 
+	/** 强制目标（集火）：倒计时到期/目标失效自动清除 */
+	TWeakObjectPtr<AActor> ForcedTargetActor;
+	float ForcedTargetRemaining = 0.f;
+
+	/** 嘲讽标记（Taunt 特性，InitUnit 时按 HeroTraits 解析） */
+	bool bTaunting = false;
+
+	/** 光环组件（有光环特性时启用；所有单位都挂一个空组件，避免运行时动态创建） */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
+	TObjectPtr<ULKTraitAuraComponent> TraitAuraComponent;
+
 	/** 缓存全局配置（InitUnit 时注入） */
 	UPROPERTY(Transient)
 	TObjectPtr<ULKGameData> GameDataCached;
@@ -173,10 +197,15 @@ protected:
 	void AcquireTarget();
 	void TryAttack(float DeltaSeconds);
 	virtual void PerformAttack(AActor* Target);
-	AActor* FindNearestEnemy() const;
+	AActor* FindNearestEnemy(bool bTauntersOnly = false) const;
 	float DistanceTo2D(const AActor* Other) const;
 	void ApplyRowAttributes(const FLKUnitRow& Row);
 	void DrawDebugShape() const;
+
+	/** 按 HeroTraits + GameData.TraitTable 应用特性（自身修饰/光环/嘲讽标记），InitUnit 末尾调用 */
+	void ApplyTraits();
+	/** 强制目标到期处理（Tick 调用） */
+	void TickForcedTarget(float DeltaSeconds);
 
 	/** InitUnit 末尾回调：子类可在数据就绪后做初始化（英雄技能授予/冷却读取等） */
 	virtual void OnUnitInitialized(const FLKUnitRow& Row);

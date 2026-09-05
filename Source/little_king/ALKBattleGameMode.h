@@ -71,6 +71,26 @@ public:
 	/** 顶部英雄血条：存活英雄当前血量合计 / 满血合计（0~1）；无存活英雄返回 0 */
 	UFUNCTION(BlueprintPure, Category = "LK|Battle")
 	float GetTeamHeroHealthRatio(ELKTeam Team) const;
+
+	// ---------- S4：AI 战术辅助 ----------
+	/** 阵营存活单位总数（英雄+佣兵+建筑；上限判定/爆发判定用） */
+	int32 CountAliveUnits(ELKTeam Team) const;
+
+	/** 阵营存活"战斗单位"中某攻击类型数量（排除建筑；AI 反制评估用） */
+	int32 CountCombatUnitsOfAttackType(ELKTeam Team, ELKAttackType Type) const;
+
+	/** 血量比例最低的存活英雄（AI 集火目标）；无英雄返回空 */
+	ALKUnitBase* GetWeakestAliveHero(ELKTeam Team) const;
+
+	/** 让某阵营所有存活单位（建筑除外）强制集火指定目标 Duration 秒（索敌优先级最高） */
+	void ForcedTargetAllUnits(ELKTeam Team, AActor* Target, float Duration);
+
+	/**
+	 * 法术智能目标：遍历敌方阵营每个存活单位，统计其半径内敌人数，
+	 * 取"聚集度最高"的点作为落点（AI 火球不再乱扔）。找到返回 true 并输出落点。
+	 */
+	bool FindBestSpellTarget(ELKTeam CasterTeam, float Radius, FVector& OutLocation) const;
+
 	bool IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType,
 		FName BuildingUnitId = NAME_None, int32 BuildingLimit = -1) const;
 	bool IsInsideField(const FVector& Location) const;

@@ -29,11 +29,13 @@ class ULKGameData : public UDataAsset
 
 public:
 	// ---------- 经济 ----------
+	/** 每秒银币产出（连续累积；1/3 ≈ 每 3 秒涨满 1 个；DA_GameData → Economy 里改） */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy", meta = (ClampMin = "0.1"))
-	float SilverPerSecond = 1.5f;
+	float SilverPerSecond = 1.f / 3.f;
 
+	/** 银币上限 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy", meta = (ClampMin = "1.0"))
-	float SilverCap = 12.f;
+	float SilverCap = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy", meta = (ClampMin = "1"))
 	int32 HandSize = 4;
@@ -67,6 +69,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Field", meta = (ClampMin = "1"))
 	int32 MaxHeroesPerTeam = 3;
+
+	/** 单阵营场上单位总数上限（英雄+佣兵+建筑；-1 = 不限）。超限出牌/出兵会被拒绝（防单位海卡顿） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Field")
+	int32 MaxUnitsPerTeam = 20;
 
 	/** 同类建筑上限（-1 = 不限；"种类无上限、同类通常<=2"） */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Field")
@@ -107,6 +113,36 @@ public:
 	/** 英雄 UnitId -> 技能 GA 资产列表；不配 = 该英雄无技能 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skills")
 	TMap<FName, FLKHeroSkillEntry> HeroAbilityMap;
+
+	// ---------- 敌方 AI（S4） ----------
+	/** 集火间隔随机区间（秒）：每轮对玩家血量最低的英雄发起集火 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "5.0"))
+	float AIFocusIntervalMin = 25.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "5.0"))
+	float AIFocusIntervalMax = 35.f;
+
+	/** 单次集火持续时长（秒） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "1.0"))
+	float AIFocusDuration = 8.f;
+
+	/** 反制评估间隔（秒）：统计玩家近战/远程构成，影响 AI 出牌偏好 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "1.0"))
+	float AICounterCheckInterval = 5.f;
+
+	/** 爆发门槛：银币达到该值且己方单位数不劣于玩家时，AI 进入"一波流"连打（应 ≤ 银币上限，否则永远不爆发） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "1.0"))
+	float AIPushSilverThreshold = 4.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "2", ClampMax = "5"))
+	int32 AIPushMaxCards = 3;
+
+	/** 两次爆发之间的冷却随机区间（秒） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "5.0"))
+	float AIPushCooldownMin = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "5.0"))
+	float AIPushCooldownMax = 35.f;
 
 	// ---------- 数据表（编辑器里指定） ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")

@@ -131,10 +131,12 @@ void ULKCheatManager::ListUnits()
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		const ALKUnitBase* Unit = *It;
-		UE_LOG(LogLK, Log, TEXT("[Cheat] %s | 阵营%d | 生命 %.0f/%.0f | 状态%d%s | @ %s"),
+		UE_LOG(LogLK, Log, TEXT("[Cheat] %s | 阵营%d | %s%s%s | 生命 %.0f/%.0f | 状态%d | @ %s"),
 			*Unit->GetUnitId().ToString(), (int32)Unit->GetTeam(),
+			Unit->IsHero() ? TEXT("英雄 ") : TEXT(""),
+			Unit->IsTaunting() ? TEXT("嘲讽中 ") : TEXT(""),
+			Unit->IsInvulnerable() ? TEXT("无敌中 ") : TEXT(""),
 			Unit->GetHealth(), Unit->GetMaxHealth(), (int32)Unit->GetState(),
-			Unit->IsInvulnerable() ? TEXT(" | 无敌中") : TEXT(""),
 			*Unit->GetActorLocation().ToString());
 		++Count;
 	}

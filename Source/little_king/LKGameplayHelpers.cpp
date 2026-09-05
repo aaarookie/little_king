@@ -144,12 +144,12 @@ namespace LKGameplay
 		}
 	}
 
-	void ApplyAttributeModifier(AActor* Target, const FGameplayAttribute& Attribute, float Value, float DurationSeconds, AActor* Instigator)
+	FActiveGameplayEffectHandle ApplyAttributeModifier(AActor* Target, const FGameplayAttribute& Attribute, float Value, float DurationSeconds, AActor* Instigator)
 	{
 		UAbilitySystemComponent* ASC = GetASC(Target);
 		if (!ASC || !Attribute.IsValid())
 		{
-			return;
+			return FActiveGameplayEffectHandle();
 		}
 
 		UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), TEXT("LK_RuntimeModifier"));
@@ -170,7 +170,21 @@ namespace LKGameplay
 		Mod.ModifierMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(Value));
 
 		FGameplayEffectSpec Spec(Effect, MakeContext(ASC, Instigator), 1.f);
-		ASC->ApplyGameplayEffectSpecToSelf(Spec);
+		return ASC->ApplyGameplayEffectSpecToSelf(Spec);
+	}
+
+	FGameplayAttribute FindAttributeByName(const FName& StatName)
+	{
+		if (StatName == TEXT("Health"))			{ return ULKUnitAttributeSet::GetHealthAttribute(); }
+		if (StatName == TEXT("MaxHealth"))		{ return ULKUnitAttributeSet::GetMaxHealthAttribute(); }
+		if (StatName == TEXT("MoveSpeed"))		{ return ULKUnitAttributeSet::GetMoveSpeedAttribute(); }
+		if (StatName == TEXT("AttackRange"))	{ return ULKUnitAttributeSet::GetAttackRangeAttribute(); }
+		if (StatName == TEXT("AttackDamage"))	{ return ULKUnitAttributeSet::GetAttackDamageAttribute(); }
+		if (StatName == TEXT("AttackInterval"))	{ return ULKUnitAttributeSet::GetAttackIntervalAttribute(); }
+
+		UE_LOG(LogLK, Warning, TEXT("[LKGameplay] 未知属性名 '%s'（可选：Health/MaxHealth/MoveSpeed/AttackRange/AttackDamage/AttackInterval）"),
+			*StatName.ToString());
+		return FGameplayAttribute();
 	}
 
 	float GetAttributeValue(const AActor* Actor, const FGameplayAttribute& Attribute, float Fallback)
@@ -181,5 +195,15 @@ namespace LKGameplay
 			return Fallback;
 		}
 		return ASC->GetNumericAttribute(Attribute);
+	}
+
+	float GetAttributeBaseValue(const AActor* Actor, const FGameplayAttribute& Attribute, float Fallback)
+	{
+		UAbilitySystemComponent* ASC = GetASC(Actor);
+		if (!ASC || !Attribute.IsValid())
+		{
+			return Fallback;
+		}
+		return ASC->GetNumericAttributeBase(Attribute);
 	}
 }

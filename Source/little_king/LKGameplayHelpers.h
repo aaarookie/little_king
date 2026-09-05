@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 
 class UAbilitySystemComponent;
 class UGameplayEffect;
@@ -26,9 +27,18 @@ namespace LKGameplay
 	/** 按最大生命百分比造成伤害（超时虚弱用） */
 	void ApplyMaxHealthPercentDamage(AActor* Target, float Percent, AActor* Instigator);
 
-	/** 属性修正（DurationSeconds <= 0 视为无限持续；支持 Buff/Debuff） */
-	void ApplyAttributeModifier(AActor* Target, const FGameplayAttribute& Attribute, float Value, float DurationSeconds, AActor* Instigator);
+	/**
+	 * 属性修正（DurationSeconds <= 0 视为无限持续；支持 Buff/Debuff）。
+	 * 返回施加的 GE handle——无限 buff 需要按 handle 移除（光环进出范围）时用。
+	 */
+	FActiveGameplayEffectHandle ApplyAttributeModifier(AActor* Target, const FGameplayAttribute& Attribute, float Value, float DurationSeconds, AActor* Instigator);
 
-	/** 读取属性 */
+	/** 按 DT_Units/Traits 约定的 StatName 找属性（Health/MaxHealth/MoveSpeed/AttackRange/AttackDamage/AttackInterval）；未知返回无效属性 */
+	FGameplayAttribute FindAttributeByName(const FName& StatName);
+
+	/** 读取属性（最终值，含所有 modifier） */
 	float GetAttributeValue(const AActor* Actor, const FGameplayAttribute& Attribute, float Fallback = 0.f);
+
+	/** 读取属性基础值（不含 modifier；特性百分比加成按基础值算，多个加成线性叠加不滚雪球） */
+	float GetAttributeBaseValue(const AActor* Actor, const FGameplayAttribute& Attribute, float Fallback = 0.f);
 }

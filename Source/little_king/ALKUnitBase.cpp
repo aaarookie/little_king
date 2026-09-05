@@ -19,6 +19,7 @@
 #include "LKGameplayHelpers.h"
 #include "LKLog.h"
 #include "ULKGameData.h"
+#include "ULKTraitAuraComponent.h"
 #include "ULKUnitAttributeSet.h"
 #include "ULKUnitMovementComponent.h"
 
@@ -54,6 +55,9 @@ ALKUnitBase::ALKUnitBase()
 	UnitAttributes = CreateDefaultSubobject<ULKUnitAttributeSet>(TEXT("Attributes"));
 
 	MovementComponent = CreateDefaultSubobject<ULKUnitMovementComponent>(TEXT("Movement"));
+
+	// 光环组件：默认空挂（不启用），有光环特性（InitUnit）时注册修改器后生效
+	TraitAuraComponent = CreateDefaultSubobject<ULKTraitAuraComponent>(TEXT("TraitAura"));
 }
 
 void ALKUnitBase::BeginPlay()
@@ -123,7 +127,77 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 
 void ALKUnitBase::OnUnitInitialized(const FLKUnitRow& Row)
 {
-	// 基类无额外逻辑；子类覆写
+	// 基类：应用特性（自身修饰/光环/嘲讽）——英雄子类覆写时先调 Super 再处理技能
+	ApplyTraits();
+}
+
+void ALKUnitBase::ApplyTraits()
+{
+	if (HeroTraits.Num() == 0 || !GameDataCached)
+	{
+		return;
+	}
+
+	UDataTable* Table = GameDataCached->TraitTable.LoadSynchronous();
+	if (!Table)
+	{
+		UE_LOG(LogLKUnit, Warning,
+			TEXT("[Trait] %s 配置了 %d 个特性，但 DA_GameData 未设置 TraitTable"),
+			*UnitId.ToString(), HeroTraits.Num());
+		return;
+	}
+
+	for (const FName TraitName : HeroTraits)
+	{
+		const FLKTraitRow* Row = Table->FindRow<FLKTraitRow>(TraitName, TEXT(""), false);
+		if (!Row)
+		{
+			UE_LOG(LogLKUnit, Warning,
+				TEXT("[Trait] %s 找不到特性行 '%s'（检查 DT_Traits 行名与 DT_Units HeroTraits 是否一致）"),
+				*UnitId.ToString(), *TraitName.ToString());
+			continue;
+		}
+
+		// 嘲讽标记：行 TraitId 或行名 = Taunt（保护后排的机制起点）
+		const bool bIsTaunt = (Row->TraitId == TEXT("Taunt")) || (TraitName == TEXT("Taunt"));
+		if (bIsTaunt)
+		{
+			bTaunting = true;
+			UE_LOG(LogLKUnit, Log, TEXT("[Trait] %s 获得嘲讽标记（敌方索敌优先攻击）"), *UnitId.ToString());
+		}
+
+		for (const FLKTraitModifier& Mod : Row->Modifiers)
+		{
+			if (FMath::IsNearlyZero(Mod.Value))
+			{
+				continue; // 纯标记特性（如嘲讽）没有属性改动
+			}
+
+			const FGameplayAttribute Attr = LKGameplay::FindAttributeByName(Mod.StatName);
+			if (!Attr.IsValid())
+			{
+				continue;
+			}
+
+			if (Mod.AuraRadius > 0.f)
+			{
+				// 光环：交给光环组件按"进出范围"施加/移除
+				if (TraitAuraComponent)
+				{
+					TraitAuraComponent->AddAuraModifier(Mod, Mod.AuraRadius);
+				}
+			}
+			else
+			{
+				// 自身修饰：基础值 × 百分比，无限时长（单位消亡随 ASC 一起移除）
+				const float Base = LKGameplay::GetAttributeBaseValue(this, Attr, 0.f);
+				LKGameplay::ApplyAttributeModifier(this, Attr, Base * Mod.Value, 0.f, this);
+				UE_LOG(LogLKUnit, Log, TEXT("[Trait] %s 自身特性 %s：%s %+.1f（基础 %.1f）"),
+					*UnitId.ToString(), *TraitName.ToString(), *Mod.StatName.ToString(),
+					Base * Mod.Value, Base);
+			}
+		}
+	}
 }
 
 void ALKUnitBase::ApplyRowAttributes(const FLKUnitRow& Row)
@@ -160,6 +234,15 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 			InvulnerableRemaining = 0.f;
 			UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 无敌结束"), *UnitId.ToString());
 		}
+	}
+
+	// 强制目标到期（集火窗口结束自动解除）
+	TickForcedTarget(DeltaSeconds);
+
+	// 光环刷新（内部 0.5s 节流）
+	if (TraitAuraComponent)
+	{
+		TraitAuraComponent->TickAura(DeltaSeconds);
 	}
 
 	DrawDebugShape();
@@ -228,6 +311,27 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
 
 void ALKUnitBase::AcquireTarget()
 {
+	// 优先级 1：强制目标（AI 集火指令）——仍然有效则一直盯它
+	if (ALKUnitBase* Forced = Cast<ALKUnitBase>(ForcedTargetActor.Get()))
+	{
+		if (Forced->IsAlive() && Forced->GetTeam() != Team)
+		{
+			TargetActor = Forced;
+			return;
+		}
+		// 强制目标已失效：清除，回落正常索敌
+		ForcedTargetActor = nullptr;
+		ForcedTargetRemaining = 0.f;
+	}
+
+	// 优先级 2：嘲讽者（保护后排机制）
+	if (AActor* Taunter = FindNearestEnemy(true))
+	{
+		TargetActor = Taunter;
+		return;
+	}
+
+	// 优先级 3：保持当前有效目标，否则找最近敌人
 	if (TargetActor.IsValid())
 	{
 		AActor* Current = TargetActor.Get();
@@ -241,7 +345,38 @@ void ALKUnitBase::AcquireTarget()
 	TargetActor = FindNearestEnemy();
 }
 
-AActor* ALKUnitBase::FindNearestEnemy() const
+void ALKUnitBase::SetForcedTarget(AActor* InTarget, float DurationSeconds)
+{
+	if (DurationSeconds <= 0.f || !IsValid(InTarget))
+	{
+		ForcedTargetActor = nullptr;
+		ForcedTargetRemaining = 0.f;
+		return;
+	}
+
+	ForcedTargetActor = InTarget;
+	ForcedTargetRemaining = DurationSeconds;
+	// 立刻生效：下一帧索敌即切换（不等 0.25s 重试周期）
+	TargetActor = InTarget;
+}
+
+void ALKUnitBase::TickForcedTarget(float DeltaSeconds)
+{
+	if (!ForcedTargetActor.IsValid())
+	{
+		return;
+	}
+
+	ForcedTargetRemaining -= DeltaSeconds;
+	if (ForcedTargetRemaining <= 0.f)
+	{
+		ForcedTargetActor = nullptr;
+		ForcedTargetRemaining = 0.f;
+		UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 集火窗口结束，恢复正常索敌"), *UnitId.ToString());
+	}
+}
+
+AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly) const
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -263,6 +398,10 @@ AActor* ALKUnitBase::FindNearestEnemy() const
 	{
 		ALKUnitBase* Other = Cast<ALKUnitBase>(Overlap.GetActor());
 		if (!Other || Other == this || Other->IsDead() || Other->GetTeam() == Team)
+		{
+			continue;
+		}
+		if (bTauntersOnly && !Other->IsTaunting())
 		{
 			continue;
 		}
@@ -405,6 +544,13 @@ void ALKUnitBase::Die()
 	bDead = true;
 	State = ELKUnitState::Dead;
 	MovementComponent->Stop();
+
+	// 光环主人死亡：立即收回对友军施加的光环效果（防止 buff 永久残留）
+	if (TraitAuraComponent)
+	{
+		TraitAuraComponent->RemoveAllAuras();
+	}
+
 	OnUnitDied.Broadcast(this);
 	SetLifeSpan(0.5f);
 
@@ -455,5 +601,14 @@ void ALKUnitBase::DrawDebugShape() const
 			GetActorLocation() + FVector(0.f, 0.f, 20.f),
 			TargetActor->GetActorLocation() + FVector(0.f, 0.f, 20.f),
 			Color, false, -1.f, 0, 1.f);
+	}
+
+	// 4) 集火线：单位 -> 强制目标（青色；AI 集火窗口可视化，随调试形状开关）
+	if (GameDataCached->bDrawDebugShapes && ForcedTargetActor.IsValid())
+	{
+		DrawDebugLine(World,
+			GetActorLocation() + FVector(0.f, 0.f, 24.f),
+			ForcedTargetActor->GetActorLocation() + FVector(0.f, 0.f, 24.f),
+			FColor::Cyan, false, -1.f, 0, 2.f);
 	}
 }

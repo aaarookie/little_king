@@ -86,14 +86,15 @@
 - [x] 教程 F：无敌调试（InvulnerableHeroes）验证"虚弱穿透无敌"
 - [x] 验收 + BugLog（BUG-014：虚弱结算遍历快照修复）+ Git 提交（tag v0.3）
 
-## 🤖 Sprint 4：敌方 AI 与内容（规划完成，未开工）
+## 🤖 Sprint 4：敌方 AI 与内容（完成 ✅，tag v0.4）
 
 **指南**：[09-Sprint4Guide.md](09-Sprint4Guide.md)（AI 集火/反制/爆发 + DT_Traits 特性 + 首次平衡）
 
-- [ ] **C++（我）**：AI 集火指令（ForcedTarget）/反制兵种/爆发时机/法术智能目标；特性运行时（Self 修饰 + 光环组件 + Taunt 嘲讽）；`MaxUnitsPerTeam` 上限
-- [ ] **教程 A（你）**：DT_Traits 建表（骑士光环/法师威能/Taunt）+ DA_GameData.TraitTable + DT_Units.HeroTraits
-- [ ] **教程 B/C（你）**：AI 手感验证 + 首次平衡（杠杆表 + 记录模板）
-- [ ] 验收清单 + BugLog + Git tag v0.4
+- [x] **C++（我）**：AI 集火指令（SetForcedTarget 优先级索敌 + 周期性集火血量最低英雄）／反制评估选牌／爆发一波流／法术智能目标；特性运行时（自身修饰 + ULKTraitAuraComponent 光环进出圈 + Taunt 嘲讽标记）；`MaxUnitsPerTeam` 上限（打牌 UnitLimitReached + 出兵拦截）；调试可视化（青色集火线、ListUnits 标记）；AI 参数集中 DA_GameData → AI 分类 → 编译通过
+- [x] **教程 A（你）**：DT_Traits 建表（行名 Taunt 踩坑已记录在 09 文档 + 风险表）+ DA_GameData.TraitTable + DT_Units.HeroTraits
+- [x] **教程 B（你）**：AI 手感验证（集火/反制/爆发日志与调试线观察）
+- [x] **教程 C（你，持续项）**：首次平衡——银币节奏调整（上限 5 / 每 3 秒 1 个，AI 爆发门槛联动降到 4）；3 轮记录可继续追加
+- [x] 验收清单 + Git 提交（tag v0.4）
 
 ## ✨ Sprint 5：体验打磨（规划完成，未开工）
 
