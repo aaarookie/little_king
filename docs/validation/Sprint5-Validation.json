@@ -1,4 +1,5 @@
 {
+  "version": "0.5.0",
   "sprint": "5 revision - full hand queue, placement previews and dungeon planning",
   "date": "2026-09-06",
   "engine": "5.8.1-56057345",
