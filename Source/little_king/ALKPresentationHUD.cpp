@@ -1,0 +1,165 @@
+#include "ALKPresentationHUD.h"
+#include "ALKBattleGameMode.h"
+#include "ALKPlayerController.h"
+#include "ALKHeroCamp.h"
+#include "ALKUnitHero.h"
+#include "ALKProjectile.h"
+#include "ULKGameData.h"
+#include "Engine/Canvas.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
+#include "PaperSpriteComponent.h"
+
+bool ALKPresentationHUD::ProjectPoint(const FVector& Location, FVector2D& Point) const
+{
+	const APlayerController* PC = GetOwningPlayerController();
+	return PC && PC->ProjectWorldLocationToScreen(Location, Point, true);
+}
+
+void ALKPresentationHUD::DrawWorldCircle(const FVector& Center, float Radius, FLinearColor Color, float Thickness)
+{
+	constexpr int32 Segments = 48;
+	for (int32 i = 0; i < Segments; ++i)
+	{
+		const float A = i * 2.f * PI / Segments, B = (i + 1) * 2.f * PI / Segments;
+		FVector2D P, Q;
+		if (ProjectPoint(Center + FVector(FMath::Cos(A), FMath::Sin(A), 0.f) * Radius, P)
+			&& ProjectPoint(Center + FVector(FMath::Cos(B), FMath::Sin(B), 0.f) * Radius, Q))
+		{
+			DrawLine(P.X, P.Y, Q.X, Q.Y, Color, Thickness);
+		}
+	}
+}
+
+void ALKPresentationHUD::DrawHUD()
+{
+	Super::DrawHUD();
+	ALKPlayerController* PC = Cast<ALKPlayerController>(GetOwningPlayerController());
+	ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+	if (!Canvas || !PC || !GM || !GM->GetGameData()) { return; }
+	if (!bBound)
+	{
+		PC->OnPlayResult.AddDynamic(this, &ALKPresentationHUD::HandleResult);
+		GM->OnDamageEvent.AddDynamic(this, &ALKPresentationHUD::HandleDamage);
+		bBound = true;
+	}
+	const float Scale = FMath::Clamp(Canvas->ClipX / 1920.f, 0.75f, 1.5f);
+	// Y=0 是规则使用的半场边界；Canvas 投影不会被地面遮挡，也不依赖 Debug 开关。
+	FVector2D LineStart, LineEnd;
+	const float HalfWidth = GM->GetGameData()->FieldHalfWidth;
+	if (ProjectPoint(FVector(-HalfWidth, 0.f, 0.f), LineStart) && ProjectPoint(FVector(HalfWidth, 0.f, 0.f), LineEnd))
+	{
+		DrawLine(LineStart.X, LineStart.Y, LineEnd.X, LineEnd.Y, FLinearColor::Yellow, 2.f * Scale);
+	}
+	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+	{
+		ALKUnitBase* Unit = *It;
+		if (!Unit->IsAlive()) { continue; }
+		FVector2D Screen;
+		if (!ProjectPoint(Unit->GetActorLocation(), Screen)) { continue; }
+		const FLinearColor TeamColor = Unit->GetTeam() == ELKTeam::Player ? FLinearColor(0.3f, 0.85f, 0.55f) : FLinearColor(0.95f, 0.35f, 0.35f);
+		if (ALKHeroCamp* Camp = Cast<ALKHeroCamp>(Unit))
+		{
+			const ALKUnitHero* Hero = Camp->GetHero();
+			const bool bAlive = Hero && Hero->IsAlive();
+			const FLinearColor CampColor = bAlive ? TeamColor : FLinearColor(0.4f, 0.4f, 0.4f);
+			DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius(), CampColor, 3.f);
+			DrawLine(Screen.X - 9.f * Scale, Screen.Y + 5.f * Scale, Screen.X, Screen.Y - 10.f * Scale, CampColor, 3.f);
+			DrawLine(Screen.X, Screen.Y - 10.f * Scale, Screen.X + 9.f * Scale, Screen.Y + 5.f * Scale, CampColor, 3.f);
+			if (PC->GetSelectedCamp() == Camp && bAlive) { DrawWorldCircle(Hero->GetCampCenter(), Hero->GetCampMoveRadius(), FLinearColor(1.f, 0.8f, 0.2f), 2.f); }
+			continue; // 营地没有血条。
+		}
+		UPaperSpriteComponent* Sprite = Unit->GetSpriteComponent();
+		float Top = Screen.Y - 15.f * Scale;
+		if (Sprite && Sprite->GetSprite())
+		{
+			const FBox Bounds = Sprite->Bounds.GetBox();
+			for (int32 Corner = 0; Corner < 8; ++Corner)
+			{
+				const FVector Point((Corner & 1) ? Bounds.Max.X : Bounds.Min.X, (Corner & 2) ? Bounds.Max.Y : Bounds.Min.Y, (Corner & 4) ? Bounds.Max.Z : Bounds.Min.Z);
+				FVector2D Projected;
+				if (ProjectPoint(Point, Projected)) { Top = FMath::Min(Top, float(Projected.Y) - 5.f * Scale); }
+			}
+		}
+		else { DrawRect(TeamColor, Screen.X - 7.f * Scale, Screen.Y - 7.f * Scale, 14.f * Scale, 14.f * Scale); }
+		const float Width = (Unit->IsHero() ? 52.f : 36.f) * Scale;
+		const float Ratio = FMath::Clamp(Unit->GetHealth() / FMath::Max(1.f, Unit->GetMaxHealth()), 0.f, 1.f);
+		DrawRect(FLinearColor(0.03f, 0.03f, 0.03f, 0.9f), Screen.X - Width * 0.5f - 1.f, Top - 1.f, Width + 2.f, 6.f * Scale);
+		DrawRect(TeamColor, Screen.X - Width * 0.5f, Top, Width * Ratio, 4.f * Scale);
+		if (Unit->IsUnderFocusWarning()) { DrawText(TEXT("!"), FLinearColor::Yellow, Screen.X - 3.f * Scale, Top - 25.f * Scale, nullptr, 1.3f * Scale); }
+		if (Unit->IsTaunting()) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius() + 6.f, FLinearColor(1.f, 0.75f, 0.2f)); }
+		if (GM->GetGameData()->bDrawTeamRing) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius(), TeamColor); }
+	}
+	for (TActorIterator<ALKProjectile> It(GetWorld()); It; ++It)
+	{
+		if (!(*It)->IsPooledActive()) { continue; }
+		FVector2D A, B;
+		const FVector Head = (*It)->GetActorLocation();
+		if (ProjectPoint(Head, A) && ProjectPoint(Head - (*It)->GetFlightDirection() * 65.f, B))
+		{
+			DrawLine(A.X, A.Y, B.X, B.Y, FLinearColor(1.f, 0.83f, 0.3f), 2.f * Scale);
+			DrawRect(FLinearColor::White, A.X - Scale, A.Y - Scale, 2.f * Scale, 2.f * Scale);
+		}
+	}
+	FVector Preview; float Radius = 0.f, AttackRadius = 0.f; bool bValid = false;
+	if (PC->GetPlacementPreview(Preview, Radius, bValid, &AttackRadius))
+	{
+		DrawWorldCircle(Preview, Radius, bValid ? FLinearColor::Green : FLinearColor::Red, 2.f);
+		if (AttackRadius > 0.f)
+		{
+			DrawWorldCircle(Preview, AttackRadius, bValid ? FLinearColor(1.f, 0.75f, 0.15f) : FLinearColor::Red, 1.5f * Scale);
+		}
+	}
+	const float Delta = GetWorld()->GetDeltaSeconds();
+	for (int32 i = DamageTexts.Num() - 1; i >= 0; --i)
+	{
+		FDamageText& Text = DamageTexts[i]; Text.Remaining -= Delta;
+		if (Text.Remaining <= 0.f || GM->GetPhase() == ELKGamePhase::Result) { DamageTexts.RemoveAtSwap(i); continue; }
+		FVector2D Point;
+		if (ProjectPoint(Text.WorldLocation, Point))
+		{
+			FLinearColor Color = Text.bHeal ? FLinearColor::Green : FLinearColor::White;
+			Color.A = FMath::Min(1.f, Text.Remaining * 3.f);
+			DrawText(FString::Printf(TEXT("%s%.0f"), Text.bHeal ? TEXT("+") : TEXT("-"), Text.Amount), Color, Point.X, Point.Y - (1.f - Text.Remaining) * 45.f * Scale, nullptr, Scale);
+		}
+	}
+	TipRemaining -= Delta;
+	if (TipRemaining > 0.f) { DrawText(Tip, FLinearColor::Yellow, Canvas->ClipX * 0.32f, Canvas->ClipY * 0.16f, nullptr, Scale); }
+	if (GM->GetPhase() == ELKGamePhase::Deployment)
+	{
+		DrawText(FString::Printf(TEXT("部署英雄 %d / %d；全部部署后点击开始"), GM->GetDeployedPlayerHeroCount(), GM->GetRequiredHeroCount()), FLinearColor::White, 24.f * Scale, 30.f * Scale, nullptr, Scale);
+		if (!GM->HasValidDecks())
+		{
+			DrawText(TEXT("牌库配置无效：每方至少 HandSize + 1 种卡，且均需加入 CardLibrary"), FLinearColor::Yellow, 24.f * Scale, 60.f * Scale, nullptr, Scale);
+		}
+	}
+}
+
+void ALKPresentationHUD::HandleDamage(FVector Location, float Amount, bool bHeal)
+{
+	const ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+	if (GM && GM->GetGameData()->bNativeDamageText && Amount > 0.f)
+	{
+		if (DamageTexts.Num() >= 96) { DamageTexts.RemoveAt(0); }
+		DamageTexts.Add({ Location, Amount, bHeal, 0.8f });
+	}
+}
+
+void ALKPresentationHUD::HandleResult(ELKPlayResult Result)
+{
+	switch (Result)
+	{
+	case ELKPlayResult::Success: return;
+	case ELKPlayResult::DeploymentIncomplete: Tip = TEXT("请先部署全部 3 名英雄"); break;
+	case ELKPlayResult::SpellLocked: Tip = TEXT("没有全场施法特性：法术只能放在己方半场"); break;
+	case ELKPlayResult::HeroMoveBlocked: Tip = TEXT("目标超出营地范围或路径被阻挡"); break;
+	case ELKPlayResult::NotEnoughSilver: Tip = TEXT("银币不足"); break;
+	case ELKPlayResult::AlreadyDeployed: Tip = TEXT("该英雄已部署，请点击营地指挥"); break;
+	case ELKPlayResult::UnitLimitReached: Tip = TEXT("单位数量达到上限"); break;
+	case ELKPlayResult::InvalidCardData: Tip = TEXT("数据配置无效，请查看日志和 Sprint 5 迁移教程"); break;
+	case ELKPlayResult::HandEmpty: Tip = TEXT("手牌尚未就绪，请检查牌库配置"); break;
+	case ELKPlayResult::WrongPhase: Tip = TEXT("当前阶段不能执行此操作"); break;
+	default: Tip = TEXT("不能放在这里：检查范围、占用或建筑上限"); break;
+	}
+	TipRemaining = 2.5f;
+}

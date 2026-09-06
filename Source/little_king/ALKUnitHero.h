@@ -5,6 +5,7 @@
 #include "ALKUnitHero.generated.h"
 
 class UGameplayAbility;
+class ALKHeroCamp;
 
 /**
  * 英雄单位：高属性 + 技能槽（GAS Ability）+ 特性（光环/羁绊）。
@@ -37,9 +38,24 @@ public:
 
 	/** 施放技能（由 Tick 周期调用；冷却结束且激活成功时进入冷却） */
 	void TryCastAbilities();
+	void SetCamp(ALKHeroCamp* Camp, float Radius);
+	UFUNCTION(BlueprintCallable, Category = "LK|Hero") bool CommandMove(const FVector& Destination);
+	UFUNCTION(BlueprintPure, Category = "LK|Hero") FVector GetCampCenter() const { return CampCenter; }
+	UFUNCTION(BlueprintPure, Category = "LK|Hero") float GetCampMoveRadius() const { return CampMoveRadius; }
+	ALKHeroCamp* GetCamp() const;
+	virtual void SetCombatEnabled(bool bEnabled) override;
+	virtual bool IsManualMoving() const override { return bManualMoving; }
+	virtual bool CanPursueTarget(const ALKUnitBase* Target) const override;
+	virtual FVector GetChaseDestination(const ALKUnitBase* Target) const override;
 
 protected:
 	virtual void OnUnitInitialized(const FLKUnitRow& Row) override;
+	virtual void UpdateStateMachine(float DeltaSeconds) override;
+	TWeakObjectPtr<ALKHeroCamp> HeroCamp;
+	FVector CampCenter = FVector::ZeroVector;
+	FVector RallyPoint = FVector::ZeroVector;
+	float CampMoveRadius = 0.f;
+	bool bManualMoving = false;
 
 	float AbilityCheckTimer = 0.f;
 	float AbilityCheckInterval = 0.5f;

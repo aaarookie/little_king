@@ -18,6 +18,13 @@ struct FLKHeroSkillEntry
 	TArray<TSubclassOf<UGameplayAbility>> Abilities;
 };
 
+USTRUCT(BlueprintType)
+struct FLKHeroTraitEntry
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FName> Traits;
+};
+
 /**
  * 全局配置 DataAsset（DA_GameData）。
  * 所有平衡数值集中于此，改数值不动代码。
@@ -28,6 +35,33 @@ class ULKGameData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	ULKGameData();
+	/** 固定种子用于规则复现；视觉随机独立，不消耗此随机流。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reproducibility")
+	int32 BattleSeed = 12345;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camps", meta = (ClampMin = "150.0"))
+	float HeroCampMoveRadius = 850.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camps", meta = (ClampMin = "10.0"))
+	float HeroCampBodyRadius = 65.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Traits", meta = (ClampMin = "1.0"))
+	float TauntAcquireRadius = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Traits", meta = (ClampMin = "1.0"))
+	float KnightTauntAuraRadius = 400.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Traits")
+	TMap<FName, FLKHeroTraitEntry> DefaultHeroTraits;
+	/** 当前法师技能为火球系；可在以后内容扩展时调整。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feel")
+	TArray<FName> FireballSkillHeroIds;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feel", meta = (ClampMin = "0.0"))
+	float FireballShakeIntensity = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "0.0"))
+	float AIFocusWarningSeconds = 2.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ClampMin = "0.0"))
+	float AIPushReserveMaxSeconds = 15.f;
+	/** 原生 HUD 自动提供血条、营地、放置预览、弹道及飘字。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Presentation")
+	bool bNativeDamageText = true;
 	// ---------- 经济 ----------
 	/** 每秒银币产出（连续累积；1/3 ≈ 每 3 秒涨满 1 个；DA_GameData → Economy 里改） */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy", meta = (ClampMin = "0.1"))
@@ -86,9 +120,9 @@ public:
 	float AttackStopBuffer = 30.f;
 
 	// ---------- 法术门 ----------
-	/** 场上存在法师英雄时，法术卡才可打出（S2 起生效） */
+	/** 弃用兼容配置，不影响新版法术落点规则 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spells")
-	bool bRequireMageForSpells = true;
+	bool bRequireMageForSpells = false; // 旧资产兼容字段，不参与新版规则。
 
 	// ---------- 弹道 ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (ClampMin = "100.0"))
@@ -96,6 +130,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (ClampMin = "0.1"))
 	float ProjectileLifetime = 3.f;
+
+	// ---------- 音频（S5） ----------
+	/** 音效触发点 ID -> 音频资产；没配的键静默跳过，不报错 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
+	TMap<FName, TSoftObjectPtr<class USoundBase>> SoundMap;
+
+	// ---------- 手感（S5） ----------
+	/** 屏幕震动幅度倍率（0 = 关闭震屏） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feel", meta = (ClampMin = "0.0"))
+	float CameraShakeScale = 1.f;
 
 	// ---------- 调试 ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug")

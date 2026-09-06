@@ -24,6 +24,8 @@ public:
 
 	/** 注册一个光环修改器（Mod.AuraRadius 需 > 0；Value 为百分比加成，如 0.15 = +15% 基础值） */
 	void AddAuraModifier(const FLKTraitModifier& Mod, float Radius);
+	void AddTauntAura(float Radius);
+	void ResetAuras();
 
 	/** 由所属单位每帧驱动（内部按 0.5s 节流刷新） */
 	void TickAura(float DeltaSeconds);
@@ -39,6 +41,8 @@ private:
 	{
 		FLKTraitModifier Modifier;
 		float Radius = 0.f;
+		bool bTaunt = false;
+		TSet<TWeakObjectPtr<ALKUnitBase>> TauntApplied;
 		/** 目标 -> 施加的 GE handle（用于离圈移除） */
 		TMap<TWeakObjectPtr<ALKUnitBase>, FActiveGameplayEffectHandle> Applied;
 	};

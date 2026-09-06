@@ -17,15 +17,15 @@ class ULKGameplayLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	/** 范围伤害：Caster 是单位时只打其【敌方】；Caster 不是单位时打半径内除 Caster 外所有单位。返回命中数 */
+	/** 范围伤害：只接受存活且未手动移动的单位 Caster，过滤敌方，返回实际受到伤害的单位数 */
 	UFUNCTION(BlueprintCallable, Category = "LK|Skill")
 	static int32 LK_ApplyDamageInRadius(AActor* CenterActor, float Radius, float Damage, AActor* Caster);
 
-	/** 范围治疗：Caster 是单位时只治疗其【友方】（含自己）；Caster 不是单位时不生效。返回命中数 */
+	/** 范围治疗：Caster 是单位时只治疗其【友方】（含自己）；Caster 不是单位时不生效。返回实际得到治疗的单位数 */
 	UFUNCTION(BlueprintCallable, Category = "LK|Skill")
 	static int32 LK_ApplyHealInRadius(AActor* CenterActor, float Radius, float HealAmount, AActor* Caster);
 
-	/** 找 Unit 最近的敌方单位（单体技能索敌用）；无敌人返回空 */
+	/** 单体技能目标：嘲讽 > 集火 > 最近可追击敌人；手动移动中返回空 */
 	UFUNCTION(BlueprintPure, Category = "LK|Skill")
 	static AActor* LK_GetNearestEnemy(AActor* Unit);
 

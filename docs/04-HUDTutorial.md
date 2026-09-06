@@ -1,5 +1,7 @@
 # 战斗 HUD 搭建教程（Sprint 1）
 
+> **Sprint 5 修订提示（2026-09-06）**：本文保留历史教程/素材参考。当前规则以 [01-GDD](01-GDD.md) 为准，先执行 [16 迁移教程](16-Sprint5MigrationTutorial.md)。旧倒计时开战、法术门/灰卡、团队血条、死亡震动、集火高于嘲讽的说明已失效；当前相机仍按正俯视验证，斜视为未验收方案。资产清单中的“完成”不代表本轮资产接通或运行验收完成。
+
 **前置**：C++ 地基已编译（`ALKPlayerController` 放置状态机 + `ULKBattleHUDWidget` 事件基类 + GameMode 自动创建 HUD）。
 
 **原理**：C++ 负责逻辑并广播事件 → Widget 蓝图（继承 `ULKBattleHUDWidget`）只需"覆写"事件刷新界面。

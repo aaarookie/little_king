@@ -6,6 +6,7 @@
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
 #include "LKLog.h"
+#include "LKGameplayHelpers.h"
 #include "ULKDeckState.h"
 #include "ULKSilverComponent.h"
 
@@ -84,7 +85,7 @@ void ULKCheatManager::KillAll(int32 TeamIdx)
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
-		if ((int32)Unit->GetTeam() == TeamIdx && Unit->IsAlive())
+		if ((int32)Unit->GetTeam() == TeamIdx && Unit->IsTargetable())
 		{
 			Unit->Die();
 			++Killed;
@@ -115,7 +116,7 @@ void ULKCheatManager::StartBattle()
 	}
 
 	GM->ForceStartBattle();
-	UE_LOG(LogLK, Log, TEXT("[Cheat] StartBattle"));
+	UE_LOG(LogLK, Log, TEXT("[Cheat] StartBattle: %s"), GM->GetPhase() == ELKGamePhase::Battle ? TEXT("已开战") : TEXT("尚未全部部署"));
 }
 
 void ULKCheatManager::ListUnits()
@@ -168,4 +169,47 @@ void ULKCheatManager::InvulnerableHeroes(float Seconds)
 	}
 	UE_LOG(LogLK, Log, TEXT("[Cheat] InvulnerableHeroes %.1f 秒：己方 %d 个在场英雄进入无敌（虚弱仍会扣血）"),
 		Seconds, Affected);
+}
+
+void ULKCheatManager::ProjectilePool()
+{
+	ALKBattleGameMode* GM = GetGameMode();
+	if (!GM)
+	{
+		return;
+	}
+
+	int32 Total = 0;
+	int32 Active = 0;
+	GM->GetProjectilePoolStats(Total, Active);
+	UE_LOG(LogLK, Log, TEXT("[Cheat] 弹道池：总量 %d，在飞 %d（对局结束应归 0；3 分钟无泄漏 = 池工作正常）"),
+		Total, Active);
+}
+
+void ULKCheatManager::HeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled)
+{
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if (It->GetTeam() == ELKTeam::Player && It->IsHero() && It->IsAlive() && It->GetUnitId() == FName(*HeroId))
+        {
+            const bool Changed = Enabled != 0 ? It->AddTrait(FName(*TraitId)) : It->RemoveTrait(FName(*TraitId));
+            UE_LOG(LogLK, Log, TEXT("[Cheat] HeroTrait %s %s = %d, changed=%d"), *HeroId, *TraitId, Enabled, int32(Changed));
+            return;
+        }
+    }
+    UE_LOG(LogLK, Warning, TEXT("[Cheat] 未找到存活的己方英雄 %s"), *HeroId);
+}
+
+void ULKCheatManager::DamageUnit(const FString& UnitId, int32 TeamIdx, float Amount)
+{
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if (int32(It->GetTeam()) == TeamIdx && It->IsTargetable() && It->GetUnitId() == FName(*UnitId))
+        {
+            const float Actual = LKGameplay::ApplyDamage(*It, Amount, nullptr, true);
+            UE_LOG(LogLK, Log, TEXT("[Cheat] DamageUnit %s actual=%.1f"), *UnitId, Actual);
+            return;
+        }
+    }
+    UE_LOG(LogLK, Warning, TEXT("[Cheat] 未找到目标单位 %s 阵营%d"), *UnitId, TeamIdx);
 }

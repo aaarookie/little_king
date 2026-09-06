@@ -30,6 +30,22 @@ void ULKTraitAuraComponent::AddAuraModifier(const FLKTraitModifier& Mod, float R
 		*GetOwner()->GetName(), Radius, *Mod.StatName.ToString(), Mod.Value * 100.f);
 }
 
+void ULKTraitAuraComponent::AddTauntAura(float Radius)
+{
+    FLKAuraGroup Group;
+    Group.bTaunt = true;
+    Group.Radius = FMath::Max(1.f, Radius);
+    Groups.Add(Group);
+}
+
+void ULKTraitAuraComponent::ResetAuras()
+{
+    RemoveAllAuras();
+    Groups.Reset();
+    RefreshTimer = 0.f;
+    bCleanedUp = false;
+}
+
 void ULKTraitAuraComponent::TickAura(float DeltaSeconds)
 {
 	ALKUnitBase* OwnerUnit = Cast<ALKUnitBase>(GetOwner());
@@ -66,6 +82,27 @@ void ULKTraitAuraComponent::RefreshGroup(ALKUnitBase* OwnerUnit, FLKAuraGroup& G
 {
 	TArray<ALKUnitBase*> InRange;
 	CollectTargetsInRange(OwnerUnit, Group, InRange);
+    if (Group.bTaunt)
+    {
+        for (ALKUnitBase* Target : InRange)
+        {
+            if (!Group.TauntApplied.Contains(Target))
+            {
+                Target->AddAuraTauntSource(OwnerUnit);
+                Group.TauntApplied.Add(Target);
+            }
+        }
+        for (auto It = Group.TauntApplied.CreateIterator(); It; ++It)
+        {
+            ALKUnitBase* Target = It->Get();
+            if (!Target || !InRange.Contains(Target))
+            {
+                if (Target) { Target->RemoveAuraTauntSource(OwnerUnit); }
+                It.RemoveCurrent();
+            }
+        }
+        return;
+    }
 
 	// 1) 圈内新目标：施加 GE 并记录 handle
 	for (ALKUnitBase* Target : InRange)
@@ -140,11 +177,11 @@ void ULKTraitAuraComponent::CollectTargetsInRange(const ALKUnitBase* OwnerUnit, 
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		ALKUnitBase* Other = *It;
-		if (!Other || Other == OwnerUnit || Other->IsDead())
+		if (!Other || Other == OwnerUnit || !Other->IsTargetable())
 		{
 			continue;
 		}
-		if (Other->GetTeam() != OwnerUnit->GetTeam())
+		if (Other->GetTeam() != OwnerUnit->GetTeam() || (Group.bTaunt && (Other->IsHero() || Other->IsBuilding() || Other->GetAttackType() != ELKAttackType::Melee)))
 		{
 			continue;
 		}
@@ -159,8 +196,13 @@ void ULKTraitAuraComponent::RemoveAllAuras()
 {
 	for (FLKAuraGroup& Group : Groups)
 	{
-		for (const TPair<TWeakObjectPtr<ALKUnitBase>, FActiveGameplayEffectHandle>& Pair : Group.Applied)
-		{
+		for (const TWeakObjectPtr<ALKUnitBase>& Target : Group.TauntApplied)
+        {
+            if (Target.IsValid()) { Target->RemoveAuraTauntSource(Cast<ALKUnitBase>(GetOwner())); }
+        }
+        Group.TauntApplied.Reset();
+        for (const TPair<TWeakObjectPtr<ALKUnitBase>, FActiveGameplayEffectHandle>& Pair : Group.Applied)
+        {
 			ALKUnitBase* Target = Pair.Key.Get();
 			if (Target && Target->IsAlive())
 			{
@@ -179,7 +221,7 @@ int32 ULKTraitAuraComponent::GetActiveEffectCount() const
 	int32 Count = 0;
 	for (const FLKAuraGroup& Group : Groups)
 	{
-		Count += Group.Applied.Num();
+		Count += Group.Applied.Num() + Group.TauntApplied.Num();
 	}
 	return Count;
 }

@@ -8,6 +8,7 @@
 class ULKDeckState;
 class ULKSilverComponent;
 class ALKBattleGameMode;
+class ALKHeroCamp;
 
 /**
  * 玩家控制器：
@@ -23,6 +24,14 @@ public:
 	ALKPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	/** S5 屏幕震动（无资产方案）：短时随机抖动当前视角相机（幅度为世界单位） */
+	void RequestCameraShake(float Intensity);
+	bool GetGroundUnderMouse(FVector& Location) const { return DeprojectMouseToGround(Location); }
+	ALKHeroCamp* GetSelectedCamp() const;
+	int32 GetPlacingHandIndex() const { return PlacingHandIndex; }
+	bool GetPlacementPreview(FVector& Location, float& Radius, bool& bValid, float* OutAttackRadius = nullptr) const;
 
 	// ---------- 放置状态机 ----------
 	UFUNCTION(BlueprintCallable, Category = "LK|Input")
@@ -93,4 +102,16 @@ private:
 	ELKPlacementMode PlacementMode = ELKPlacementMode::None;
 	int32 PlacingHandIndex = -1;
 	FName PlacingHeroId = NAME_None;
+	TWeakObjectPtr<ALKHeroCamp> SelectedCamp;
+	ALKHeroCamp* FindCampAt(const FVector& Location) const;
+	void SelectCamp(ALKHeroCamp* Camp);
+	FRandomStream VisualRandom = FRandomStream(97131);
+	TWeakObjectPtr<AActor> ShakenCamera;
+
+	// ---------- S5 相机震动状态 ----------
+	bool bCameraShakeActive = false;
+	float CameraShakeRemaining = 0.f;
+	float CameraShakeIntensity = 0.f;
+	float CameraShakeDuration = 0.15f;
+	FVector CameraShakeBaseLocation = FVector::ZeroVector;
 };

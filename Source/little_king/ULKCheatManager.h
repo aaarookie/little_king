@@ -16,7 +16,7 @@ class ALKBattleGameMode;
  *         SpawnUnit Unit_Swordsman 0 0 -300  → 玩家半场
  *   KillAll 阵营                杀死某阵营全部单位（0=玩家 1=敌方）
  *   WinMatch 阵营               直接结束对局并指定胜者
- *   StartBattle                 跳过部署直接开战
+ *   StartBattle                 全部英雄部署后开始（不能绕过门槛）
  *   ListUnits                   列出场上所有单位
  *   InvulnerableHeroes 秒数     让己方（玩家）在场英雄无敌 N 秒（省略 = 10 秒；
  *                               无敌免疫敌方伤害，但超时虚弱仍会扣血——可用来拖到超时观察虚弱）
@@ -50,6 +50,15 @@ public:
 
 	UFUNCTION(Exec)
 	void InvulnerableHeroes(float Seconds);
+
+	/** 弹道对象池状态（总量/在飞数；对局结束应归零） */
+	UFUNCTION(Exec)
+	void ProjectilePool();
+
+	/** 仅调试：修改己方指定英雄特性，Enabled 0 删除 / 1 添加。 */
+	UFUNCTION(Exec) void HeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled);
+	/** 仅调试：对首个匹配单位施加无来源、穿透无敌的伤害。 */
+	UFUNCTION(Exec) void DamageUnit(const FString& UnitId, int32 TeamIdx, float Amount);
 
 private:
 	ALKBattleGameMode* GetGameMode() const;

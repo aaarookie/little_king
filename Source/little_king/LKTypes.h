@@ -73,13 +73,16 @@ enum class ELKPlayResult : uint8
 	Success				UMETA(DisplayName = "成功"),
 	NotEnoughSilver		UMETA(DisplayName = "银币不足"),
 	InvalidLocation		UMETA(DisplayName = "位置非法"),
-	SpellLocked			UMETA(DisplayName = "法术未解锁（需要法师英雄）"),
+	SpellLocked			UMETA(DisplayName = "无法在敌方半场施法（需要全场施法特性）"),
 	HandEmpty			UMETA(DisplayName = "手牌无效"),
 	WrongPhase			UMETA(DisplayName = "阶段错误"),
 	HeroLimitReached	UMETA(DisplayName = "英雄数量已达上限"),
 	AlreadyDeployed		UMETA(DisplayName = "该英雄已部署"),
 	UnitLimitReached	UMETA(DisplayName = "单位数量已达上限"),
-	Unknown				UMETA(DisplayName = "未知错误")
+	Unknown				UMETA(DisplayName = "未知错误"),
+	DeploymentIncomplete UMETA(DisplayName = "请先部署全部英雄"),
+	InvalidCardData UMETA(DisplayName = "卡牌配置无效"),
+	HeroMoveBlocked UMETA(DisplayName = "目标超出营地范围或被阻挡")
 };
 
 /** 法术效果（原型期直接由 C++ 结算，后期替换为 GAS Ability） */
@@ -97,5 +100,71 @@ enum class ELKPlacementMode : uint8
 {
 	None	UMETA(DisplayName = "无"),
 	Card	UMETA(DisplayName = "出牌"),
-	Hero	UMETA(DisplayName = "部署英雄")
+	Hero	UMETA(DisplayName = "部署英雄"),
+	HeroMove UMETA(DisplayName = "营地指挥")
+};
+
+/** 特性行为；数值修饰仍由 DT_Traits.Modifiers 提供。 */
+UENUM(BlueprintType)
+enum class ELKTraitEffect : uint8
+{
+	Attributes,
+	Taunt,
+	GlobalSpellPlacement,
+	MeleeSoldierTauntAura
+};
+
+UENUM(BlueprintType)
+enum class ELKCombatSourceKind : uint8 { Attack, Projectile, Spell, Skill, Overtime };
+
+USTRUCT(BlueprintType)
+struct FLKCombatSource
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadOnly) bool bHasTeam = false;
+	UPROPERTY(BlueprintReadOnly) ELKTeam Team = ELKTeam::Player;
+	UPROPERTY(BlueprintReadOnly) FName UnitId;
+	UPROPERTY(BlueprintReadOnly) FName InstanceId;
+	UPROPERTY(BlueprintReadOnly) FName ActionId;
+	UPROPERTY(BlueprintReadOnly) ELKCombatSourceKind Kind = ELKCombatSourceKind::Attack;
+};
+
+USTRUCT(BlueprintType)
+struct FLKCombatEvent
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadOnly) FLKCombatSource Source;
+	UPROPERTY(BlueprintReadOnly) ELKTeam TargetTeam = ELKTeam::Player;
+	UPROPERTY(BlueprintReadOnly) FName TargetUnitId;
+	UPROPERTY(BlueprintReadOnly) FName TargetInstanceId;
+	UPROPERTY(BlueprintReadOnly) FVector Location = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly) float RequestedAmount = 0.f;
+	UPROPERTY(BlueprintReadOnly) float ActualAmount = 0.f;
+	UPROPERTY(BlueprintReadOnly) float HealthBefore = 0.f;
+	UPROPERTY(BlueprintReadOnly) float HealthAfter = 0.f;
+	UPROPERTY(BlueprintReadOnly) bool bIsHeal = false;
+	UPROPERTY(BlueprintReadOnly) bool bKilled = false;
+};
+
+USTRUCT(BlueprintType)
+struct FLKTeamMatchStats
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadOnly) int32 Kills = 0;
+	UPROPERTY(BlueprintReadOnly) int32 CardsPlayed = 0;
+	UPROPERTY(BlueprintReadOnly) float Damage = 0.f;
+	UPROPERTY(BlueprintReadOnly) float Healing = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FLKMatchStats
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadOnly) FLKTeamMatchStats Player;
+	UPROPERTY(BlueprintReadOnly) FLKTeamMatchStats Enemy;
+	UPROPERTY(BlueprintReadOnly) float Duration = 0.f;
+	UPROPERTY(BlueprintReadOnly) int32 Seed = 0;
+	UPROPERTY(BlueprintReadOnly) bool bOvertime = false;
+	UPROPERTY(BlueprintReadOnly) bool bSimultaneousElimination = false;
+	UPROPERTY(BlueprintReadOnly) ELKTeam Winner = ELKTeam::Player;
 };

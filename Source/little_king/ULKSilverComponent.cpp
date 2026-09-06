@@ -27,7 +27,7 @@ void ULKSilverComponent::TickSilver(float DeltaTime)
 
 bool ULKSilverComponent::TrySpend(float Amount)
 {
-	if (Amount <= 0.f || Silver < Amount)
+	if (!FMath::IsFinite(Amount) || Amount < 0.f || Silver < Amount)
 	{
 		return false;
 	}

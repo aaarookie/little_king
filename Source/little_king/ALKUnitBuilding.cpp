@@ -5,6 +5,7 @@
 #include "ALKBattleGameMode.h"
 #include "LKDataTypes.h"
 #include "LKLog.h"
+#include "ULKGameData.h"
 #include "ULKUnitMovementComponent.h"
 
 ALKUnitBuilding::ALKUnitBuilding()
@@ -52,10 +53,10 @@ void ALKUnitBuilding::UpdateStateMachine(float DeltaSeconds)
 	}
 
 	ALKUnitBase* TargetUnit = Cast<ALKUnitBase>(TargetActor.Get());
-	if (!TargetUnit || TargetUnit->IsDead() || DistanceTo2D(TargetUnit) > GetAttackRange())
+	if (!TargetUnit || !TargetUnit->IsTargetable() || DistanceTo2D(TargetUnit) > GetAttackRange())
 	{
 		// 目标死亡或已跑出射程：清除目标，下个重试周期重新索敌（否则哨塔会永远发呆）
-		TargetActor = nullptr;
+		ChangeTarget(nullptr);
 		State = ELKUnitState::Idle;
 		return;
 	}
@@ -66,18 +67,17 @@ void ALKUnitBuilding::UpdateStateMachine(float DeltaSeconds)
 
 void ALKUnitBuilding::TrySpawnUnit()
 {
-	UWorld* World = GetWorld();
-	ALKBattleGameMode* GameMode = World ? World->GetAuthGameMode<ALKBattleGameMode>() : nullptr;
-	if (!GameMode || SpawnUnitId.IsNone())
-	{
-		return;
-	}
-
-	// 朝中线方向出兵：玩家（Y<0）向 +Y，敌方（Y>0）向 -Y
-	const float ForwardSign = (Team == ELKTeam::Player) ? 1.f : -1.f;
-	const FVector SpawnLoc = GetActorLocation() + FVector(0.f, ForwardSign * 100.f, 0.f);
-	if (ALKUnitBase* Spawned = GameMode->SpawnUnitForTeam(SpawnUnitId, Team, SpawnLoc))
-	{
-		UE_LOG(LogLKUnit, Log, TEXT("[Building] %s 出兵 %s"), *UnitId.ToString(), *SpawnUnitId.ToString());
-	}
+    ALKBattleGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<ALKBattleGameMode>() : nullptr;
+    if (!GM || !GM->GetGameData() || SpawnUnitId.IsNone()) { return; }
+    const float Distance = GetBodyRadius() + GM->GetGameData()->UnitBodyRadius + 8.f;
+    for (int32 Index = 0; Index < 8; ++Index)
+    {
+        const float Angle = (Team == ELKTeam::Player ? PI * 0.5f : -PI * 0.5f) + Index * PI * 0.25f;
+        const FVector Location = GetActorLocation() + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f) * Distance;
+        if (GM->SpawnUnitForTeam(SpawnUnitId, Team, Location))
+        {
+            UE_LOG(LogLKUnit, Log, TEXT("[Building] %s 出兵 %s"), *UnitId.ToString(), *SpawnUnitId.ToString());
+            return;
+        }
+    }
 }

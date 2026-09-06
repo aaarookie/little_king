@@ -3,7 +3,9 @@
 #include "AbilitySystemComponent.h"
 #include "CollisionQueryParams.h"
 #include "CollisionShape.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/SceneComponent.h"
+#include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/DataTable.h"
 #include "Engine/OverlapResult.h"
@@ -28,7 +30,9 @@ ALKUnitBase::ALKUnitBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
-	SetRootComponent(SpriteComponent);
+	LogicRoot = CreateDefaultSubobject<USceneComponent>(TEXT("LogicRoot"));
+    SetRootComponent(LogicRoot);
+    SpriteComponent->SetupAttachment(LogicRoot);
 	SpriteComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Paper2D 精灵默认"立着"（纸片竖在 XZ 平面、正面朝 +Y——为横版游戏设计）。
@@ -41,9 +45,9 @@ ALKUnitBase::ALKUnitBase()
 	const FVector SpriteFaceDir(0.f, 0.f, 1.f);
 	SpriteComponent->SetRelativeRotation(FRotationMatrix::MakeFromXY(SpriteWidthDir, SpriteFaceDir).Rotator());
 
-	BodyCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
-	BodyCollision->SetupAttachment(SpriteComponent);
-	BodyCollision->SetBoxExtent(FVector(BodyRadius, BodyRadius, 20.f));
+	BodyCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Body"));
+	BodyCollision->SetupAttachment(LogicRoot);
+	BodyCollision->SetSphereRadius(BodyRadius);
 	BodyCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	BodyCollision->SetCollisionObjectType(ECC_Pawn);
 	BodyCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
@@ -94,8 +98,18 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	bIsMage = Row.bIsMage;
 	AttackType = Row.AttackType;
 	HeroTraits = Row.HeroTraits;
+    // 迁移旧原型的默认属性特性；新版英雄默认行为来自独立的特性配置。
+    if (IsHero() && InGameData)
+    {
+        HeroTraits.Remove(TEXT("Trait_KnightAura"));
+        HeroTraits.Remove(TEXT("Trait_MageMight"));
+        if (const FLKHeroTraitEntry* Entry = InGameData->DefaultHeroTraits.Find(UnitId))
+        {
+            for (FName Id : Entry->Traits) { HeroTraits.AddUnique(Id); }
+        }
+    }
 	BodyRadius = InGameData ? InGameData->UnitBodyRadius : 50.f;
-	BodyCollision->SetBoxExtent(FVector(BodyRadius, BodyRadius, 20.f));
+	BodyCollision->SetSphereRadius(BodyRadius);
 	MovementComponent->SetSeparationRadius(BodyRadius);
 	if (InGameData)
 	{
@@ -103,6 +117,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	}
 
 	// 精灵（占位期可能没有，用调试色块代替）
+	BaseSpriteLocalScale = FVector(1.f, 1.f, 1.f);
 	if (!Row.Sprite.IsNull())
 	{
 		if (UPaperSprite* Sprite = Row.Sprite.LoadSynchronous())
@@ -113,6 +128,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 			// 且要在组件旋转【之前】生效——否则旋转后宽高与世界轴错位、非等比缩放会变形。
 			// 不能缩 Actor：Actor 缩放沿世界轴，会把宽高缩反并连带缩放碰撞体。
 			SpriteComponent->SetRelativeScale3D(FVector(Row.SpriteScale.X, 1.f, Row.SpriteScale.Y));
+			BaseSpriteLocalScale = SpriteComponent->GetRelativeScale3D(); // S5 打击感动画的基准
 		}
 	}
 
@@ -133,71 +149,113 @@ void ALKUnitBase::OnUnitInitialized(const FLKUnitRow& Row)
 
 void ALKUnitBase::ApplyTraits()
 {
-	if (HeroTraits.Num() == 0 || !GameDataCached)
-	{
-		return;
-	}
+    TraitAuraComponent->ResetAuras();
+    for (FActiveGameplayEffectHandle Handle : SelfTraitHandles)
+    {
+        AbilitySystem->RemoveActiveGameplayEffect(Handle);
+    }
+    SelfTraitHandles.Reset();
+    ResolvedTraits.Reset();
+    bTaunting = false;
+    if (IsCamp() || IsDead()) { return; }
+    for (FName Id : HeroTraits)
+    {
+        FLKTraitRow Row;
+        if (!ResolveTrait(Id, Row)) { continue; }
+        ResolvedTraits.Add(Id, Row);
+        bTaunting |= Row.Effect == ELKTraitEffect::Taunt;
+        if (Row.Effect == ELKTraitEffect::MeleeSoldierTauntAura)
+        {
+            TraitAuraComponent->AddTauntAura(Row.EffectRadius);
+        }
+        for (const FLKTraitModifier& Mod : Row.Modifiers)
+        {
+            if (Mod.AuraRadius > 0.f) { TraitAuraComponent->AddAuraModifier(Mod, Mod.AuraRadius); continue; }
+            const FGameplayAttribute Attr = LKGameplay::FindAttributeByName(Mod.StatName);
+            if (Attr.IsValid())
+            {
+                const float Base = LKGameplay::GetAttributeBaseValue(this, Attr, 0.f);
+                SelfTraitHandles.Add(LKGameplay::ApplyAttributeModifier(this, Attr, Base * Mod.Value, 0.f, this));
+            }
+        }
+    }
+    TraitAuraComponent->TickAura(0.f);
+}
 
-	UDataTable* Table = GameDataCached->TraitTable.LoadSynchronous();
-	if (!Table)
-	{
-		UE_LOG(LogLKUnit, Warning,
-			TEXT("[Trait] %s 配置了 %d 个特性，但 DA_GameData 未设置 TraitTable"),
-			*UnitId.ToString(), HeroTraits.Num());
-		return;
-	}
+bool ALKUnitBase::ResolveTrait(FName Id, FLKTraitRow& Row) const
+{
+    Row.TraitId = Id;
+    if (Id == TEXT("Trait_MageSpellReach")) { Row.Effect = ELKTraitEffect::GlobalSpellPlacement; return true; }
+    if (Id == TEXT("Trait_KnightTauntAura"))
+    {
+        Row.Effect = ELKTraitEffect::MeleeSoldierTauntAura;
+        Row.EffectRadius = GameDataCached ? GameDataCached->KnightTauntAuraRadius : 400.f;
+        return true;
+    }
+    if (Id == TEXT("Taunt")) { Row.Effect = ELKTraitEffect::Taunt; return true; }
+    if (GameDataCached)
+    {
+        if (UDataTable* Table = GameDataCached->TraitTable.LoadSynchronous())
+        {
+            if (Table->GetRowStruct() == FLKTraitRow::StaticStruct())
+            {
+                if (const FLKTraitRow* Found = Table->FindRow<FLKTraitRow>(Id, TEXT("Traits"), false))
+                {
+                    Row = *Found;
+                    if (Row.TraitId == TEXT("Taunt")) { Row.Effect = ELKTraitEffect::Taunt; }
+                    return true;
+                }
+            }
+        }
+    }
+    UE_LOG(LogLKUnit, Warning, TEXT("[Trait] 无效特性 %s"), *Id.ToString());
+    return false;
+}
 
-	for (const FName TraitName : HeroTraits)
-	{
-		const FLKTraitRow* Row = Table->FindRow<FLKTraitRow>(TraitName, TEXT(""), false);
-		if (!Row)
-		{
-			UE_LOG(LogLKUnit, Warning,
-				TEXT("[Trait] %s 找不到特性行 '%s'（检查 DT_Traits 行名与 DT_Units HeroTraits 是否一致）"),
-				*UnitId.ToString(), *TraitName.ToString());
-			continue;
-		}
+bool ALKUnitBase::AddTrait(FName Id)
+{
+    FLKTraitRow Row;
+    if (IsDead() || IsCamp() || HeroTraits.Contains(Id) || !ResolveTrait(Id, Row)) { return false; }
+    HeroTraits.Add(Id);
+    ApplyTraits();
+    return true;
+}
 
-		// 嘲讽标记：行 TraitId 或行名 = Taunt（保护后排的机制起点）
-		const bool bIsTaunt = (Row->TraitId == TEXT("Taunt")) || (TraitName == TEXT("Taunt"));
-		if (bIsTaunt)
-		{
-			bTaunting = true;
-			UE_LOG(LogLKUnit, Log, TEXT("[Trait] %s 获得嘲讽标记（敌方索敌优先攻击）"), *UnitId.ToString());
-		}
+bool ALKUnitBase::RemoveTrait(FName Id)
+{
+    if (HeroTraits.Remove(Id) == 0) { return false; }
+    ApplyTraits();
+    return true;
+}
 
-		for (const FLKTraitModifier& Mod : Row->Modifiers)
-		{
-			if (FMath::IsNearlyZero(Mod.Value))
-			{
-				continue; // 纯标记特性（如嘲讽）没有属性改动
-			}
+bool ALKUnitBase::HasTraitEffect(ELKTraitEffect Effect) const
+{
+    if (!IsTargetable()) { return false; }
+    for (const auto& Pair : ResolvedTraits) { if (Pair.Value.Effect == Effect) { return true; } }
+    return false;
+}
 
-			const FGameplayAttribute Attr = LKGameplay::FindAttributeByName(Mod.StatName);
-			if (!Attr.IsValid())
-			{
-				continue;
-			}
+bool ALKUnitBase::IsTaunting() const
+{
+    if (!IsTargetable()) { return false; }
+    if (bTaunting) { return true; }
+    for (const auto& Pair : AuraTauntSources)
+    {
+        if (Pair.Key.IsValid() && Pair.Key->IsAlive() && Pair.Value > 0) { return true; }
+    }
+    return false;
+}
 
-			if (Mod.AuraRadius > 0.f)
-			{
-				// 光环：交给光环组件按"进出范围"施加/移除
-				if (TraitAuraComponent)
-				{
-					TraitAuraComponent->AddAuraModifier(Mod, Mod.AuraRadius);
-				}
-			}
-			else
-			{
-				// 自身修饰：基础值 × 百分比，无限时长（单位消亡随 ASC 一起移除）
-				const float Base = LKGameplay::GetAttributeBaseValue(this, Attr, 0.f);
-				LKGameplay::ApplyAttributeModifier(this, Attr, Base * Mod.Value, 0.f, this);
-				UE_LOG(LogLKUnit, Log, TEXT("[Trait] %s 自身特性 %s：%s %+.1f（基础 %.1f）"),
-					*UnitId.ToString(), *TraitName.ToString(), *Mod.StatName.ToString(),
-					Base * Mod.Value, Base);
-			}
-		}
-	}
+void ALKUnitBase::AddAuraTauntSource(ALKUnitBase* Source) { if (Source) { ++AuraTauntSources.FindOrAdd(Source); } }
+void ALKUnitBase::RemoveAuraTauntSource(ALKUnitBase* Source)
+{
+    if (int32* Count = AuraTauntSources.Find(Source)) { if (--*Count <= 0) { AuraTauntSources.Remove(Source); } }
+}
+
+void ALKUnitBase::EndPlay(const EEndPlayReason::Type Reason)
+{
+    TraitAuraComponent->ResetAuras();
+    Super::EndPlay(Reason);
 }
 
 void ALKUnitBase::ApplyRowAttributes(const FLKUnitRow& Row)
@@ -213,6 +271,9 @@ void ALKUnitBase::ApplyRowAttributes(const FLKUnitRow& Row)
 	AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetAttackRangeAttribute(), Row.AttackRange);
 	AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetAttackDamageAttribute(), Row.AttackDamage);
 	AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetAttackIntervalAttribute(), Row.AttackInterval);
+
+	// S5：攻击前摇（行可配，0 = 无前摇）
+	AttackWindup = FMath::Clamp(Row.AttackWindup, 0.f, 0.5f);
 }
 
 void ALKUnitBase::Tick(float DeltaSeconds)
@@ -221,6 +282,14 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 
 	if (bDead)
 	{
+		// S5 死亡表现：缩小 + 淡出（动画结束后由 LifeSpan 销毁）
+		if (SpriteComponent && DeathAnimRemaining > 0.f)
+		{
+			DeathAnimRemaining -= DeltaSeconds;
+			const float t = FMath::Clamp(DeathAnimRemaining / DeathAnimDuration, 0.f, 1.f);
+			SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale * FMath::Max(t, 0.05f));
+			SpriteComponent->SetSpriteColor(FLinearColor(1.f, 1.f, 1.f, t));
+		}
 		return;
 	}
 
@@ -245,11 +314,14 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 		TraitAuraComponent->TickAura(DeltaSeconds);
 	}
 
+	TickCombatFeedback(DeltaSeconds);
+
 	DrawDebugShape();
 
 	// 部署阶段：单位冻结（不索敌/不移动/不攻击），开战后由 GameMode 打开
 	if (!bCombatEnabled)
 	{
+        if (IsManualMoving()) { UpdateStateMachine(DeltaSeconds); return; }
 		if (State != ELKUnitState::Idle)
 		{
 			State = ELKUnitState::Idle;
@@ -258,190 +330,185 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 		return;
 	}
 
-	UpdateStateMachine(DeltaSeconds);
+	AttackCooldownRemaining = FMath::Max(0.f, AttackCooldownRemaining - DeltaSeconds);
+    HitStopRemaining = FMath::Max(0.f, HitStopRemaining - DeltaSeconds);
+    FocusWarningRemaining = FMath::Max(0.f, FocusWarningRemaining - DeltaSeconds);
+    UpdateStateMachine(DeltaSeconds);
+}
+
+/** S5：攻击脉冲回弹 + 受击闪白恢复（纯视觉） */
+void ALKUnitBase::TickCombatFeedback(float DeltaSeconds)
+{
+	if (!SpriteComponent || SpriteComponent->GetSprite() == nullptr)
+	{
+		// 无精灵（调试色块期）：只清计时，不做精灵表现
+		AttackPulseRemaining = 0.f;
+		HitFlashRemaining = 0.f;
+		return;
+	}
+
+	// 攻击缩放脉冲：命中瞬间 1.15 -> 1.0 线性回弹
+	if (AttackPulseRemaining > 0.f)
+	{
+		AttackPulseRemaining -= DeltaSeconds;
+		const float t = FMath::Clamp(AttackPulseRemaining / 0.15f, 0.f, 1.f);
+		SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale * (1.f + 0.15f * t));
+		if (AttackPulseRemaining <= 0.f)
+		{
+			SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale);
+		}
+	}
+
+	// 受击闪白恢复（TriggerHitFlash 置白，0.08s 后还原）
+	if (HitFlashRemaining > 0.f)
+	{
+		HitFlashRemaining -= DeltaSeconds;
+		if (HitFlashRemaining <= 0.f)
+		{
+			SpriteComponent->SetSpriteColor(FLinearColor::White);
+		}
+	}
+}
+
+void ALKUnitBase::TriggerHitFlash()
+{
+	// 精灵颜色乘大数提亮；深色像素不保证纯白，严格白闪需配套材质。
+	if (!SpriteComponent || SpriteComponent->GetSprite() == nullptr)
+	{
+		return;
+	}
+	HitFlashRemaining = 0.08f;
+	SpriteComponent->SetSpriteColor(FLinearColor(4.f, 4.f, 4.f, 1.f));
 }
 
 void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
 {
-	if (IsBuilding())
-	{
-		// 建筑由子类 ALKUnitBuilding 处理（哨塔/兵营）
-		return;
-	}
+    if (IsBuilding()) { return; }
+    TargetRetryTimer -= DeltaSeconds;
+    if (TargetRetryTimer <= 0.f) { AcquireTarget(); TargetRetryTimer = 0.15f; }
+    ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
+    if (!Target || !Target->IsTargetable() || !CanPursueTarget(Target))
+    {
+        ChangeTarget(nullptr);
+        State = ELKUnitState::Idle;
+        MovementComponent->Stop();
+        return;
+    }
+    if (DistanceTo2D(Target) > GetAttackRange())
+    {
+        CancelAttackWindup();
+        State = ELKUnitState::Moving;
+        MovementComponent->MoveToward(GetChaseDestination(Target), GetMoveSpeed());
+    }
+    else
+    {
+        State = ELKUnitState::Attacking;
+        MovementComponent->Stop();
+        TryAttack(DeltaSeconds);
+    }
+}
 
-	// 定期重新索敌
-	TargetRetryTimer -= DeltaSeconds;
-	if (TargetRetryTimer <= 0.f)
-	{
-		AcquireTarget();
-		TargetRetryTimer = 0.25f;
-	}
+bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
+{
+    return Target && Target->IsTargetable() && Target->GetTeam() != Team
+        && (!IsBuilding() || DistanceTo2D(Target) <= GetAttackRange());
+}
 
-	AActor* Target = TargetActor.Get();
-	if (!IsValid(Target) || !Target->IsA<ALKUnitBase>() || Cast<ALKUnitBase>(Target)->IsDead())
-	{
-		TargetActor = nullptr;
-		State = ELKUnitState::Idle;
-		MovementComponent->Stop();
-		return;
-	}
+FVector ALKUnitBase::GetChaseDestination(const ALKUnitBase* Target) const
+{
+    const FVector ToSelf = (GetActorLocation() - Target->GetActorLocation()).GetSafeNormal2D();
+    return Target->GetActorLocation() + ToSelf * FMath::Max(GetAttackRange() * 0.85f, GetBodyRadius() + Target->GetBodyRadius() + 2.f);
+}
 
-	const float Dist = DistanceTo2D(Target);
-	const float Range = GetAttackRange();
+void ALKUnitBase::CancelAttackWindup() { bWindupActive = false; WindupTarget = nullptr; WindupRemaining = 0.f; }
+void ALKUnitBase::ChangeTarget(AActor* NewTarget)
+{
+    if (TargetActor.Get() != NewTarget) { CancelAttackWindup(); }
+    TargetActor = NewTarget;
+}
 
-	// 滞回判定（防射程边界抖动）：
-	// - 移动中：进入攻击需要 Dist <= Range
-	// - 攻击中：只要 Dist <= Range + AttackStopBuffer 就继续攻击（不来回切换）
-	const float StopDist = (State == ELKUnitState::Attacking)
-		? Range + (GameDataCached ? GameDataCached->AttackStopBuffer : 30.f)
-		: Range;
-
-	if (Dist > StopDist)
-	{
-		State = ELKUnitState::Moving;
-		MovementComponent->MoveToward(Target->GetActorLocation(), GetMoveSpeed());
-	}
-	else
-	{
-		State = ELKUnitState::Attacking;
-		MovementComponent->Stop();
-		TryAttack(DeltaSeconds);
-	}
+void ALKUnitBase::SetTarget(AActor* NewTarget)
+{
+    AActor* Taunter = FindNearestEnemy(true);
+    ChangeTarget(Taunter ? Taunter : (CanPursueTarget(Cast<ALKUnitBase>(NewTarget)) ? NewTarget : nullptr));
 }
 
 void ALKUnitBase::AcquireTarget()
 {
-	// 优先级 1：强制目标（AI 集火指令）——仍然有效则一直盯它
-	if (ALKUnitBase* Forced = Cast<ALKUnitBase>(ForcedTargetActor.Get()))
-	{
-		if (Forced->IsAlive() && Forced->GetTeam() != Team)
-		{
-			TargetActor = Forced;
-			return;
-		}
-		// 强制目标已失效：清除，回落正常索敌
-		ForcedTargetActor = nullptr;
-		ForcedTargetRemaining = 0.f;
-	}
-
-	// 优先级 2：嘲讽者（保护后排机制）
-	if (AActor* Taunter = FindNearestEnemy(true))
-	{
-		TargetActor = Taunter;
-		return;
-	}
-
-	// 优先级 3：保持当前有效目标，否则找最近敌人
-	if (TargetActor.IsValid())
-	{
-		AActor* Current = TargetActor.Get();
-		if (IsValid(Current) && Current->IsA<ALKUnitBase>() && !Cast<ALKUnitBase>(Current)->IsDead()
-			&& Cast<ALKUnitBase>(Current)->GetTeam() != Team)
-		{
-			return; // 目标仍有效
-		}
-	}
-
-	TargetActor = FindNearestEnemy();
+    // 嘲讽始终高于集火、普通目标指定和最近目标。
+    if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); return; }
+    if (ALKUnitBase* Forced = Cast<ALKUnitBase>(ForcedTargetActor.Get()))
+    {
+        if (CanPursueTarget(Forced)) { ChangeTarget(Forced); return; }
+    }
+    ChangeTarget(FindNearestEnemy());
 }
 
 void ALKUnitBase::SetForcedTarget(AActor* InTarget, float DurationSeconds)
 {
-	if (DurationSeconds <= 0.f || !IsValid(InTarget))
-	{
-		ForcedTargetActor = nullptr;
-		ForcedTargetRemaining = 0.f;
-		return;
-	}
-
-	ForcedTargetActor = InTarget;
-	ForcedTargetRemaining = DurationSeconds;
-	// 立刻生效：下一帧索敌即切换（不等 0.25s 重试周期）
-	TargetActor = InTarget;
+    ALKUnitBase* Unit = Cast<ALKUnitBase>(InTarget);
+    ForcedTargetActor = DurationSeconds > 0.f && CanPursueTarget(Unit) ? InTarget : nullptr;
+    ForcedTargetRemaining = ForcedTargetActor.IsValid() ? DurationSeconds : 0.f;
+    AcquireTarget();
 }
 
 void ALKUnitBase::TickForcedTarget(float DeltaSeconds)
 {
-	if (!ForcedTargetActor.IsValid())
-	{
-		return;
-	}
-
-	ForcedTargetRemaining -= DeltaSeconds;
-	if (ForcedTargetRemaining <= 0.f)
-	{
-		ForcedTargetActor = nullptr;
-		ForcedTargetRemaining = 0.f;
-		UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 集火窗口结束，恢复正常索敌"), *UnitId.ToString());
-	}
+    if (ForcedTargetRemaining <= 0.f) { return; }
+    ForcedTargetRemaining -= DeltaSeconds;
+    if (ForcedTargetRemaining <= 0.f || !ForcedTargetActor.IsValid())
+    {
+        ForcedTargetActor = nullptr;
+        ForcedTargetRemaining = 0.f;
+        ChangeTarget(nullptr);
+        TargetRetryTimer = 0.f;
+    }
 }
 
 AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly) const
 {
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return nullptr;
-	}
-
-	TArray<FOverlapResult> Overlaps;
-	const FCollisionShape Shape = FCollisionShape::MakeSphere(4000.f);
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	World->OverlapMultiByChannel(Overlaps, GetActorLocation(), FQuat::Identity, ECC_Pawn, Shape, Params);
-
-	AActor* Best = nullptr;
-	float BestDist = TNumericLimits<float>::Max();
-
-	for (const FOverlapResult& Overlap : Overlaps)
-	{
-		ALKUnitBase* Other = Cast<ALKUnitBase>(Overlap.GetActor());
-		if (!Other || Other == this || Other->IsDead() || Other->GetTeam() == Team)
-		{
-			continue;
-		}
-		if (bTauntersOnly && !Other->IsTaunting())
-		{
-			continue;
-		}
-
-		const float Dist = DistanceTo2D(Other);
-		if (Dist < BestDist)
-		{
-			BestDist = Dist;
-			Best = Other;
-		}
-	}
-
-	return Best;
+    AActor* Best = nullptr;
+    float BestDistance = TNumericLimits<float>::Max();
+    if (!GetWorld()) { return nullptr; }
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        ALKUnitBase* Other = *It;
+        if (!CanPursueTarget(Other)) { continue; }
+        const float Distance = DistanceTo2D(Other);
+        if (bTauntersOnly && (!Other->IsTaunting() || Distance > (GameDataCached ? GameDataCached->TauntAcquireRadius : 500.f))) { continue; }
+        if (Distance < BestDistance) { BestDistance = Distance; Best = Other; }
+    }
+    return Best;
 }
 
 void ALKUnitBase::TryAttack(float DeltaSeconds)
 {
-	AttackCooldownRemaining -= DeltaSeconds;
-
-	AActor* Target = TargetActor.Get();
-	if (AttackCooldownRemaining > 0.f || !IsValid(Target))
-	{
-		return;
-	}
-
-	// 目标已死亡（尚未销毁的 0.5 秒内）不攻击，并清除目标
-	const ALKUnitBase* TargetUnit = Cast<ALKUnitBase>(Target);
-	if (TargetUnit && TargetUnit->IsDead())
-	{
-		TargetActor = nullptr;
-		return;
-	}
-
-	if (DistanceTo2D(Target) > GetAttackRange())
-	{
-		return;
-	}
-
-	PerformAttack(Target);
-	AttackCooldownRemaining = GetAttackInterval();
+    if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); }
+    ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
+    if (!Target || !CanPursueTarget(Target) || DistanceTo2D(Target) > GetAttackRange() || IsManualMoving())
+    {
+        CancelAttackWindup(); return;
+    }
+    if (bWindupActive)
+    {
+        if (WindupTarget.Get() != Target) { CancelAttackWindup(); return; }
+        WindupRemaining -= DeltaSeconds;
+    }
+    else
+    {
+        if (AttackCooldownRemaining > 0.f) { return; }
+        bWindupActive = true;
+        WindupTarget = Target;
+        WindupRemaining = AttackWindup;
+        // Interval 明确为连续两次起手间隔；前摇包含其中，移动和视觉停顿不暂停它。
+        AttackCooldownRemaining = FMath::Max(GetAttackInterval(), AttackWindup);
+        if (WindupRemaining > 0.f) { return; }
+    }
+    if (WindupRemaining <= 0.f)
+    {
+        CancelAttackWindup();
+        PerformAttack(Target);
+    }
 }
 
 void ALKUnitBase::PerformAttack(AActor* Target)
@@ -451,6 +518,10 @@ void ALKUnitBase::PerformAttack(AActor* Target)
 		return;
 	}
 
+	// S5 命中瞬间反馈：攻击缩放脉冲 + 攻击者命中停顿
+	AttackPulseRemaining = 0.15f;
+	HitStopRemaining = 0.06f;
+
 	if (AttackType == ELKAttackType::Ranged)
 	{
 		UWorld* World = GetWorld();
@@ -459,21 +530,41 @@ void ALKUnitBase::PerformAttack(AActor* Target)
 			return;
 		}
 
-		FVector Muzzle = GetActorLocation();
-		Muzzle.Z = 20.f;
-		const FVector Dir = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
-
-		FActorSpawnParameters Params;
-		Params.Owner = this;
-		ALKProjectile* Projectile = World->SpawnActor<ALKProjectile>(ALKProjectile::StaticClass(), Muzzle, FRotator::ZeroRotator, Params);
-		if (Projectile)
+		// S5 弹道对象池：向 GameMode 取弹道（无 GameMode 时回退旧逻辑直接生成）
+		ALKBattleGameMode* GM = World->GetAuthGameMode<ALKBattleGameMode>();
+		if (GM)
 		{
-			Projectile->Init(GetAttackDamage(), Team, this, Dir);
+			const FVector Muzzle = GetActorLocation() + FVector(0.f, 0.f, 20.f);
+			const FVector Dir = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+			GM->AcquireProjectile(Muzzle, GetAttackDamage(), Team, this, Dir);
 		}
+		else
+		{
+			FVector Muzzle = GetActorLocation();
+			Muzzle.Z = 20.f;
+			const FVector Dir = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+
+			FActorSpawnParameters Params;
+			Params.Owner = this;
+			ALKProjectile* Projectile = World->SpawnActor<ALKProjectile>(ALKProjectile::StaticClass(), Muzzle, FRotator::ZeroRotator, Params);
+			if (Projectile)
+			{
+				Projectile->Init(GetAttackDamage(), Team, this, Dir);
+			}
+		}
+
+		// 音效：远程发射
+		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("RangedShoot"), GetActorLocation(), 0.7f);
 	}
 	else
 	{
 		LKGameplay::ApplyDamage(Target, GetAttackDamage(), this);
+
+		// 音效：近战挥击（命中点）
+		if (UWorld* World = GetWorld())
+		{
+			LKGameplay::PlayOneShot(World, GameDataCached, TEXT("MeleeHit"), Target->GetActorLocation(), 0.8f);
+		}
 	}
 }
 
@@ -536,23 +627,38 @@ void ALKUnitBase::SetInvulnerable(float DurationSeconds)
 
 void ALKUnitBase::Die()
 {
-	if (bDead)
+	if (bDead || IsCamp())
 	{
 		return;
 	}
 
 	bDead = true;
+    AbilitySystem->CancelAllAbilities();
+    CancelAttackWindup();
 	State = ELKUnitState::Dead;
 	MovementComponent->Stop();
+
+	// S5 死亡表现：缩小淡出动画后销毁（替换旧版 0.5s 直接消失）
+	DeathAnimRemaining = DeathAnimDuration;
+	SetLifeSpan(DeathAnimDuration);
+	if (BodyCollision)
+	{
+		BodyCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	// 光环主人死亡：立即收回对友军施加的光环效果（防止 buff 永久残留）
 	if (TraitAuraComponent)
 	{
-		TraitAuraComponent->RemoveAllAuras();
+		TraitAuraComponent->ResetAuras();
+	}
+
+	// 音效：单位死亡
+	if (UWorld* World = GetWorld())
+	{
+		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("UnitDied"), GetActorLocation(), 1.f);
 	}
 
 	OnUnitDied.Broadcast(this);
-	SetLifeSpan(0.5f);
 
 	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s (%s) 阵亡"), *UnitId.ToString(), *GetName());
 }
@@ -585,7 +691,7 @@ void ALKUnitBase::DrawDebugShape() const
 
 	// 2) 脚下阵营色环：有精灵/无精灵都显示（精灵上线后的敌我标识，绿=玩家/红=敌方）
 	//    无精灵时随 bDrawDebugShapes，有精灵时随 bDrawTeamRing
-	const bool bShowRing = bHasSprite ? GameDataCached->bDrawTeamRing : GameDataCached->bDrawDebugShapes;
+	const bool bShowRing = false; // 阵营环已由原生 HUD 绘制，保留调试框和索敌线。
 	if (bShowRing)
 	{
 		const FVector RingCenter = GetActorLocation() + FVector(0.f, 0.f, 8.f);
@@ -611,4 +717,16 @@ void ALKUnitBase::DrawDebugShape() const
 			ForcedTargetActor->GetActorLocation() + FVector(0.f, 0.f, 24.f),
 			FColor::Cyan, false, -1.f, 0, 2.f);
 	}
+}
+
+void ALKUnitBase::SetCombatEnabled(bool bEnabled)
+{
+    bCombatEnabled = bEnabled;
+    if (!bEnabled)
+    {
+        MovementComponent->Stop();
+        CancelAttackWindup();
+        ChangeTarget(nullptr);
+        AbilitySystem->CancelAllAbilities();
+    }
 }

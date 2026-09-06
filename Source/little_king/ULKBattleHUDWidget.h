@@ -28,12 +28,14 @@ class ULKBattleHUDWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& Geometry, float DeltaTime) override;
+	int32 LastWholeSilver = -1;
 
 	// ---------- 蓝图实现事件（BP 里覆写，刷新界面） ----------
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnPhaseChanged(ELKGamePhase NewPhase);
 
-	/** bPlayable[i] = false 表示该卡当前不可打出（银币不足/法术门锁定/阶段错误） */
+	/** bPlayable[i] = false 表示该卡当前不可打出（空槽/银币不足/阶段错误，不因法师死亡灰卡） */
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnHandChanged(const TArray<FName>& Hand, const TArray<int32>& Costs, const TArray<bool>& bPlayable);
 
@@ -42,6 +44,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnMatchEnded(ELKTeam Winner);
+
+	/** S5 飘字数据链：任何伤害/治疗生效时触发（Amount 恒为正；bIsHeal 区分伤害/治疗） */
+	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
+	void OnDamageEventBP(FVector WorldLocation, float Amount, bool bIsHeal);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|HUD")
 	void OnPlacementStateChanged(bool bPlacing, ELKPlacementMode Mode, int32 HandIndex, FName ItemId);
@@ -73,6 +79,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LK|HUD")
 	class UTexture2D* GetCardIcon(FName CardId) const;
 
+	/** S5 飘字定位：世界坐标 -> 视口坐标（失败返回 false，通常不会） */
+	UFUNCTION(BlueprintPure, Category = "LK|HUD")
+	bool WorldToScreen(FVector WorldLocation, FVector2D& OutScreenLocation) const;
+
 protected:
 	// ---------- C++ 事件转发（绑定引擎/游戏事件 -> 调用蓝图事件） ----------
 	UFUNCTION()
@@ -89,6 +99,9 @@ protected:
 
 	UFUNCTION()
 	void HandleMatchEnded(ELKTeam Winner);
+
+	UFUNCTION()
+	void HandleDamageEvent(FVector WorldLocation, float Amount, bool bIsHeal);
 
 	UFUNCTION()
 	void HandlePlacementStateChanged(bool bPlacing, ELKPlacementMode Mode, int32 HandIndex, FName ItemId);

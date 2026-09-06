@@ -2,6 +2,8 @@
 
 #include "Engine/Texture2D.h"
 #include "Engine/World.h"
+#include "Components/Button.h"
+#include "ULKGameData.h"
 
 #include "ALKBattleGameMode.h"
 #include "ALKBattleGameState.h"
@@ -43,10 +45,13 @@ void ULKBattleHUDWidget::BindEvents()
 		Deck->OnHandChanged.AddDynamic(this, &ULKBattleHUDWidget::HandleHandChanged);
 	}
 
-	// 法术门：法师英雄阵亡/开战时刷新（锁定的法术卡显示为不可打出）
+	// 战斗表现事件：法师死亡不会改变手牌可选状态。
 	if (ALKBattleGameMode* GM = GetBattleGameMode())
 	{
-		GM->OnSpellLockChanged.AddDynamic(this, &ULKBattleHUDWidget::HandleSpellLockChanged);
+
+
+		// S5 飘字数据链：伤害/治疗事件
+		GM->OnDamageEvent.AddDynamic(this, &ULKBattleHUDWidget::HandleDamageEvent);
 	}
 
 	if (ULKSilverComponent* Silver = GetSilverComp())
@@ -76,7 +81,8 @@ void ULKBattleHUDWidget::UnbindEvents()
 
 	if (ALKBattleGameMode* GM = GetBattleGameMode())
 	{
-		GM->OnSpellLockChanged.RemoveDynamic(this, &ULKBattleHUDWidget::HandleSpellLockChanged);
+
+		GM->OnDamageEvent.RemoveDynamic(this, &ULKBattleHUDWidget::HandleDamageEvent);
 	}
 
 	if (ULKSilverComponent* Silver = GetSilverComp())
@@ -103,45 +109,32 @@ void ULKBattleHUDWidget::PushInitialState()
 void ULKBattleHUDWidget::HandlePhaseChanged(ELKGamePhase NewPhase)
 {
 	OnPhaseChanged(NewPhase);
+	HandleHandChanged();
 }
 
 void ULKBattleHUDWidget::HandleHandChanged()
 {
-	TArray<FName> Hand;
-	TArray<int32> Costs;
-	TArray<bool> bPlayable;
-
-	if (ULKDeckState* Deck = GetDeck())
-	{
-		ALKBattleGameMode* GM = GetBattleGameMode();
-
-		Hand = Deck->GetHand();
-		for (int32 i = 0; i < Hand.Num(); ++i)
-		{
-			Costs.Add(Deck->GetHandCost(i));
-
-			// 可打出判定：法术门锁定（无法师在场）时法术卡不可打出
-			bool Playable = true;
-			if (GM)
-			{
-				if (const ULKCardDefinition* Card = GM->FindCard(Hand[i]))
-				{
-					if (Card->CardType == ELKCardType::Spell && !GM->CanCastSpell(ELKTeam::Player))
-					{
-						Playable = false;
-					}
-				}
-			}
-			bPlayable.Add(Playable);
-		}
-	}
-
-	OnHandChanged(Hand, Costs, bPlayable);
+    TArray<FName> Hand;
+    TArray<int32> Costs;
+    TArray<bool> Playable;
+    if (ULKDeckState* Deck = GetDeck())
+    {
+        ALKBattleGameMode* GM = GetBattleGameMode();
+        Hand = Deck->GetHand();
+        for (int32 Index = 0; Index < Hand.Num(); ++Index)
+        {
+            const int32 Cost = Deck->GetHandCost(Index);
+            Costs.Add(Cost);
+            Playable.Add(GM && GM->GetPhase() == ELKGamePhase::Battle && GM->FindCard(Hand[Index])
+                && GetSilverComp() && GetSilverComp()->GetSilver() >= Cost);
+        }
+    }
+    OnHandChanged(Hand, Costs, Playable);
 }
 
 void ULKBattleHUDWidget::HandleSpellLockChanged(bool bUnlocked)
 {
-	// 法术锁定状态变化 -> 重推手牌（刷新可打出标记）
+	// 兼容旧绑定，仅刷新费用/空槽/阶段，不锁定法术。
 	HandleHandChanged();
 }
 
@@ -149,11 +142,39 @@ void ULKBattleHUDWidget::HandleSilverChanged(float NewSilver, float Delta)
 {
 	const float Cap = GetSilverComp() ? GetSilverComp()->GetCap() : 0.f;
 	OnSilverChanged(NewSilver, Cap, Delta);
+    const int32 WholeSilver = FMath::FloorToInt(NewSilver);
+    if (WholeSilver != LastWholeSilver) { LastWholeSilver = WholeSilver; HandleHandChanged(); }
 }
 
 void ULKBattleHUDWidget::HandleMatchEnded(ELKTeam Winner)
 {
 	OnMatchEnded(Winner);
+}
+
+void ULKBattleHUDWidget::HandleDamageEvent(FVector WorldLocation, float Amount, bool bIsHeal)
+{
+    const ALKBattleGameMode* GM = GetBattleGameMode();
+    if (!GM || !GM->GetGameData() || !GM->GetGameData()->bNativeDamageText)
+    { OnDamageEventBP(WorldLocation, Amount, bIsHeal); }
+}
+
+bool ULKBattleHUDWidget::WorldToScreen(FVector WorldLocation, FVector2D& OutScreenLocation) const
+{
+	ALKPlayerController* PC = GetLKPlayerController();
+	if (!PC)
+	{
+		return false;
+	}
+
+	FVector2D ScreenPos;
+	if (!PC->ProjectWorldLocationToScreen(WorldLocation, ScreenPos))
+	{
+		return false;
+	}
+
+	// 视口坐标的原点在左上角，与锚点对齐
+	OutScreenLocation = ScreenPos;
+	return true;
 }
 
 void ULKBattleHUDWidget::HandlePlacementStateChanged(bool bPlacing, ELKPlacementMode Mode, int32 HandIndex, FName ItemId)
@@ -163,7 +184,8 @@ void ULKBattleHUDWidget::HandlePlacementStateChanged(bool bPlacing, ELKPlacement
 
 void ULKBattleHUDWidget::HandlePlayResult(ELKPlayResult Result)
 {
-	OnPlayResult(Result);
+    // The native presentation owns the updated territory message; old BP branches say "spell locked".
+    if (Result != ELKPlayResult::SpellLocked) { OnPlayResult(Result); }
 }
 
 ALKPlayerController* ULKBattleHUDWidget::GetLKPlayerController() const
@@ -212,4 +234,14 @@ UTexture2D* ULKBattleHUDWidget::GetCardIcon(FName CardId) const
 {
 	const ULKCardDefinition* Card = GetCardDefinition(CardId);
 	return Card ? Card->Icon.LoadSynchronous() : nullptr;
+}
+
+void ULKBattleHUDWidget::NativeTick(const FGeometry& Geometry, float DeltaTime)
+{
+    Super::NativeTick(Geometry, DeltaTime);
+    // Migration bridge until the old aggregate widgets are deleted in the editor.
+    for (FName Name : {FName("PlayerHeroBar"), FName("EnemyHeroBar")})
+    { if (UWidget* Widget = GetWidgetFromName(Name)) { Widget->SetVisibility(ESlateVisibility::Collapsed); } }
+    if (UButton* Start = Cast<UButton>(GetWidgetFromName(TEXT("Btn_Start"))))
+    { Start->SetIsEnabled(GetBattleGameMode() && GetBattleGameMode()->CanStartBattle()); }
 }

@@ -62,6 +62,10 @@ private:
 	int32 PushRemainingCards = 0;		// 爆发窗口中剩余连打张数（>0 时 ThinkAndPlay 连打）
 	int32 PlayerRangedCount = 0;		// 最近一次评估：玩家远程战斗单位数
 	int32 PlayerMeleeCount = 0;			// 最近一次评估：玩家近战战斗单位数
+	TWeakObjectPtr<ALKUnitBase> PendingFocusTarget;
+	float FocusWarningTimer = 0.f;
+	bool bReserving = false;
+	float ReserveRemaining = 0.f;
 
 	void LoadWaves();
 	void ProcessWaves(float BattleElapsed);

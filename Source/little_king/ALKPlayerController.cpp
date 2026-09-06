@@ -9,6 +9,10 @@
 
 #include "ALKBattleGameMode.h"
 #include "ALKPlayerState.h"
+#include "ALKHeroCamp.h"
+#include "ALKUnitHero.h"
+#include "ULKGameData.h"
+#include "ULKUnitMovementComponent.h"
 #include "LKLog.h"
 #include "ULKCheatManager.h"
 #include "ULKDeckState.h"
@@ -16,9 +20,12 @@
 
 ALKPlayerController::ALKPlayerController()
 {
-	// 调试命令（PIE 中按 `~` 输入）：AddSilver/DrawCard/SpawnUnit/KillAll/WinMatch/StartBattle/ListUnits
+	// 调试命令（PIE 中按 `~` 输入）：AddSilver/DrawCard/SpawnUnit/KillAll/WinMatch/StartBattle/ListUnits/InvulnerableHeroes
 	// 注：UE5.8 中 CheatClass 位于 APlayerController（旧版本在 GameMode 上）
 	CheatClass = ULKCheatManager::StaticClass();
+
+	// S5 相机震动：控制器 Tick 驱动
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ALKPlayerController::BeginPlay()
@@ -33,6 +40,41 @@ void ALKPlayerController::BeginPlay()
 	SetInputMode(InputMode);
 }
 
+void ALKPlayerController::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+    if (GetPhase() == ELKGamePhase::Result && IsPlacing()) { CancelPlacement(); }
+    if (!bCameraShakeActive) { return; }
+    AActor* Camera = ShakenCamera.Get();
+    CameraShakeRemaining -= DeltaSeconds;
+    if (!Camera || Camera != GetViewTarget() || CameraShakeRemaining <= 0.f)
+    {
+        if (Camera) { Camera->SetActorLocation(CameraShakeBaseLocation); }
+        bCameraShakeActive = false;
+        CameraShakeIntensity = 0.f;
+        ShakenCamera.Reset();
+        return;
+    }
+    const float Amp = CameraShakeIntensity * FMath::Clamp(CameraShakeRemaining / CameraShakeDuration, 0.f, 1.f);
+    Camera->SetActorLocation(CameraShakeBaseLocation + FVector(VisualRandom.FRandRange(-Amp, Amp), VisualRandom.FRandRange(-Amp, Amp), 0.f));
+}
+
+void ALKPlayerController::RequestCameraShake(float Intensity)
+{
+    AActor* Camera = GetViewTarget();
+    if (!FMath::IsFinite(Intensity) || Intensity <= 0.f || !IsValid(Camera)) { return; }
+    if (!bCameraShakeActive || Camera != ShakenCamera.Get())
+    {
+        if (AActor* Previous = ShakenCamera.Get()) { Previous->SetActorLocation(CameraShakeBaseLocation); }
+        CameraShakeBaseLocation = Camera->GetActorLocation();
+        CameraShakeIntensity = Intensity;
+        ShakenCamera = Camera;
+    }
+    else { CameraShakeIntensity = FMath::Max(CameraShakeIntensity, Intensity); }
+    bCameraShakeActive = true;
+    CameraShakeRemaining = CameraShakeDuration;
+}
+
 void ALKPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -43,10 +85,16 @@ void ALKPlayerController::SetupInputComponent()
 
 void ALKPlayerController::HandleLeftClick()
 {
-	if (PlacementMode != ELKPlacementMode::None)
-	{
-		TryPlaceActive();
-	}
+    if (GetPhase() == ELKGamePhase::Result) { return; }
+    if (PlacementMode == ELKPlacementMode::None || PlacementMode == ELKPlacementMode::HeroMove)
+    {
+        FVector Point;
+        if (DeprojectMouseToGround(Point))
+        {
+            if (ALKHeroCamp* Camp = FindCampAt(Point)) { SelectCamp(Camp); return; }
+        }
+    }
+    if (PlacementMode != ELKPlacementMode::None) { TryPlaceActive(); }
 }
 
 void ALKPlayerController::HandleRightClick()
@@ -67,7 +115,15 @@ void ALKPlayerController::TryPlaceActive()
 		Result = DeployHeroAtMouse(PlacingHeroId);
 	}
 
-	OnPlayResult.Broadcast(Result);
+    else if (PlacementMode == ELKPlacementMode::HeroMove)
+    {
+        FVector Point;
+        ALKHeroCamp* Camp = GetSelectedCamp();
+        Result = GetPhase() == ELKGamePhase::Result ? ELKPlayResult::WrongPhase : ELKPlayResult::HeroMoveBlocked;
+        if (Camp && Camp->GetHero() && DeprojectMouseToGround(Point) && Camp->GetHero()->CommandMove(Point))
+        { Result = ELKPlayResult::Success; }
+    }
+    OnPlayResult.Broadcast(Result);
 
 	// 成功或阶段错误（如开战时还在部署英雄）都退出放置模式
 	if (Result == ELKPlayResult::Success || Result == ELKPlayResult::WrongPhase)
@@ -78,6 +134,7 @@ void ALKPlayerController::TryPlaceActive()
 
 void ALKPlayerController::BeginCardPlacement(int32 HandIndex)
 {
+	SelectedCamp.Reset();
 	PlacementMode = ELKPlacementMode::Card;
 	PlacingHandIndex = HandIndex;
 	PlacingHeroId = NAME_None;
@@ -86,6 +143,7 @@ void ALKPlayerController::BeginCardPlacement(int32 HandIndex)
 
 void ALKPlayerController::BeginHeroPlacement(FName HeroUnitId)
 {
+	SelectedCamp.Reset();
 	PlacementMode = ELKPlacementMode::Hero;
 	PlacingHeroId = HeroUnitId;
 	PlacingHandIndex = -1;
@@ -99,6 +157,7 @@ void ALKPlayerController::CancelPlacement()
 		return;
 	}
 
+	SelectedCamp.Reset();
 	PlacementMode = ELKPlacementMode::None;
 	PlacingHandIndex = -1;
 	PlacingHeroId = NAME_None;
@@ -152,24 +211,13 @@ ALKBattleGameMode* ALKPlayerController::GetBattleGameMode() const
 
 bool ALKPlayerController::DeprojectMouseToGround(FVector& OutLocation) const
 {
-	FVector WorldLocation;
-	FVector WorldDirection;
-	if (!DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
-	{
-		return false;
-	}
-
-	FHitResult Hit;
-	const FVector End = WorldLocation + WorldDirection * 20000.f;
-	if (GetWorld()->LineTraceSingleByChannel(Hit, WorldLocation, End, ECC_Visibility))
-	{
-		OutLocation = Hit.Location;
-		return true;
-	}
-
-	// 兜底：直接取射线远处一点
-	OutLocation = WorldLocation + WorldDirection * 8000.f;
-	return true;
+    FVector Origin, Direction;
+    if (!DeprojectMousePositionToWorld(Origin, Direction) || FMath::IsNearlyZero(Direction.Z)) { return false; }
+    const double Distance = -Origin.Z / Direction.Z;
+    if (Distance < 0.0) { return false; }
+    OutLocation = Origin + Direction * Distance;
+    OutLocation.Z = 0.f;
+    return !OutLocation.ContainsNaN();
 }
 
 ELKPlayResult ALKPlayerController::TryPlayCard(int32 HandIndex, const FVector& WorldLocation)
@@ -206,10 +254,15 @@ ELKPlayResult ALKPlayerController::DeployHeroAtMouse(FName HeroUnitId)
 
 void ALKPlayerController::RequestStartBattle()
 {
-	if (ALKBattleGameMode* GameMode = GetBattleGameMode())
-	{
-		GameMode->ForceStartBattle();
-	}
+    if (ALKBattleGameMode* GM = GetBattleGameMode())
+    {
+        if (GM->CanStartBattle()) { CancelPlacement(); GM->ForceStartBattle(); }
+        else
+        {
+            OnPlayResult.Broadcast(GetPhase() != ELKGamePhase::Deployment ? ELKPlayResult::WrongPhase
+                : (!GM->HasValidDecks() ? ELKPlayResult::InvalidCardData : ELKPlayResult::DeploymentIncomplete));
+        }
+    }
 }
 
 float ALKPlayerController::GetSilver() const
@@ -234,4 +287,65 @@ ELKGamePhase ALKPlayerController::GetPhase() const
 {
 	const ALKBattleGameMode* GameMode = GetBattleGameMode();
 	return GameMode ? GameMode->GetPhase() : ELKGamePhase::Deployment;
+}
+
+ALKHeroCamp* ALKPlayerController::GetSelectedCamp() const { return SelectedCamp.Get(); }
+
+ALKHeroCamp* ALKPlayerController::FindCampAt(const FVector& Location) const
+{
+    for (TActorIterator<ALKHeroCamp> It(GetWorld()); It; ++It)
+    {
+        if (It->GetTeam() == ELKTeam::Player && It->GetHero() && It->GetHero()->IsAlive()
+            && FVector::Dist2D(Location, It->GetActorLocation()) <= It->GetBodyRadius()) { return *It; }
+    }
+    return nullptr;
+}
+
+void ALKPlayerController::SelectCamp(ALKHeroCamp* Camp)
+{
+    SelectedCamp = Camp;
+    PlacementMode = ELKPlacementMode::HeroMove;
+    PlacingHandIndex = -1;
+    PlacingHeroId = NAME_None;
+    OnPlacementStateChanged.Broadcast(true, PlacementMode, -1, NAME_None);
+}
+
+bool ALKPlayerController::GetPlacementPreview(FVector& Location, float& Radius, bool& bValid, float* OutAttackRadius) const
+{
+    if (OutAttackRadius) { *OutAttackRadius = 0.f; }
+    ALKBattleGameMode* GM = GetBattleGameMode();
+    if (!IsPlacing() || !GM || !GM->GetGameData() || !DeprojectMouseToGround(Location)) { return false; }
+    bValid = false;
+    Radius = 50.f;
+    if (PlacementMode == ELKPlacementMode::Card)
+    {
+        ULKDeckState* Deck = GetDeckState();
+        if (!Deck || !Deck->GetHand().IsValidIndex(PlacingHandIndex)) { return false; }
+        const ULKCardDefinition* Card = GM->FindCard(Deck->GetHand()[PlacingHandIndex]);
+        if (!Card) { return false; }
+        if (OutAttackRadius) { *OutAttackRadius = GM->GetBuildingPlacementAttackRange(Card->CardId); }
+        if (Card->CardType == ELKCardType::Spell) { Radius = Card->SpellRadius; }
+        else { Radius = GM->GetGameData()->UnitBodyRadius; }
+        bValid = GM->ValidateCardPlay(ELKTeam::Player, PlacingHandIndex, Location) == ELKPlayResult::Success;
+    }
+    else if (PlacementMode == ELKPlacementMode::Hero)
+    {
+        Radius = FMath::Max(GM->GetGameData()->HeroCampMoveRadius, 2.f * GM->GetGameData()->UnitBodyRadius + GM->GetGameData()->HeroCampBodyRadius + 9.f);
+        bValid = GM->ValidateHeroDeployment(ELKTeam::Player, PlacingHeroId, Location) == ELKPlayResult::Success;
+    }
+    else if (ALKHeroCamp* Camp = GetSelectedCamp())
+    {
+        if (ALKUnitHero* Hero = Camp->GetHero())
+        {
+            Radius = Hero->GetBodyRadius();
+            // No path search in DrawHUD: preview covers geometry; the click also validates reachability.
+            bValid = Hero->IsAlive() && GM->IsInsideField(Location)
+                && FVector::Dist2D(Location, Hero->GetCampCenter()) <= Hero->GetCampMoveRadius() - Radius;
+            for (TActorIterator<ALKUnitBase> It(GetWorld()); It && bValid; ++It)
+            {
+                if (It->IsAlive() && It->IsBuilding() && FVector::Dist2D(Location, It->GetActorLocation()) < Radius + It->GetBodyRadius() + 1.f) { bValid = false; }
+            }
+        }
+    }
+    return true;
 }

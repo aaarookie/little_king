@@ -48,6 +48,10 @@ struct FLKUnitRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1"))
 	float AttackInterval = 1.0f;
 
+	/** 攻击前摇（秒）：进入攻击到命中结算的延迟（S5 打击感节奏；>0.25 会明显迟滞） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "0.5"))
+	float AttackWindup = 0.15f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ELKAttackType AttackType = ELKAttackType::Melee;
 
@@ -61,7 +65,7 @@ struct FLKUnitRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FName> HeroTraits;
 
-	/** 法师英雄：场上存在法师时法术卡才可用 */
+	/** 法师身份兼容标记；全场施法由独立特性决定 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsMage = false;
 
@@ -119,6 +123,12 @@ struct FLKTraitRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText TraitName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ELKTraitEffect Effect = ELKTraitEffect::Attributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1.0"))
+	float EffectRadius = 400.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FLKTraitModifier> Modifiers;

@@ -1,0 +1,328 @@
+{
+  "sprint": "5 revision - full hand queue, placement previews and dungeon planning",
+  "date": "2026-09-06",
+  "engine": "5.8.1-56057345",
+  "builds": [
+    {
+      "target": "little_kingEditor",
+      "platform": "Win64",
+      "configuration": "Development",
+      "result": "Succeeded"
+    }
+  ],
+  "automation": {
+    "reportCreatedOnUTC": "2026.09.06-14.32.46",
+    "succeeded": 3,
+    "succeededWithWarnings": 7,
+    "failed": 0,
+    "notRun": 0,
+    "tests": [
+      {
+        "name": "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+        "state": "Success",
+        "warnings": 2,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+        "state": "Success",
+        "warnings": 2,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+        "state": "Success",
+        "warnings": 1,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+        "state": "Success",
+        "warnings": 0,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+        "state": "Success",
+        "warnings": 0,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+        "state": "Success",
+        "warnings": 1,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+        "state": "Success",
+        "warnings": 1,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+        "state": "Success",
+        "warnings": 1,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Movement.CampPathGeometry",
+        "state": "Success",
+        "warnings": 0,
+        "errors": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Placement.BuildingAttackRange",
+        "state": "Success",
+        "warnings": 1,
+        "errors": 0
+      }
+    ]
+  },
+  "warningNotes": [
+    "Temporary gameplay test worlds have no camera.",
+    "GameplayCueNotifyPaths is unspecified; GAS falls back to scanning /Game/."
+  ],
+  "blueprints": {
+    "checked": [
+      "BP_ALKBattleGameMode",
+      "WBP_BattleHUD",
+      "GA_KnightHeal",
+      "GA_MageNova",
+      "GA_RangerShot"
+    ],
+    "errors": 0,
+    "compileWarnings": 0,
+    "failedToLoad": 0,
+    "allowListArgument": "-AllowListFile=Saved/Sprint5BlueprintAllowList.txt"
+  },
+  "userReportedPlaytest": "User tried a few battles and reported good results; no itemized visual checklist supplied.",
+  "visualChecksNotPerformedThisPass": [
+    "Building attack range circle appearance and mouse cancellation",
+    "Yellow center line appearance with debug drawing off"
+  ],
+  "deferredByUser": [
+    "Audio and presentation assets",
+    "Cooking and packaging",
+    "Hardware and performance-specific testing"
+  ],
+  "nextPhase": {
+    "plan": "docs/17-DungeonDevelopmentPlan.md",
+    "dungeonCodeImplemented": false,
+    "sprint6Deleted": true
+  },
+  "sourceInventoryRelativeToLocalRevisionBaseline": [
+    {
+      "path": "Source/little_king/ALKBattleGameMode.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKHeroCamp.cpp",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/ALKHeroCamp.h",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.cpp",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.h",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/LKDataTypes.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/LKNavigation.cpp",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/LKNavigation.h",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/LKTypes.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/Tests/LKSprint5Tests.cpp",
+      "change": "added"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKCardDefinition.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKCheatManager.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKCheatManager.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKGameData.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKGameData.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKGameplayLibrary.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKGameplayLibrary.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKSilverComponent.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKTraitAuraComponent.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKTraitAuraComponent.h",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAttributeSet.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.cpp",
+      "change": "modified"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.h",
+      "change": "modified"
+    }
+  ],
+  "assetFilesModifiedByAssistantThisPass": false,
+  "userAssetUpdatesIncluded": [
+    {
+      "path": "Content/Data/DA_GameData.uasset",
+      "sha256": "32fa648c6ef983a52ed1944396fd3fd7ad890da5ee2f2d955de4102351cd377f"
+    },
+    {
+      "path": "Content/Data/DT_Traits.uasset",
+      "sha256": "908225ee76f8dc63f0ce379b229bc0669714f4a37402d5293d36fb5809b425bf"
+    },
+    {
+      "path": "Content/Data/DT_Units.uasset",
+      "sha256": "d4868bfb9111166a6d5e09775cb1c1221bc68bbc5b095d95d96e36837955b348"
+    },
+    {
+      "path": "Content/blueprint/WBP_BattleHUD.uasset",
+      "sha256": "31c41d6665cbcb557aa7a44552c281433076c12f96deee79cf2f5fddd650364c"
+    }
+  ],
+  "previousRevisionEvidence": {
+    "note": "Before latest queue change; historical only",
+    "builds": [
+      {
+        "target": "little_kingEditor",
+        "platform": "Win64",
+        "configuration": "Development",
+        "result": "Succeeded"
+      },
+      {
+        "target": "little_king",
+        "platform": "Win64",
+        "configuration": "Development",
+        "result": "Succeeded"
+      }
+    ],
+    "automationTestsPassed": 8,
+    "blueprintWarnings": 2
+  },
+  "evidencePaths": [
+    "Saved/Logs/Sprint5QueueBuild.log",
+    "Saved/Logs/Sprint5QueueAutomation.log",
+    "Saved/Logs/Sprint5QueueBlueprintFinal.log",
+    "Saved/Automation/Sprint5Queue/index.json"
+  ],
+  "git": {
+    "scope": "Complete collaborative Sprint 5 work; commit identity is in git log",
+    "httpProxy": "http://127.0.0.1:18081"
+  }
+}

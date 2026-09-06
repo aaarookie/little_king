@@ -4,12 +4,14 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Actor.h"
 #include "LKTypes.h"
+#include "LKDataTypes.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "ALKUnitBase.generated.h"
 
 class UAbilitySystemComponent;
 class ULKUnitAttributeSet;
 class UPaperSpriteComponent;
-class UBoxComponent;
+class USphereComponent;
 class ULKUnitMovementComponent;
 class ULKTraitAuraComponent;
 class ULKGameData;
@@ -18,18 +20,37 @@ struct FLKUnitRow;
 /**
  * 单位基类（佣兵 / 英雄 / 建筑）。
  * 属性走 GAS（ULKUnitAttributeSet），移动/索敌/攻击为自研轻量 FSM。
- * 全部数值由 FLKUnitRow（DT_Units）驱动；找不到行时使用内置默认值，保证无资产可运行。
+ * 全部数值由 FLKUnitRow（DT_Units）驱动；未配置表时用内置示例；配置表缺行时拒绝生成。
  */
 UCLASS()
 class ALKUnitBase : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
+	friend struct FLKSprint5TestAccess;
 
 public:
 	ALKUnitBase();
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual bool IsCamp() const { return false; }
+	bool IsTargetable() const { return !bDead && !IsCamp(); }
+	float GetBodyRadius() const { return BodyRadius; }
+	UPaperSpriteComponent* GetSpriteComponent() const { return SpriteComponent; }
+	bool IsUnderFocusWarning() const { return FocusWarningRemaining > 0.f; }
+	void SetFocusWarning(float Seconds) { FocusWarningRemaining = FMath::Max(0.f, Seconds); }
+	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool AddTrait(FName TraitId);
+	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool RemoveTrait(FName TraitId);
+	UFUNCTION(BlueprintPure, Category = "LK|Traits") bool HasTrait(FName TraitId) const { return HeroTraits.Contains(TraitId); }
+	UFUNCTION(BlueprintPure, Category = "LK|Traits") bool HasTraitEffect(ELKTraitEffect Effect) const;
+	void AddAuraTauntSource(ALKUnitBase* Source);
+	void RemoveAuraTauntSource(ALKUnitBase* Source);
+	bool ResolveTrait(FName TraitId, FLKTraitRow& OutRow) const;
+	virtual bool CanPursueTarget(const ALKUnitBase* Target) const;
+	virtual FVector GetChaseDestination(const ALKUnitBase* Target) const;
+	virtual bool IsManualMoving() const { return false; }
+	void CancelAttackWindup();
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUnitDied, ALKUnitBase*, Unit);
 	UPROPERTY(BlueprintAssignable, Category = "LK|Unit")
@@ -97,7 +118,7 @@ public:
 	void Die();
 
 	/** 设置/获取索敌目标 */
-	void SetTarget(AActor* NewTarget) { TargetActor = NewTarget; }
+	void SetTarget(AActor* NewTarget);
 
 	/** 当前索敌目标（技能蓝图可用：单体技能找当前攻击对象） */
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
@@ -116,27 +137,35 @@ public:
 	bool IsInvulnerable() const { return bInvulnerable; }
 
 	/** 战斗开关：部署阶段关闭（不能移动/攻击/放技能），开战由 GameMode 统一打开 */
-	void SetCombatEnabled(bool bEnabled) { bCombatEnabled = bEnabled; }
+	virtual void SetCombatEnabled(bool bEnabled);
 	bool IsCombatEnabled() const { return bCombatEnabled; }
 
-	// ---------- S4：索敌优先级（ForcedTarget > 嘲讽者 > 最近敌人） ----------
-	/** 强制目标（AI 集火指令）：优先级最高的索敌目标；DurationSeconds <= 0 立即清除 */
+	// ---------- S4：索敌优先级（嘲讽者 > ForcedTarget > 最近可追击敌人） ----------
+	/** 强制目标（AI 集火指令）：低于有效嘲讽的索敌目标；DurationSeconds <= 0 立即清除 */
 	void SetForcedTarget(AActor* InTarget, float DurationSeconds);
 
 	bool HasForcedTarget() const { return ForcedTargetActor.IsValid(); }
 
 	/** 嘲讽标记（特性 Taunt）：敌方索敌优先攻击本单位 */
-	bool IsTaunting() const { return bTaunting; }
+	bool IsTaunting() const;
+
+	/** S5 受击反馈：命中瞬间精灵闪白（由伤害管线统一调用；纯视觉无逻辑） */
+	void TriggerHitFlash();
+
+	/** S5 死亡表现时长（缩小+淡出动画后销毁） */
+	static constexpr float DeathAnimDuration = 0.35f;
 
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	ELKAttackType GetAttackType() const { return AttackType; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
+	TObjectPtr<USceneComponent> LogicRoot;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<UPaperSpriteComponent> SpriteComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
-	TObjectPtr<UBoxComponent> BodyCollision;
+	TObjectPtr<USphereComponent> BodyCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
@@ -183,6 +212,28 @@ protected:
 
 	/** 嘲讽标记（Taunt 特性，InitUnit 时按 HeroTraits 解析） */
 	bool bTaunting = false;
+	TMap<TWeakObjectPtr<ALKUnitBase>, int32> AuraTauntSources;
+	TArray<FActiveGameplayEffectHandle> SelfTraitHandles;
+	TMap<FName, FLKTraitRow> ResolvedTraits;
+	TWeakObjectPtr<AActor> WindupTarget;
+	float FocusWarningRemaining = 0.f;
+	void ChangeTarget(AActor* NewTarget);
+
+	// ---------- S5 打击感状态 ----------
+	/** 攻击前摇（秒，DT_Units AttackWindup 注入；0 = 无前摇） */
+	float AttackWindup = 0.15f;
+	bool bWindupActive = false;
+	float WindupRemaining = 0.f;
+	/** 命中反馈计时；不冻结战斗逻辑 */
+	float HitStopRemaining = 0.f;
+	/** 攻击缩放脉冲计时（命中瞬间 1.15 -> 1.0 回弹） */
+	float AttackPulseRemaining = 0.f;
+	/** 受击闪白计时 */
+	float HitFlashRemaining = 0.f;
+	/** 死亡缩小淡出动画计时 */
+	float DeathAnimRemaining = 0.f;
+	/** 精灵基础本地缩放（InitUnit 记录；脉冲/死亡动画在此基础上乘） */
+	FVector BaseSpriteLocalScale = FVector(1.f, 1.f, 1.f);
 
 	/** 光环组件（有光环特性时启用；所有单位都挂一个空组件，避免运行时动态创建） */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
@@ -201,6 +252,8 @@ protected:
 	float DistanceTo2D(const AActor* Other) const;
 	void ApplyRowAttributes(const FLKUnitRow& Row);
 	void DrawDebugShape() const;
+	/** S5 打击感视觉（攻击脉冲/受击闪白恢复），Tick 调用 */
+	void TickCombatFeedback(float DeltaSeconds);
 
 	/** 按 HeroTraits + GameData.TraitTable 应用特性（自身修饰/光环/嘲讽标记），InitUnit 末尾调用 */
 	void ApplyTraits();

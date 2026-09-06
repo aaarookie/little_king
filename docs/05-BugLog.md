@@ -1,5 +1,8 @@
 # Bug 修复记录（Bug Log）
 
+> 2026-09-06：新增 Sprint 5 的 P0/P1 修复、回归范围和实际结果集中记录在 [15 协作变更记录](15-Sprint5ChangeLog.md)，对应测试位于 Source/little_king/Tests/LKSprint5Tests.cpp。本文以下是此前缺陷记录；相关旧规则按 [01](01-GDD.md) / [16](16-Sprint5MigrationTutorial.md)迁移。
+
+
 **用途**：记录每次修改的 bug——影响、原因、修复方法。新 bug 按编号追加在最后，保持编号递增。
 
 **格式**：现象（影响）→ 原因 → 修复 → 涉及文件 → 验证

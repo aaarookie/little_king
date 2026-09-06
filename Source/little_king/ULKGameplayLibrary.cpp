@@ -1,139 +1,58 @@
 #include "ULKGameplayLibrary.h"
-
-#include "CollisionQueryParams.h"
-#include "CollisionShape.h"
-#include "Engine/OverlapResult.h"
-#include "Engine/World.h"
-
 #include "ALKUnitBase.h"
+#include "ALKBattleGameMode.h"
 #include "LKGameplayHelpers.h"
-#include "LKLog.h"
 #include "ULKUnitAttributeSet.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
 
 namespace
 {
-	/** 半径内与单位碰撞体相交的 Actor 列表（ECC_Pawn 查询通道） */
-	TArray<FOverlapResult> OverlapUnits(UWorld* World, const FVector& Center, float Radius, const AActor* Ignore)
-	{
-		TArray<FOverlapResult> Overlaps;
-		if (!World || Radius <= 0.f)
-		{
-			return Overlaps;
-		}
-
-		FCollisionQueryParams Params;
-		if (Ignore)
-		{
-			Params.AddIgnoredActor(Ignore);
-		}
-		World->OverlapMultiByChannel(Overlaps, Center, FQuat::Identity, ECC_Pawn,
-			FCollisionShape::MakeSphere(Radius), Params);
-		return Overlaps;
-	}
+    int32 ApplyArea(AActor* CenterActor, float Radius, float Amount, AActor* Caster, bool bHeal)
+    {
+        ALKUnitBase* SourceUnit = Cast<ALKUnitBase>(Caster);
+        if (!IsValid(CenterActor) || !SourceUnit || !SourceUnit->IsTargetable() || SourceUnit->IsManualMoving()
+            || !FMath::IsFinite(Radius) || Radius <= 0.f || !FMath::IsFinite(Amount) || Amount <= 0.f) { return 0; }
+        UWorld* World = CenterActor->GetWorld();
+        ALKBattleGameMode* GM = World->GetAuthGameMode<ALKBattleGameMode>();
+        if (GM && GM->GetPhase() != ELKGamePhase::Battle) { return 0; }
+        FLKCombatSource Source = LKGameplay::MakeSource(Caster, ELKCombatSourceKind::Skill, SourceUnit->GetUnitId());
+        TArray<ALKUnitBase*> Targets;
+        for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+        {
+            ALKUnitBase* Unit = *It;
+            if (Unit->IsTargetable() && ((Unit->GetTeam() == SourceUnit->GetTeam()) == bHeal)
+                && FVector::Dist2D(CenterActor->GetActorLocation(), Unit->GetActorLocation()) <= Radius) { Targets.Add(Unit); }
+        }
+        if (GM) { GM->BeginCombatBatch(); }
+        int32 Count = 0;
+        for (ALKUnitBase* Unit : Targets)
+        {
+            const float Actual = bHeal ? LKGameplay::ApplyHeal(Unit, Amount, Caster, &Source)
+                : LKGameplay::ApplyDamage(Unit, Amount, Caster, false, &Source);
+            if (Actual > 0.f) { ++Count; }
+        }
+        if (GM) { GM->EndCombatBatch(); }
+        return Count;
+    }
 }
 
 int32 ULKGameplayLibrary::LK_ApplyDamageInRadius(AActor* CenterActor, float Radius, float Damage, AActor* Caster)
 {
-	if (!CenterActor || Damage <= 0.f)
-	{
-		return 0;
-	}
-
-	UWorld* World = CenterActor->GetWorld();
-	if (!World)
-	{
-		return 0;
-	}
-
-	// 敌我判定：施法者是单位 -> 只打敌方；否则退化为"半径内除施法者外所有单位"，并告警提醒接线问题
-	const ALKUnitBase* CasterUnit = Cast<ALKUnitBase>(Caster);
-	if (!CasterUnit)
-	{
-		UE_LOG(LogLK, Warning,
-			TEXT("[Skill] 施法者不是单位，范围伤害将作用于半径内所有单位（检查技能蓝图的 Caster 引脚）"));
-	}
-
-	int32 HitCount = 0;
-	for (const FOverlapResult& Overlap : OverlapUnits(World, CenterActor->GetActorLocation(), Radius, Caster))
-	{
-		ALKUnitBase* Unit = Cast<ALKUnitBase>(Overlap.GetActor());
-		if (!Unit || Unit->IsDead())
-		{
-			continue;
-		}
-
-		if (CasterUnit && Unit->GetTeam() == CasterUnit->GetTeam())
-		{
-			continue; // 不打友军
-		}
-
-		LKGameplay::ApplyDamage(Unit, Damage, Caster);
-		++HitCount;
-	}
-
-	if (HitCount > 0)
-	{
-		UE_LOG(LogLKUnit, Log, TEXT("[Skill] 范围伤害 %s：半径 %.0f 命中 %d 个单位"),
-			*CenterActor->GetName(), Radius, HitCount);
-	}
-	return HitCount;
+    return ApplyArea(CenterActor, Radius, Damage, Caster, false);
 }
-
 int32 ULKGameplayLibrary::LK_ApplyHealInRadius(AActor* CenterActor, float Radius, float HealAmount, AActor* Caster)
 {
-	if (!CenterActor || HealAmount <= 0.f)
-	{
-		return 0;
-	}
-
-	UWorld* World = CenterActor->GetWorld();
-	if (!World)
-	{
-		return 0;
-	}
-
-	const ALKUnitBase* CasterUnit = Cast<ALKUnitBase>(Caster);
-	if (!CasterUnit)
-	{
-		UE_LOG(LogLK, Warning,
-			TEXT("[Skill] 施法者不是单位，无法判断友军，治疗不生效（检查技能蓝图的 Caster 引脚）"));
-		return 0;
-	}
-
-	int32 HitCount = 0;
-	// 不忽略 Caster：治疗包含施法者自己（骑士鼓舞可以自奶）
-	for (const FOverlapResult& Overlap : OverlapUnits(World, CenterActor->GetActorLocation(), Radius, nullptr))
-	{
-		ALKUnitBase* Unit = Cast<ALKUnitBase>(Overlap.GetActor());
-		if (!Unit || Unit->IsDead() || Unit->GetTeam() != CasterUnit->GetTeam())
-		{
-			continue;
-		}
-
-		LKGameplay::ApplyHeal(Unit, HealAmount, Caster);
-		++HitCount;
-	}
-
-	if (HitCount > 0)
-	{
-		UE_LOG(LogLKUnit, Log, TEXT("[Skill] 范围治疗 %s：半径 %.0f 治疗 %d 个单位"),
-			*CenterActor->GetName(), Radius, HitCount);
-	}
-	return HitCount;
+    return ApplyArea(CenterActor, Radius, HealAmount, Caster, true);
 }
-
 AActor* ULKGameplayLibrary::LK_GetNearestEnemy(AActor* Unit)
 {
-	ALKUnitBase* Self = Cast<ALKUnitBase>(Unit);
-	return Self ? Self->FindNearestEnemy() : nullptr;
+    ALKUnitBase* Self = Cast<ALKUnitBase>(Unit);
+    if (!Self || !Self->IsTargetable() || Self->IsManualMoving()) { return nullptr; }
+    if (AActor* Taunter = Self->FindNearestEnemy(true)) { return Taunter; }
+    if (ALKUnitBase* Forced = Cast<ALKUnitBase>(Self->ForcedTargetActor.Get()))
+    { if (Self->CanPursueTarget(Forced)) { return Forced; } }
+    return Self->FindNearestEnemy();
 }
-
-float ULKGameplayLibrary::LK_GetUnitHealth(AActor* Unit)
-{
-	return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetHealthAttribute(), 0.f);
-}
-
-float ULKGameplayLibrary::LK_GetUnitMaxHealth(AActor* Unit)
-{
-	return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetMaxHealthAttribute(), 0.f);
-}
+float ULKGameplayLibrary::LK_GetUnitHealth(AActor* Unit) { return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetHealthAttribute(), 0.f); }
+float ULKGameplayLibrary::LK_GetUnitMaxHealth(AActor* Unit) { return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetMaxHealthAttribute(), 0.f); }

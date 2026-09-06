@@ -13,7 +13,7 @@ void ULKUnitAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		const float MaxHp = FMath::Max(1.f, GetMaxHealth());
-		Health.SetCurrentValue(FMath::Clamp(GetHealth(), 0.f, MaxHp));
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, MaxHp));
 
 		AActor* OwningActor = GetOwningActor();
 		if (ALKUnitBase* Unit = Cast<ALKUnitBase>(OwningActor))

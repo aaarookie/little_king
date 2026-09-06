@@ -1,4 +1,8 @@
 #include "ALKBattleGameMode.h"
+#include "ALKHeroCamp.h"
+#include "ALKUnitHero.h"
+#include "ALKPresentationHUD.h"
+#include "Sound/SoundBase.h"
 
 #include "Blueprint/UserWidget.h"
 #include "CollisionQueryParams.h"
@@ -14,6 +18,7 @@
 #include "ALKOpponentBrain.h"
 #include "ALKPlayerController.h"
 #include "ALKPlayerState.h"
+#include "ALKProjectile.h"
 #include "ALKUnitBase.h"
 #include "ALKUnitBuilding.h"
 #include "ALKUnitHero.h"
@@ -32,6 +37,7 @@ ALKBattleGameMode::ALKBattleGameMode()
 
 	// 纯 UI 驱动战斗，不需要 Pawn
 	DefaultPawnClass = nullptr;
+    HUDClass = ALKPresentationHUD::StaticClass();
 	GameStateClass = ALKBattleGameState::StaticClass();
 	PlayerStateClass = ALKPlayerState::StaticClass();
 	PlayerControllerClass = ALKPlayerController::StaticClass();
@@ -56,7 +62,148 @@ void ALKBattleGameMode::BeginPlay()
 	// 敌方默认英雄就位（否则玩家没有可击败的目标，胜负永不触发）
 	AutoDeployDefaultHeroes(ELKTeam::Enemy);
 
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] GameMode 就绪，进入部署阶段（%.0f 秒）"), GameData->DeploymentTime);
+	// S5 弹道对象池预生成（命中/超时回收复用，避免每箭 New/Delete）
+	InitProjectilePool();
+
+	UE_LOG(LogLKBattle, Log, TEXT("[Battle] GameMode 就绪，无限部署时间，全部英雄部署后由玩家开始"));
+}
+
+void ALKBattleGameMode::InitProjectilePool()
+{
+	UWorld* World = GetWorld();
+	if (!World || ProjectilePool.Num() > 0)
+	{
+		return;
+	}
+
+	// 预生成 32 条，全部停用藏在战场外
+	const int32 PreSpawnCount = 32;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Owner = this;
+
+	for (int32 i = 0; i < PreSpawnCount; ++i)
+	{
+		ALKProjectile* Projectile = World->SpawnActor<ALKProjectile>(
+			ALKProjectile::StaticClass(), FVector(0.f, 0.f, -100000.f), FRotator::ZeroRotator, Params);
+		if (Projectile)
+		{
+			Projectile->DeactivateToPool();
+			ProjectilePool.Add(Projectile);
+		}
+	}
+
+	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 弹道对象池就绪：%d 条"), ProjectilePool.Num());
+}
+
+ALKProjectile* ALKBattleGameMode::AcquireProjectile(const FVector& Location, float Damage, ELKTeam Team, AActor* InInstigator, const FVector& Direction)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return nullptr;
+	}
+
+	// 复用池中闲置弹道
+	for (ALKProjectile* Projectile : ProjectilePool)
+	{
+		if (Projectile && !Projectile->IsPooledActive())
+		{
+			Projectile->ActivateFromPool(Location, Damage, Team, InInstigator, Direction);
+			return Projectile;
+		}
+	}
+
+	// 池耗尽（极端场面）：动态扩一条（保底可玩）
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Owner = this;
+	ALKProjectile* Projectile = World->SpawnActor<ALKProjectile>(
+		ALKProjectile::StaticClass(), Location, FRotator::ZeroRotator, Params);
+	if (Projectile)
+	{
+		Projectile->ActivateFromPool(Location, Damage, Team, InInstigator, Direction);
+		ProjectilePool.Add(Projectile);
+		UE_LOG(LogLKBattle, Warning, TEXT("[Battle] 弹道池耗尽，动态扩容至 %d 条（预期内可忽略；若频繁出现说明场上远程单位过多）"),
+			ProjectilePool.Num());
+	}
+	return Projectile;
+}
+
+void ALKBattleGameMode::ReleaseProjectile(ALKProjectile* Projectile)
+{
+	if (!Projectile)
+	{
+		return;
+	}
+
+	// 确认是本池管理的弹道（旧路径直生成的直接销毁）
+	bool bInPool = false;
+	for (const TObjectPtr<ALKProjectile>& P : ProjectilePool)
+	{
+		if (P == Projectile)
+		{
+			bInPool = true;
+			break;
+		}
+	}
+
+	if (!bInPool)
+	{
+		Projectile->Destroy();
+		return;
+	}
+
+	Projectile->DeactivateToPool();
+}
+
+void ALKBattleGameMode::ReleaseAllProjectiles()
+{
+	for (ALKProjectile* Projectile : ProjectilePool)
+	{
+		if (Projectile)
+		{
+			Projectile->DeactivateToPool();
+		}
+	}
+}
+
+void ALKBattleGameMode::GetProjectilePoolStats(int32& OutTotal, int32& OutActive) const
+{
+	OutTotal = ProjectilePool.Num();
+	OutActive = 0;
+	for (const ALKProjectile* Projectile : ProjectilePool)
+	{
+		if (Projectile && Projectile->IsPooledActive())
+		{
+			++OutActive;
+		}
+	}
+}
+
+void ALKBattleGameMode::PlayLKOneShot(FName SoundId, const FVector& Location, float VolumeScale)
+{
+	LKGameplay::PlayOneShot(GetWorld(), GameData, SoundId, Location, VolumeScale);
+}
+
+void ALKBattleGameMode::TriggerCameraShake(float BaseIntensity)
+{
+	const float Scale = GameData ? GameData->CameraShakeScale : 1.f;
+	if (Scale <= 0.f)
+	{
+		return; // 可配置关闭震屏
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	if (ALKPlayerController* PC = Cast<ALKPlayerController>(World->GetFirstPlayerController()))
+	{
+		PC->RequestCameraShake(BaseIntensity * Scale);
+	}
 }
 
 void ALKBattleGameMode::EnsureGameData()
@@ -68,6 +215,32 @@ void ALKBattleGameMode::EnsureGameData()
 	}
 
 	GameData->EnsureDefaultDecks();
+    BattleRandom.Initialize(GameData->BattleSeed);
+    SeedTieBreaker = BattleRandom.RandRange(0, 1) == 0 ? ELKTeam::Player : ELKTeam::Enemy;
+    MatchStats.Seed = GameData->BattleSeed;
+    for (const auto& Pair : GameData->SoundMap)
+    {
+        if (USoundBase* Sound = Pair.Value.LoadSynchronous()) { PreloadedSounds.Add(Pair.Key, Sound); }
+    }
+    auto AddUnit = [this](FName Id, ELKUnitClass Type, ELKAttackType Attack, float HP, float Range, float Damage)
+    {
+        FLKUnitRow& Row = FallbackUnitRows.FindOrAdd(Id);
+        Row.UnitId = Id; Row.UnitClass = Type; Row.AttackType = Attack;
+        Row.BaseHealth = HP; Row.AttackRange = Range; Row.AttackDamage = Damage;
+    };
+    AddUnit(TEXT("Hero_Knight"), ELKUnitClass::Hero, ELKAttackType::Melee, 800.f, 170.f, 35.f);
+    AddUnit(TEXT("Hero_Mage"), ELKUnitClass::Hero, ELKAttackType::Ranged, 450.f, 700.f, 25.f);
+    FallbackUnitRows[TEXT("Hero_Mage")].bIsMage = true;
+    AddUnit(TEXT("Hero_Ranger"), ELKUnitClass::Hero, ELKAttackType::Ranged, 500.f, 850.f, 25.f);
+    AddUnit(TEXT("Unit_Swordsman"), ELKUnitClass::Soldier, ELKAttackType::Melee, 140.f, 150.f, 15.f);
+    AddUnit(TEXT("Unit_Archer"), ELKUnitClass::Soldier, ELKAttackType::Ranged, 100.f, 700.f, 18.f);
+    AddUnit(TEXT("Unit_Shieldbearer"), ELKUnitClass::Soldier, ELKAttackType::Melee, 250.f, 150.f, 8.f);
+    FallbackUnitRows[TEXT("Unit_Shieldbearer")].HeroTraits = { TEXT("Taunt") };
+    AddUnit(TEXT("Building_ArrowTower"), ELKUnitClass::Building, ELKAttackType::Ranged, 400.f, 900.f, 20.f);
+    FallbackUnitRows[TEXT("Building_ArrowTower")].BuildingBehavior = ELKBuildingBehavior::Turret;
+    AddUnit(TEXT("Building_Barracks"), ELKUnitClass::Building, ELKAttackType::Melee, 450.f, 0.f, 0.f);
+    FallbackUnitRows[TEXT("Building_Barracks")].BuildingBehavior = ELKBuildingBehavior::Barracks;
+    FallbackUnitRows[TEXT("Building_Barracks")].SpawnUnitId = TEXT("Unit_Swordsman");
 
 	UnitTableCached = GameData->UnitTable.LoadSynchronous();
 
@@ -131,14 +304,7 @@ void ALKBattleGameMode::Tick(float DeltaSeconds)
 
 void ALKBattleGameMode::TickDeployment(float DeltaSeconds)
 {
-	TryInitPlayerState();
-
-	PhaseElapsed += DeltaSeconds;
-	if (PhaseElapsed >= GameData->DeploymentTime)
-	{
-		SetPhase(ELKGamePhase::Battle);
-		UE_LOG(LogLKBattle, Log, TEXT("[Battle] 部署倒计时结束，自动开战"));
-	}
+    TryInitPlayerState(); // 无限部署时间，只有玩家主动开始。
 }
 
 void ALKBattleGameMode::TryInitPlayerState()
@@ -161,7 +327,10 @@ void ALKBattleGameMode::TryInitPlayerState()
 	}
 
 	PS->Silver->Init(GameData->SilverPerSecond, GameData->SilverCap);
-	PS->Deck->InitDeck(GameData->DefaultPlayerDeck, GameData->HandSize);
+	if (!PS->Deck->InitDeck(GameData->DefaultPlayerDeck, GameData->HandSize, GameData->BattleSeed + 1))
+	{
+		UE_LOG(LogLKBattle, Warning, TEXT("[Deck] 玩家牌库无效：去重后至少需要 HandSize + 1 种卡，禁止开战"));
+	}
 	PS->Deck->CostProvider = [this](FName CardId) { return GetCardCost(CardId); };
 	bPlayerStateReady = true;
 
@@ -193,6 +362,8 @@ void ALKBattleGameMode::TickBattle(float DeltaSeconds)
 		OpponentBrain->TickBrain(DeltaSeconds, BattleElapsed);
 	}
 
+	if (Phase != ELKGamePhase::Battle) { return; }
+
 	if (!bOvertimeActive && BattleElapsed >= GameData->BattleTimeLimit)
 	{
 		bOvertimeActive = true;
@@ -207,122 +378,105 @@ void ALKBattleGameMode::TickBattle(float DeltaSeconds)
 
 	if (bOvertimeActive)
 	{
-		TickOvertime(DeltaSeconds);
+		TickOvertime(FMath::Min(DeltaSeconds, FMath::Max(0.f, BattleElapsed - GameData->BattleTimeLimit)));
 	}
 }
 
 void ALKBattleGameMode::TickOvertime(float DeltaSeconds)
 {
-	OvertimeElapsed += DeltaSeconds;
-	OvertimeTickAccumulator += DeltaSeconds;
-
-	if (OvertimeTickAccumulator < GameData->OvertimeWeaknessTick)
-	{
-		return;
-	}
-	OvertimeTickAccumulator = 0.f;
-
-	const float Pct = GameData->OvertimeWeaknessBasePct
-		* (1.f + GameData->OvertimeWeaknessGrowth * (OvertimeElapsed / GameData->OvertimeWeaknessTick));
-
-	for (int32 TeamIdx = 0; TeamIdx < 2; ++TeamIdx)
-	{
-		// 遍历【快照副本】：ApplyDamage 可能把英雄打死 -> 同步回调 HandleUnitDied -> Remove 原数组，
-		// 直接 range-for 原数组会在 checked 构建触发 "Array has changed during ranged-for iteration"
-		const TArray<ALKUnitBase*> HeroesSnapshot = AliveHeroes[TeamIdx];
-		for (ALKUnitBase* Hero : HeroesSnapshot)
-		{
-			if (Hero && Hero->IsAlive())
-			{
-				LKGameplay::ApplyMaxHealthPercentDamage(Hero, Pct, nullptr);
-			}
-		}
-	}
-
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 虚弱结算：%.2f%% 最大生命"), Pct * 100.f);
+    OvertimeElapsed += DeltaSeconds;
+    OvertimeTickAccumulator += DeltaSeconds;
+    const float Interval = FMath::Max(1.f, GameData->OvertimeWeaknessTick);
+    while (OvertimeTickAccumulator >= Interval && Phase == ELKGamePhase::Battle)
+    {
+        OvertimeTickAccumulator -= Interval;
+        const float TickTime = OvertimeElapsed - OvertimeTickAccumulator;
+        const float Pct = GameData->OvertimeWeaknessBasePct * (1.f + GameData->OvertimeWeaknessGrowth * TickTime / Interval);
+        BeginCombatBatch();
+        for (int32 TeamIdx = 0; TeamIdx < 2; ++TeamIdx)
+        {
+            const TArray<ALKUnitBase*> Snapshot = AliveHeroes[TeamIdx];
+            for (ALKUnitBase* Hero : Snapshot)
+            {
+                if (IsValid(Hero) && Hero->IsAlive()) { LKGameplay::ApplyMaxHealthPercentDamage(Hero, Pct, nullptr); }
+            }
+        }
+        EndCombatBatch();
+    }
 }
 
 void ALKBattleGameMode::TickPlayerSilver(float DeltaSeconds)
 {
-	if (!bPlayerStateReady)
-	{
-		return;
-	}
-
-	if (ALKPlayerState* PS = Cast<ALKPlayerState>(GetWorld()->GetFirstPlayerController()->PlayerState))
-	{
-		PS->Silver->TickSilver(DeltaSeconds);
-	}
+    if (bPlayerStateReady)
+    {
+        if (ULKSilverComponent* Silver = GetTeamSilver(ELKTeam::Player)) { Silver->TickSilver(DeltaSeconds); }
+    }
 }
 
 void ALKBattleGameMode::SetPhase(ELKGamePhase NewPhase)
 {
-	if (Phase == NewPhase)
-	{
-		return;
-	}
-
-	// 开战时玩家一个英雄都没部署 -> 自动补位，保证对局必然能分出胜负
-	if (NewPhase == ELKGamePhase::Battle && Phase == ELKGamePhase::Deployment && HeroCounts[0] == 0)
-	{
-		AutoDeployDefaultHeroes(ELKTeam::Player);
-	}
-
-	Phase = NewPhase;
-
-	// 部署阶段冻结单位（不能移动/攻击/放技能），开战才解冻
-	ApplyCombatEnabledToAllUnits(NewPhase == ELKGamePhase::Battle);
-
-	// 开战瞬间广播法术锁定状态（HUD 刷新手牌）
-	if (NewPhase == ELKGamePhase::Battle)
-	{
-		OnSpellLockChanged.Broadcast(CanCastSpell(ELKTeam::Player));
-	}
-
-	if (ALKBattleGameState* GS = GetGameState<ALKBattleGameState>())
-	{
-		GS->SetPhase(NewPhase);
-	}
+    if (Phase == NewPhase) { return; }
+    if (NewPhase == ELKGamePhase::Battle && !CanStartBattle()) { return; }
+    Phase = NewPhase;
+    ApplyCombatEnabledToAllUnits(NewPhase == ELKGamePhase::Battle);
+    if (NewPhase == ELKGamePhase::Battle) { PlayLKOneShot(TEXT("BattleStart"), FVector::ZeroVector); }
+    if (ALKBattleGameState* GS = GetGameState<ALKBattleGameState>()) { GS->SetPhase(NewPhase); }
 }
 
 void ALKBattleGameMode::ApplyCombatEnabledToAllUnits(bool bEnabled)
 {
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
 	{
-		(*It)->SetCombatEnabled(bEnabled);
+		(*It)->SetCombatEnabled(bEnabled && !(*It)->IsCamp());
 	}
 }
 
 void ALKBattleGameMode::AutoDeployDefaultHeroes(ELKTeam Team)
 {
-	const int32 TeamIdx = (int32)Team;
-	const int32 ToDeploy = FMath::Min(AvailableHeroes.Num(), GameData->MaxHeroesPerTeam);
-	const float Sign = (Team == ELKTeam::Player) ? -1.f : 1.f;
+    if (Team == ELKTeam::Player) { return; }
+    for (int32 i = 0; i < AvailableHeroes.Num(); ++i)
+    {
+        const float X = (i - (AvailableHeroes.Num() - 1) * 0.5f) * GameData->FieldHalfWidth * 0.6f;
+        const FVector Location(X, GameData->FieldHalfHeight * 0.65f, 0.f);
+        const ELKPlayResult Result = DeployHero(Team, AvailableHeroes[i], Location);
+        if (Result != ELKPlayResult::Success) { UE_LOG(LogLKBattle, Error, TEXT("[Deployment] 敌方英雄部署失败 %s: %d"), *AvailableHeroes[i].ToString(), int32(Result)); }
+    }
+}
 
-	for (int32 i = 0; i < ToDeploy; ++i)
-	{
-		// 左右分界在 Y 轴：玩家 Y<0（屏幕左），敌方 Y>0（屏幕右）
-		const FVector Loc(
-			FMath::FRandRange(-0.6f, 0.6f) * GameData->FieldHalfWidth,
-			Sign * FMath::FRandRange(0.3f, 0.7f) * GameData->FieldHalfHeight,
-			0.f);
+bool ALKBattleGameMode::HasValidDecks() const
+{
+    for (ELKTeam Side : { ELKTeam::Player, ELKTeam::Enemy })
+    {
+        const ULKDeckState* Deck = GetTeamDeck(Side);
+        if (!Deck || !Deck->IsReady()) { return false; }
+        for (FName Id : Deck->GetAllCards()) { if (!FindCard(Id)) { return false; } }
+    }
+    return true;
+}
 
-		if (ALKUnitBase* Hero = SpawnUnitForTeam(AvailableHeroes[i], Team, Loc, ELKUnitClass::Hero))
-		{
-			DeployedHeroes[TeamIdx].Add(AvailableHeroes[i]);
-		}
-	}
+float ALKBattleGameMode::GetBuildingPlacementAttackRange(FName CardId) const
+{
+    const ULKCardDefinition* Card = FindCard(CardId);
+    if (!Card || Card->CardType != ELKCardType::Building) { return 0.f; }
+    const FLKUnitRow* Row = GetUnitRow(Card->BuildingUnitId);
+    return Row && Row->BuildingBehavior == ELKBuildingBehavior::Turret && FMath::IsFinite(Row->AttackRange)
+        ? FMath::Max(0.f, Row->AttackRange) : 0.f;
+}
 
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 自动部署默认英雄 x%d（%s）"), ToDeploy, TeamIdx == 0 ? TEXT("玩家") : TEXT("敌方"));
+bool ALKBattleGameMode::CanStartBattle() const
+{
+    if (Phase != ELKGamePhase::Deployment || !bPlayerStateReady || AvailableHeroes.IsEmpty() || !HasValidDecks()) { return false; }
+    for (int32 Side = 0; Side < 2; ++Side)
+    {
+        for (FName Id : AvailableHeroes) { if (!DeployedHeroes[Side].Contains(Id)) { return false; } }
+        if (HeroCounts[Side] != AvailableHeroes.Num()) { return false; }
+    }
+    return true;
 }
 
 void ALKBattleGameMode::ForceStartBattle()
 {
-	if (Phase == ELKGamePhase::Deployment)
-	{
-		SetPhase(ELKGamePhase::Battle);
-		UE_LOG(LogLKBattle, Log, TEXT("[Battle] 手动开战"));
-	}
+    if (CanStartBattle()) { SetPhase(ELKGamePhase::Battle); }
 }
 
 void ALKBattleGameMode::ForceEndMatch(ELKTeam Winner)
@@ -337,10 +491,23 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 		return;
 	}
 
-	Phase = ELKGamePhase::Result;
+	MatchStats.Duration = BattleElapsed;
+    MatchStats.bOvertime = bOvertimeActive;
+    MatchStats.Winner = Winner;
+    Phase = ELKGamePhase::Result;
+    UE_LOG(LogLKBattle, Log, TEXT("[MatchStats] Seed=%d Winner=%d Duration=%.2f Kills=%d/%d Damage=%.1f/%.1f Healing=%.1f/%.1f Cards=%d/%d Overtime=%d Simultaneous=%d"),
+        MatchStats.Seed, int32(Winner), BattleElapsed, MatchStats.Player.Kills, MatchStats.Enemy.Kills,
+        MatchStats.Player.Damage, MatchStats.Enemy.Damage, MatchStats.Player.Healing, MatchStats.Enemy.Healing,
+        MatchStats.Player.CardsPlayed, MatchStats.Enemy.CardsPlayed, int32(bOvertimeActive), int32(MatchStats.bSimultaneousElimination));
 
 	// 对局结束，单位停止战斗
 	ApplyCombatEnabledToAllUnits(false);
+
+	// S5：回收全部弹道（防对象池泄漏）
+	ReleaseAllProjectiles();
+
+	// S5 音效：胜利/失败
+	PlayLKOneShot(Winner == ELKTeam::Player ? TEXT("Victory") : TEXT("Defeat"), FVector::ZeroVector, 1.f);
 
 	if (ALKBattleGameState* GS = GetGameState<ALKBattleGameState>())
 	{
@@ -350,147 +517,172 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 
 void ALKBattleGameMode::HandleUnitDied(ALKUnitBase* Unit)
 {
-	if (!Unit)
-	{
-		return;
-	}
+    if (!Unit || Unit->IsCamp()) { return; }
+    const int32 Side = int32(Unit->GetTeam());
+    if (Unit->IsHero())
+    {
+        AliveHeroes[Side].Remove(Unit);
+        HeroCounts[Side] = FMath::Max(0, HeroCounts[Side] - 1);
+        bPendingVictoryCheck = true;
+    }
+    if (Unit->IsBuilding())
+    {
+        int32& Count = BuildingCounts[Side].FindOrAdd(Unit->GetUnitId());
+        Count = FMath::Max(0, Count - 1);
+    }
+    if (CombatBatchDepth == 0) { CheckVictoryAfterBatch(); }
+}
 
-	const int32 TeamIdx = (int32)Unit->GetTeam();
+void ALKBattleGameMode::EndCombatBatch()
+{
+    check(CombatBatchDepth > 0);
+    --CombatBatchDepth;
+    if (CombatBatchDepth == 0) { CheckVictoryAfterBatch(); }
+}
 
-	if (Unit->IsHero())
-	{
-		AliveHeroes[TeamIdx].Remove(Unit);
-		HeroCounts[TeamIdx] = FMath::Max(0, HeroCounts[TeamIdx] - 1);
-		UE_LOG(LogLKBattle, Log, TEXT("[Battle] 英雄阵亡 %s，%s 剩余英雄 %d"),
-			*Unit->GetUnitId().ToString(), TeamIdx == 0 ? TEXT("玩家") : TEXT("敌方"), HeroCounts[TeamIdx]);
+void ALKBattleGameMode::CheckVictoryAfterBatch()
+{
+    if (!bPendingVictoryCheck || Phase != ELKGamePhase::Battle) { return; }
+    bPendingVictoryCheck = false;
+    if (HeroCounts[0] > 0 && HeroCounts[1] > 0) { return; }
+    if (HeroCounts[0] <= 0 && HeroCounts[1] <= 0)
+    {
+        MatchStats.bSimultaneousElimination = true;
+        const float Difference = MatchStats.Player.Damage - MatchStats.Enemy.Damage;
+        EndMatch(FMath::IsNearlyZero(Difference) ? SeedTieBreaker : (Difference > 0.f ? ELKTeam::Player : ELKTeam::Enemy));
+    }
+    else { EndMatch(HeroCounts[0] > 0 ? ELKTeam::Player : ELKTeam::Enemy); }
+}
 
-		if (HeroCounts[TeamIdx] <= 0)
-		{
-			const ELKTeam Winner = (TeamIdx == 0) ? ELKTeam::Enemy : ELKTeam::Player;
-			UE_LOG(LogLKBattle, Log, TEXT("[Battle] 一方英雄全灭，胜者: %d"), (int32)Winner);
-			EndMatch(Winner);
-		}
+void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
+{
+    if (Phase == ELKGamePhase::Result) { return; }
+    if (Event.Source.bHasTeam)
+    {
+        FLKTeamMatchStats& Stats = Event.Source.Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy;
+        if (Event.bIsHeal) { Stats.Healing += Event.ActualAmount; }
+        else if (Event.Source.Team != Event.TargetTeam)
+        {
+            Stats.Damage += Event.ActualAmount;
+            if (Event.bKilled) { ++Stats.Kills; }
+        }
+    }
+    OnCombatEvent.Broadcast(Event);
+    if (Event.ActualAmount > 0.f) { OnDamageEvent.Broadcast(Event.Location, Event.ActualAmount, Event.bIsHeal); }
+}
 
-		// 法师英雄阵亡 -> 法术可能被锁定，通知 HUD 刷新
-		if (Unit->IsMage())
-		{
-			OnSpellLockChanged.Broadcast(HasMage(ELKTeam::Player));
-		}
-	}
+void ALKBattleGameMode::NotifyFireballCast(const FVector& Location)
+{
+    if (Phase == ELKGamePhase::Battle) { TriggerCameraShake(GameData->FireballShakeIntensity); }
+}
 
-	if (Unit->IsBuilding())
-	{
-		if (int32* Count = BuildingCounts[TeamIdx].Find(Unit->GetUnitId()))
-		{
-			*Count = FMath::Max(0, *Count - 1);
-		}
-	}
+USoundBase* ALKBattleGameMode::FindPreloadedSound(FName Id) const
+{
+    const TObjectPtr<USoundBase>* Sound = PreloadedSounds.Find(Id);
+    return Sound ? Sound->Get() : nullptr;
+}
+
+ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex, const FVector& Location) const
+{
+    if (Phase != ELKGamePhase::Battle) { return ELKPlayResult::WrongPhase; }
+    const ULKDeckState* Deck = GetTeamDeck(Team);
+    const ULKSilverComponent* Silver = GetTeamSilver(Team);
+    if (!Deck || !Silver) { return ELKPlayResult::Unknown; }
+    const FName Id = Deck->GetHandCard(HandIndex);
+    if (Id.IsNone()) { return ELKPlayResult::HandEmpty; }
+    const ULKCardDefinition* Card = FindCard(Id);
+    if (!Card || Card->Cost < 0) { return ELKPlayResult::InvalidCardData; }
+    if (Card->CardType == ELKCardType::Spell)
+    {
+        if (Card->SpellEffect == ELKSpellEffect::None || !FMath::IsFinite(Card->SpellValue) || Card->SpellValue <= 0.f
+            || !FMath::IsFinite(Card->SpellRadius) || Card->SpellRadius <= 0.f) { return ELKPlayResult::InvalidCardData; }
+        if (!IsInsideField(Location)) { return ELKPlayResult::InvalidLocation; }
+        if (!CanPlaceSpellAt(Team, Location)) { return ELKPlayResult::SpellLocked; }
+    }
+    else
+    {
+        const FName UnitId = Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId;
+        const FLKUnitRow* Row = GetUnitRow(UnitId);
+        if (!Row || Row->UnitClass != (Card->CardType == ELKCardType::Building ? ELKUnitClass::Building : ELKUnitClass::Soldier)) { return ELKPlayResult::InvalidCardData; }
+        // -2 继承全局，-1 不限，>=0 卡牌自己的上限。
+        const int32 Limit = Card->BuildingTypeLimitOverride == -2 ? GameData->BuildingTypeLimit : Card->BuildingTypeLimitOverride;
+        if (!IsPlacementValid(Location, Team, Card->CardType, UnitId, Limit)) { return ELKPlayResult::InvalidLocation; }
+        if (GameData->MaxUnitsPerTeam > 0 && CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam) { return ELKPlayResult::UnitLimitReached; }
+    }
+    return Silver->GetSilver() >= Card->Cost ? ELKPlayResult::Success : ELKPlayResult::NotEnoughSilver;
 }
 
 ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, const FVector& Location)
 {
-	if (Phase != ELKGamePhase::Battle)
-	{
-		return ELKPlayResult::WrongPhase;
-	}
+    if (bResolvingCard) { return ELKPlayResult::WrongPhase; }
+    const ELKPlayResult Validation = ValidateCardPlay(Team, HandIndex, Location);
+    if (Validation != ELKPlayResult::Success) { return Validation; }
+    TGuardValue<bool> Guard(bResolvingCard, true);
+    ULKDeckState* Deck = GetTeamDeck(Team);
+    ULKSilverComponent* Silver = GetTeamSilver(Team);
+    ULKCardDefinition* Card = FindCard(Deck->GetHandCard(HandIndex));
+    BeginCombatBatch();
+    const bool bPaid = Silver->TrySpend(Card->Cost);
+    const bool bResolved = bPaid && Phase == ELKGamePhase::Battle && ResolveCard(Card, Team, Location);
+    if (bResolved)
+    {
+        Deck->PlayCard(HandIndex);
+        ++(Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy).CardsPlayed;
+        PlayLKOneShot(TEXT("CardPlay"), Location, 0.8f);
+    }
+    else if (bPaid) { Silver->AddSilver(Card->Cost); }
+    EndCombatBatch();
+    return bResolved ? ELKPlayResult::Success : ELKPlayResult::InvalidCardData;
+}
 
-	ULKDeckState* Deck = GetTeamDeck(Team);
-	ULKSilverComponent* Silver = GetTeamSilver(Team);
-	if (!Deck || !Silver)
-	{
-		return ELKPlayResult::Unknown;
-	}
-
-	const FName CardId = Deck->GetHandCard(HandIndex);
-	if (CardId.IsNone())
-	{
-		return ELKPlayResult::HandEmpty;
-	}
-
-	ULKCardDefinition* Card = FindCard(CardId);
-	if (!Card)
-	{
-		UE_LOG(LogLKBattle, Warning, TEXT("[Battle] 卡牌 %s 不在 CardLibrary 中"), *CardId.ToString());
-		return ELKPlayResult::Unknown;
-	}
-
-	const int32 Cost = Card->Cost;
-	if (Silver->GetSilver() < Cost)
-	{
-		return ELKPlayResult::NotEnoughSilver;
-	}
-
-	if (Card->CardType == ELKCardType::Spell)
-	{
-		if (!CanCastSpell(Team))
-		{
-			return ELKPlayResult::SpellLocked;
-		}
-		if (!IsInsideField(Location))
-		{
-			return ELKPlayResult::InvalidLocation;
-		}
-	}
-	else
-	{
-		const int32 BuildingLimit = (Card->CardType == ELKCardType::Building && Card->BuildingTypeLimitOverride >= 0)
-			? Card->BuildingTypeLimitOverride
-			: GameData->BuildingTypeLimit;
-		if (!IsPlacementValid(Location, Team, Card->CardType, Card->BuildingUnitId, BuildingLimit))
-		{
-			return ELKPlayResult::InvalidLocation;
-		}
-
-		// 单阵营单位总数上限（防单位海卡顿）；法术不占名额
-		if (GameData->MaxUnitsPerTeam > 0 && CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam)
-		{
-			UE_LOG(LogLKBattle, Log, TEXT("[Battle] %s 单位已达上限 %d，拒绝出牌 %s"),
-				Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), GameData->MaxUnitsPerTeam, *CardId.ToString());
-			return ELKPlayResult::UnitLimitReached;
-		}
-	}
-
-	if (!Silver->TrySpend(Cost))
-	{
-		return ELKPlayResult::NotEnoughSilver;
-	}
-
-	Deck->PlayCard(HandIndex);
-	ResolveCard(Card, Team, Location);
-	return ELKPlayResult::Success;
+ELKPlayResult ALKBattleGameMode::ValidateHeroDeployment(ELKTeam Team, FName HeroUnitId, const FVector& Location, FVector* OutHeroPosition) const
+{
+    if (Phase != ELKGamePhase::Deployment) { return ELKPlayResult::WrongPhase; }
+    const int32 Side = int32(Team);
+    if (!AvailableHeroes.Contains(HeroUnitId)) { return ELKPlayResult::InvalidCardData; }
+    if (DeployedHeroes[Side].Contains(HeroUnitId)) { return ELKPlayResult::AlreadyDeployed; }
+    if (HeroCounts[Side] >= AvailableHeroes.Num()) { return ELKPlayResult::HeroLimitReached; }
+    const FLKUnitRow* Row = GetUnitRow(HeroUnitId);
+    if (!Row || Row->UnitClass != ELKUnitClass::Hero) { return ELKPlayResult::InvalidCardData; }
+    const float CampRadius = GameData->HeroCampBodyRadius;
+    if (!IsPlacementValid(Location, Team, ELKCardType::Building) ||
+        FMath::Abs(Location.X) + CampRadius >= GameData->FieldHalfWidth ||
+        FMath::Abs(Location.Y) + CampRadius >= GameData->FieldHalfHeight) { return ELKPlayResult::InvalidLocation; }
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if ((*It)->IsAlive() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < CampRadius + (*It)->GetBodyRadius() + 2.f) { return ELKPlayResult::InvalidLocation; }
+    }
+    FVector HeroPosition = FVector::ZeroVector;
+    bool bFound = false;
+    for (int32 i = 0; i < 16; ++i)
+    {
+        const float Angle = (Team == ELKTeam::Player ? PI * 0.5f : -PI * 0.5f) + i * PI / 8.f;
+        const FVector Candidate = Location + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f) * (CampRadius + GameData->UnitBodyRadius + 8.f);
+        if (IsPlacementValid(Candidate, Team, ELKCardType::Unit)) { HeroPosition = Candidate; bFound = true; break; }
+    }
+    if (!bFound) { return ELKPlayResult::InvalidLocation; }
+    if (OutHeroPosition) { *OutHeroPosition = HeroPosition; }
+    return ELKPlayResult::Success;
 }
 
 ELKPlayResult ALKBattleGameMode::DeployHero(ELKTeam Team, FName HeroUnitId, const FVector& Location)
 {
-	if (Phase != ELKGamePhase::Deployment)
-	{
-		return ELKPlayResult::WrongPhase;
-	}
-
-	const int32 TeamIdx = (int32)Team;
-	if (HeroCounts[TeamIdx] >= GameData->MaxHeroesPerTeam)
-	{
-		return ELKPlayResult::HeroLimitReached;
-	}
-	if (DeployedHeroes[TeamIdx].Contains(HeroUnitId))
-	{
-		return ELKPlayResult::AlreadyDeployed;
-	}
-	if (!IsPlacementValid(Location, Team, ELKCardType::Unit))
-	{
-		return ELKPlayResult::InvalidLocation;
-	}
-
-	ALKUnitBase* Hero = SpawnUnitForTeam(HeroUnitId, Team, Location, ELKUnitClass::Hero);
-	if (!Hero)
-	{
-		return ELKPlayResult::Unknown;
-	}
-
-	DeployedHeroes[TeamIdx].Add(HeroUnitId);
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] %s 部署英雄 %s @ %s"),
-		TeamIdx == 0 ? TEXT("玩家") : TEXT("敌方"), *HeroUnitId.ToString(), *Location.ToString());
-	return ELKPlayResult::Success;
+    FVector HeroPosition = FVector::ZeroVector;
+    const ELKPlayResult Validation = ValidateHeroDeployment(Team, HeroUnitId, Location, &HeroPosition);
+    if (Validation != ELKPlayResult::Success) { return Validation; }
+    const int32 Side = int32(Team);
+    ALKUnitHero* Hero = Cast<ALKUnitHero>(SpawnUnitForTeam(HeroUnitId, Team, HeroPosition, ELKUnitClass::Hero));
+    if (!Hero) { return ELKPlayResult::InvalidCardData; }
+    FActorSpawnParameters Params; Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    ALKHeroCamp* Camp = GetWorld()->SpawnActor<ALKHeroCamp>(ALKHeroCamp::StaticClass(), FVector(Location.X, Location.Y, 0.f), FRotator::ZeroRotator, Params);
+    if (!Camp)
+    {
+        AliveHeroes[Side].Remove(Hero); --HeroCounts[Side]; Hero->Destroy();
+        return ELKPlayResult::Unknown;
+    }
+    Camp->InitializeCamp(Hero, GameData);
+    DeployedHeroes[Side].Add(HeroUnitId);
+    return ELKPlayResult::Success;
 }
 
 ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass)
@@ -510,20 +702,20 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 		return nullptr;
 	}
 
-	const FLKUnitRow* Row = GetUnitRow(UnitId);
-	if (!Row)
-	{
-		// 自诊断：行找不到（DT_Units 无此行 / 行名与引用不一致）→ 使用默认值生成，并明确告警
-		UE_LOG(LogLKUnit, Warning,
-			TEXT("[Unit] 单位行 '%s' 未找到（检查 DT_Units 行名，或卡牌 SpawnUnitId/波次 UnitId 是否一致），已用默认值生成"),
-			*UnitId.ToString());
-	}
-
-	FLKUnitRow Fallback;
-	Fallback.UnitId = UnitId;
-	Fallback.UnitClass = FallbackClass;
-
-	const FLKUnitRow& Data = Row ? *Row : Fallback;
+    const FLKUnitRow* Row = GetUnitRow(UnitId);
+    if (!Row || !IsInsideField(Location)) { UE_LOG(LogLKUnit, Warning, TEXT("[Spawn] 无效单位或位置 %s"), *UnitId.ToString()); return nullptr; }
+    const FLKUnitRow& Data = *Row;
+    if (Data.BaseHealth <= 0.f || !FMath::IsFinite(Data.BaseHealth)
+        || !FMath::IsFinite(Data.MoveSpeed) || Data.MoveSpeed < 0.f
+        || !FMath::IsFinite(Data.AttackRange) || Data.AttackRange < 0.f
+        || !FMath::IsFinite(Data.AttackDamage) || Data.AttackDamage < 0.f
+        || !FMath::IsFinite(Data.AttackInterval) || Data.AttackInterval <= 0.f
+        || FMath::Abs(Location.X) + GameData->UnitBodyRadius >= GameData->FieldHalfWidth
+        || FMath::Abs(Location.Y) + GameData->UnitBodyRadius >= GameData->FieldHalfHeight) { return nullptr; }
+    for (TActorIterator<ALKUnitBase> It(World); It; ++It)
+    {
+        if ((*It)->IsAlive() && (*It)->IsBuilding() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < GameData->UnitBodyRadius + (*It)->GetBodyRadius() + 2.f) { return nullptr; }
+    }
 
 	UClass* ClassToSpawn = ALKUnitBase::StaticClass();
 	switch (Data.UnitClass)
@@ -574,11 +766,13 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 
 const FLKUnitRow* ALKBattleGameMode::GetUnitRow(FName UnitId) const
 {
-	if (!UnitTableCached)
-	{
-		return nullptr;
-	}
-	return UnitTableCached->FindRow<FLKUnitRow>(UnitId, TEXT(""), false);
+    if (!GameData) { return nullptr; }
+    if (!GameData->UnitTable.IsNull())
+    {
+        return UnitTableCached && UnitTableCached->GetRowStruct() == FLKUnitRow::StaticStruct()
+            ? UnitTableCached->FindRow<FLKUnitRow>(UnitId, TEXT("Units"), false) : nullptr;
+    }
+    return FallbackUnitRows.Find(UnitId);
 }
 
 ULKCardDefinition* ALKBattleGameMode::FindCard(FName CardId) const
@@ -628,40 +822,27 @@ ALKUnitBase* ALKBattleGameMode::GetRandomAliveHero(ELKTeam Team) const
 	{
 		return nullptr;
 	}
-	return Heroes[FMath::RandRange(0, Heroes.Num() - 1)];
+	return Heroes[BattleRandom.RandRange(0, Heroes.Num() - 1)];
 }
 
-bool ALKBattleGameMode::CanCastSpell(ELKTeam Team) const
+bool ALKBattleGameMode::CanCastSpell(ELKTeam Team) const { return true; }
+
+bool ALKBattleGameMode::HasGlobalSpellPlacement(ELKTeam Team) const
 {
-	return !GameData->bRequireMageForSpells || HasMage(Team);
+    for (const ALKUnitBase* Hero : AliveHeroes[int32(Team)])
+    {
+        if (IsValid(Hero) && Hero->HasTraitEffect(ELKTraitEffect::GlobalSpellPlacement)) { return true; }
+    }
+    return false;
 }
 
-float ALKBattleGameMode::GetTeamHeroHealthRatio(ELKTeam Team) const
+bool ALKBattleGameMode::CanPlaceSpellAt(ELKTeam Team, FVector Location) const
 {
-	const TArray<ALKUnitBase*>& Heroes = AliveHeroes[(int32)Team];
-	if (Heroes.Num() == 0)
-	{
-		return 0.f;
-	}
-
-	float SumHealth = 0.f;
-	float SumMaxHealth = 0.f;
-	for (const ALKUnitBase* Hero : Heroes)
-	{
-		if (!Hero || Hero->IsDead())
-		{
-			continue;
-		}
-		SumHealth += Hero->GetHealth();
-		SumMaxHealth += Hero->GetMaxHealth();
-	}
-
-	if (SumMaxHealth <= 0.f)
-	{
-		return 0.f;
-	}
-	return FMath::Clamp(SumHealth / SumMaxHealth, 0.f, 1.f);
+    return IsInsideField(Location) && (HasGlobalSpellPlacement(Team)
+        || (Team == ELKTeam::Player ? Location.Y <= 0.f : Location.Y >= 0.f));
 }
+
+float ALKBattleGameMode::GetTeamHeroHealthRatio(ELKTeam Team) const { return 0.f; }
 
 int32 ALKBattleGameMode::CountAliveUnits(ELKTeam Team) const
 {
@@ -674,7 +855,7 @@ int32 ALKBattleGameMode::CountAliveUnits(ELKTeam Team) const
 	int32 Count = 0;
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
-		if ((*It)->GetTeam() == Team && !(*It)->IsDead())
+		if ((*It)->GetTeam() == Team && (*It)->IsTargetable())
 		{
 			++Count;
 		}
@@ -748,113 +929,51 @@ void ALKBattleGameMode::ForcedTargetAllUnits(ELKTeam Team, AActor* Target, float
 		Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), Affected, *Target->GetName(), Duration);
 }
 
-bool ALKBattleGameMode::FindBestSpellTarget(ELKTeam CasterTeam, float Radius, FVector& OutLocation) const
+bool ALKBattleGameMode::FindBestSpellTarget(ELKTeam CasterTeam, float Radius, FVector& OutLocation, ELKSpellEffect Effect) const
 {
-	UWorld* World = GetWorld();
-	if (!World || Radius <= 0.f)
-	{
-		return false;
-	}
-
-	// 敌方单位 = 施法者的敌人
-	const ELKTeam TargetTeam = (CasterTeam == ELKTeam::Player) ? ELKTeam::Enemy : ELKTeam::Player;
-
-	// 收集候选（敌方存活单位）
-	TArray<ALKUnitBase*> Candidates;
-	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
-	{
-		ALKUnitBase* Unit = *It;
-		if (Unit->GetTeam() == TargetTeam && !Unit->IsDead())
-		{
-			Candidates.Add(Unit);
-		}
-	}
-
-	// 对每个候选统计其半径内"敌人数"（聚集度），取最高点作为落点
-	ALKUnitBase* Best = nullptr;
-	int32 BestCluster = 0;
-	for (ALKUnitBase* Candidate : Candidates)
-	{
-		int32 Cluster = 0;
-		const FVector Center = Candidate->GetActorLocation();
-		for (ALKUnitBase* Other : Candidates)
-		{
-			if (Other != Candidate && FVector::Dist2D(Center, Other->GetActorLocation()) <= Radius)
-			{
-				++Cluster;
-			}
-		}
-		if (Cluster > BestCluster)
-		{
-			BestCluster = Cluster;
-			Best = Candidate;
-		}
-	}
-
-	if (!Best)
-	{
-		return false;
-	}
-
-	OutLocation = Best->GetActorLocation();
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 法术目标：%s 处聚集 %d 个单位（半径 %.0f）"),
-		*Best->GetUnitId().ToString(), BestCluster, Radius);
-	return true;
+    if (!GetWorld() || Radius <= 0.f) { return false; }
+    TArray<ALKUnitBase*> Candidates;
+    const bool bHeal = Effect == ELKSpellEffect::Heal;
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        ALKUnitBase* Unit = *It;
+        if (Unit->IsTargetable() && ((Unit->GetTeam() == CasterTeam) == bHeal)) { Candidates.Add(Unit); }
+    }
+    float BestScore = 0.f;
+    for (ALKUnitBase* Candidate : Candidates)
+    {
+        FVector Location = Candidate->GetActorLocation();
+        if (!CanPlaceSpellAt(CasterTeam, Location)) { continue; }
+        float Score = 0.f;
+        for (ALKUnitBase* Other : Candidates)
+        {
+            if (FVector::Dist2D(Location, Other->GetActorLocation()) <= Radius)
+            {
+                Score += bHeal ? FMath::Max(0.f, Other->GetMaxHealth() - Other->GetHealth()) : (Other->IsHero() ? 2.f : 1.f);
+            }
+        }
+        if (Score > BestScore) { BestScore = Score; OutLocation = Location; }
+    }
+    return BestScore > 0.f;
 }
 
-bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType,
-	FName BuildingUnitId, int32 BuildingLimit) const
+bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, ELKCardType CardType, FName BuildingUnitId, int32 BuildingLimit) const
 {
-	if (!IsInsideField(Location))
-	{
-		return false;
-	}
-
-	// 玩家左半侧（Y<=0）/ 敌方右半侧（Y>=0）——配合 Pitch=-90 相机，屏幕左右即世界 Y
-	if (Team == ELKTeam::Player ? Location.Y > 0.f : Location.Y < 0.f)
-	{
-		return false;
-	}
-
-	// 不与已有单位重叠
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		TArray<FOverlapResult> Overlaps;
-		const FCollisionShape Shape = FCollisionShape::MakeSphere(GameData->UnitBodyRadius * 0.8f);
-		FCollisionQueryParams Params;
-		if (World->OverlapMultiByChannel(Overlaps, Location, FQuat::Identity, ECC_Pawn, Shape, Params))
-		{
-			for (const FOverlapResult& Overlap : Overlaps)
-			{
-				if (Overlap.GetActor() && Overlap.GetActor()->IsA<ALKUnitBase>())
-				{
-					return false;
-				}
-			}
-		}
-	}
-
-	// 同类建筑数量上限（种类无上限，见 GDD）
-	if (CardType == ELKCardType::Building)
-	{
-		const int32 Limit = (BuildingLimit >= 0) ? BuildingLimit : GameData->BuildingTypeLimit;
-		if (Limit >= 0 && !BuildingUnitId.IsNone())
-		{
-			const int32 Current = BuildingCounts[(int32)Team].FindRef(BuildingUnitId);
-			if (Current >= Limit)
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+    if (!IsInsideField(Location) || (Team == ELKTeam::Player ? Location.Y > 0.f : Location.Y < 0.f)) { return false; }
+    const float Radius = GameData->UnitBodyRadius;
+    if (FMath::Abs(Location.X) + Radius >= GameData->FieldHalfWidth || FMath::Abs(Location.Y) + Radius >= GameData->FieldHalfHeight) { return false; }
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if ((*It)->IsAlive() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < Radius + (*It)->GetBodyRadius() + 2.f) { return false; }
+    }
+    const int32 Limit = BuildingLimit == -2 ? GameData->BuildingTypeLimit : BuildingLimit;
+    return CardType != ELKCardType::Building || Limit < 0 || BuildingUnitId.IsNone()
+        || BuildingCounts[int32(Team)].FindRef(BuildingUnitId) < Limit;
 }
 
 bool ALKBattleGameMode::IsInsideField(const FVector& Location) const
 {
-	return FMath::Abs(Location.X) <= GameData->FieldHalfWidth
+	return GameData && !Location.ContainsNaN() && FMath::Abs(Location.X) <= GameData->FieldHalfWidth
 		&& FMath::Abs(Location.Y) <= GameData->FieldHalfHeight;
 }
 
@@ -882,65 +1001,37 @@ ULKDeckState* ALKBattleGameMode::GetTeamDeck(ELKTeam Team) const
 	return OpponentBrain ? OpponentBrain->GetDeck() : nullptr;
 }
 
-void ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
+bool ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
 {
-	if (!Card)
-	{
-		return;
-	}
-
-	switch (Card->CardType)
-	{
-	case ELKCardType::Unit:
-		SpawnUnitForTeam(Card->SpawnUnitId, Team, Location);
-		break;
-
-	case ELKCardType::Building:
-		SpawnUnitForTeam(Card->BuildingUnitId, Team, Location, ELKUnitClass::Building);
-		break;
-
-	case ELKCardType::Spell:
-		CastSpell(Card, Team, Location);
-		break;
-	}
+    if (!Card) { return false; }
+    switch (Card->CardType)
+    {
+    case ELKCardType::Unit: return SpawnUnitForTeam(Card->SpawnUnitId, Team, Location) != nullptr;
+    case ELKCardType::Building: return SpawnUnitForTeam(Card->BuildingUnitId, Team, Location, ELKUnitClass::Building) != nullptr;
+    case ELKCardType::Spell: return CastSpell(Card, Team, Location);
+    }
+    return false;
 }
 
-void ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
+bool ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
 {
-	UWorld* World = GetWorld();
-	if (!World || !Card || Card->SpellEffect == ELKSpellEffect::None)
-	{
-		return;
-	}
-
-	TArray<FOverlapResult> Overlaps;
-	const FCollisionShape Shape = FCollisionShape::MakeSphere(Card->SpellRadius);
-	FCollisionQueryParams Params;
-	World->OverlapMultiByChannel(Overlaps, Location, FQuat::Identity, ECC_Pawn, Shape, Params);
-
-	int32 HitCount = 0;
-	for (const FOverlapResult& Overlap : Overlaps)
-	{
-		ALKUnitBase* Unit = Cast<ALKUnitBase>(Overlap.GetActor());
-		if (!Unit || Unit->IsDead())
-		{
-			continue;
-		}
-
-		if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team)
-		{
-			LKGameplay::ApplyDamage(Unit, Card->SpellValue, nullptr);
-			++HitCount;
-		}
-		else if (Card->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team)
-		{
-			LKGameplay::ApplyHeal(Unit, Card->SpellValue, nullptr);
-			++HitCount;
-		}
-	}
-
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 法术 %s @ %s，命中 %d 个单位"),
-		*Card->CardId.ToString(), *Location.ToString(), HitCount);
+    if (!GetWorld() || !Card || Card->SpellEffect == ELKSpellEffect::None || !CanPlaceSpellAt(Team, Location)) { return false; }
+    FLKCombatSource Source;
+    Source.bHasTeam = true; Source.Team = Team; Source.ActionId = Card->CardId; Source.Kind = ELKCombatSourceKind::Spell;
+    TArray<ALKUnitBase*> Targets;
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if ((*It)->IsTargetable() && FVector::Dist2D(Location, (*It)->GetActorLocation()) <= Card->SpellRadius) { Targets.Add(*It); }
+    }
+    BeginCombatBatch();
+    if (Card->CardId == TEXT("Spell_Fireball")) { NotifyFireballCast(Location); }
+    for (ALKUnitBase* Unit : Targets)
+    {
+        if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, Card->SpellValue, nullptr, false, &Source); }
+        else if (Card->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team) { LKGameplay::ApplyHeal(Unit, Card->SpellValue, nullptr, &Source); }
+    }
+    EndCombatBatch();
+    return true; // 合法空放是玩家选择，也会消耗卡牌和银币。
 }
 
 void ALKBattleGameMode::DrawFieldBounds() const
@@ -960,7 +1051,5 @@ void ALKBattleGameMode::DrawFieldBounds() const
 	const FVector Extent(GameData->FieldHalfWidth, GameData->FieldHalfHeight, 5.f);
 	DrawDebugBox(World, Center, Extent, FColor::White, false, -1.f, 0, 1.f);
 
-	// 中线（玩家左半 / 敌方右半）：沿 X 方向、位于 Y=0 —— 屏幕上呈现为左右分界竖线
-	DrawDebugLine(World, FVector(-GameData->FieldHalfWidth, 0.f, 0.f), FVector(GameData->FieldHalfWidth, 0.f, 0.f),
-		FColor::Yellow, false, -1.f, 0, 1.f);
+	// 正式中线由 LKPresentationHUD 绘制，不依赖调试开关或地面深度。
 }

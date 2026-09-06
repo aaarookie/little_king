@@ -51,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<class UTexture2D> Icon;
 
-	/** 同类建筑是否受数量上限限制（-1 = 不受限制，见 GDD） */
+	/** 同类建筑上限：-2 继承 GameData，-1 不限，>=0 指定上限 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "CardType==ELKCardType::Building", EditConditionHides))
-	int32 BuildingTypeLimitOverride = -1;
+	int32 BuildingTypeLimitOverride = -2;
 };

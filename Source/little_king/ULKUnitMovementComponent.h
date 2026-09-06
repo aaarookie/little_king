@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "LKNavigation.h"
 #include "ULKUnitMovementComponent.generated.h"
 
 /**
- * 轻量移动组件：朝目标直线移动 + 径向分离（软碰撞挤开，皇室战争式手感）。
+ * 轻量移动组件：绕实体建筑的轻量路径 + 营地范围 + 仅推自身的软分离。
  * 刻意不用 UE NavMesh / CharacterMovement（2D 战场用不上）。
  */
 UCLASS(ClassGroup = (LK), meta = (BlueprintSpawnableComponent))
@@ -20,6 +21,7 @@ public:
 
 	/** 朝目标点移动（Speed 由调用方每帧传入，便于读 GAS 属性） */
 	void MoveToward(const FVector& Destination, float Speed);
+	bool CanReach(const FVector& Target) const;
 
 	void Stop() { bMoving = false; }
 
@@ -42,6 +44,10 @@ private:
 
 	FVector2D FieldHalfExtent = FVector2D(1200.f, 2000.f);
 	bool bHasFieldBounds = false;
+	TArray<FVector> Path;
+	FVector PathDestination = FVector::ZeroVector;
+	float RepathTimer = 0.f;
+	void CollectNavigation(TArray<LKNavigation::FObstacle>& Obstacles, LKNavigation::FBounds& Bounds) const;
 
 	/** 与周围单位径向分离 */
 	void ApplySeparation(float DeltaTime);

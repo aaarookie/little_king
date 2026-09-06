@@ -1,148 +1,92 @@
 #include "ULKDeckState.h"
-#include "LKLog.h"
 
-void ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimit)
+bool ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimit, int32 Seed)
 {
-	HandSizeLimit = FMath::Max(1, InHandSizeLimit);
-	DrawPile = DeckCards;
-	DiscardPile.Reset();
-	Hand.Reset();
+    const int32 Slots = FMath::Max(1, InHandSizeLimit);
+    TArray<FName> Cards;
+    for (FName Id : DeckCards) { if (!Id.IsNone()) { Cards.AddUnique(Id); } }
+    if (Cards.Num() <= Slots) { return false; }
 
-	Shuffle(DrawPile);
-
-	// 开局抽满手牌
-	int32 Safety = 0;
-	while (Hand.Num() < HandSizeLimit && DrawPile.Num() > 0 && Safety < 64)
-	{
-		DrawCard();
-		++Safety;
-	}
-
-	UE_LOG(LogLKEconomy, Log, TEXT("[Deck] Init: 牌库 %d 张, 手牌 %d 张"), DrawPile.Num(), Hand.Num());
-	BroadcastHandChanged();
+    FRandomStream Random(Seed);
+    for (int32 i = Cards.Num() - 1; i > 0; --i) { Cards.Swap(i, Random.RandRange(0, i)); }
+    HandSizeLimit = Slots;
+    Hand.Reset(Slots);
+    for (int32 i = 0; i < Slots; ++i) { Hand.Add(Cards[i]); }
+    Cards.RemoveAt(0, Slots);
+    DrawPile = MoveTemp(Cards);
+    BroadcastHandChanged();
+    return true;
 }
 
-bool ULKDeckState::DrawCard()
-{
-	if (Hand.Num() >= HandSizeLimit)
-	{
-		return false;
-	}
-
-	if (DrawPile.Num() == 0)
-	{
-		RefillDrawFromDiscard();
-	}
-
-	if (DrawPile.Num() == 0)
-	{
-		return false;
-	}
-
-	Hand.Add(DrawPile[0]);
-	DrawPile.RemoveAt(0);
-	BroadcastHandChanged();
-	return true;
-}
+bool ULKDeckState::DrawCard() { return false; }
 
 FName ULKDeckState::PlayCard(int32 HandIndex)
 {
-	if (!Hand.IsValidIndex(HandIndex))
-	{
-		return NAME_None;
-	}
-
-	const FName CardId = Hand[HandIndex];
-	DiscardPile.Add(CardId);
-
-	// 原地补牌：打出的位置直接替换为牌堆顶的新牌（皇室战争式，其他手牌位置不动）。
-	// 不能用 RemoveAt+Append——那会导致手牌左移、新牌固定出现在末尾。
-	if (DrawPile.Num() == 0)
-	{
-		RefillDrawFromDiscard();
-	}
-
-	if (DrawPile.Num() > 0)
-	{
-		Hand[HandIndex] = DrawPile[0];
-		DrawPile.RemoveAt(0);
-	}
-	else
-	{
-		// 理论上不会发生（弃牌堆含刚打出的牌，洗回后必有牌）；保险起见清空槽位
-		Hand[HandIndex] = NAME_None;
-	}
-
-	BroadcastHandChanged();
-
-	UE_LOG(LogLKEconomy, Log, TEXT("[Deck] Play %s -> 原位补入新牌，手牌 %d 张"), *CardId.ToString(), Hand.Num());
-	return CardId;
+    if (!IsReady() || !Hand.IsValidIndex(HandIndex)) { return NAME_None; }
+    const FName Played = Hand[HandIndex];
+    Hand[HandIndex] = DrawPile[0];
+    DrawPile.RemoveAt(0);
+    DrawPile.Add(Played);
+    BroadcastHandChanged();
+    return Played;
 }
 
 FName ULKDeckState::GetHandCard(int32 HandIndex) const
 {
-	return Hand.IsValidIndex(HandIndex) ? Hand[HandIndex] : NAME_None;
+    return Hand.IsValidIndex(HandIndex) ? Hand[HandIndex] : NAME_None;
 }
 
-int32 ULKDeckState::GetHandSize() const
-{
-	return Hand.Num();
-}
+int32 ULKDeckState::GetHandSize() const { return Hand.Num(); }
 
 int32 ULKDeckState::GetHandCost(int32 HandIndex) const
 {
-	const FName CardId = GetHandCard(HandIndex);
-	if (CardId.IsNone())
-	{
-		return -1;
-	}
-	return CostProvider ? CostProvider(CardId) : 2;
+    const FName Id = GetHandCard(HandIndex);
+    return Id.IsNone() ? -1 : (CostProvider ? CostProvider(Id) : 2);
 }
 
-void ULKDeckState::RemoveCardFromDeck(FName CardId)
+TArray<FName> ULKDeckState::GetAllCards() const
 {
-	DrawPile.Remove(CardId);
-	Hand.Remove(CardId);
-	DiscardPile.Remove(CardId);
-	BroadcastHandChanged();
+    TArray<FName> Cards = Hand;
+    Cards.Append(DrawPile);
+    return Cards;
 }
 
-void ULKDeckState::TransformCard(FName OldCardId, FName NewCardId)
+bool ULKDeckState::AddCardToDeck(FName CardId)
 {
-	for (FName& Id : DrawPile) { if (Id == OldCardId) { Id = NewCardId; } }
-	for (FName& Id : Hand)    { if (Id == OldCardId) { Id = NewCardId; } }
-	for (FName& Id : DiscardPile) { if (Id == OldCardId) { Id = NewCardId; } }
-	BroadcastHandChanged();
+    if (!IsReady() || CardId.IsNone() || ContainsCard(CardId)) { return false; }
+    DrawPile.Add(CardId);
+    BroadcastHandChanged();
+    return true;
 }
 
-void ULKDeckState::RefillDrawFromDiscard()
+bool ULKDeckState::RemoveCardFromDeck(FName CardId)
 {
-	if (DiscardPile.Num() == 0)
-	{
-		return;
-	}
-
-	DrawPile = DiscardPile;
-	DiscardPile.Reset();
-	Shuffle(DrawPile);
-	UE_LOG(LogLKEconomy, Log, TEXT("[Deck] 洗回弃牌堆: %d 张"), DrawPile.Num());
+    if (!IsReady() || DrawPile.Num() <= 1 || !ContainsCard(CardId)) { return false; }
+    const int32 Slot = Hand.IndexOfByKey(CardId);
+    if (Slot != INDEX_NONE)
+    {
+        Hand[Slot] = DrawPile[0];
+        DrawPile.RemoveAt(0);
+    }
+    else { DrawPile.RemoveSingle(CardId); }
+    BroadcastHandChanged();
+    return true;
 }
 
-void ULKDeckState::Shuffle(TArray<FName>& Cards)
+bool ULKDeckState::TransformCard(FName OldCardId, FName NewCardId)
 {
-	if (Cards.Num() < 2)
-	{
-		return;
-	}
-
-	for (int32 i = Cards.Num() - 1; i > 0; --i)
-	{
-		const int32 j = FMath::RandRange(0, i);
-		Cards.Swap(i, j);
-	}
+    if (!IsReady() || NewCardId.IsNone() || ContainsCard(NewCardId)) { return false; }
+    for (TArray<FName>* Pile : { &Hand, &DrawPile })
+    {
+        const int32 Index = Pile->IndexOfByKey(OldCardId);
+        if (Index != INDEX_NONE)
+        {
+            (*Pile)[Index] = NewCardId;
+            BroadcastHandChanged();
+            return true;
+        }
+    }
+    return false;
 }
 
-void ULKDeckState::BroadcastHandChanged()
-{
-	OnHandChanged.Broadcast();
-}
+void ULKDeckState::BroadcastHandChanged() { OnHandChanged.Broadcast(); }

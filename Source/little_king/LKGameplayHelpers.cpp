@@ -3,7 +3,11 @@
 #include "AbilitySystemInterface.h"
 #include "AttributeSet.h"
 #include "GameplayEffect.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 #include "ALKUnitBase.h"
+#include "ALKBattleGameMode.h"
+#include "ULKGameData.h"
 #include "ULKUnitAttributeSet.h"
 #include "LKLog.h"
 
@@ -76,6 +80,9 @@ namespace LKGameplay
 			Spec.SetSetByCallerMagnitude(DataName, Delta);
 			ASC->ApplyGameplayEffectSpecToSelf(Spec);
 		}
+
+		/** S5：伤害/治疗事件 -> GameMode（HUD 飘字数据链） */
+
 	}
 
 	UAbilitySystemComponent* GetASC(const AActor* Actor)
@@ -94,39 +101,61 @@ namespace LKGameplay
 		return const_cast<UAbilitySystemComponent*>(Cast<UAbilitySystemComponent>(Comp));
 	}
 
-	void ApplyDamage(AActor* Target, float Amount, AActor* Instigator, bool bBypassInvulnerability)
-	{
-		if (Amount <= 0.f)
-		{
-			return;
-		}
+    FLKCombatSource MakeSource(AActor* Instigator, ELKCombatSourceKind Kind, FName ActionId)
+    {
+        FLKCombatSource Source;
+        Source.Kind = Kind;
+        Source.ActionId = ActionId;
+        if (const ALKUnitBase* Unit = Cast<ALKUnitBase>(Instigator))
+        {
+            Source.bHasTeam = true; Source.Team = Unit->GetTeam();
+            Source.UnitId = Unit->GetUnitId(); Source.InstanceId = Unit->GetFName();
+        }
+        return Source;
+    }
 
-		// 无敌拦截：普通伤害一律挡下；只有显式"真伤"（bBypassInvulnerability，超时虚弱用）能穿透。
-		// 所有敌方伤害（近战/弹道/法术/技能）都汇聚到这里，所以在此拦截一处生效全局。
-		if (!bBypassInvulnerability)
-		{
-			if (const ALKUnitBase* Unit = Cast<ALKUnitBase>(Target))
-			{
-				if (Unit->IsInvulnerable())
-				{
-					UE_LOG(LogLK, Verbose, TEXT("[LKGameplay] %s 处于无敌，免疫 %.1f 点伤害"),
-						*Unit->GetUnitId().ToString(), Amount);
-					return;
-				}
-			}
-		}
+    float ApplyDamage(AActor* Target, float Amount, AActor* Instigator, bool bBypassInvulnerability, const FLKCombatSource* SourceOverride)
+    {
+        ALKUnitBase* Unit = Cast<ALKUnitBase>(Target);
+        if (!IsValid(Unit) || !Unit->IsTargetable() || !FMath::IsFinite(Amount) || Amount <= 0.f) { return 0.f; }
+        ALKBattleGameMode* GM = Unit->GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+        if (GM && GM->GetPhase() != ELKGamePhase::Battle) { return 0.f; }
+        FLKCombatEvent Event;
+        Event.Source = SourceOverride ? *SourceOverride : MakeSource(Instigator);
+        Event.TargetTeam = Unit->GetTeam(); Event.TargetUnitId = Unit->GetUnitId(); Event.TargetInstanceId = Unit->GetFName();
+        Event.Location = Unit->GetActorLocation(); Event.RequestedAmount = Amount; Event.HealthBefore = Unit->GetHealth();
+        if (GM) { GM->BeginCombatBatch(); }
+        if (bBypassInvulnerability || !Unit->IsInvulnerable()) { ApplyHealthDelta(Unit, DamageDataName, -Amount, Instigator); }
+        Event.HealthAfter = IsValid(Unit) ? Unit->GetHealth() : 0.f;
+        Event.ActualAmount = FMath::Clamp(Event.HealthBefore - Event.HealthAfter, 0.f, Event.HealthBefore);
+        Event.bKilled = Event.HealthBefore > 0.f && Event.HealthAfter <= 0.f;
+        if (Event.ActualAmount > 0.f && IsValid(Unit))
+        {
+            Unit->TriggerHitFlash();
+            PlayOneShot(Unit->GetWorld(), GM ? GM->GetGameData() : nullptr, TEXT("HitTaken"), Event.Location, 0.5f);
+        }
+        if (GM) { GM->RecordCombatEvent(Event); GM->EndCombatBatch(); }
+        return Event.ActualAmount;
+    }
 
-		ApplyHealthDelta(Target, DamageDataName, -Amount, Instigator);
-	}
-
-	void ApplyHeal(AActor* Target, float Amount, AActor* Instigator)
-	{
-		if (Amount <= 0.f)
-		{
-			return;
-		}
-		ApplyHealthDelta(Target, HealDataName, Amount, Instigator);
-	}
+    float ApplyHeal(AActor* Target, float Amount, AActor* Instigator, const FLKCombatSource* SourceOverride)
+    {
+        ALKUnitBase* Unit = Cast<ALKUnitBase>(Target);
+        if (!IsValid(Unit) || !Unit->IsTargetable() || !FMath::IsFinite(Amount) || Amount <= 0.f) { return 0.f; }
+        ALKBattleGameMode* GM = Unit->GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+        if (GM && GM->GetPhase() != ELKGamePhase::Battle) { return 0.f; }
+        FLKCombatEvent Event;
+        Event.Source = SourceOverride ? *SourceOverride : MakeSource(Instigator);
+        Event.TargetTeam = Unit->GetTeam(); Event.TargetUnitId = Unit->GetUnitId(); Event.TargetInstanceId = Unit->GetFName();
+        Event.Location = Unit->GetActorLocation(); Event.RequestedAmount = Amount;
+        Event.bIsHeal = true; Event.HealthBefore = Unit->GetHealth();
+        if (GM) { GM->BeginCombatBatch(); }
+        ApplyHealthDelta(Unit, HealDataName, Amount, Instigator);
+        Event.HealthAfter = IsValid(Unit) ? Unit->GetHealth() : Event.HealthBefore;
+        Event.ActualAmount = FMath::Max(0.f, Event.HealthAfter - Event.HealthBefore);
+        if (GM) { GM->RecordCombatEvent(Event); GM->EndCombatBatch(); }
+        return Event.ActualAmount;
+    }
 
 	void ApplyMaxHealthPercentDamage(AActor* Target, float Percent, AActor* Instigator)
 	{
@@ -140,7 +169,8 @@ namespace LKGameplay
 		if (MaxHp > 0.f)
 		{
 			// 超时虚弱 = 真伤：穿透无敌（无敌单位也会被虚弱磨死，保证无平局）
-			ApplyDamage(Target, MaxHp * Percent, Instigator, true);
+			FLKCombatSource Source = MakeSource(Instigator, ELKCombatSourceKind::Overtime, TEXT("Overtime"));
+            ApplyDamage(Target, MaxHp * Percent, Instigator, true, &Source);
 		}
 	}
 
@@ -152,7 +182,7 @@ namespace LKGameplay
 			return FActiveGameplayEffectHandle();
 		}
 
-		UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), TEXT("LK_RuntimeModifier"));
+		UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage());
 		if (DurationSeconds > 0.f)
 		{
 			Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
@@ -205,5 +235,29 @@ namespace LKGameplay
 			return Fallback;
 		}
 		return ASC->GetNumericAttributeBase(Attribute);
+	}
+
+	void PlayOneShot(UWorld* World, const ULKGameData* GameData, FName SoundId, const FVector& Location, float VolumeScale)
+	{
+		if (!World || !GameData || SoundId.IsNone())
+		{
+			return;
+		}
+
+		const TSoftObjectPtr<USoundBase>* Found = GameData->SoundMap.Find(SoundId);
+		if (!Found || Found->IsNull())
+		{
+			return; // 未配置的键静默跳过（不报错，教程 B 允许只配 3 个）
+		}
+
+		const ALKBattleGameMode* GM = World->GetAuthGameMode<ALKBattleGameMode>();
+        USoundBase* Sound = GM ? GM->FindPreloadedSound(SoundId) : Found->Get();
+		if (!Sound)
+		{
+			UE_LOG(LogLK, Warning, TEXT("[Sound] 键 '%s' 配置了但资源加载失败"), *SoundId.ToString());
+			return;
+		}
+
+		UGameplayStatics::PlaySoundAtLocation(World, Sound, Location, VolumeScale);
 	}
 }

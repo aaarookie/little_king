@@ -30,15 +30,18 @@ void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InG
 	}
 
 	Silver->Init(GameData->SilverPerSecond, GameData->SilverCap);
-	Deck->InitDeck(GameData->DefaultEnemyDeck, GameData->HandSize);
+	if (!Deck->InitDeck(GameData->DefaultEnemyDeck, GameData->HandSize, GameData->BattleSeed + 2))
+	{
+		UE_LOG(LogLKBattle, Warning, TEXT("[Deck] 敌方牌库无效：去重后至少需要 HandSize + 1 种卡，禁止开战"));
+	}
 	Deck->CostProvider = [this](FName CardId) { return GameMode.IsValid() ? GameMode->GetCardCost(CardId) : 2; };
 
 	LoadWaves();
 
 	// 集火节奏：首轮随机落在配置区间内
-	FocusTimer = FMath::FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
+	FocusTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
 	CounterTimer = GameData->AICounterCheckInterval;
-	PushCooldownTimer = FMath::FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
+	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
 
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 敌方 AI 就绪: 波次 %d, 牌库 %d 张（首轮集火 %.0f 秒后）"),
 		Waves.Num(), Deck->GetDeckSize() + Deck->GetHandSize(), FocusTimer);
@@ -53,6 +56,7 @@ void ALKOpponentBrain::LoadWaves()
 	{
 		if (UDataTable* Table = GameData->WaveTable.LoadSynchronous())
 		{
+			if (Table->GetRowStruct() != FLKWaveRow::StaticStruct()) { UE_LOG(LogLKBattle, Error, TEXT("[Brain] WaveTable 必须使用 LKWaveRow")); return; }
 			for (const TPair<FName, uint8*>& Pair : Table->GetRowMap())
 			{
 				if (const FLKWaveRow* Row = reinterpret_cast<const FLKWaveRow*>(Pair.Value))
@@ -93,13 +97,26 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 	Silver->TickSilver(DeltaTime);
 
 	ProcessWaves(BattleElapsed);
+    if (bReserving) { ReserveRemaining -= DeltaTime; }
+    if (FocusWarningTimer > 0.f)
+    {
+        FocusWarningTimer -= DeltaTime;
+        if (FocusWarningTimer <= 0.f)
+        {
+            if (PendingFocusTarget.IsValid() && PendingFocusTarget->IsTargetable())
+            {
+                GameMode->ForcedTargetAllUnits(ELKTeam::Enemy, PendingFocusTarget.Get(), GameData->AIFocusDuration);
+            }
+            PendingFocusTarget = nullptr;
+        }
+    }
 
 	// ---------- S4 战术节奏 ----------
 	FocusTimer -= DeltaTime;
 	if (FocusTimer <= 0.f)
 	{
 		DoFocus();
-		FocusTimer = FMath::FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
+		FocusTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
 	}
 
 	CounterTimer -= DeltaTime;
@@ -136,8 +153,8 @@ void ALKOpponentBrain::ProcessWaves(float BattleElapsed)
 			const float HalfH = GameData->FieldHalfHeight;
 			// 敌方右半侧（Y>0），前中场位置
 			const FVector Loc(
-				FMath::FRandRange(-0.8f, 0.8f) * HalfW,
-				FMath::FRandRange(0.15f, 0.45f) * HalfH,
+				GameMode->GetBattleRandom().FRandRange(-0.8f, 0.8f) * HalfW,
+				GameMode->GetBattleRandom().FRandRange(0.15f, 0.45f) * HalfH,
 				0.f);
 			GameMode->SpawnUnitForTeam(Entry.UnitId, ELKTeam::Enemy, Loc);
 		}
@@ -161,8 +178,10 @@ void ALKOpponentBrain::DoFocus()
 		return; // 玩家已无英雄（对局即将结束），跳过
 	}
 
-	GM->ForcedTargetAllUnits(ELKTeam::Enemy, Weakest, GameData->AIFocusDuration);
-	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 集火！敌方全体转火玩家英雄 %s（%.0f 秒）"),
+	PendingFocusTarget = Weakest;
+    FocusWarningTimer = FMath::Max(0.01f, GameData->AIFocusWarningSeconds);
+    Weakest->SetFocusWarning(FocusWarningTimer);
+	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 集火预警：即将转火玩家英雄 %s（集火持续 %.0f 秒）"),
 		*Weakest->GetUnitId().ToString(), GameData->AIFocusDuration);
 }
 
@@ -188,7 +207,7 @@ bool ALKOpponentBrain::TryEnterPush()
 	}
 
 	// 银币达标 + 己方兵力不劣于玩家 → 一波流
-	if (Silver->GetSilver() < GameData->AIPushSilverThreshold)
+	if (Silver->GetSilver() < FMath::Min(GameData->AIPushSilverThreshold, GameData->SilverCap))
 	{
 		return false;
 	}
@@ -198,7 +217,7 @@ bool ALKOpponentBrain::TryEnterPush()
 	}
 
 	PushRemainingCards = GameData->AIPushMaxCards;
-	PushCooldownTimer = FMath::FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
+	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 爆发！银币 %.1f 兵力占优，一波连打 %d 张"),
 		Silver->GetSilver(), PushRemainingCards);
 	return true;
@@ -206,23 +225,25 @@ bool ALKOpponentBrain::TryEnterPush()
 
 void ALKOpponentBrain::ThinkAndPlay()
 {
-	// 爆发窗口：一口气连打（最多 AIPushMaxCards 张，一张失败就停）
-	if (TryEnterPush())
-	{
-		while (PushRemainingCards > 0)
-		{
-			if (!TryPlayOneCard())
-			{
-				break;
-			}
-			--PushRemainingCards;
-		}
-		PushRemainingCards = 0;
-		return;
-	}
-
-	// 常规节奏：每思考周期一张
-	TryPlayOneCard();
+    if (PushCooldownTimer <= 0.f && !bReserving)
+    {
+        bReserving = true;
+        ReserveRemaining = GameData->AIPushReserveMaxSeconds;
+    }
+    if (bReserving)
+    {
+        if (TryEnterPush())
+        {
+            bReserving = false;
+            while (PushRemainingCards-- > 0) { if (!TryPlayOneCard()) { break; } }
+            PushRemainingCards = 0;
+            return;
+        }
+        if (ReserveRemaining > 0.f && Silver->GetSilver() < FMath::Min(GameData->AIPushSilverThreshold, GameData->SilverCap)) { return; }
+        bReserving = false;
+        PushCooldownTimer = GameData->AIPushCooldownMin;
+    }
+    TryPlayOneCard();
 }
 
 int32 ALKOpponentBrain::GetCounterBonus(const ULKCardDefinition* Def) const
@@ -239,7 +260,7 @@ int32 ALKOpponentBrain::GetCounterBonus(const ULKCardDefinition* Def) const
 	if (PlayerRangedCount >= 3
 		&& (CardId == TEXT("Unit_Shieldbearer") || CardId == TEXT("Unit_Swordsman")))
 	{
-		Bonus += 3;
+		Bonus += 35;
 	}
 
 	// 玩家近战多 → 弓箭手/箭塔放风筝（克制近战）
@@ -247,7 +268,7 @@ int32 ALKOpponentBrain::GetCounterBonus(const ULKCardDefinition* Def) const
 	{
 		if (CardId == TEXT("Unit_Archer") || CardId == TEXT("Building_ArrowTower"))
 		{
-			Bonus += 3;
+			Bonus += 35;
 		}
 	}
 
@@ -256,61 +277,31 @@ int32 ALKOpponentBrain::GetCounterBonus(const ULKCardDefinition* Def) const
 
 bool ALKOpponentBrain::TryPlayOneCard()
 {
-	ULKDeckState* DeckState = Deck;
-	ULKSilverComponent* SilverComp = Silver;
-	ALKBattleGameMode* GM = GameMode.Get();
-
-	if (!DeckState || !SilverComp || !GM)
-	{
-		return false;
-	}
-
-	// 选牌：得分 = 费用权重（便宜优先）+ 反制偏好分
-	int32 BestIndex = -1;
-	int32 BestScore = TNumericLimits<int32>::Min();
-
-	for (int32 i = 0; i < DeckState->GetHandSize(); ++i)
-	{
-		const FName CardId = DeckState->GetHandCard(i);
-		const ULKCardDefinition* Def = GM->FindCard(CardId);
-		if (!Def)
-		{
-			continue;
-		}
-		if (Def->CardType == ELKCardType::Spell && !GM->CanCastSpell(ELKTeam::Enemy))
-		{
-			continue; // 法术门：敌方同样需要法师在场
-		}
-		if (SilverComp->GetSilver() < Def->Cost)
-		{
-			continue; // 买不起的不参与评分
-		}
-
-		const int32 Score = (100 - Def->Cost * 10) + GetCounterBonus(Def);
-		if (Score > BestScore)
-		{
-			BestScore = Score;
-			BestIndex = i;
-		}
-	}
-
-	if (BestIndex < 0)
-	{
-		return false;
-	}
-
-	const FName CardId = DeckState->GetHandCard(BestIndex);
-	FVector Location;
-	if (!PickTargetLocation(CardId, Location))
-	{
-		return false;
-	}
-
-	const ELKPlayResult Result = GM->PlayCardForTeam(ELKTeam::Enemy, BestIndex, Location);
-	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 打出 %s @ %s -> %d%s"),
-		*CardId.ToString(), *Location.ToString(), (int32)Result,
-		Result == ELKPlayResult::Success ? TEXT("") : TEXT("（失败）"));
-	return Result == ELKPlayResult::Success;
+    ALKBattleGameMode* GM = GameMode.Get();
+    if (!GM || !Deck || !Silver || GM->GetPhase() != ELKGamePhase::Battle) { return false; }
+    TArray<int32> Candidates;
+    for (int32 i = 0; i < Deck->GetHandSize(); ++i)
+    {
+        const ULKCardDefinition* Card = GM->FindCard(Deck->GetHandCard(i));
+        if (Card && Card->Cost <= Silver->GetSilver()) { Candidates.Add(i); }
+    }
+    Candidates.StableSort([this, GM](int32 A, int32 B)
+    {
+        const ULKCardDefinition* Left = GM->FindCard(Deck->GetHandCard(A));
+        const ULKCardDefinition* Right = GM->FindCard(Deck->GetHandCard(B));
+        return (100 - Left->Cost * 10 + GetCounterBonus(Left)) > (100 - Right->Cost * 10 + GetCounterBonus(Right));
+    });
+    for (int32 Index : Candidates)
+    {
+        for (int32 Attempt = 0; Attempt < 8; ++Attempt)
+        {
+            FVector Location;
+            if (!PickTargetLocation(Deck->GetHandCard(Index), Location)) { break; }
+            if (GM->ValidateCardPlay(ELKTeam::Enemy, Index, Location) != ELKPlayResult::Success) { continue; }
+            if (GM->PlayCardForTeam(ELKTeam::Enemy, Index, Location) == ELKPlayResult::Success) { return true; }
+        }
+    }
+    return false;
 }
 
 bool ALKOpponentBrain::PickTargetLocation(FName CardId, FVector& OutLocation) const
@@ -328,28 +319,17 @@ bool ALKOpponentBrain::PickTargetLocation(FName CardId, FVector& OutLocation) co
 	// 法术：智能落点（聚集度最高的敌人堆）；找不到就随机瞄准玩家英雄
 	if (Def && Def->CardType == ELKCardType::Spell)
 	{
-		if (GM->FindBestSpellTarget(ELKTeam::Enemy, Def->SpellRadius, OutLocation))
-		{
-			return true;
-		}
-
-		const ALKUnitBase* Hero = GM->GetRandomAliveHero(ELKTeam::Player);
-		if (!Hero)
-		{
-			return false;
-		}
-		OutLocation = Hero->GetActorLocation() + FVector(FMath::FRandRange(-100.f, 100.f), FMath::FRandRange(-100.f, 100.f), 0.f);
-		return true;
-	}
+        return GM->FindBestSpellTarget(ELKTeam::Enemy, Def->SpellRadius, OutLocation, Def->SpellEffect);
+    }
 
 	// 建筑：后场（Y 深处）；角色：前中场 —— 敌方右半侧（Y>0）
 	if (Def && Def->CardType == ELKCardType::Building)
 	{
-		OutLocation = FVector(FMath::FRandRange(-0.7f, 0.7f) * HalfW, FMath::FRandRange(0.65f, 0.9f) * HalfH, 0.f);
+		OutLocation = FVector(GameMode->GetBattleRandom().FRandRange(-0.7f, 0.7f) * HalfW, GameMode->GetBattleRandom().FRandRange(0.65f, 0.9f) * HalfH, 0.f);
 	}
 	else
 	{
-		OutLocation = FVector(FMath::FRandRange(-0.8f, 0.8f) * HalfW, FMath::FRandRange(0.1f, 0.35f) * HalfH, 0.f);
+		OutLocation = FVector(GameMode->GetBattleRandom().FRandRange(-0.8f, 0.8f) * HalfW, GameMode->GetBattleRandom().FRandRange(0.1f, 0.35f) * HalfH, 0.f);
 	}
 	return true;
 }
