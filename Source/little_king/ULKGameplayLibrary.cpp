@@ -52,7 +52,8 @@ AActor* ULKGameplayLibrary::LK_GetNearestEnemy(AActor* Unit)
     if (AActor* Taunter = Self->FindNearestEnemy(true)) { return Taunter; }
     if (ALKUnitBase* Forced = Cast<ALKUnitBase>(Self->ForcedTargetActor.Get()))
     { if (Self->CanPursueTarget(Forced)) { return Forced; } }
-    return Self->FindNearestEnemy();
+    // 技能索敌不受单位索敌范围限制（技能由玩家主动释放，取全图最近敌人）。
+    return Self->FindNearestEnemy(false, true);
 }
 float ULKGameplayLibrary::LK_GetUnitHealth(AActor* Unit) { return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetHealthAttribute(), 0.f); }
 float ULKGameplayLibrary::LK_GetUnitMaxHealth(AActor* Unit) { return LKGameplay::GetAttributeValue(Unit, ULKUnitAttributeSet::GetMaxHealthAttribute(), 0.f); }

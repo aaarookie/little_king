@@ -6,7 +6,8 @@
 #include "ULKUnitMovementComponent.generated.h"
 
 /**
- * 轻量移动组件：绕实体建筑的轻量路径 + 营地范围 + 仅推自身的软分离。
+ * 轻量移动组件：绕实体建筑的轻量路径 + 仅推自身的软分离 + 战场矩形边界。
+ * 营地圈不再限制移动（英雄活动不限距离；圈仅显示与未来营地 buff 用）。
  * 刻意不用 UE NavMesh / CharacterMovement（2D 战场用不上）。
  */
 UCLASS(ClassGroup = (LK), meta = (BlueprintSpawnableComponent))

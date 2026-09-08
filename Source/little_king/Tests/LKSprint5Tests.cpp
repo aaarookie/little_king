@@ -3,9 +3,11 @@
 #include "Misc/AutomationTest.h"
 #include "Tests/AutomationCommon.h"
 #include "Engine/World.h"
+#include "Engine/GameInstance.h"
 #include "EngineUtils.h"
 #include "GameFramework/WorldSettings.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "PaperSpriteComponent.h"
 #include "../ALKBattleGameMode.h"
 #include "../ALKPlayerController.h"
@@ -21,8 +23,10 @@
 #include "../ULKUnitMovementComponent.h"
 #include "../ULKTraitAuraComponent.h"
 #include "../LKGameplayHelpers.h"
+#include "../LKEncounterContent.h"
 #include "../LKNavigation.h"
 #include "../ULKGameplayLibrary.h"
+#include "../ULKRunSubsystem.h"
 
 struct FLKSprint5TestAccess
 {
@@ -174,14 +178,16 @@ bool FLKDeploymentTest::RunTest(const FString& Parameters)
     TestFalse(TEXT("Camp is not attackable"), Hero->GetCamp()->IsTargetable());
     TestTrue(TEXT("Camp is a building"), Hero->GetCamp()->IsBuilding());
     const FVector Destination = Hero->GetCampCenter() + FVector(0.f, -250.f, 0.f);
-    TestFalse(TEXT("Cannot walk through destination camp"), Hero->CommandMove(Hero->GetCampCenter()));
-    TestFalse(TEXT("Cannot walk beyond camp range"), Hero->CommandMove(Hero->GetCampCenter() + FVector(2000.f, 0.f, 0.f)));
+    TestFalse(TEXT("Cannot walk into a destination camp"), Hero->CommandMove(Hero->GetCampCenter()));
+    // 活动范围不限距离：营地圈外的可达地点可以下达指令。
+    const FVector FarDestination = Hero->GetCampCenter() + FVector(1750.f, 0.f, 0.f);
+    TestTrue(TEXT("Can order a move far beyond the former camp range"), Hero->CommandMove(FarDestination));
     TestTrue(TEXT("Can reposition before battle without attack"), Hero->CommandMove(Destination));
     ULKUnitMovementComponent* Movement = Hero->FindComponentByClass<ULKUnitMovementComponent>();
     for (int32 i = 0; i < 350; ++i)
     {
         Hero->Tick(0.01f); Movement->TickComponent(0.01f, LEVELTICK_All, nullptr);
-        TestTrue(TEXT("Whole hero remains within camp"), FVector::Dist2D(Hero->GetActorLocation(), Hero->GetCampCenter()) <= Hero->GetCampMoveRadius() - Hero->GetBodyRadius() + 0.1f);
+        // 移动不再被营地圈拴住：只要求不穿过实体营地。
         TestTrue(TEXT("Hero never crosses solid camp"), FVector::Dist2D(Hero->GetActorLocation(), Hero->GetCampCenter()) >= Hero->GetBodyRadius() + Hero->GetCamp()->GetBodyRadius());
     }
     TestTrue(TEXT("Arrived around camp"), FVector::Dist2D(Hero->GetActorLocation(), Destination) <= 5.f);
@@ -272,6 +278,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKAttackProjectileTest, "LittleKing.Sprint5.Co
 bool FLKAttackProjectileTest::RunTest(const FString& Parameters)
 {
     FLKBattleTestWorld Env; if (!Env.Open(*this) || !Env.DeployAndStart(*this)) { return false; }
+    // 此测试验证前摇/切目标，不依赖当前平衡表的近战射程。
+    FLKSprint5TestAccess::Row(Env.GM, "Unit_Swordsman").AttackRange = 150.f;
     ALKUnitBase* Attacker = Env.GM->SpawnUnitForTeam("Unit_Swordsman", ELKTeam::Player, FVector(-100.f, 0.f, 0.f));
     ALKUnitBase* Target = Env.GM->SpawnUnitForTeam("Unit_Swordsman", ELKTeam::Enemy, FVector(30.f, 0.f, 0.f));
     ALKUnitBase* Other = Env.GM->SpawnUnitForTeam("Unit_Swordsman", ELKTeam::Enemy, FVector(-100.f, 130.f, 0.f));
@@ -357,7 +365,7 @@ bool FLKLiveBattleTest::RunTest(const FString& Parameters)
         Env.TickTestWorld(1.f / 30.f);
         for (TActorIterator<ALKUnitHero> It(Env.GetTestWorld()); It; ++It)
         {
-            TestTrue(TEXT("Live battle hero body stays inside camp"), FVector::Dist2D(It->GetCampCenter(), It->GetActorLocation()) <= It->GetCampMoveRadius() - It->GetBodyRadius() + 0.1f);
+            // 英雄可自由离开营地圈（活动不限距离）；只要求不穿建筑。
             for (TActorIterator<ALKUnitBase> Obstacle(Env.GetTestWorld()); Obstacle; ++Obstacle)
             {
                 if (Obstacle->IsAlive() && Obstacle->IsBuilding())
@@ -419,6 +427,228 @@ bool FLKSavedConfigTest::RunTest(const FString& Parameters)
         const TSubclassOf<AHUD> HUD = Mode->GetDefaultObject<ALKBattleGameMode>()->HUDClass;
         TestTrue(TEXT("Saved GameMode uses native HUD for center line and range previews"), HUD && HUD->IsChildOf(ALKPresentationHUD::StaticClass()));
     }
+    return true;
+}
+
+// 营地放开后的回归：英雄自由走位/全图指挥时仍必须正常交战（贴脸互殴、手动到敌前自动开打）。
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKFreeRoamFightTest, "LittleKing.Sprint5.Heroes.FreeRoamFightRegression", Flags)
+bool FLKFreeRoamFightTest::RunTest(const FString& Parameters)
+{
+    FLKBattleTestWorld Env; if (!Env.Open(*this) || !Env.DeployAndStart(*this)) { return false; }
+    ALKUnitHero* Knight = Env.Hero(ELKTeam::Player, "Hero_Knight");
+    ALKUnitHero* Enemy = Env.Hero(ELKTeam::Enemy, "Hero_Knight");
+    if (!TestNotNull(TEXT("Player hero exists"), Knight) || !TestNotNull(TEXT("Enemy hero exists"), Enemy)) { return false; }
+    const float EnemyMax = Enemy->GetMaxHealth();
+    const float KnightMax = Knight->GetMaxHealth();
+
+    // 场景 a：手动指挥直奔敌方英雄当前所在位置（全图进攻指令）。
+    const FVector OrderPoint = Enemy->GetActorLocation();
+    TestTrue(TEXT("Free roam order toward the enemy hero is accepted"), Knight->CommandMove(OrderPoint));
+
+    // 场景 b：把另一名我方英雄直接生成到敌方英雄身边（贴脸开局）验证贴脸必战。
+    ALKUnitBase* Ranger = Env.GM->SpawnUnitForTeam("Hero_Ranger", ELKTeam::Player,
+        Enemy->GetActorLocation() + FVector(0.f, -90.f, 0.f), ELKUnitClass::Hero);
+
+    bool bEnemyDamaged = false;
+    bool bKnightFought = false;
+    for (int32 Frame = 0; Frame < 1200 && (!bEnemyDamaged || !bKnightFought); ++Frame)
+    {
+        Env.TickTestWorld(1.f / 30.f);
+        if (Enemy->GetHealth() < EnemyMax - 1.f) { bEnemyDamaged = true; }
+        if (Knight->GetHealth() < KnightMax - 1.f) { bKnightFought = true; }
+    }
+    TestTrue(TEXT("Adjacent hero fights back at point blank"), bKnightFought);
+    TestTrue(TEXT("Ordered hero attacks after walking onto the enemy"), bEnemyDamaged);
+    // 新规则：移动指令强行打断战斗，只在到达（或卡住超时）后结束，然后恢复自动战斗。
+    for (int32 Frame = 0; Frame < 900 && Knight->IsManualMoving(); ++Frame) { Env.TickTestWorld(1.f / 30.f); }
+    TestFalse(TEXT("Manual order ends only after arriving or getting stuck"), Knight->IsManualMoving());
+    return true;
+}
+
+// 移动指令强行打断战斗（BUG-018）：战斗中点营地移动必须立刻生效，走到落点后恢复自动战斗。
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKManualMoveInterruptTest, "LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat", Flags)
+bool FLKManualMoveInterruptTest::RunTest(const FString& Parameters)
+{
+    FLKBattleTestWorld Env; if (!Env.Open(*this) || !Env.DeployAndStart(*this)) { return false; }
+    ALKUnitHero* Knight = Env.Hero(ELKTeam::Player, "Hero_Knight");
+    if (!TestNotNull(TEXT("Player knight exists"), Knight)) { return false; }
+
+    // 贴脸放一个敌方佣兵：英雄立即进入交战（有目标、目标在攻击距离内）。
+    const FVector Anchor = Knight->GetActorLocation();
+    ALKUnitBase* Enemy = Env.GM->SpawnUnitForTeam("Unit_Swordsman", ELKTeam::Enemy, Anchor + FVector(0.f, 110.f, 0.f));
+    if (!TestNotNull(TEXT("Adjacent enemy fixture"), Enemy)) { return false; }
+    Env.TickTestWorld(0.6f);
+    if (!TestTrue(TEXT("Knight is engaged before the order"), Knight->GetTarget() != nullptr)) { return false; }
+
+    // 1) 战斗中的移动指令必须被接受并立即打断战斗（旧行为会被"敌人已在攻击距离内"当场取消）。
+    const FVector Destination = Anchor + FVector(0.f, -400.f, 0.f);
+    TestTrue(TEXT("Move order is accepted while fighting"), Knight->CommandMove(Destination));
+    TestTrue(TEXT("Order interrupts combat immediately"),
+        Knight->IsManualMoving() && Knight->GetTarget() == nullptr);
+
+    // 2) 移动过程中不索敌、不回头打架，且确实在移动（营地可能挡在直线路径上，这里只要求真的在走）。
+    const FVector StartLocation = Knight->GetActorLocation();
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Manual move survives an adjacent enemy"), Knight->IsManualMoving());
+    TestTrue(TEXT("Hero actually walks while the order runs"),
+        FVector::Dist2D(Knight->GetActorLocation(), StartLocation) > 50.f);
+    TestTrue(TEXT("No re-acquire while the order runs"), Knight->GetTarget() == nullptr);
+
+    // 3) 到达落点后恢复自动战斗：重新索敌。
+    for (int32 Frame = 0; Frame < 600 && Knight->IsManualMoving(); ++Frame) { Env.TickTestWorld(1.f / 30.f); }
+    TestFalse(TEXT("Order ends after arriving or getting stuck"), Knight->IsManualMoving());
+    Env.TickTestWorld(0.3f);
+    TestTrue(TEXT("Auto combat resumes after the order ends"), Knight->GetTarget() != nullptr);
+
+    // 4) 落点被敌人占据时不能永远卡住：卡住超时后同样恢复自动战斗（BUG-016 场景的收敛出口）。
+    TestTrue(TEXT("Order onto the enemy position is accepted"), Knight->CommandMove(Enemy->GetActorLocation()));
+    for (int32 Frame = 0; Frame < 300 && Knight->IsManualMoving(); ++Frame) { Env.TickTestWorld(1.f / 30.f); }
+    TestFalse(TEXT("Stuck order ends by timeout instead of locking the hero"), Knight->IsManualMoving());
+    Env.TickTestWorld(0.3f);
+    TestTrue(TEXT("Hero fights again after a stuck order"), Knight->GetTarget() != nullptr);
+    return true;
+}
+
+// 索敌范围：范围内锁定、范围外不锁、离开释放并重索敌、嘲讽强制改变、集火跨范围。
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKAcquireRangeTest, "LittleKing.Sprint5.Heroes.AcquireRangeAndRelease", Flags)
+bool FLKAcquireRangeTest::RunTest(const FString& Parameters)
+{
+    FLKBattleTestWorld Env; if (!Env.Open(*this) || !Env.DeployAndStart(*this)) { return false; }
+    ALKUnitHero* Knight = Env.Hero(ELKTeam::Player, "Hero_Knight");
+    ALKUnitHero* EnemyHero = Env.Hero(ELKTeam::Enemy, "Hero_Knight");
+    if (!TestNotNull(TEXT("Player hero exists"), Knight) || !TestNotNull(TEXT("Enemy hero exists"), EnemyHero)) { return false; }
+
+    const float Radius = Knight->GetAcquireRadius();
+    TestTrue(TEXT("Acquire radius comes from configuration"), Radius >= 100.f);
+
+    // 1) 范围外敌人不锁定：沿 +Y 放置，远离所有玩家单位（含另外两名英雄）。
+    ALKUnitBase* Far = Env.GM->SpawnUnitForTeam("Unit_Swordsman", ELKTeam::Enemy, Knight->GetActorLocation() + FVector(0.f, Radius + 300.f, 0.f));
+    if (!TestNotNull(TEXT("Far enemy fixture"), Far)) { return false; }
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Enemy outside acquire radius is not locked"), Knight->GetTarget() != Far);
+
+    // 2) 无目标的佣兵会主动行军（保证双方仍能接触）。
+    const FVector MarchStart = Far->GetActorLocation();
+    Env.TickTestWorld(1.f);
+    TestTrue(TEXT("Idle soldier marches toward the nearest enemy"), FVector::Dist2D(Far->GetActorLocation(), MarchStart) > 50.f);
+
+    // 3) 进入索敌范围 → 自动锁定。
+    Far->SetActorLocation(Knight->GetActorLocation() + FVector(0.f, Radius - 200.f, 0.f));
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Enemy inside acquire radius is locked"), Knight->GetTarget() == Far);
+
+    // 4) 离开索敌范围（含滞回）→ 释放并重新索敌（此处范围外无其它敌人 → 目标清空）。
+    Far->SetActorLocation(Knight->GetActorLocation() + FVector(0.f, Radius * 1.2f + 200.f, 0.f));
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Target beyond release threshold is dropped"), Knight->GetTarget() != Far);
+
+    // 5) 嘲讽强制改变索敌：范围内的嘲讽单位夺取锁定（优先级高于最近敌人）。
+    Far->SetActorLocation(Knight->GetActorLocation() + FVector(0.f, Radius - 200.f, 0.f));
+    ALKUnitBase* Taunter = Env.GM->SpawnUnitForTeam("Unit_Shieldbearer", ELKTeam::Enemy, Knight->GetActorLocation() + FVector(400.f, 0.f, 0.f));
+    if (!TestNotNull(TEXT("Taunter fixture"), Taunter)) { return false; }
+    TestTrue(TEXT("Shieldbearer carries taunt"), Taunter->IsTaunting());
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Taunter overrides normal acquisition"), Knight->GetTarget() == Taunter);
+
+    // 6) 集火指令跨范围优先：先让嘲讽者离开嘲讽半径，再强制一个超范围目标。
+    Taunter->SetActorLocation(FVector(0.f, -1900.f, 0.f));
+    Env.TickTestWorld(0.5f);
+    TestTrue(TEXT("Taunt releases after leaving its radius"), Knight->GetTarget() != Taunter);
+    const FVector FarPoint = Knight->GetActorLocation() + FVector(0.f, Radius * 2.f, 0.f);
+    EnemyHero->SetActorLocation(FarPoint);
+    Knight->SetForcedTarget(EnemyHero, 5.f);
+    Env.TickTestWorld(0.3f);
+    TestTrue(TEXT("Forced target ignores acquire radius"), Knight->GetTarget() == EnemyHero);
+    return true;
+}
+
+// BUG-017 回归：旧档（快照里没有身份特性）冷启动恢复后，法师上场必须能直接对敌方半场施法。
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKAuthoredSpellTerritoryTest, "LittleKing.Sprint5.Heroes.AuthoredSpellTerritory", Flags)
+bool FLKAuthoredSpellTerritoryTest::RunTest(const FString& Parameters)
+{
+    UGameplayStatics::DeleteGameInSlot(ULKRunSubsystem::GetRunSlotName(), 0);
+
+    // 1) 造一份"旧档"：英雄快照里没有任何身份特性（模拟 BUG-017 的旧远征）。
+    TArray<FLKRunHeroState> OldHeroes;
+    for (const TPair<FName, float>& Pair : {
+        TPair<FName, float>("Hero_Knight", 450.f), TPair<FName, float>("Hero_Mage", 300.f),
+        TPair<FName, float>("Hero_Ranger", 350.f) })
+    {
+        FLKRunHeroState Hero;
+        Hero.HeroId = Pair.Key;
+        Hero.Health = Hero.MaxHealth = Hero.BaseMaxHealth = Pair.Value;
+        if (Pair.Key == "Hero_Ranger") { Hero.Traits = { "Trait_FaceFear" }; }
+        OldHeroes.Add(MoveTemp(Hero));
+    }
+    TArray<FLKRunCardState> OldCards;
+    for (FName Id : { FName("Unit_Swordsman"), FName("Unit_Archer"), FName("Unit_Shieldbearer"),
+        FName("Spell_Fireball"), FName("Spell_HealWave"), FName("Building_ArrowTower"), FName("Building_Barracks") })
+    {
+        FLKRunCardState Card;
+        Card.CardId = Id;
+        OldCards.Add(MoveTemp(Card));
+    }
+    TArray<FLKEncounterRow> Encounters;
+    FString CatalogError;
+    if (!TestTrue(TEXT("Encounter catalog loads"), LKEncounterContent::BuildCatalog(nullptr, Encounters, CatalogError))) { return false; }
+    {
+        UGameInstance* SeedInstance = NewObject<UGameInstance>();
+        ULKRunSubsystem* Seed = NewObject<ULKRunSubsystem>(SeedInstance);
+        Seed->SetAutoSaveEnabled(false);
+        if (!TestTrue(TEXT("Old-style run starts"), Seed->StartNewRun(OldHeroes, OldCards, 4242, Encounters))) { return false; }
+        if (!TestTrue(TEXT("Old-style save written to the run slot"), Seed->SaveExpeditionToSlot(ULKRunSubsystem::GetRunSlotName()))) { return false; }
+    }
+
+    // 2) 真实 BP GameMode + DA_GameData 冷启动恢复该旧档（GameMode 会补全身份特性）。
+    FTestWorldWrapper World;
+    if (!World.CreateTestWorld(EWorldType::Game)) { World.ForwardErrorMessages(this); return false; }
+    TSubclassOf<ALKBattleGameMode> AuthoredMode = LoadClass<ALKBattleGameMode>(
+        nullptr, TEXT("/Game/blueprint/BP_ALKBattleGameMode.BP_ALKBattleGameMode_C"));
+    if (!TestTrue(TEXT("Authored battle GameMode loads"), bool(AuthoredMode))) { return false; }
+    World.GetTestWorld()->GetWorldSettings()->DefaultGameMode = AuthoredMode;
+    if (!World.BeginPlayInTestWorld()) { World.ForwardErrorMessages(this); return false; }
+    ALKBattleGameMode* GM = World.GetTestWorld()->GetAuthGameMode<ALKBattleGameMode>();
+    World.GetTestWorld()->SpawnActor<ALKPlayerController>();
+    if (!TestNotNull(TEXT("Authored GameMode starts"), GM)) { return false; }
+    GM->Tick(0.f);
+
+    ULKRunSubsystem* Run = World.GetTestWorld()->GetGameInstance()->GetSubsystem<ULKRunSubsystem>();
+    if (!TestNotNull(TEXT("Run subsystem exists"), Run)) { return false; }
+    const FLKRunState RecoveredRun = Run->GetRunState();
+    const FLKRunHeroState* SnapshotMage = RecoveredRun.Heroes.FindByPredicate(
+        [](const FLKRunHeroState& Hero) { return Hero.HeroId == "Hero_Mage"; });
+    const FLKRunHeroState* SnapshotRanger = RecoveredRun.Heroes.FindByPredicate(
+        [](const FLKRunHeroState& Hero) { return Hero.HeroId == "Hero_Ranger"; });
+    TestTrue(TEXT("Cold start restores the mage identity trait from code"),
+        SnapshotMage && SnapshotMage->Traits.Contains("Trait_MageSpellReach"));
+    TestTrue(TEXT("Cold start keeps player-added non-identity traits"),
+        SnapshotRanger && SnapshotRanger->Traits.Contains("Trait_FaceFear"));
+
+    // 3) 部署三英雄并开战：法师在场 → 敌方半场可施法；法师死亡 → 恢复只允许己方半场。
+    const TArray<FVector> Camps = { FVector(-700.f, -1300.f, 0.f), FVector(0.f, -1300.f, 0.f), FVector(700.f, -1300.f, 0.f) };
+    const TArray<FName> Roster = { FName("Hero_Knight"), FName("Hero_Mage"), FName("Hero_Ranger") };
+    for (int32 Index = 0; Index < Roster.Num(); ++Index)
+    {
+        TestEqual(TEXT("Recovered expedition hero deploys"), GM->DeployHero(ELKTeam::Player, Roster[Index], Camps[Index]),
+            ELKPlayResult::Success);
+    }
+    GM->ForceStartBattle();
+    TestEqual(TEXT("Recovered expedition battle starts"), GM->GetPhase(), ELKGamePhase::Battle);
+
+    ALKUnitHero* Mage = nullptr;
+    for (TActorIterator<ALKUnitHero> It(World.GetTestWorld()); It; ++It)
+    {
+        if (It->GetTeam() == ELKTeam::Player && It->GetUnitId() == "Hero_Mage") { Mage = *It; }
+    }
+    if (!TestNotNull(TEXT("Deployed mage exists"), Mage)) { return false; }
+    TestTrue(TEXT("Deployed mage keeps global spell placement"), Mage->HasTraitEffect(ELKTraitEffect::GlobalSpellPlacement));
+    TestTrue(TEXT("Global spell placement is reported while the mage lives"), GM->HasGlobalSpellPlacement(ELKTeam::Player));
+    TestTrue(TEXT("Enemy half is castable while the mage lives"), GM->CanPlaceSpellAt(ELKTeam::Player, FVector(0.f, 600.f, 0.f)));
+    Mage->Die();
+    TestFalse(TEXT("Mage death locks the enemy half again"), GM->CanPlaceSpellAt(ELKTeam::Player, FVector(0.f, 600.f, 0.f)));
+    TestTrue(TEXT("Own half stays castable after mage death"), GM->CanPlaceSpellAt(ELKTeam::Player, FVector(0.f, -600.f, 0.f)));
+
+    UGameplayStatics::DeleteGameInSlot(ULKRunSubsystem::GetRunSlotName(), 0);
     return true;
 }
 

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-08",
+  "engine": "UE 5.8.1-56057345",
+  "scope": "Dungeon D3 room rewards, atomic reward claims, deck upgrades, and native UMG reward UI",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/D3UIFinalBuild.log"
+  },
+  "automation": {
+    "command": "Automation RunTests LittleKing",
+    "report": "Saved/Automation/D3UIFinal/index.json",
+    "total": 26,
+    "succeeded": 26,
+    "succeededWithoutWarnings": 10,
+    "succeededWithWarnings": 16,
+    "failed": 0,
+    "notRun": 0,
+    "allTestStates": "Success",
+    "d3Tests": [
+      "LittleKing.D3.Rewards.ClaimBoundaries",
+      "LittleKing.D3.Rewards.StateMachineAtomicity"
+    ],
+    "knownWarnings": [
+      "Temporary test worlds have no camera",
+      "NullRHI integration world has no game viewport",
+      "GameplayCueNotifyPaths falls back to /Game/",
+      "One D0 test intentionally reaches the enemy unit limit",
+      "One D2 negative-path test intentionally resolves an unknown trait"
+    ]
+  },
+  "uiIntegration": {
+    "test": "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+    "checks": [
+      "A pending reward batch creates the native reward panel",
+      "Skipping through the HUD closes the panel",
+      "Resolving the reward unlocks the next-room action"
+    ],
+    "note": "The NullRHI automation world has no viewport, so it verifies lifecycle and input contracts rather than rendered pixels."
+  },
+  "blueprints": {
+    "allowList": "Saved/Sprint5BlueprintAllowList.txt",
+    "result": "0 errors, 0 warnings, 0 failed to load",
+    "log": "Saved/Logs/D3UIBlueprintCompile.log",
+    "assets": [
+      "/Game/blueprint/BP_ALKBattleGameMode.BP_ALKBattleGameMode",
+      "/Game/blueprint/WBP_BattleHUD.WBP_BattleHUD",
+      "/Game/blueprint/GA_MageNova.GA_MageNova",
+      "/Game/blueprint/GA_KnightHeal.GA_KnightHeal",
+      "/Game/blueprint/GA_RangerShot.GA_RangerShot"
+    ]
+  },
+  "assetOwnership": {
+    "userModifiedPreserved": [
+      "Content/Data/DT_Units.uasset",
+      "Content/Data/DT_Traits.uasset",
+      "Content/blueprint/GA_MageNova.uasset",
+      "Content/blueprint/GA_RangerShot.uasset"
+    ],
+    "existingBlueprintPreserved": [
+      "Content/blueprint/WBP_BattleHUD.uasset"
+    ],
+    "assistantCreatedSource": [
+      "Source/little_king/ULKRunRewardWidget.h",
+      "Source/little_king/ULKRunRewardWidget.cpp"
+    ],
+    "assistantModifiedBinaryAssets": []
+  },
+  "manualChecks": "not run in this turn; see docs/23-D3RewardTutorial.md",
+  "deferred": [
+    "D4 branching route",
+    "D5 safe-node save and expedition summary",
+    "audio, final art, packaging, hardware and performance testing"
+  ]
+}

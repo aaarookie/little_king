@@ -1,0 +1,104 @@
+[
+  {
+    "Name": "Encounter_UndeadPatrol",
+    "EncounterId": "Encounter_UndeadPatrol",
+    "DisplayName": "亡灵巡逻",
+    "Rank": "Normal",
+    "RewardTier": 1,
+    "EnemyHeroIds": ["Hero_Necromancer"],
+    "Waves": [
+      {"Time": 0.0, "UnitId": "Unit_Skeleton", "Count": 3},
+      {"Time": 0.0, "UnitId": "Unit_SkeletonArcher", "Count": 1},
+      {"Time": 28.0, "UnitId": "Unit_Skeleton", "Count": 2},
+      {"Time": 55.0, "UnitId": "Unit_SkeletonArcher", "Count": 1}
+    ],
+    "bEnemyUsesCards": false,
+    "EnemyCards": [],
+    "EnemySilverPerSecond": 0.333333,
+    "EnemySilverCap": 5.0,
+    "EnemyStartingSilver": 0.0,
+    "AI": {
+      "bEnableFocus": false,
+      "bEnableCounter": false,
+      "bEnablePush": false,
+      "FocusWarningSeconds": 2.5,
+      "FocusIntervalMin": 35.0,
+      "FocusIntervalMax": 42.0,
+      "FocusDuration": 5.0,
+      "CounterCheckInterval": 5.0,
+      "PushSilverThreshold": 4.0,
+      "PushMaxCards": 3,
+      "PushCooldownMin": 20.0,
+      "PushCooldownMax": 35.0,
+      "PushReserveMaxSeconds": 15.0
+    }
+  },
+  {
+    "Name": "Encounter_UndeadElite",
+    "EncounterId": "Encounter_UndeadElite",
+    "DisplayName": "巨骨卫队",
+    "Rank": "Elite",
+    "RewardTier": 2,
+    "EnemyHeroIds": ["Hero_Necromancer", "Hero_SkeletonGiant"],
+    "Waves": [
+      {"Time": 0.0, "UnitId": "Unit_Skeleton", "Count": 3},
+      {"Time": 0.0, "UnitId": "Unit_SkeletonArcher", "Count": 2},
+      {"Time": 32.0, "UnitId": "Unit_Skeleton", "Count": 2},
+      {"Time": 60.0, "UnitId": "Unit_SkeletonArcher", "Count": 2}
+    ],
+    "bEnemyUsesCards": false,
+    "EnemyCards": [],
+    "EnemySilverPerSecond": 0.333333,
+    "EnemySilverCap": 5.0,
+    "EnemyStartingSilver": 0.0,
+    "AI": {
+      "bEnableFocus": true,
+      "bEnableCounter": false,
+      "bEnablePush": false,
+      "FocusWarningSeconds": 2.5,
+      "FocusIntervalMin": 28.0,
+      "FocusIntervalMax": 36.0,
+      "FocusDuration": 6.0,
+      "CounterCheckInterval": 5.0,
+      "PushSilverThreshold": 4.0,
+      "PushMaxCards": 3,
+      "PushCooldownMin": 20.0,
+      "PushCooldownMax": 35.0,
+      "PushReserveMaxSeconds": 15.0
+    }
+  },
+  {
+    "Name": "Encounter_SkeletonKing",
+    "EncounterId": "Encounter_SkeletonKing",
+    "DisplayName": "骷髅王座",
+    "Rank": "Boss",
+    "RewardTier": 3,
+    "EnemyHeroIds": ["Boss_SkeletonKing", "Hero_Necromancer"],
+    "Waves": [
+      {"Time": 0.0, "UnitId": "Unit_Skeleton", "Count": 4},
+      {"Time": 0.0, "UnitId": "Unit_SkeletonArcher", "Count": 2},
+      {"Time": 30.0, "UnitId": "Unit_Skeleton", "Count": 2},
+      {"Time": 60.0, "UnitId": "Unit_SkeletonArcher", "Count": 2}
+    ],
+    "bEnemyUsesCards": false,
+    "EnemyCards": [],
+    "EnemySilverPerSecond": 0.333333,
+    "EnemySilverCap": 5.0,
+    "EnemyStartingSilver": 0.0,
+    "AI": {
+      "bEnableFocus": true,
+      "bEnableCounter": false,
+      "bEnablePush": false,
+      "FocusWarningSeconds": 2.0,
+      "FocusIntervalMin": 22.0,
+      "FocusIntervalMax": 30.0,
+      "FocusDuration": 7.0,
+      "CounterCheckInterval": 5.0,
+      "PushSilverThreshold": 4.0,
+      "PushMaxCards": 3,
+      "PushCooldownMin": 20.0,
+      "PushCooldownMax": 35.0,
+      "PushReserveMaxSeconds": 15.0
+    }
+  }
+]

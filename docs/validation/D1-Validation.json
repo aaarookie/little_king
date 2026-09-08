@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-08",
+  "engine": "UE 5.8.1-56057345",
+  "scope": "Dungeon D1 fixed three-room expedition, result action, and built-in unit rule/tuning split",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/CoreUnitRulesBuild.log"
+  },
+  "automation": {
+    "command": "Automation RunTests LittleKing",
+    "report": "Saved/Automation/CoreUnitRulesFinal/index.json",
+    "total": 20,
+    "succeeded": 20,
+    "succeededWithoutWarnings": 6,
+    "succeededWithWarnings": 14,
+    "failed": 0,
+    "notRun": 0,
+    "allTestStates": "Success",
+    "d1Tests": [
+      "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+      "LittleKing.D1.Configuration.BuiltInUnitRules",
+      "LittleKing.D1.Run.BossCompletion",
+      "LittleKing.D1.Run.ThreeRoomFlow"
+    ],
+    "knownWarnings": [
+      "Temporary test worlds have no camera",
+      "NullRHI integration world has no game viewport",
+      "GameplayCueNotifyPaths falls back to /Game/",
+      "One D0 test intentionally reaches the enemy unit limit"
+    ]
+  },
+  "blueprints": {
+    "allowList": "Saved/Sprint5BlueprintAllowList.txt",
+    "result": "0 errors, 0 warnings, 0 failed to load",
+    "log": "Saved/Logs/CoreUnitRulesBlueprintCompile.log",
+    "assets": [
+      "/Game/blueprint/BP_ALKBattleGameMode.BP_ALKBattleGameMode",
+      "/Game/blueprint/WBP_BattleHUD.WBP_BattleHUD",
+      "/Game/blueprint/GA_MageNova.GA_MageNova",
+      "/Game/blueprint/GA_KnightHeal.GA_KnightHeal",
+      "/Game/blueprint/GA_RangerShot.GA_RangerShot"
+    ],
+    "semanticChecks": "Mage and ranger target inputs connected; ranger uses damage and has no old heal node"
+  },
+  "assetOwnership": {
+    "userModified": [
+      "Content/Data/DT_Units.uasset",
+      "Content/Data/DT_Traits.uasset",
+      "Content/blueprint/GA_MageNova.uasset",
+      "Content/blueprint/GA_RangerShot.uasset"
+    ],
+    "assistantAssetWrites": "none"
+  },
+  "manualChecks": "not run in this turn; see docs/21-D1ExpeditionTutorial.md",
+  "deferred": [
+    "D2 encounter data assets and expedition balance pass",
+    "D3 rewards, D4 branching route, D5 save and summary",
+    "audio, final art, packaging, hardware and performance testing"
+  ]
+}

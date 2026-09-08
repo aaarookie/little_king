@@ -105,6 +105,17 @@ void ALKUnitHero::OnUnitInitialized(const FLKUnitRow& Row)
 	}
 }
 
+void ALKUnitHero::ResetTransientRoomState()
+{
+	Super::ResetTransientRoomState();
+	bManualMoving = false;
+	ManualMoveStuckTimer = 0.f;
+	RallyPoint = GetActorLocation();
+	AbilityCheckTimer = 0.f;
+	SkillCooldownRemaining = 0.f;
+	if (AbilitySystem) { AbilitySystem->CancelAllAbilities(); }
+}
+
 void ALKUnitHero::TryCastAbilities()
 {
 	if (!IsAlive() || !IsCombatEnabled() || !AbilitySystem || !bAbilitiesResolved || !GetTarget() || IsManualMoving())
@@ -149,6 +160,7 @@ void ALKUnitHero::SetCamp(ALKHeroCamp* Camp, float Radius)
 {
     HeroCamp = Camp;
     CampCenter = Camp->GetActorLocation();
+    // CampMoveRadius 仅作"营地范围圈"的显示半径与未来营地 buff 范围使用，不再限制英雄活动。
     CampMoveRadius = FMath::Max(Radius, 2.f * GetBodyRadius() + Camp->GetBodyRadius() + 9.f);
     RallyPoint = GetActorLocation();
 }
@@ -156,10 +168,13 @@ void ALKUnitHero::SetCamp(ALKHeroCamp* Camp, float Radius)
 bool ALKUnitHero::CommandMove(const FVector& Destination)
 {
     const ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+    // 活动范围不限距离：只校验目标地点可达性（出界/建筑与营地占据/路径被阻挡 → false）。
     if (!IsAlive() || !HeroCamp.IsValid() || !GM || GM->GetPhase() == ELKGamePhase::Result
         || !MovementComponent->CanReach(Destination)) { return false; }
     RallyPoint = FVector(Destination.X, Destination.Y, 0.f);
     bManualMoving = true;
+    ManualMoveStuckTimer = 0.f;
+    ManualMoveLastLocation = GetActorLocation();
     ChangeTarget(nullptr);
     AbilitySystem->CancelAllAbilities();
     MovementComponent->MoveToward(RallyPoint, GetMoveSpeed());
@@ -168,18 +183,13 @@ bool ALKUnitHero::CommandMove(const FVector& Destination)
 
 bool ALKUnitHero::CanPursueTarget(const ALKUnitBase* Target) const
 {
-    return Super::CanPursueTarget(Target) && (CampMoveRadius <= 0.f
-        || FVector::Dist2D(CampCenter, Target->GetActorLocation()) <= CampMoveRadius - GetBodyRadius() + GetAttackRange());
+    // 英雄活动不再受营地范围限制：可全图追击。
+    return Super::CanPursueTarget(Target);
 }
 
 FVector ALKUnitHero::GetChaseDestination(const ALKUnitBase* Target) const
 {
-    FVector Destination = Super::GetChaseDestination(Target);
-    if (CampMoveRadius > 0.f)
-    {
-        Destination = CampCenter + (Destination - CampCenter).GetClampedToMaxSize2D(CampMoveRadius - GetBodyRadius());
-    }
-    return Destination;
+    return Super::GetChaseDestination(Target);
 }
 
 void ALKUnitHero::UpdateStateMachine(float DeltaSeconds)
@@ -187,18 +197,33 @@ void ALKUnitHero::UpdateStateMachine(float DeltaSeconds)
     if (bManualMoving)
     {
         CancelAttackWindup();
-        if (FVector::Dist2D(GetActorLocation(), RallyPoint) <= 5.f)
+        // 移动指令强行打断战斗（用户规则 2026-09-09）：期间不索敌、不攻击，只走向落点，
+        // 到达后再由下方战斗 FSM 恢复自动战斗。
+        const bool bArrived = FVector::Dist2D(GetActorLocation(), RallyPoint) <= 5.f;
+        if (!bArrived)
         {
-            bManualMoving = false;
-            MovementComponent->Stop();
-            TargetRetryTimer = 0.f;
+            // 卡住检测：被单位/建筑挡住、或落点被占（贴脸推挤）导致长时间无位移 →
+            // 结束指令交给战斗 FSM，避免"永远走不到点、也永远不打"的死锁（BUG-016 场景的收敛出口）。
+            const float StuckTimeout = GameDataCached ? FMath::Max(0.2f, GameDataCached->HeroMoveStuckTimeout) : 1.5f;
+            const bool bMoved = FVector::Dist2D(GetActorLocation(), ManualMoveLastLocation) >= 1.f;
+            ManualMoveStuckTimer = bMoved ? 0.f : ManualMoveStuckTimer + DeltaSeconds;
+            ManualMoveLastLocation = GetActorLocation();
+            if (ManualMoveStuckTimer < StuckTimeout)
+            {
+                State = ELKUnitState::Moving;
+                MovementComponent->MoveToward(RallyPoint, GetMoveSpeed());
+                return;
+            }
+            UE_LOG(LogLKUnit, Verbose, TEXT("[Hero] %s 手动移动卡住 %.1f 秒（落点 %s），恢复自动战斗"),
+                *UnitId.ToString(), ManualMoveStuckTimer, *RallyPoint.ToCompactString());
         }
-        else
-        {
-            State = ELKUnitState::Moving;
-            MovementComponent->MoveToward(RallyPoint, GetMoveSpeed());
-            return;
-        }
+
+        bManualMoving = false;
+        ManualMoveStuckTimer = 0.f;
+        MovementComponent->Stop();
+        TargetRetryTimer = 0.f;
+        // 恢复自动战斗：清空目标让战斗 FSM 重新索敌（含嘲讽/集火优先级）。
+        ChangeTarget(nullptr);
     }
     if (!IsCombatEnabled()) { State = ELKUnitState::Idle; return; }
     Super::UpdateStateMachine(DeltaSeconds);
@@ -213,5 +238,5 @@ ALKHeroCamp* ALKUnitHero::GetCamp() const { return HeroCamp.Get(); }
 void ALKUnitHero::SetCombatEnabled(bool bEnabled)
 {
     Super::SetCombatEnabled(bEnabled);
-    if (!bEnabled) { bManualMoving = false; }
+    if (!bEnabled) { bManualMoving = false; ManualMoveStuckTimer = 0.f; }
 }

@@ -3,6 +3,7 @@
 
 ULKGameData::ULKGameData()
 {
+	EncounterTable = TSoftObjectPtr<UDataTable>(FSoftObjectPath(TEXT("/Game/Data/DT_Encounters.DT_Encounters")));
     DefaultHeroTraits.FindOrAdd(TEXT("Hero_Mage")).Traits = { TEXT("Trait_MageSpellReach") };
     DefaultHeroTraits.FindOrAdd(TEXT("Hero_Knight")).Traits = { TEXT("Trait_KnightTauntAura") };
     FireballSkillHeroIds = { TEXT("Hero_Mage") };

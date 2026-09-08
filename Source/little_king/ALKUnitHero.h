@@ -21,6 +21,7 @@ UCLASS()
 class ALKUnitHero : public ALKUnitBase
 {
 	GENERATED_BODY()
+	friend struct FLKD2TestAccess;
 
 public:
 	ALKUnitHero();
@@ -38,6 +39,7 @@ public:
 
 	/** 施放技能（由 Tick 周期调用；冷却结束且激活成功时进入冷却） */
 	void TryCastAbilities();
+	float GetSkillCooldownRemaining() const { return SkillCooldownRemaining; }
 	void SetCamp(ALKHeroCamp* Camp, float Radius);
 	UFUNCTION(BlueprintCallable, Category = "LK|Hero") bool CommandMove(const FVector& Destination);
 	UFUNCTION(BlueprintPure, Category = "LK|Hero") FVector GetCampCenter() const { return CampCenter; }
@@ -51,11 +53,15 @@ public:
 protected:
 	virtual void OnUnitInitialized(const FLKUnitRow& Row) override;
 	virtual void UpdateStateMachine(float DeltaSeconds) override;
+	virtual void ResetTransientRoomState() override;
 	TWeakObjectPtr<ALKHeroCamp> HeroCamp;
 	FVector CampCenter = FVector::ZeroVector;
 	FVector RallyPoint = FVector::ZeroVector;
 	float CampMoveRadius = 0.f;
 	bool bManualMoving = false;
+	/** 手动移动"卡住"计时：连续无位移超过 HeroMoveStuckTimeout 就结束指令，恢复自动战斗（BUG-018） */
+	float ManualMoveStuckTimer = 0.f;
+	FVector ManualMoveLastLocation = FVector::ZeroVector;
 
 	float AbilityCheckTimer = 0.f;
 	float AbilityCheckInterval = 0.5f;

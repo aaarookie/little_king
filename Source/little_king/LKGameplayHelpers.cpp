@@ -110,6 +110,7 @@ namespace LKGameplay
         {
             Source.bHasTeam = true; Source.Team = Unit->GetTeam();
             Source.UnitId = Unit->GetUnitId(); Source.InstanceId = Unit->GetFName();
+            Source.bRangedSource = Unit->GetAttackType() == ELKAttackType::Ranged;
         }
         return Source;
     }
@@ -125,7 +126,10 @@ namespace LKGameplay
         Event.TargetTeam = Unit->GetTeam(); Event.TargetUnitId = Unit->GetUnitId(); Event.TargetInstanceId = Unit->GetFName();
         Event.Location = Unit->GetActorLocation(); Event.RequestedAmount = Amount; Event.HealthBefore = Unit->GetHealth();
         if (GM) { GM->BeginCombatBatch(); }
-        if (bBypassInvulnerability || !Unit->IsInvulnerable()) { ApplyHealthDelta(Unit, DamageDataName, -Amount, Instigator); }
+        const bool bRemoteDamage = Event.Source.Kind == ELKCombatSourceKind::Spell
+            || (Event.Source.bRangedSource && Event.Source.Kind != ELKCombatSourceKind::Overtime && Event.Source.Kind != ELKCombatSourceKind::HealthCost);
+        const float Damage = Amount * (bRemoteDamage ? 1.f - Unit->GetTraitEffectValue(ELKTraitEffect::RangedDamageReduction) : 1.f);
+        if (bBypassInvulnerability || !Unit->IsInvulnerable()) { ApplyHealthDelta(Unit, DamageDataName, -Damage, Instigator); }
         Event.HealthAfter = IsValid(Unit) ? Unit->GetHealth() : 0.f;
         Event.ActualAmount = FMath::Clamp(Event.HealthBefore - Event.HealthAfter, 0.f, Event.HealthBefore);
         Event.bKilled = Event.HealthBefore > 0.f && Event.HealthAfter <= 0.f;

@@ -13,14 +13,7 @@ void ULKUnitMovementComponent::CollectNavigation(TArray<LKNavigation::FObstacle>
 {
     const ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
     Bounds.HalfExtent = FieldHalfExtent - FVector2D(SeparationRadius + 1.f);
-    if (const ALKUnitHero* Hero = Cast<ALKUnitHero>(Self))
-    {
-        if (Hero->GetCampMoveRadius() > 0.f)
-        {
-            Bounds.LeashCenter = Hero->GetCampCenter();
-            Bounds.LeashRadius = Hero->GetCampMoveRadius() - SeparationRadius;
-        }
-    }
+    // 营地圈不再作为移动拴绳（英雄活动不限距离；圈仅作显示与未来营地 buff 范围）。
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         const ALKUnitBase* Other = *It;
@@ -129,12 +122,5 @@ void ULKUnitMovementComponent::ClampToFieldBounds()
     FVector Position = Self->GetActorLocation();
     Position.X = FMath::Clamp(Position.X, -FieldHalfExtent.X + SeparationRadius + 1.f, FieldHalfExtent.X - SeparationRadius - 1.f);
     Position.Y = FMath::Clamp(Position.Y, -FieldHalfExtent.Y + SeparationRadius + 1.f, FieldHalfExtent.Y - SeparationRadius - 1.f);
-    if (const ALKUnitHero* Hero = Cast<ALKUnitHero>(Self))
-    {
-        if (Hero->GetCampMoveRadius() > 0.f)
-        {
-            Position = Hero->GetCampCenter() + (Position - Hero->GetCampCenter()).GetClampedToMaxSize2D(Hero->GetCampMoveRadius() - SeparationRadius);
-        }
-    }
     Self->SetActorLocation(Position);
 }

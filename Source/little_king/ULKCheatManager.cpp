@@ -2,6 +2,7 @@
 
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Engine/GameInstance.h"
 
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
@@ -9,11 +10,59 @@
 #include "LKGameplayHelpers.h"
 #include "ULKDeckState.h"
 #include "ULKSilverComponent.h"
+#include "ULKRunSubsystem.h"
 
 ALKBattleGameMode* ULKCheatManager::GetGameMode() const
 {
 	UWorld* World = GetWorld();
 	return World ? World->GetAuthGameMode<ALKBattleGameMode>() : nullptr;
+}
+
+void ULKCheatManager::UndeadEncounter(const FString& Preset)
+{
+    ALKBattleGameMode* GM = GetGameMode();
+    UE_LOG(LogLK, Log, TEXT("[Cheat] UndeadEncounter %s: %s"), *Preset,
+        GM && GM->ConfigureEnemyEncounter(FName(*Preset)) ? TEXT("已切换") : TEXT("仅部署阶段可用，参数 Patrol / Elite / Boss"));
+}
+
+void ULKCheatManager::RunHeroMaxHealth(const FString& HeroId, float NewBaseMaxHealth)
+{
+	UGameInstance* Instance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	ULKRunSubsystem* Run = Instance ? Instance->GetSubsystem<ULKRunSubsystem>() : nullptr;
+	const bool bChanged = Run && Run->SetHeroBaseMaxHealth(FName(*HeroId), NewBaseMaxHealth);
+	if (bChanged) { UE_LOG(LogLK, Log, TEXT("[Cheat] RunHeroMaxHealth %s %.1f：已写入下一房永久状态"), *HeroId, NewBaseMaxHealth); }
+	else { UE_LOG(LogLK, Warning, TEXT("[Cheat] RunHeroMaxHealth 失败：仅能在前两房胜利结算后使用，且英雄/数值必须有效")); }
+}
+
+void ULKCheatManager::RunHeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled)
+{
+	UGameInstance* Instance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	ULKRunSubsystem* Run = Instance ? Instance->GetSubsystem<ULKRunSubsystem>() : nullptr;
+	const bool bChanged = Run && (Enabled != 0
+		? Run->AddHeroTrait(FName(*HeroId), FName(*TraitId))
+		: Run->RemoveHeroTrait(FName(*HeroId), FName(*TraitId)));
+	if (bChanged) { UE_LOG(LogLK, Log, TEXT("[Cheat] RunHeroTrait %s %s=%d：已写入下一房永久状态"), *HeroId, *TraitId, Enabled); }
+	else { UE_LOG(LogLK, Warning, TEXT("[Cheat] RunHeroTrait 失败：阶段、英雄、特性或重复状态不合法")); }
+}
+
+void ULKCheatManager::ListRunState()
+{
+	UGameInstance* Instance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	const ULKRunSubsystem* Run = Instance ? Instance->GetSubsystem<ULKRunSubsystem>() : nullptr;
+	if (!Run || !Run->HasRun()) { UE_LOG(LogLK, Warning, TEXT("[Cheat] 当前没有远征")); return; }
+	const FLKRunState State = Run->GetRunState();
+	const FLKEncounterRow* Encounter = State.Encounters.FindByPredicate(
+		[&State](const FLKEncounterRow& Row) { return Row.EncounterId == State.PendingBattle.EncounterId; });
+	UE_LOG(LogLK, Log, TEXT("[Cheat] Run=%s Phase=%d Node=%s Encounter=%s RewardTier=%d History=%d"),
+		*State.RunId.ToString(), int32(State.Phase), *State.CurrentNodeId.ToString(), *State.PendingBattle.EncounterId.ToString(),
+		Encounter ? Encounter->RewardTier : 0, State.BattleHistory.Num());
+	for (const FLKRunHeroState& Hero : State.Heroes)
+	{
+		FString Traits;
+		for (FName Trait : Hero.Traits) { if (!Traits.IsEmpty()) { Traits += TEXT(","); } Traits += Trait.ToString(); }
+		UE_LOG(LogLK, Log, TEXT("[Cheat] %s HP=%.1f/%.1f BaseMax=%.1f Traits=[%s]"),
+			*Hero.HeroId.ToString(), Hero.Health, Hero.MaxHealth, Hero.BaseMaxHealth, *Traits);
+	}
 }
 
 void ULKCheatManager::AddSilver(float Amount)
@@ -82,15 +131,19 @@ void ULKCheatManager::KillAll(int32 TeamIdx)
 	}
 
 	int32 Killed = 0;
+	TArray<ALKUnitBase*> Victims;
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
 		if ((int32)Unit->GetTeam() == TeamIdx && Unit->IsTargetable())
 		{
-			Unit->Die();
-			++Killed;
+			Victims.Add(Unit);
 		}
 	}
+	ALKBattleGameMode* GM = GetGameMode();
+	if (GM) { GM->BeginCombatBatch(); }
+	for (ALKUnitBase* Unit : Victims) { Unit->Die(); ++Killed; }
+	if (GM) { GM->EndCombatBatch(); }
 	UE_LOG(LogLK, Log, TEXT("[Cheat] KillAll 阵营%d：处决 %d 个单位"), TeamIdx, Killed);
 }
 

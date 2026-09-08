@@ -2,15 +2,17 @@
 
 日期：2026-09-06。执行者：本次 Codex 协作。全部内容属于**新的 Sprint 5 范围**，Sprint 6 已按最新要求删除并跳过。
 
+历史说明（2026-09-07）：本文记录 v0.5 发布时状态。后续 D0、英雄失能/战后恢复、亡灵内容和最新验证见 [18](18-DungeonChangeLog.md)；下文“地牢未开工”“满血基线/血量待定”只描述当时状态，不再是当前计划。
+
 ## 接手前先看
 
 这是在此前未提交的 Sprint 5 工作上继续完成的协作交付，整个 diff 包含已有代码、文档和用户资产修改，不能全部归为本轮助手独立产出。上一轮开始前的本地快照在忽略目录 `Saved/Sprint5RevisionBaseline`；长期追溯以包含本文的 Git 提交为准。
 
-本次追加内容：**始终满手的队列过牌、攻击建筑射程预览、正式黄色中线、删除 Sprint 6、详细地牢任务规划**。源码、测试、教程与规则文档全部归新的 Sprint 5；地牢只完成规划，代码尚未开始。
+本次（v0.5 发布时）追加内容：**始终满手的队列过牌、攻击建筑射程预览、正式黄色中线、删除 Sprint 6、详细地牢任务规划**。源码、测试、教程与规则文档全部归新的 Sprint 5；当时地牢只完成规划，代码尚未开始。D0 后续交付见本文顶部的 18。
 
 用户已保存 `Content/Data/DA_GameData.uasset`、`DT_Traits.uasset`、`DT_Units.uasset` 和 `Content/blueprint/WBP_BattleHUD.uasset`，并反馈数次试玩效果不错。助手本轮保留这四份二进制改动，仅只读加载/编译检查，未覆盖或重建资产；没有将用户反馈当作逐项视觉测试报告。五个项目蓝图目前 **0 错误、0 警告**。
 
-用户本轮要求 Git 提交，交付包括已有未提交的 Sprint 5 文件和上述资产；不额外打版本标签。Git HTTP 代理为 `http://127.0.0.1:18081`；提交身份和最终提交号用 `git log` 查询，避免在提交内写回自身哈希。
+用户随后明确要求推送并更新版本，v0.5 版本号、提交与标签已完成推送；交付包括已有 Sprint 5 文件和上述资产。Git HTTP 代理为 `http://127.0.0.1:18081`；提交身份和具体提交号用 `git log` 查询。
 
 当前规则入口是 [01-GDD](01-GDD.md)，技术契约见 [02](02-BattlePrototypeDesign.md)，编辑器短检查见 [16](16-Sprint5MigrationTutorial.md)，下一阶段详细安排见 [17](17-DungeonDevelopmentPlan.md)。原始评审 14 保留建议来源，不覆盖最新用户决定。
 
@@ -34,7 +36,7 @@
 | S5-R09 | 队列过牌与构筑接口保护 | 添加重复牌、转换成已持有种类、删到不足五种均返回 false；保持原状态；GetNextCard 可查下一张，GetDiscardSize 兼容返回 0 |
 | S5-R10 | 攻击建筑落点预览同时画占地圈和射程圈 | 读 Turret 建筑单位行 AttackRange；无效落点红色，取消放置消失；兵营无攻击圈；不计临时战斗增益 |
 | S5-R11 | 黄色中线改为独立原生 HUD 投影 | 原实现是 bDrawFieldBounds 控制的 Z=0 调试线；新线不依赖 Debug 开关，也不被地面深度遮挡 |
-| S5-R12 | 删除原 Sprint 6 指南及任务，直接进入地牢规划 | 音效/素材、打包/硬件测试后置；新增 17，详细拆 D0～D5，明确英雄跨房间规则待定 |
+| S5-R12 | 删除原 Sprint 6 指南及任务，直接进入地牢规划 | 音效/素材、打包/硬件测试后置；新增 17，详细拆 D0～D5；当时英雄跨房间规则待定，现已由 D0 定稿为战后 +40% |
 
 游侠本轮不加新特性；“驻守后扩大远程支援范围”只放在 GDD 候选建议。没有擅自采用两英雄部署、改开局银币、加入地牢/家园或大规模渲染配置变更。
 
@@ -122,3 +124,45 @@
 | 打包与硬件专项 | 发布阶段再安排 | 当前跳过，原 Sprint 6 已删除 |
 
 每次协作更新记录资产名、所测规则、结果和对应提交。二进制资产避免多人同时保存；不要根据历史教程重新加回团队血条、死亡震动、法术灰卡或允许空槽的逻辑。
+
+## 营地规则修订（2026-09-08，地牢阶段期间）
+
+用户确认：**英雄活动范围不限距离**——点击营地后可在全图任意可达地点下达移动指令；自动追击与手动移动都不再受营地移动半径（850）拴住。营地范围圈与 `HeroCampMoveRadius` 数据**保留**：圈在选中营地时继续显示，字段留作将来的"营地内 buff"范围（当前不生效，设计未定）。
+
+| 改动 | 文件 |
+|---|---|
+| 移动不再受营地圈约束（拴绳/位置钳制移除） | `ULKUnitMovementComponent.cpp`（CollectNavigation / ClampToFieldBounds）、头注释 |
+| 英雄追击与追击落点不再按营地半径钳制 | `ALKUnitHero.cpp`（CanPursueTarget / GetChaseDestination / SetCamp 注释） |
+| 指挥移动只校验"目标可达"（出界/建筑与营地占据/路径阻挡 → 拒绝）；提示改为"目标地点不可达" | `ALKUnitHero.cpp`、`ALKPlayerController.cpp`（GetPlacementPreview 去半径）、`ALKPresentationHUD.cpp`（Tip）、`LKTypes.h`（HeroMoveBlocked DisplayName） |
+| 营地范围圈显示保留 | `ALKPresentationHUD.cpp`（选中营地画圈，未改） |
+| 测试按新语义更新（可走出圈、仍拒营地/建筑内目标）；`LittleKing` 32/32 通过 | `Tests/LKSprint5Tests.cpp` |
+| 规则正文同步 | `docs/01-GDD.md`（部署与营地/索敌两节） |
+
+## 索敌范围（2026-09-08）
+
+用户要求给所有单位加索敌范围：范围内出现敌方单位才自动锁定并寻路战斗；目标死亡或离开范围后重新索敌；嘲讽仍可强制改变索敌。
+
+| 改动 | 说明 |
+|---|---|
+| 配置 | `DA_GameData → Combat → UnitAcquireRadius`（默认 900）；`DT_Units` 新增列 `AcquireRadius`（0 = 用全局默认） |
+| 锁定 | `ALKUnitBase::FindNearestEnemy` 默认只考虑索敌范围内的敌人；`AcquireTarget` 保持 嘲讽 > 集火 > 范围内最近 |
+| 释放 | 普通目标超出 `AcquireRadius × 1.15` 释放；嘲讽者超出 `TauntAcquireRadius × 1.15` 释放；集火目标不受范围限制（跨图集火保持） |
+| 行军兜底 | 无目标的非英雄单位向"全图最近敌人"行军（避免双方互相看不到、对局停滞）；英雄仍保持待命/回集结点 |
+| 技能索敌 | `LK_GetNearestEnemy` 取全图最近敌人（技能由玩家主动释放，不受单位视野限制） |
+| 建筑 | 哨塔仍只在攻击射程内选目标（原有行为不变） |
+| 自动化 | 新增 `LittleKing.Sprint5.Heroes.AcquireRangeAndRelease`（范围外不锁/进入锁定/离开释放/行军/嘲讽夺取/集火跨范围）；`LittleKing` **34/34** |
+
+涉及文件：`ULKGameData.h`、`LKDataTypes.h`、`ALKUnitBase.h/.cpp`、`ULKGameplayLibrary.cpp`、`Tests/LKSprint5Tests.cpp`、`docs/01-GDD.md`。
+
+## 移动指令打断战斗（2026-09-09，BUG-018）
+
+用户反馈：英雄战斗中点营地移动"没反应"。原因是手动移动分支里"敌人进入攻击距离就结束手动"的退出条件（BUG-016 加的）会在战斗中被立刻触发，把玩家刚下的指令吃掉。
+
+| 改动 | 说明 |
+|---|---|
+| 指令优先级 | 手动移动期间不索敌、不攻击（取消前摇与技能），即使敌人贴脸也照走落点 |
+| 结束条件 | ① 到达落点（≤5 世界单位）→ 恢复自动战斗；② 卡住超时 `DA_GameData → Camps → HeroMoveStuckTimeout`（默认 1.5 秒）连续无位移 → 结束指令并恢复战斗（落点被占据/被推挤时的收敛出口） |
+| 恢复战斗 | 结束时清空目标，让战斗 FSM 重新索敌（保留嘲讽 > 集火 > 范围内最近）；落点成为新的驻守位置 |
+| 自动化 | 新增 `LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat`；`FreeRoamFightRegression` 按新语义更新；`LittleKing` **37/37** |
+
+涉及文件：`ALKUnitHero.h/.cpp`、`ULKGameData.h`、`Tests/LKSprint5Tests.cpp`、`docs/01-GDD.md`、`docs/05-BugLog.md`（BUG-018）。

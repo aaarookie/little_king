@@ -20,6 +20,9 @@ class ALKBattleGameMode;
  *   ListUnits                   列出场上所有单位
  *   InvulnerableHeroes 秒数     让己方（玩家）在场英雄无敌 N 秒（省略 = 10 秒；
  *                               无敌免疫敌方伤害，但超时虚弱仍会扣血——可用来拖到超时观察虚弱）
+ *   RunHeroMaxHealth 英雄ID 数值  房间间修改英雄永久基础最大生命
+ *   RunHeroTrait 英雄ID 特性ID 0/1 房间间删除/添加英雄永久特性
+ *   ListRunState               列出远征、当前遭遇奖励档和英雄永久状态
  */
 UCLASS()
 class ULKCheatManager : public UCheatManager
@@ -59,6 +62,14 @@ public:
 	UFUNCTION(Exec) void HeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled);
 	/** 仅调试：对首个匹配单位施加无来源、穿透无敌的伤害。 */
 	UFUNCTION(Exec) void DamageUnit(const FString& UnitId, int32 TeamIdx, float Amount);
+	/** 部署阶段切换亡灵测试遭遇：Patrol / Elite / Boss。 */
+	UFUNCTION(Exec) void UndeadEncounter(const FString& Preset);
+	/** 仅调试：结算后的房间间阶段修改英雄永久基础最大生命。 */
+	UFUNCTION(Exec) void RunHeroMaxHealth(const FString& HeroId, float NewBaseMaxHealth);
+	/** 仅调试：结算后的房间间阶段添加/删除永久特性。 */
+	UFUNCTION(Exec) void RunHeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled);
+	/** 输出当前远征、房间、遭遇奖励档和英雄永久状态。 */
+	UFUNCTION(Exec) void ListRunState();
 
 private:
 	ALKBattleGameMode* GetGameMode() const;

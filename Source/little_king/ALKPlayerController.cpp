@@ -338,9 +338,8 @@ bool ALKPlayerController::GetPlacementPreview(FVector& Location, float& Radius, 
         if (ALKUnitHero* Hero = Camp->GetHero())
         {
             Radius = Hero->GetBodyRadius();
-            // No path search in DrawHUD: preview covers geometry; the click also validates reachability.
-            bValid = Hero->IsAlive() && GM->IsInsideField(Location)
-                && FVector::Dist2D(Location, Hero->GetCampCenter()) <= Hero->GetCampMoveRadius() - Radius;
+            // 活动范围不限距离：仅当目标在场内且不与建筑/营地重叠时有效（真正可达性在点击时再验）。
+            bValid = Hero->IsAlive() && GM->IsInsideField(Location);
             for (TActorIterator<ALKUnitBase> It(GetWorld()); It && bValid; ++It)
             {
                 if (It->IsAlive() && It->IsBuilding() && FVector::Dist2D(Location, It->GetActorLocation()) < Radius + It->GetBodyRadius() + 1.f) { bValid = false; }

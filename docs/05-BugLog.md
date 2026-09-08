@@ -126,6 +126,63 @@
 - **验证**：`BattleTimeLimit=60` 拖到超时，双方英雄陆续被虚弱磨死（日志 `[Unit] xxx 阵亡` 正常、无 ensure），一方全灭判负。
 - **教训**（面试可讲）：UE 里"回调同步修改容器"是最常见的迭代陷阱——凡是循环体里可能触发广播/回调的遍历，先拷快照（或延迟处理）；开发版 checked 迭代器会替你抓出来，发行版则是静默 UB，务必修在源头。
 
+## BUG-015：远征房间敌方英雄继承上一房状态（"第三间亡灵法师开局 40%"）
+
+- **现象**：地牢远征（D0~D2）中，第三间"骷髅王座"的敌方亡灵法师开局只有 40% 生命。房间切换时本应只有己方英雄跨房继承（战后 +40% 恢复），敌方单位每房按遭遇配置满血重建。
+- **原因**（两层）：
+  1. **规则层**：D0 定稿的 `FinalizeHeroRecovery` 对**双方**英雄都执行战后 +40% 恢复（失能者 0%→40% 并在结算画面"复活站场"）。这套行为在独立单场成立（LKD0Tests 也断言敌方恢复），但在**跨房远征**里敌方恢复没有任何消费方——敌方下一房由遭遇配置全新建造，恢复值既不继承也无意义，只造成"敌方带 40% 状态进入下一房"的错误观感与潜在误用（Outcome.EnemyHeroes 快照唯一读者是 BattleHistory）。
+  2. **边界层**：跨房继承入口（`DeployHero`）虽已限定 `Team==Player`，`ULKRunSubsystem::SubmitBattleOutcome` 也只消费 `PlayerHeroes` 且校验 ID 集合——但"敌方英雄结算后以 40% 复活站场"的中间状态没有显式规则与日志，难以区分"生成链路带血"与"结算恢复复活"。
+- **修复**（按用户规则"敌方单位状态不跨房间继承"落地，且不写死到骷髅单位——敌方可以是骑士/法师等任何单位，规则按**阵营**分类）：
+  1. `FinalizeHeroRecovery`：远征房间（`bExpeditionBattle`）**只对玩家英雄执行战后恢复**；敌方英雄跳过恢复，快照如实记录结算时状态（失能即 0），仅存 BattleHistory。独立单场保持旧的双方恢复（测试与调试兼容）。
+  2. 继承边界显式化：`DeployHero` 玩家分支注释"跨房继承仅限玩家英雄，按 HeroId 精确匹配"；`SubmitBattleOutcome` 注释并 Verbose 日志声明"Outcome.EnemyHeroes 永不写入 State.Heroes"，既有 ID 集合校验继续挡住任何敌方/未知 ID 混入。
+  3. 部署血量埋点日志：`AutoDeployDefaultHeroes`（敌方部署后）、`DeployHero`（玩家继承后）、`SpawnUnitForTeam`（任何英雄生成）分别打印 `HP 当前/最大（BaseMax）`——若再出现非满血开局，日志可直接区分"生成链路问题"与"开战后被改血"。
+- **涉及文件**：`ALKBattleGameMode_Undead.cpp`（FinalizeHeroRecovery）、`ALKBattleGameMode.cpp`（部署/生成埋点+注释）、`ULKRunSubsystem.cpp`（边界注释）、`docs/01-GDD.md`、`docs/17-DungeonDevelopmentPlan.md`、`docs/18-DungeonChangeLog.md`
+- **验证**：远征房 1→2→3 全程日志：敌方部署日志 `[Run] 敌方自动部署：Hero_Necromancer HP 100%/100%`（每房满血）；`[Run] 敌方英雄 xxx 跳过战后恢复` 在房 1/2 结算出现；`ListRunState` 的 Heroes 始终只有玩家三英雄；LKD0 的独立单场敌方恢复断言不变（非远征路径保留）。
+- **教训**（面试可讲）：一条规则（"战后全员恢复"）在引入"跨房持久化"后会悄悄越过边界——恢复/存档这类"为下一阶段准备状态"的逻辑，必须与"谁会消费这个状态"绑定；无人消费的恢复既是浪费也是 bug 温床。修复时先按**阵营/角色分类**定规则（我方英雄=跨房继承的唯一载体），再在生成、结算、提交三个边界各加一道显式校验与日志。
+
+## BUG-016：放开营地范围后，指挥英雄到敌人身边会"无限追赶、永不攻击"
+
+- **现象**：营地活动范围放开（英雄可全图移动）后，把英雄指挥/自动走向敌方英雄身边，双方贴脸却不动手（至少我方英雄永不攻击）。
+- **原因**：手动移动的"到达判定"要求距指令点 ≤5 世界单位。把指令点下在**移动中的敌方英雄身上/附近**时，敌人一直走动（或互相分离推挤），英雄永远追不到指令点 → `bManualMoving` 永远为真 → `ALKUnitHero::UpdateStateMachine` 的手动分支每帧 `return` 早退，**永不进入索敌/攻击逻辑**。放开营地圈之前，指挥范围被营地半径拴住（指令点基本是静态可达点），该场景几乎不出现；放开后玩家可把英雄指挥到敌人脸上，问题暴露。
+- **修复**：手动移动中额外检查两个"结束手动"条件——① 已到达指令点；② **敌人已进入攻击距离**（最近可追敌人 ≤ 攻击射程）。任一满足即 `bManualMoving=false` 并**直接锁定该敌人**交给战斗 FSM（下方 Super 立即索敌交战）。这样"指挥到敌人面前=进攻指令，走到即开打"；追不上移动目标时，一旦被敌人贴近也会立即反击。
+- **涉及文件**：`ALKUnitHero.cpp`（UpdateStateMachine 手动分支）
+- **验证**：新增自动化 `LittleKing.Sprint5.Heroes.FreeRoamFightRegression`（开战后指挥骑士直奔敌方英雄 + 贴脸生成单位）：修复前 `Manual order ends once combat is possible` 断言失败（手动永不结束），修复后通过；全量 `LittleKing` **33/33 Success**。
+- **教训**（面试可讲）：状态机"手动接管/自动接管"切换的终止条件必须收敛——任何以"到达某个点"为唯一退出条件的接管逻辑，在目标可移动/目标点不可达时都会死锁；退出条件应包含"能力已经完成它的目的"（这里是：能打了就该打），而不是只测几何距离。
+
+## BUG-017：法师在场却"没有全场施法特性"（旧档快照丢失身份特性）
+
+- **现象**：远征里法师明明还活着站在场上，在**敌方半场**点法术却提示"没有全场施法特性：法术只能放在己方半场"（旧蓝图 HUD 分支文案为"法术未解锁（需要法师英雄在场）"）；按规则只有法师死亡后才应退回"仅己方半场"。
+- **原因**（调用链取证）：
+  1. 全场施法只有一个判据：`ALKBattleGameMode::HasGlobalSpellPlacement` 遍历 `AliveHeroes[阵营]`，要求某个存活英雄 `HasTraitEffect(GlobalSpellPlacement)`；该效果由特性 `Trait_MageSpellReach` 解析而来。法师在场时该判据为假，只可能是**英雄身上没有这条特性**。
+  2. 英雄上场时的永久特性来自远征快照：`ALKUnitBase::ApplyRunHeroState` 用 `FLKRunHeroState.Traits` **整体替换** `HeroTraits`（这是 D2"房间间增删永久特性"的设计）。因此若某个远征快照里没写身份特性，`InitUnit` 里由 `DA_GameData.DefaultHeroTraits` 加上的 `Trait_MageSpellReach` 会被随后上场的快照覆盖掉——法师"有身份、没特性"，全场施法被静默关掉。
+  3. 快照缺身份特性的来源：早期构建的 `BuildInitialRunHeroes` 尚未接入 `DefaultHeroTraits`（或旧存档），这类远征一旦落盘，后续每次载入都缺。
+- **修复**（按"身份特性属于英雄身份，不随旧档缺失而丢失"落地）：
+  1. `ULKRunSubsystem::RestoreHeroIdentityTraits(IdentityTraits)`：载入存档后按当前代码补全缺失的身份特性（只加不删，保持 D2 的"房间间临时增删其他特性"语义），补全后按安全点自动保存。
+  2. **同步待开战上下文**：`PendingBattle.PlayerHeroes` 是英雄快照的副本，补全后必须一并刷新，否则部署时仍按旧副本应用特性（首次修复漏了这一步，被新自动化当场抓住：`[Run] Hero_Mage 应用永久特性：无`）。
+  3. 身份特性表由 GameMode 汇总（`CollectIdentityTraits`）：`DA_GameData.DefaultHeroTraits` + 单位行内代码特性（如盾卫 `Taunt`），不写死英雄列表。
+  4. 排查埋点：`ApplyRunHeroState` 打印 `[Run] %s 应用永久特性：…`；敌方半场施法被拒时打印存活英雄及其特性（`[Spell] … 施法被拒绝：存活英雄 …`）。
+- **涉及文件**：`ULKRunSubsystem.h/.cpp`、`ALKBattleGameMode.h`、`ALKBattleGameMode_Run.cpp`、`ALKBattleGameMode.cpp`、`ALKUnitBase.cpp`、`Tests/LKSprint5Tests.cpp`、`Tests/LKD5Tests.cpp`
+- **验证**：
+  - 新增 `LittleKing.Sprint5.Heroes.AuthoredSpellTerritory`：手工造一份"缺身份特性"的旧档写入固定槽 → 真实 `BP_ALKBattleGameMode` 冷启动 → 日志出现 `身份特性补全：Hero_Mage + Trait_MageSpellReach` → 部署三英雄 → `HasGlobalSpellPlacement` 为真、敌方半场可施法；法师死亡后敌方半场重新锁定、己方半场仍可用。
+  - 新增 `LittleKing.D5.Save.IdentityTraitsRestoredOnLoad`：旧档载入后补全 2 条身份特性、玩家自加特性不受影响、二次补全为 no-op、`BeginCurrentBattle` 上下文带上补全后的特性。
+  - 全量 `LittleKing` **36/36 Success，0 failed**（`Saved/Automation/Bug017b/index.json`，精简摘要 [validation/BUG017-Validation.json](validation/BUG017-Validation.json)）。
+- **教训**（面试可讲）："快照覆盖"型状态恢复一定要区分**身份数据**与**可变数据**——身份特性（职业能力）应由代码/配置拥有，快照只记录可变部分；否则一次格式演进就会让老存档悄悄丢掉核心能力，而且不报错、只在玩法层表现为"技能不生效"，极难定位。定位这类问题的关键是：先把"判据 → 数据来源 → 数据写入点"整条链路的唯一可能失效点找出来（本例只有"快照缺特性"一种可能），再用日志把该点钉死。
+
+## BUG-018：战斗中点击营地移动"没反应"（移动指令被战斗状态当场取消）
+
+- **现象**：英雄正在战斗中时，点自己的营地再点地面下达移动指令，英雄原地不动（也没有任何提示），看起来像"点击无效"。
+- **原因**：`ALKUnitHero::UpdateStateMachine` 的手动移动分支里有一条"敌人已进入攻击距离就结束手动"的退出条件（BUG-016 为修"指挥到移动目标身上永不交战"而加）。战斗中英雄的目标几乎总在攻击距离内，于是 `CommandMove` 刚把 `bManualMoving` 置真，下一帧就被这条条件清掉并直接转回战斗 FSM——指令等于没下。这个条件对"贴着敌人"下达的移动指令尤其致命（而玩家想做的正是战斗中撤退/换位）。
+- **修复**（按用户规则"移动指令强行打断战斗，到达后恢复自动战斗"）：
+  1. 手动移动期间**不再**因敌人进入攻击距离而结束：不索敌、不攻击，只走向落点（`CancelAttackWindup` + 提前 return）。
+  2. 指令结束条件改为两种：**到达落点**（≤5 世界单位）或**卡住超时**——连续 `DA_GameData → Camps → HeroMoveStuckTimeout`（默认 1.5 秒）无位移（落点被单位/建筑占据、或贴脸被软分离推挤）就结束指令并立即恢复自动战斗。这条是 BUG-016 场景的收敛出口，避免"走不到点也永不打架"。
+  3. 结束时清空目标让战斗 FSM 重新索敌（保留嘲讽/集火优先级）；`RallyPoint` 就是落点，之后没有敌人时英雄会回到该位置。
+- **涉及文件**：`ALKUnitHero.h/.cpp`（手动移动分支 + 卡住计时）、`ULKGameData.h`（`HeroMoveStuckTimeout`）、`Tests/LKSprint5Tests.cpp`
+- **验证**：
+  - 新增 `LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat`：贴脸生成敌人 → 确认已交战 → 下移动指令 → 断言"立即打断战斗（目标清空）"、"0.5 秒后仍在手动移动且真的在走"、"移动期间不重新索敌"、"到达/卡住后结束并重新索敌"；再用"指令落点=敌人当前位置"验证卡住超时后能恢复战斗。
+  - `LittleKing.Sprint5.Heroes.FreeRoamFightRegression` 按新语义更新（指令在到达或卡住后结束，不再因"能打"而结束）。
+  - 全量 `LittleKing` **37/37 Success，0 failed**（`Saved/Automation/Bug018b/index.json`，摘要 [validation/BUG018-Validation.json](validation/BUG018-Validation.json)）。
+- **教训**（面试可讲）：给状态机加"提前退出条件"时要问清楚它会不会把玩家刚下达的指令吃掉。BUG-016 的退出条件解决的是"自动追击追不上移动目标"，却顺手让"战斗中主动换位"失效——两个需求其实需要**不同的**退出条件（前者用"打得到就打"，后者用"到达或卡住"）。正确做法是把"指令是否仍然有效"与"能不能打到敌人"解耦，并给指令配一个可收敛的兜底（卡住超时）。
+
 ---
 
 ## 附：调试工具（同批加入）

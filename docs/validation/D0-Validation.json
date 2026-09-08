@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-07",
+  "engine": "UE 5.8.1-56057345",
+  "scope": "Dungeon D0 and undead content preparation",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/D0UndeadBuild.log"
+  },
+  "automation": {
+    "command": "Automation RunTests LittleKing",
+    "report": "Saved/Automation/D0Undead/index.json",
+    "total": 16,
+    "succeeded": 3,
+    "succeededWithWarnings": 13,
+    "failed": 0,
+    "notRun": 0,
+    "allTestStates": "Success",
+    "tests": [
+      "LittleKing.D0.Content.RegistryAndEncounter",
+      "LittleKing.D0.Heroes.IncapacitationAndRecovery",
+      "LittleKing.D0.Undead.BoneRegenerationAndBatchOrder",
+      "LittleKing.D0.Undead.GiantBones",
+      "LittleKing.D0.Undead.RangedDamageClassification",
+      "LittleKing.D0.Undead.SummoningAndSacrifice",
+      "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+      "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+      "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+      "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+      "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+      "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+      "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+      "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+      "LittleKing.Sprint5.Movement.CampPathGeometry",
+      "LittleKing.Sprint5.Placement.BuildingAttackRange"
+    ],
+    "knownWarnings": [
+      "Temporary test worlds have no camera",
+      "GameplayCueNotifyPaths falls back to /Game/",
+      "One test intentionally reaches the enemy unit limit"
+    ]
+  },
+  "blueprints": {
+    "allowList": "Saved/Sprint5BlueprintAllowList.txt",
+    "result": "0 errors, 0 warnings, 0 failed to load",
+    "log": "Saved/Logs/D0UndeadBlueprintCompile.log",
+    "assets": [
+      "/Game/blueprint/BP_ALKBattleGameMode.BP_ALKBattleGameMode",
+      "/Game/blueprint/WBP_BattleHUD.WBP_BattleHUD",
+      "/Game/blueprint/GA_MageNova.GA_MageNova",
+      "/Game/blueprint/GA_KnightHeal.GA_KnightHeal",
+      "/Game/blueprint/GA_RangerShot.GA_RangerShot"
+    ]
+  },
+  "assetChanges": "none",
+  "manualChecks": "not run in this turn; see docs/20-D0UndeadTutorial.md",
+  "deferred": [
+    "D1 RunSubsystem and fixed three-room flow",
+    "real cross-room state transfer",
+    "route/reward/save UI",
+    "audio, final art, packaging, hardware and performance testing",
+    "manual repair of existing GA_MageNova and GA_RangerShot wiring"
+  ]
+}

@@ -4,6 +4,7 @@
 #include "ALKHeroCamp.h"
 #include "ALKUnitHero.h"
 #include "ALKProjectile.h"
+#include "ULKUnitPassiveComponent.h"
 #include "ULKGameData.h"
 #include "Engine/Canvas.h"
 #include "Engine/World.h"
@@ -54,10 +55,16 @@ void ALKPresentationHUD::DrawHUD()
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
-		if (!Unit->IsAlive()) { continue; }
+		if (!Unit->IsAlive() && !Unit->IsHero()) { continue; }
 		FVector2D Screen;
 		if (!ProjectPoint(Unit->GetActorLocation(), Screen)) { continue; }
 		const FLinearColor TeamColor = Unit->GetTeam() == ELKTeam::Player ? FLinearColor(0.3f, 0.85f, 0.55f) : FLinearColor(0.95f, 0.35f, 0.35f);
+		if (Unit->IsIncapacitated())
+		{
+			DrawRect(FLinearColor(0.3f, 0.3f, 0.3f), Screen.X - 9.f * Scale, Screen.Y - 9.f * Scale, 18.f * Scale, 18.f * Scale);
+			DrawText(TEXT("失能"), FLinearColor::Gray, Screen.X - 14.f * Scale, Screen.Y - 30.f * Scale, nullptr, Scale);
+			continue;
+		}
 		if (ALKHeroCamp* Camp = Cast<ALKHeroCamp>(Unit))
 		{
 			const ALKUnitHero* Hero = Camp->GetHero();
@@ -81,11 +88,25 @@ void ALKPresentationHUD::DrawHUD()
 				if (ProjectPoint(Point, Projected)) { Top = FMath::Min(Top, float(Projected.Y) - 5.f * Scale); }
 			}
 		}
-		else { DrawRect(TeamColor, Screen.X - 7.f * Scale, Screen.Y - 7.f * Scale, 14.f * Scale, 14.f * Scale); }
+		else
+		{
+			const FLinearColor Color = Unit->GetPlaceholderColor().A > 0.f ? Unit->GetPlaceholderColor() : TeamColor;
+			const float Size = (Unit->IsBoss() ? 28.f : (Unit->IsHero() ? 22.f : 14.f)) * Scale;
+			DrawRect(Color, Screen.X - Size * 0.5f, Screen.Y - Size * 0.5f, Size, Size);
+			if (Unit->GetPlaceholderColor().A > 0.f)
+			{
+				DrawText(Unit->GetDisplayName().ToString(), Color, Screen.X - Size, Screen.Y + Size * 0.6f, nullptr, 0.8f * Scale);
+			}
+		}
 		const float Width = (Unit->IsHero() ? 52.f : 36.f) * Scale;
 		const float Ratio = FMath::Clamp(Unit->GetHealth() / FMath::Max(1.f, Unit->GetMaxHealth()), 0.f, 1.f);
 		DrawRect(FLinearColor(0.03f, 0.03f, 0.03f, 0.9f), Screen.X - Width * 0.5f - 1.f, Top - 1.f, Width + 2.f, 6.f * Scale);
 		DrawRect(TeamColor, Screen.X - Width * 0.5f, Top, Width * Ratio, 4.f * Scale);
+		if (Unit->GetPassiveComponent()->GetAbility() == ELKPassiveAbility::BoneRegeneration)
+		{
+			DrawText(FString::Printf(TEXT("%d / %d"), Unit->GetPassiveComponent()->GetBoneCount(), Unit->GetPassiveComponent()->GetRevivalThreshold()),
+				FLinearColor::Yellow, Screen.X - Width * 0.5f, Top - 18.f * Scale, nullptr, 0.85f * Scale);
+		}
 		if (Unit->IsUnderFocusWarning()) { DrawText(TEXT("!"), FLinearColor::Yellow, Screen.X - 3.f * Scale, Top - 25.f * Scale, nullptr, 1.3f * Scale); }
 		if (Unit->IsTaunting()) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius() + 6.f, FLinearColor(1.f, 0.75f, 0.2f)); }
 		if (GM->GetGameData()->bDrawTeamRing) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius(), TeamColor); }
@@ -152,7 +173,7 @@ void ALKPresentationHUD::HandleResult(ELKPlayResult Result)
 	case ELKPlayResult::Success: return;
 	case ELKPlayResult::DeploymentIncomplete: Tip = TEXT("请先部署全部 3 名英雄"); break;
 	case ELKPlayResult::SpellLocked: Tip = TEXT("没有全场施法特性：法术只能放在己方半场"); break;
-	case ELKPlayResult::HeroMoveBlocked: Tip = TEXT("目标超出营地范围或路径被阻挡"); break;
+	case ELKPlayResult::HeroMoveBlocked: Tip = TEXT("目标地点不可达：被阻挡或为建筑/营地"); break;
 	case ELKPlayResult::NotEnoughSilver: Tip = TEXT("银币不足"); break;
 	case ELKPlayResult::AlreadyDeployed: Tip = TEXT("该英雄已部署，请点击营地指挥"); break;
 	case ELKPlayResult::UnitLimitReached: Tip = TEXT("单位数量达到上限"); break;

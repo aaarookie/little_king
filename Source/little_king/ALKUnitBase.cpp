@@ -24,6 +24,8 @@
 #include "ULKTraitAuraComponent.h"
 #include "ULKUnitAttributeSet.h"
 #include "ULKUnitMovementComponent.h"
+#include "ULKUnitPassiveComponent.h"
+#include "LKRunTypes.h"
 
 ALKUnitBase::ALKUnitBase()
 {
@@ -62,6 +64,7 @@ ALKUnitBase::ALKUnitBase()
 
 	// 光环组件：默认空挂（不启用），有光环特性（InitUnit）时注册修改器后生效
 	TraitAuraComponent = CreateDefaultSubobject<ULKTraitAuraComponent>(TEXT("TraitAura"));
+	PassiveComponent = CreateDefaultSubobject<ULKUnitPassiveComponent>(TEXT("Passive"));
 }
 
 void ALKUnitBase::BeginPlay()
@@ -95,6 +98,10 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	}
 
 	UnitClass = Row.UnitClass;
+	DisplayName = Row.DisplayName.IsEmpty() ? FText::FromName(UnitId) : Row.DisplayName;
+	bSkeleton = Row.bSkeleton;
+	PlaceholderColor = Row.PlaceholderColor;
+	PassiveComponent->Initialize(Row);
 	bIsMage = Row.bIsMage;
 	AttackType = Row.AttackType;
 	HeroTraits = Row.HeroTraits;
@@ -109,6 +116,9 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
         }
     }
 	BodyRadius = InGameData ? InGameData->UnitBodyRadius : 50.f;
+	// 索敌范围：行内值优先，0 表示用全局默认（DA_GameData.UnitAcquireRadius）。
+	AcquireRadius = Row.AcquireRadius > 0.f ? Row.AcquireRadius
+		: (InGameData ? InGameData->UnitAcquireRadius : 900.f);
 	BodyCollision->SetSphereRadius(BodyRadius);
 	MovementComponent->SetSeparationRadius(BodyRadius);
 	if (InGameData)
@@ -145,6 +155,55 @@ void ALKUnitBase::OnUnitInitialized(const FLKUnitRow& Row)
 {
 	// 基类：应用特性（自身修饰/光环/嘲讽）——英雄子类覆写时先调 Super 再处理技能
 	ApplyTraits();
+}
+
+bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
+{
+    if (!IsHero() || IsDead() || RunState.HeroId != UnitId || !FMath::IsFinite(RunState.Health)
+        || RunState.Health <= 0.f || !FMath::IsFinite(RunState.MaxHealth) || RunState.MaxHealth <= 0.f
+		|| !FMath::IsFinite(RunState.BaseMaxHealth) || RunState.BaseMaxHealth < 0.f)
+    { return false; }
+    TSet<FName> UniqueTraits;
+	for (FName Trait : RunState.Traits)
+	{
+		FLKTraitRow Resolved;
+		if (Trait.IsNone() || UniqueTraits.Contains(Trait) || !ResolveTrait(Trait, Resolved)) { return false; }
+		UniqueTraits.Add(Trait);
+	}
+    HeroTraits = UniqueTraits.Array();
+    HeroTraits.Sort(FNameLexicalLess());
+	ResetTransientRoomState();
+	const float DesiredBaseMaximum = RunState.BaseMaxHealth > 0.f ? RunState.BaseMaxHealth : RunState.MaxHealth;
+	AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetMaxHealthAttribute(), DesiredBaseMaximum);
+    ApplyTraits();
+    // BUG-017 排查埋点：打印上场时真正生效的永久特性，
+    // 便于一眼确认"法师是否带着全场施法上场"，不必再靠猜。
+    const FString TraitList = HeroTraits.Num() > 0
+        ? FString::JoinBy(HeroTraits, TEXT("，"), [](const FName& Id) { return Id.ToString(); })
+        : FString(TEXT("无"));
+    UE_LOG(LogLKUnit, Log, TEXT("[Run] %s 应用永久特性：%s"), *UnitId.ToString(), *TraitList);
+    const float CurrentMaximum = GetMaxHealth();
+    if (!FMath::IsNearlyEqual(CurrentMaximum, RunState.MaxHealth, 0.1f))
+    {
+		UE_LOG(LogLKUnit, Verbose, TEXT("[Run] %s 最大生命快照 %.1f，新房重算 %.1f；按新房值钳制"),
+            *UnitId.ToString(), RunState.MaxHealth, CurrentMaximum);
+    }
+    AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetHealthAttribute(), FMath::Clamp(RunState.Health, 0.f, CurrentMaximum));
+    OnHealthChanged(GetHealth(), CurrentMaximum);
+    return true;
+}
+
+void ALKUnitBase::ResetTransientRoomState()
+{
+	ChangeTarget(nullptr);
+	ForcedTargetActor.Reset();
+	ForcedTargetRemaining = 0.f;
+	FocusWarningRemaining = 0.f;
+	AuraTauntSources.Reset();
+	TargetRetryTimer = 0.f;
+	AttackCooldownRemaining = 0.f;
+	CancelAttackWindup();
+	if (MovementComponent) { MovementComponent->Stop(); }
 }
 
 void ALKUnitBase::ApplyTraits()
@@ -185,6 +244,8 @@ void ALKUnitBase::ApplyTraits()
 bool ALKUnitBase::ResolveTrait(FName Id, FLKTraitRow& Row) const
 {
     Row.TraitId = Id;
+    if (Id == "Trait_Sacrifice") { Row.TraitName = FText::FromString(TEXT("献祭")); Row.Effect = ELKTraitEffect::SummoningHealthCost; Row.EffectValue = 0.08f; return true; }
+    if (Id == "Trait_FaceFear") { Row.TraitName = FText::FromString(TEXT("直面恐惧")); Row.Effect = ELKTraitEffect::RangedDamageReduction; Row.EffectValue = 0.3f; return true; }
     if (Id == TEXT("Trait_MageSpellReach")) { Row.Effect = ELKTraitEffect::GlobalSpellPlacement; return true; }
     if (Id == TEXT("Trait_KnightTauntAura"))
     {
@@ -387,9 +448,27 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
     TargetRetryTimer -= DeltaSeconds;
     if (TargetRetryTimer <= 0.f) { AcquireTarget(); TargetRetryTimer = 0.15f; }
     ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
+    if (Target && ShouldReleaseTarget(Target))
+    {
+        // 普通目标离开索敌范围 / 嘲讽者离开嘲讽半径：释放并立刻重新索敌（下一个目标）。
+        ChangeTarget(nullptr);
+        TargetRetryTimer = 0.f;
+        Target = nullptr;
+    }
     if (!Target || !Target->IsTargetable() || !CanPursueTarget(Target))
     {
         ChangeTarget(nullptr);
+        // 无目标：非英雄单位向"全图最近敌人"行军（保证双方仍会接触），
+        // 英雄保持由玩家指挥/回到集结点（子类处理）。
+        if (!IsHero() && IsCombatEnabled())
+        {
+            if (AActor* FarEnemy = FindNearestEnemy(false, true))
+            {
+                State = ELKUnitState::Moving;
+                MovementComponent->MoveToward(FarEnemy->GetActorLocation(), GetMoveSpeed());
+                return;
+            }
+        }
         State = ELKUnitState::Idle;
         MovementComponent->Stop();
         return;
@@ -406,6 +485,22 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
         MovementComponent->Stop();
         TryAttack(DeltaSeconds);
     }
+}
+
+bool ALKUnitBase::ShouldReleaseTarget(const ALKUnitBase* Target) const
+{
+    if (!Target) { return true; }
+    // 集火指令目标不受索敌范围限制（AI 战术可跨图）。
+    if (ForcedTargetActor.Get() == Target) { return false; }
+    const float Distance = DistanceTo2D(Target);
+    if (Target->IsTaunting())
+    {
+        // 嘲讽者只在离开嘲讽吸引半径（含滞回）后释放。
+        const float TauntRadius = GameDataCached ? GameDataCached->TauntAcquireRadius : 500.f;
+        return Distance > TauntRadius * 1.15f;
+    }
+    // 普通目标离开索敌范围（含滞回，避免边界抖动）后释放，等待重索敌。
+    return Distance > AcquireRadius * 1.15f;
 }
 
 bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
@@ -465,7 +560,7 @@ void ALKUnitBase::TickForcedTarget(float DeltaSeconds)
     }
 }
 
-AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly) const
+AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRange) const
 {
     AActor* Best = nullptr;
     float BestDistance = TNumericLimits<float>::Max();
@@ -475,7 +570,16 @@ AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly) const
         ALKUnitBase* Other = *It;
         if (!CanPursueTarget(Other)) { continue; }
         const float Distance = DistanceTo2D(Other);
-        if (bTauntersOnly && (!Other->IsTaunting() || Distance > (GameDataCached ? GameDataCached->TauntAcquireRadius : 500.f))) { continue; }
+        if (bTauntersOnly)
+        {
+            // 嘲讽吸引半径单独配置（TauntAcquireRadius）。
+            if (!Other->IsTaunting() || Distance > (GameDataCached ? GameDataCached->TauntAcquireRadius : 500.f)) { continue; }
+        }
+        else if (!bIgnoreAcquireRange && Distance > AcquireRadius)
+        {
+            // 索敌范围：范围内才锁定战斗；行军方向用 bIgnoreAcquireRange 取全图最近。
+            continue;
+        }
         if (Distance < BestDistance) { BestDistance = Distance; Best = Other; }
     }
     return Best;
@@ -587,6 +691,11 @@ float ALKUnitBase::GetMaxHealth() const
 	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMaxHealthAttribute(), 1.f);
 }
 
+float ALKUnitBase::GetBaseMaxHealth() const
+{
+	return LKGameplay::GetAttributeBaseValue(this, ULKUnitAttributeSet::GetMaxHealthAttribute(), 1.f);
+}
+
 float ALKUnitBase::GetAttackDamage() const
 {
 	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackDamageAttribute(), 0.f);
@@ -625,6 +734,46 @@ void ALKUnitBase::SetInvulnerable(float DurationSeconds)
 	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s 进入无敌（%s）"), *UnitId.ToString(), *DurationText);
 }
 
+float ALKUnitBase::GetTraitEffectValue(ELKTraitEffect Effect) const
+{
+    float Value = 0.f;
+    for (const auto& Pair : ResolvedTraits)
+    {
+        if (Pair.Value.Effect == Effect && FMath::IsFinite(Pair.Value.EffectValue)) { Value += Pair.Value.EffectValue; }
+    }
+    return FMath::Clamp(Value, 0.f, 1.f);
+}
+
+void ALKUnitBase::RestoreHeroLife(float Health, bool bResumeCombat)
+{
+    bDead = false; State = ELKUnitState::Idle;
+    DeathAnimRemaining = 0.f; SetLifeSpan(0.f);
+    SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale);
+    SpriteComponent->SetSpriteColor(FLinearColor::White);
+    BodyCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    ForcedTargetActor.Reset(); ForcedTargetRemaining = 0.f; FocusWarningRemaining = 0.f;
+    SetCombatEnabled(bResumeCombat);
+    if (bResumeCombat) { ApplyTraits(); }
+    AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetHealthAttribute(), FMath::Clamp(Health, 0.f, GetMaxHealth()));
+    OnHealthChanged(GetHealth(), GetMaxHealth());
+}
+
+bool ALKUnitBase::ReviveDuringBattle()
+{
+    const ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+    if (!IsHero() || !bDead || !GM || GM->GetPhase() != ELKGamePhase::Battle) { return false; }
+    RestoreHeroLife(GetMaxHealth(), true);
+    return true;
+}
+
+void ALKUnitBase::RecoverAfterBattle(float Percent)
+{
+    const ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+    if (!IsHero() || !GM || GM->GetPhase() != ELKGamePhase::Result) { return; }
+    const float Recovered = LKRunRules::RecoveredHealth(bDead ? 0.f : GetHealth(), GetMaxHealth(), Percent);
+    if (Recovered > 0.f) { RestoreHeroLife(Recovered, false); }
+}
+
 void ALKUnitBase::Die()
 {
 	if (bDead || IsCamp())
@@ -632,15 +781,20 @@ void ALKUnitBase::Die()
 		return;
 	}
 
+	ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+	if (GM && GM->GetPhase() == ELKGamePhase::Result) { return; }
+	if (GM) { GM->BeginCombatBatch(); }
 	bDead = true;
+    SetCombatEnabled(false);
+    AbilitySystem->SetNumericAttributeBase(ULKUnitAttributeSet::GetHealthAttribute(), 0.f);
     AbilitySystem->CancelAllAbilities();
     CancelAttackWindup();
 	State = ELKUnitState::Dead;
 	MovementComponent->Stop();
 
-	// S5 死亡表现：缩小淡出动画后销毁（替换旧版 0.5s 直接消失）
+	// 佣兵/建筑淡出后销毁；英雄保留失能实例，供战内被动复活和战后恢复。
 	DeathAnimRemaining = DeathAnimDuration;
-	SetLifeSpan(DeathAnimDuration);
+	SetLifeSpan(IsHero() ? 0.f : DeathAnimDuration);
 	if (BodyCollision)
 	{
 		BodyCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -660,7 +814,8 @@ void ALKUnitBase::Die()
 
 	OnUnitDied.Broadcast(this);
 
-	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s (%s) 阵亡"), *UnitId.ToString(), *GetName());
+	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s (%s) %s"), *UnitId.ToString(), *GetName(), IsHero() ? TEXT("失能") : TEXT("死亡"));
+	if (GM) { GM->EndCombatBatch(); }
 }
 
 void ALKUnitBase::DrawDebugShape() const

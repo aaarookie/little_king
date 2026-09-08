@@ -1,0 +1,43 @@
+﻿{
+    "note":  "BUG-017 修复验证（精简摘要；完整报告见 Saved/Automation/Bug017b/index.json 与 Saved/Logs/Bug017b.log）",
+    "reportCreatedOn":  "2026.09.08-16.13.17",
+    "engine":  "UE 5.8.1-56057345",
+    "target":  "little_kingEditor Win64 Development",
+    "succeeded":  16,
+    "succeededWithWarnings":  20,
+    "failed":  0,
+    "notRun":  0,
+    "total":  36,
+    "tests":  [
+                  {
+                      "fullTestPath":  "LittleKing.D5.Save.IdentityTraitsRestoredOnLoad",
+                      "state":  "Success",
+                      "warnings":  0,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.D5.Save.RecoverySemantics",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.D5.Save.RoundTripAndNoDoubleClaim",
+                      "state":  "Success",
+                      "warnings":  0,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.AuthoredSpellTerritory",
+                      "state":  "Success",
+                      "warnings":  2,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  }
+              ]
+}

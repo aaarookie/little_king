@@ -1,0 +1,1332 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "DESKTOP-D34Q4BV",
+			"instance": "BDC13088483FADBD773AF89A27ED5A24",
+			"instanceName": "DESKTOP-D34Q4BV-31616",
+			"platform": "WindowsEditor",
+			"oSVersion": "Windows 11 (25H2) [10.0.26200.9168] ",
+			"model": "Default",
+			"gPU": "NVIDIA GeForce RTX 5080",
+			"cPUModel": "AMD Ryzen 7 9800X3D 8-Core Processor           ",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.09.08-14.55.27",
+	"succeeded": 13,
+	"succeededWithWarnings": 16,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.55747932195663452,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "RegistryAndEncounter",
+			"fullTestPath": "LittleKing.D0.Content.RegistryAndEncounter",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.018904499709606171,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAbilitySystem: No GameplayCueNotifyPaths were specified in DefaultGame.ini under [/Script/GameplayAbilities.AbilitySystemGlobals]. Falling back to using all of /Game/. This may be slow on large projects. Consider specifying which paths are to be searched.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Unit_Swordsman HP=120.00 Damage=15.00 Range=120.00 Interval=1.00 Speed=300.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Unit_Archer HP=80.00 Damage=12.00 Range=450.00 Interval=1.20 Speed=320.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Unit_Shieldbearer HP=220.00 Damage=8.00 Range=120.00 Interval=1.20 Speed=240.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Hero_Knight HP=450.00 Damage=25.00 Range=130.00 Interval=1.00 Speed=300.00 Windup=0.15 SkillCooldown=8.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Hero_Mage HP=300.00 Damage=20.00 Range=500.00 Interval=1.30 Speed=280.00 Windup=0.15 SkillCooldown=6.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Hero_Ranger HP=350.00 Damage=22.00 Range=400.00 Interval=1.10 Speed=340.00 Windup=0.15 SkillCooldown=5.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Building_ArrowTower HP=600.00 Damage=18.00 Range=500.00 Interval=1.50 Speed=0.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Building_Barracks HP=500.00 Damage=10.00 Range=150.00 Interval=1.00 Speed=0.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Unit_Skeleton HP=65.00 Damage=6.00 Range=150.00 Interval=1.30 Speed=240.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Unit_SkeletonArcher HP=45.00 Damage=7.00 Range=400.00 Interval=1.60 Speed=220.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit NewHero_NecromancerRow HP=180.00 Damage=9.00 Range=480.00 Interval=1.80 Speed=170.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Hero_SkeletonGiant HP=280.00 Damage=13.00 Range=160.00 Interval=1.90 Speed=170.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogUnit Boss_SkeletonKing HP=420.00 Damage=18.00 Range=170.00 Interval=1.70 Speed=185.00 Windup=0.15 SkillCooldown=0.00 SpawnInterval=8.00",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Unit_Swordsman Cost=2 SpellValue=0.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Unit_Archer Cost=2 SpellValue=0.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Unit_Shieldbearer Cost=2 SpellValue=0.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Spell_Fireball Cost=2 SpellValue=60.00 Radius=250.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Spell_HealWave Cost=2 SpellValue=40.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Building_ArrowTower Cost=2 SpellValue=0.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogCard Building_Barracks Cost=2 SpellValue=0.00 Radius=300.00 Limit=-2",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [LK_ApplyHealInRadius] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [LK_ApplyHealInRadius] CenterActor=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [LK_ApplyHealInRadius] Radius=300.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [LK_ApplyHealInRadius] HealAmount=150.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [LK_ApplyHealInRadius] Caster=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [GetAvatarActorFromActorInfo] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_KnightHeal [End Ability] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [GetAvatarActorFromActorInfo] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [End Ability] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_ApplyDamageInRadius] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_ApplyDamageInRadius] CenterActor=LK_GetNearestEnemy",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_ApplyDamageInRadius] Radius=250.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_ApplyDamageInRadius] Damage=120.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_ApplyDamageInRadius] Caster=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_GetNearestEnemy] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_MageNova [LK_GetNearestEnemy] Unit=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [GetAvatarActorFromActorInfo] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [End Ability] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_GetNearestEnemy] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_GetNearestEnemy] Unit=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_ApplyDamageInRadius] self=",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_ApplyDamageInRadius] CenterActor=LK_GetNearestEnemy",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_ApplyDamageInRadius] Radius=350.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_ApplyDamageInRadius] Damage=90.000000",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "CatalogSkill GA_RangerShot [LK_ApplyDamageInRadius] Caster=GetAvatarActorFromActorInfo",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "IncapacitationAndRecovery",
+			"fullTestPath": "LittleKing.D0.Heroes.IncapacitationAndRecovery",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.013336397707462311,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "BoneRegenerationAndBatchOrder",
+			"fullTestPath": "LittleKing.D0.Undead.BoneRegenerationAndBatchOrder",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.028893698006868362,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "GiantBones",
+			"fullTestPath": "LittleKing.D0.Undead.GiantBones",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.014160498976707458,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RangedDamageClassification",
+			"fullTestPath": "LittleKing.D0.Undead.RangedDamageClassification",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012951299548149109,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "SummoningAndSacrifice",
+			"fullTestPath": "LittleKing.D0.Undead.SummoningAndSacrifice",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.019751399755477905,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKUnit: [Unit] 敌方 单位已达上限 8，拒绝生成 Unit_Skeleton",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.26"
+				}
+			],
+			"warnings": 3,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "BuiltInUnitRules",
+			"fullTestPath": "LittleKing.D1.Configuration.BuiltInUnitRules",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.008498702198266983,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "AuthoredGameModeAndResultButton",
+			"fullTestPath": "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012697599828243256,
+			"dateTime": "2026.09.08-14.55.26",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogScript: Script Msg: No game viewport was found.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogScript: Script Msg: No game viewport was found.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogScript: Script Msg: No game viewport was found.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 4,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "BossCompletion",
+			"fullTestPath": "LittleKing.D1.Run.BossCompletion",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0079994983971118927,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ThreeRoomFlow",
+			"fullTestPath": "LittleKing.D1.Run.ThreeRoomFlow",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0080412998795509338,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "EncounterCatalog",
+			"fullTestPath": "LittleKing.D2.Configuration.EncounterCatalog",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0082972012460231781,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RoomBoundaryReset",
+			"fullTestPath": "LittleKing.D2.Heroes.RoomBoundaryReset",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012623298913240433,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKUnit: [Trait] 无效特性 Trait_DoesNotExist",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "AuthoredEncounterSnapshot",
+			"fullTestPath": "LittleKing.D2.Integration.AuthoredEncounterSnapshot",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.011447999626398087,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogScript: Script Msg: No game viewport was found.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "EncounterSnapshotAndPermanentState",
+			"fullTestPath": "LittleKing.D2.Run.EncounterSnapshotAndPermanentState",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0083488002419471741,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ClaimBoundaries",
+			"fullTestPath": "LittleKing.D3.Rewards.ClaimBoundaries",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0080645978450775146,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "StateMachineAtomicity",
+			"fullTestPath": "LittleKing.D3.Rewards.StateMachineAtomicity",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0081473998725414276,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RowStructureAndVisibility",
+			"fullTestPath": "LittleKing.D4.Map.RowStructureAndVisibility",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0083164013922214508,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RandomizedEncounterRules",
+			"fullTestPath": "LittleKing.D4.Roster.RandomizedEncounterRules",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0080177001655101776,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RestHealAndFullClear",
+			"fullTestPath": "LittleKing.D4.Run.RestHealAndFullClear",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0082722976803779602,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ActualAmountsAndCardTransaction",
+			"fullTestPath": "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.013635400682687759,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "SimultaneousEliminationAndLastHit",
+			"fullTestPath": "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.016967900097370148,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "WindupCollisionAndProjectilePool",
+			"fullTestPath": "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012990199029445648,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "SavedDecksAndHUD",
+			"fullTestPath": "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.008203599601984024,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "UniqueHandAndCycling",
+			"fullTestPath": "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0083133019506931305,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "DeploymentAndManualMovement",
+			"fullTestPath": "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012663397938013077,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "TraitsTauntAndSpellTerritory",
+			"fullTestPath": "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.012985002249479294,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "LiveBattleAndBarracks",
+			"fullTestPath": "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.22348029911518097,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "CampPathGeometry",
+			"fullTestPath": "LittleKing.Sprint5.Movement.CampPathGeometry",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.0083816982805728912,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "BuildingAttackRange",
+			"fullTestPath": "LittleKing.Sprint5.Placement.BuildingAttackRange",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"BDC13088483FADBD773AF89A27ED5A24"
+			],
+			"duration": 0.013087902218103409,
+			"dateTime": "2026.09.08-14.55.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.09.08-14.55.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

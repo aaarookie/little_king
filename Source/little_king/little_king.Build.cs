@@ -18,6 +18,10 @@ public class little_king : ModuleRules
 			"UMG"                   // UI 组件
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"Slate",
+			"SlateCore"
+		});
 	}
 }

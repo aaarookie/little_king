@@ -35,7 +35,8 @@ enum class ELKUnitClass : uint8
 {
 	Soldier		UMETA(DisplayName = "佣兵"),
 	Hero		UMETA(DisplayName = "英雄"),
-	Building	UMETA(DisplayName = "建筑")
+	Building	UMETA(DisplayName = "建筑"),
+	Boss		UMETA(DisplayName = "首领")
 };
 
 /** 攻击类型 */
@@ -82,7 +83,7 @@ enum class ELKPlayResult : uint8
 	Unknown				UMETA(DisplayName = "未知错误"),
 	DeploymentIncomplete UMETA(DisplayName = "请先部署全部英雄"),
 	InvalidCardData UMETA(DisplayName = "卡牌配置无效"),
-	HeroMoveBlocked UMETA(DisplayName = "目标超出营地范围或被阻挡")
+	HeroMoveBlocked UMETA(DisplayName = "目标地点不可达（被阻挡或为建筑）")
 };
 
 /** 法术效果（原型期直接由 C++ 结算，后期替换为 GAS Ability） */
@@ -111,11 +112,25 @@ enum class ELKTraitEffect : uint8
 	Attributes,
 	Taunt,
 	GlobalSpellPlacement,
-	MeleeSoldierTauntAura
+	MeleeSoldierTauntAura,
+    SummoningHealthCost,
+    RangedDamageReduction
 };
 
 UENUM(BlueprintType)
-enum class ELKCombatSourceKind : uint8 { Attack, Projectile, Spell, Skill, Overtime };
+enum class ELKPassiveAbility : uint8 { None, UndeadSummoning, GiantBones, BoneRegeneration };
+
+/** 遭遇强度只描述内容与奖励层级；路线节点类型仍由 ELKDungeonNodeType 决定。 */
+UENUM(BlueprintType)
+enum class ELKEncounterRank : uint8
+{
+	Normal UMETA(DisplayName = "普通"),
+	Elite UMETA(DisplayName = "精英"),
+	Boss UMETA(DisplayName = "首领")
+};
+
+UENUM(BlueprintType)
+enum class ELKCombatSourceKind : uint8 { Attack, Projectile, Spell, Skill, Overtime, HealthCost, Revival };
 
 USTRUCT(BlueprintType)
 struct FLKCombatSource
@@ -127,6 +142,8 @@ struct FLKCombatSource
 	UPROPERTY(BlueprintReadOnly) FName InstanceId;
 	UPROPERTY(BlueprintReadOnly) FName ActionId;
 	UPROPERTY(BlueprintReadOnly) ELKCombatSourceKind Kind = ELKCombatSourceKind::Attack;
+	/** 发射/施法时快照；发射者失能或销毁后仍能判定远程减伤。 */
+	UPROPERTY(BlueprintReadOnly) bool bRangedSource = false;
 };
 
 USTRUCT(BlueprintType)

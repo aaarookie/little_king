@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "LKTypes.h"
+#include "LKDataTypes.h"
 #include "ALKOpponentBrain.generated.h"
 
 class ULKSilverComponent;
@@ -19,7 +19,7 @@ class ALKUnitBase;
  *  ② 反制：每 AICounterCheckInterval 评估玩家近战/远程构成，出牌给"克制卡"加分；
  *  ③ 爆发：银币达标 + 兵力不劣时，一波连打 AIPushMaxCards 张；
  *  ④ 法术：用 GameMode 的聚集度评估找最优落点，不再乱扔。
- * 索敌优先级（单位侧）：ForcedTarget > 嘲讽者 > 最近敌人。
+ * 索敌优先级（单位侧）：嘲讽者 > ForcedTarget > 最近敌人。
  */
 UCLASS()
 class ALKOpponentBrain : public AActor
@@ -29,10 +29,16 @@ class ALKOpponentBrain : public AActor
 public:
 	ALKOpponentBrain();
 
-	void InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InGameMode);
+	void InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InGameMode, bool bInCanPlayCards = true);
 
 	/** 由 GameMode 每帧驱动 */
 	void TickBrain(float DeltaTime, float BattleElapsed);
+	void SetScriptedWaves(const TArray<struct FLKWaveEntry>& InWaves);
+	/** 应用已校验的 D2 遭遇快照，并重建该房的敌方经济、牌组、波次和战术计时。 */
+	bool ConfigureEncounter(const FLKEncounterRow& Encounter);
+	bool UsesCards() const { return bCanPlayCards; }
+	bool IsFocusEnabled() const;
+	const TArray<struct FLKWaveEntry>& GetWaves() const { return Waves; }
 
 	ULKSilverComponent* GetSilver() const { return Silver; }
 	ULKDeckState* GetDeck() const { return Deck; }
@@ -51,6 +57,8 @@ private:
 
 	TArray<struct FLKWaveEntry> Waves;
 	int32 WaveIndex = 0;
+	bool bCanPlayCards = true;
+	FLKEncounterAISettings AISettings;
 
 	float ThinkTimer = 0.f;
 	float ThinkInterval = 1.f;

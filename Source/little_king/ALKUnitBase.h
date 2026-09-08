@@ -15,18 +15,21 @@ class USphereComponent;
 class ULKUnitMovementComponent;
 class ULKTraitAuraComponent;
 class ULKGameData;
+class ULKUnitPassiveComponent;
 struct FLKUnitRow;
+struct FLKRunHeroState;
 
 /**
  * 单位基类（佣兵 / 英雄 / 建筑）。
  * 属性走 GAS（ULKUnitAttributeSet），移动/索敌/攻击为自研轻量 FSM。
- * 全部数值由 FLKUnitRow（DT_Units）驱动；未配置表时用内置示例；配置表缺行时拒绝生成。
+ * FLKUnitRow 提供运行时单位数据；内置单位由代码锁定玩法身份并从 DT_Units 合并调参数值，自定义 ID 完全按表读取。
  */
 UCLASS()
 class ALKUnitBase : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	friend struct FLKSprint5TestAccess;
+	friend struct FLKD2TestAccess;
 
 public:
 	ALKUnitBase();
@@ -39,6 +42,11 @@ public:
 	float GetBodyRadius() const { return BodyRadius; }
 	UPaperSpriteComponent* GetSpriteComponent() const { return SpriteComponent; }
 	bool IsUnderFocusWarning() const { return FocusWarningRemaining > 0.f; }
+	FLinearColor GetPlaceholderColor() const { return PlaceholderColor; }
+	FText GetDisplayName() const { return DisplayName; }
+	ULKUnitPassiveComponent* GetPassiveComponent() const { return PassiveComponent; }
+	TArray<FName> GetTraits() const { return HeroTraits; }
+	float GetTraitEffectValue(ELKTraitEffect Effect) const;
 	void SetFocusWarning(float Seconds) { FocusWarningRemaining = FMath::Max(0.f, Seconds); }
 	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool AddTrait(FName TraitId);
 	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool RemoveTrait(FName TraitId);
@@ -58,6 +66,8 @@ public:
 
 	/** 用数据表行初始化（GameMode 生成后调用）；FallbackUnitId 在行内 UnitId 为空时兜底（行名） */
 	void InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId = NAME_None);
+	/** D2：用纯值远征快照替换英雄永久状态，清理房间临时状态后恢复基础最大生命与当前生命。 */
+	bool ApplyRunHeroState(const FLKRunHeroState& State);
 
 	/** 阵营由 GameMode 生成时指定（InitUnit 之后调用） */
 	void SetTeam(ELKTeam InTeam) { Team = InTeam; }
@@ -73,7 +83,11 @@ public:
 	FName GetUnitId() const { return UnitId; }
 
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
-	bool IsHero() const { return UnitClass == ELKUnitClass::Hero; }
+	bool IsHero() const { return UnitClass == ELKUnitClass::Hero || UnitClass == ELKUnitClass::Boss; }
+	UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsBoss() const { return UnitClass == ELKUnitClass::Boss; }
+	UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsSoldier() const { return UnitClass == ELKUnitClass::Soldier; }
+	UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsSkeleton() const { return bSkeleton; }
+	UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsIncapacitated() const { return IsHero() && bDead; }
 
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	bool IsMage() const { return bIsMage; }
@@ -95,6 +109,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	float GetMaxHealth() const;
+	UFUNCTION(BlueprintPure, Category = "LK|Unit")
+	float GetBaseMaxHealth() const;
 
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	float GetAttackDamage() const;
@@ -108,14 +124,20 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LK|Unit")
 	float GetMoveSpeed() const;
 
+	/** 索敌范围（世界单位）：范围内出现敌人才自动锁定战斗；DT_Units 行可覆盖 */
+	UFUNCTION(BlueprintPure, Category = "LK|Unit")
+	float GetAcquireRadius() const { return AcquireRadius; }
+
 	ULKUnitAttributeSet* GetUnitAttributeSet() const { return UnitAttributes; }
 
 	/** 生命变化（AttributeSet 回调；蓝图可覆写做血条/表现） */
 	UFUNCTION(BlueprintImplementableEvent, Category = "LK|Unit")
 	void OnHealthChanged(float Health, float MaxHealth);
 
-	/** 死亡：标记 + 广播 + 短延迟销毁 */
+	/** 佣兵/建筑死亡后销毁；英雄失能并保留，等待被动复活或战后恢复。 */
 	void Die();
+	bool ReviveDuringBattle();
+	void RecoverAfterBattle(float Percent);
 
 	/** 设置/获取索敌目标 */
 	void SetTarget(AActor* NewTarget);
@@ -178,6 +200,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "LK|Unit")
 	FName UnitId;
+	FText DisplayName;
+	FLinearColor PlaceholderColor = FLinearColor::Transparent;
+	bool bSkeleton = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "LK|Unit")
 	ELKTeam Team = ELKTeam::Player;
@@ -222,6 +247,8 @@ protected:
 	// ---------- S5 打击感状态 ----------
 	/** 攻击前摇（秒，DT_Units AttackWindup 注入；0 = 无前摇） */
 	float AttackWindup = 0.15f;
+	/** 索敌范围（世界单位；DT_Units AcquireRadius 覆盖，0 则用 DA_GameData 默认） */
+	float AcquireRadius = 900.f;
 	bool bWindupActive = false;
 	float WindupRemaining = 0.f;
 	/** 命中反馈计时；不冻结战斗逻辑 */
@@ -238,6 +265,9 @@ protected:
 	/** 光环组件（有光环特性时启用；所有单位都挂一个空组件，避免运行时动态创建） */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<ULKTraitAuraComponent> TraitAuraComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
+	TObjectPtr<ULKUnitPassiveComponent> PassiveComponent;
+	void RestoreHeroLife(float Health, bool bResumeCombat);
 
 	/** 缓存全局配置（InitUnit 时注入） */
 	UPROPERTY(Transient)
@@ -248,7 +278,10 @@ protected:
 	void AcquireTarget();
 	void TryAttack(float DeltaSeconds);
 	virtual void PerformAttack(AActor* Target);
-	AActor* FindNearestEnemy(bool bTauntersOnly = false) const;
+	/** 最近敌人：默认只考虑索敌范围内；bIgnoreAcquireRange=true 用于行军方向（全图最近） */
+	AActor* FindNearestEnemy(bool bTauntersOnly = false, bool bIgnoreAcquireRange = false) const;
+	/** 目标是否应放弃（普通目标离开索敌范围、嘲讽者离开嘲讽半径；集火目标不受限） */
+	bool ShouldReleaseTarget(const ALKUnitBase* Target) const;
 	float DistanceTo2D(const AActor* Other) const;
 	void ApplyRowAttributes(const FLKUnitRow& Row);
 	void DrawDebugShape() const;
@@ -262,6 +295,8 @@ protected:
 
 	/** InitUnit 末尾回调：子类可在数据就绪后做初始化（英雄技能授予/冷却读取等） */
 	virtual void OnUnitInitialized(const FLKUnitRow& Row);
+	/** 进入新房间时只清临时战斗状态；永久特性随后由快照重新应用。 */
+	virtual void ResetTransientRoomState();
 
 	friend class ULKUnitAttributeSet;
 	friend class ULKGameplayLibrary;

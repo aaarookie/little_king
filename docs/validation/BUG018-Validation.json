@@ -1,0 +1,37 @@
+﻿{
+    "note":  "BUG-018 修复验证（精简摘要；完整报告见 Saved/Automation/Bug018b/index.json 与 Saved/Logs/Bug018b.log）",
+    "reportCreatedOn":  "2026.09.08-16.45.32",
+    "engine":  "UE 5.8.1-56057345",
+    "target":  "little_kingEditor Win64 Development",
+    "succeeded":  16,
+    "succeededWithWarnings":  21,
+    "failed":  0,
+    "notRun":  0,
+    "total":  37,
+    "tests":  [
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.AcquireRangeAndRelease",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.FreeRoamFightRegression",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  },
+                  {
+                      "fullTestPath":  "LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat",
+                      "state":  "Success",
+                      "warnings":  1,
+                      "errors":  0
+                  }
+              ]
+}

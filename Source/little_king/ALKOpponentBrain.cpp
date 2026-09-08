@@ -19,10 +19,11 @@ ALKOpponentBrain::ALKOpponentBrain()
 	Deck = CreateDefaultSubobject<ULKDeckState>(TEXT("Deck"));
 }
 
-void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InGameMode)
+void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InGameMode, bool bInCanPlayCards)
 {
 	GameData = InGameData;
 	GameMode = InGameMode;
+	bCanPlayCards = bInCanPlayCards;
 
 	if (!GameData || !GameMode.IsValid())
 	{
@@ -30,21 +31,36 @@ void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InG
 	}
 
 	Silver->Init(GameData->SilverPerSecond, GameData->SilverCap);
-	if (!Deck->InitDeck(GameData->DefaultEnemyDeck, GameData->HandSize, GameData->BattleSeed + 2))
+	if (bCanPlayCards && !Deck->InitDeck(GameData->DefaultEnemyDeck, GameData->HandSize, GameData->BattleSeed + 2))
 	{
 		UE_LOG(LogLKBattle, Warning, TEXT("[Deck] 敌方牌库无效：去重后至少需要 HandSize + 1 种卡，禁止开战"));
+		bCanPlayCards = false;
 	}
 	Deck->CostProvider = [this](FName CardId) { return GameMode.IsValid() ? GameMode->GetCardCost(CardId) : 2; };
 
 	LoadWaves();
 
+	AISettings.bEnableFocus = true;
+	AISettings.bEnableCounter = true;
+	AISettings.bEnablePush = true;
+	AISettings.FocusWarningSeconds = GameData->AIFocusWarningSeconds;
+	AISettings.FocusIntervalMin = GameData->AIFocusIntervalMin;
+	AISettings.FocusIntervalMax = GameData->AIFocusIntervalMax;
+	AISettings.FocusDuration = GameData->AIFocusDuration;
+	AISettings.CounterCheckInterval = GameData->AICounterCheckInterval;
+	AISettings.PushSilverThreshold = GameData->AIPushSilverThreshold;
+	AISettings.PushMaxCards = GameData->AIPushMaxCards;
+	AISettings.PushCooldownMin = GameData->AIPushCooldownMin;
+	AISettings.PushCooldownMax = GameData->AIPushCooldownMax;
+	AISettings.PushReserveMaxSeconds = GameData->AIPushReserveMaxSeconds;
+
 	// 集火节奏：首轮随机落在配置区间内
-	FocusTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
-	CounterTimer = GameData->AICounterCheckInterval;
-	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
+	FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
+	CounterTimer = AISettings.CounterCheckInterval;
+	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
 
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 敌方 AI 就绪: 波次 %d, 牌库 %d 张（首轮集火 %.0f 秒后）"),
-		Waves.Num(), Deck->GetDeckSize() + Deck->GetHandSize(), FocusTimer);
+		Waves.Num(), bCanPlayCards ? Deck->GetDeckSize() + Deck->GetHandSize() : 0, FocusTimer);
 }
 
 void ALKOpponentBrain::LoadWaves()
@@ -87,6 +103,50 @@ void ALKOpponentBrain::LoadWaves()
 	};
 }
 
+void ALKOpponentBrain::SetScriptedWaves(const TArray<FLKWaveEntry>& InWaves)
+{
+    Waves = InWaves;
+    Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
+	WaveIndex = 0; bCanPlayCards = false;
+    PendingFocusTarget.Reset(); FocusWarningTimer = 0.f;
+}
+
+bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
+{
+	if (!GameData || !GameMode.IsValid() || Encounter.EncounterId.IsNone()) { return false; }
+	Waves = Encounter.Waves;
+	Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
+	WaveIndex = 0;
+	bCanPlayCards = Encounter.bEnemyUsesCards;
+	AISettings = Encounter.AI;
+	PendingFocusTarget.Reset();
+	FocusWarningTimer = 0.f;
+	bReserving = false;
+	ReserveRemaining = 0.f;
+	PushRemainingCards = 0;
+	ThinkTimer = 0.f;
+	Silver->Init(Encounter.EnemySilverPerSecond, Encounter.EnemySilverCap);
+	Silver->AddSilver(Encounter.EnemyStartingSilver);
+	if (bCanPlayCards && !Deck->InitDeck(Encounter.EnemyCards, GameData->HandSize, GameData->BattleSeed + 2))
+	{
+		UE_LOG(LogLKBattle, Error, TEXT("[Encounter] %s 敌方牌组无效"), *Encounter.EncounterId.ToString());
+		bCanPlayCards = false;
+		return false;
+	}
+	FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
+	CounterTimer = AISettings.CounterCheckInterval;
+	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
+	UE_LOG(LogLKBattle, Log, TEXT("[Encounter] AI %s：波次%d 出牌=%d 集火=%d 反制=%d 爆发=%d 奖励档=%d"),
+		*Encounter.EncounterId.ToString(), Waves.Num(), int32(bCanPlayCards), int32(AISettings.bEnableFocus),
+		int32(AISettings.bEnableCounter), int32(AISettings.bEnablePush), Encounter.RewardTier);
+	return true;
+}
+
+bool ALKOpponentBrain::IsFocusEnabled() const
+{
+	return AISettings.bEnableFocus;
+}
+
 void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 {
 	if (!GameData || !GameMode.IsValid())
@@ -94,9 +154,10 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 		return;
 	}
 
-	Silver->TickSilver(DeltaTime);
+	if (bCanPlayCards) { Silver->TickSilver(DeltaTime); }
 
 	ProcessWaves(BattleElapsed);
+	// 波次、集火和出牌是独立开关；无牌遭遇仍可拥有精英/首领集火节奏。
     if (bReserving) { ReserveRemaining -= DeltaTime; }
     if (FocusWarningTimer > 0.f)
     {
@@ -105,32 +166,32 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
         {
             if (PendingFocusTarget.IsValid() && PendingFocusTarget->IsTargetable())
             {
-                GameMode->ForcedTargetAllUnits(ELKTeam::Enemy, PendingFocusTarget.Get(), GameData->AIFocusDuration);
+				GameMode->ForcedTargetAllUnits(ELKTeam::Enemy, PendingFocusTarget.Get(), AISettings.FocusDuration);
             }
             PendingFocusTarget = nullptr;
         }
     }
 
 	// ---------- S4 战术节奏 ----------
-	FocusTimer -= DeltaTime;
-	if (FocusTimer <= 0.f)
+	if (AISettings.bEnableFocus) { FocusTimer -= DeltaTime; }
+	if (AISettings.bEnableFocus && FocusTimer <= 0.f)
 	{
 		DoFocus();
-		FocusTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIFocusIntervalMin, GameData->AIFocusIntervalMax);
+		FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
 	}
 
-	CounterTimer -= DeltaTime;
-	if (CounterTimer <= 0.f)
+	if (bCanPlayCards && AISettings.bEnableCounter) { CounterTimer -= DeltaTime; }
+	if (bCanPlayCards && AISettings.bEnableCounter && CounterTimer <= 0.f)
 	{
 		RefreshCounter();
-		CounterTimer = GameData->AICounterCheckInterval;
+		CounterTimer = AISettings.CounterCheckInterval;
 	}
 
 	PushCooldownTimer = FMath::Max(0.f, PushCooldownTimer - DeltaTime);
 
 	// 思考出牌
-	ThinkTimer -= DeltaTime;
-	if (ThinkTimer <= 0.f)
+	if (bCanPlayCards) { ThinkTimer -= DeltaTime; }
+	if (bCanPlayCards && ThinkTimer <= 0.f)
 	{
 		ThinkTimer = ThinkInterval;
 		ThinkAndPlay();
@@ -179,10 +240,10 @@ void ALKOpponentBrain::DoFocus()
 	}
 
 	PendingFocusTarget = Weakest;
-    FocusWarningTimer = FMath::Max(0.01f, GameData->AIFocusWarningSeconds);
+	FocusWarningTimer = FMath::Max(0.01f, AISettings.FocusWarningSeconds);
     Weakest->SetFocusWarning(FocusWarningTimer);
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 集火预警：即将转火玩家英雄 %s（集火持续 %.0f 秒）"),
-		*Weakest->GetUnitId().ToString(), GameData->AIFocusDuration);
+		*Weakest->GetUnitId().ToString(), AISettings.FocusDuration);
 }
 
 void ALKOpponentBrain::RefreshCounter()
@@ -207,7 +268,7 @@ bool ALKOpponentBrain::TryEnterPush()
 	}
 
 	// 银币达标 + 己方兵力不劣于玩家 → 一波流
-	if (Silver->GetSilver() < FMath::Min(GameData->AIPushSilverThreshold, GameData->SilverCap))
+	if (!AISettings.bEnablePush || Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap()))
 	{
 		return false;
 	}
@@ -216,8 +277,8 @@ bool ALKOpponentBrain::TryEnterPush()
 		return false;
 	}
 
-	PushRemainingCards = GameData->AIPushMaxCards;
-	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(GameData->AIPushCooldownMin, GameData->AIPushCooldownMax);
+	PushRemainingCards = AISettings.PushMaxCards;
+	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 爆发！银币 %.1f 兵力占优，一波连打 %d 张"),
 		Silver->GetSilver(), PushRemainingCards);
 	return true;
@@ -228,7 +289,7 @@ void ALKOpponentBrain::ThinkAndPlay()
     if (PushCooldownTimer <= 0.f && !bReserving)
     {
         bReserving = true;
-        ReserveRemaining = GameData->AIPushReserveMaxSeconds;
+		ReserveRemaining = AISettings.PushReserveMaxSeconds;
     }
     if (bReserving)
     {
@@ -239,9 +300,9 @@ void ALKOpponentBrain::ThinkAndPlay()
             PushRemainingCards = 0;
             return;
         }
-        if (ReserveRemaining > 0.f && Silver->GetSilver() < FMath::Min(GameData->AIPushSilverThreshold, GameData->SilverCap)) { return; }
+		if (ReserveRemaining > 0.f && Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap())) { return; }
         bReserving = false;
-        PushCooldownTimer = GameData->AIPushCooldownMin;
+		PushCooldownTimer = AISettings.PushCooldownMin;
     }
     TryPlayOneCard();
 }
