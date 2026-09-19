@@ -1,0 +1,115 @@
+{
+  "stage": "Optimization 2",
+  "date": "2026-09-15",
+  "engine": "Unreal Engine 5.8.1",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/Optimization2Build09.log"
+  },
+  "automation": {
+    "filter": "LittleKing",
+    "passed": 58,
+    "passedWithoutWarnings": 28,
+    "passedWithWarnings": 30,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/Optimization2Verified/index.json",
+    "log": "Saved/Logs/Optimization2Verified.log",
+    "newTests": [
+      {
+        "fullTestPath": "LittleKing.Optimization2.BattleWorldPreservesMapAndService",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization2.BranchProgressionAndFullGold",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization2.MapServiceAndGateUI",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization2.OldMapMigrationAndDepartureFailure",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization2.WalletSettlementAndCrashRecovery",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization2.WorldGraph200Seeds",
+        "state": "Success"
+      }
+    ],
+    "coverage": [
+      "200 seeds: 5 fixed regions, 10-20 nodes each, shared geographical edges, stable entry/exit coordinates, merge entries, reachable DAG and normal/elite/boss rosters",
+      "12 controlled-outcome routes: branch traversal, success/failure, service healing caps, no duplicate node resolution, full wallet return",
+      "Native UButton and SpinBox callbacks, variable option count, Slate map hit testing and mouse callback",
+      "Battle GameMode arrival retains map, market and rest states and permits safe return home",
+      "Gold carry limits, debit, wallet overdraft rejection, transaction deduplication, persistence, interrupted settlement and orphan funding recovery",
+      "Unwritable departure refunds carry gold, Schema 5 route/earnings migration, frozen receipts retain original amount"
+    ],
+    "warnings": "30 suites include expected invalid-input/save-failure/recovery warnings and existing headless-world/camera/GameplayCue warnings; not a zero-warning claim"
+  },
+  "visualReview": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "method": "UE RenderOffscreen native UMG screenshots, inspected locally",
+    "screens": [
+      "world overview",
+      "region zoom",
+      "market",
+      "rest",
+      "home gate"
+    ],
+    "sharedImages": [
+      "docs/images/WorldMapOverview.png",
+      "docs/images/WorldMapRegion.png",
+      "docs/images/ExpeditionMarket.png",
+      "docs/images/ExpeditionRest.png",
+      "docs/images/HomeGate.png"
+    ],
+    "logs": [
+      "Saved/Logs/Optimization2Preview720c.log",
+      "Saved/Logs/Optimization2Preview1080.log",
+      "Saved/Logs/Optimization2Home720.log",
+      "Saved/Logs/Optimization2Home1080.log"
+    ],
+    "fixedDuringReview": [
+      "TArray self-reference assertion in polygon outline closure",
+      "Crowding near narrow region tips",
+      "Paint-only UUserWidget missing mouse hit-test visibility"
+    ]
+  },
+  "saveProtection": {
+    "profiles": [
+      {
+        "file": "LittleKing_Profile_A.sav",
+        "sha256": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Profile_B.sav",
+        "sha256": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+        "unchanged": true
+      }
+    ],
+    "temporarySaveFilesRemoved": true,
+    "finalFiles": [
+      "LittleKing_Profile_A.sav",
+      "LittleKing_Profile_B.sav"
+    ]
+  },
+  "scopeNotes": [
+    "Market merchandise and additional rest actions are intentionally deferred; extension interfaces supplied",
+    "Tests simulate campaign outcomes, not full-length human difficulty/balance testing",
+    "No art, sound, packaging or hardware test work"
+  ],
+  "documentation": [
+    "docs/29-OptimizationChangeLog.md",
+    "docs/31-WorldMapExpeditionTutorial.md"
+  ]
+}

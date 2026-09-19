@@ -3,6 +3,7 @@
 #include "Engine/Texture2D.h"
 #include "Engine/World.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Components/PanelWidget.h"
 #include "Components/TextBlock.h"
 #include "ULKGameData.h"
@@ -17,9 +18,24 @@
 #include "ULKRunResumeWidget.h"
 #include "ULKRunRewardWidget.h"
 #include "ULKSilverComponent.h"
+#include "LKCardPresentation.h"
+#include "LKCardRules.h"
 
 namespace
 {
+	UImage* FindFirstImage(UWidget* Widget)
+	{
+		if (UImage* Image = Cast<UImage>(Widget)) { return Image; }
+		if (UPanelWidget* Panel = Cast<UPanelWidget>(Widget))
+		{
+			for (int32 Index = 0; Index < Panel->GetChildrenCount(); ++Index)
+			{
+				if (UImage* Image = FindFirstImage(Panel->GetChildAt(Index))) { return Image; }
+			}
+		}
+		return nullptr;
+	}
+
 	UTextBlock* FindFirstTextBlock(UWidget* Widget)
 	{
 		if (UTextBlock* Text = Cast<UTextBlock>(Widget))
@@ -44,6 +60,7 @@ void ULKBattleHUDWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	BindResultActionButton();
+	BindDeploymentButtons();
 }
 
 void ULKBattleHUDWidget::NativeConstruct()
@@ -52,6 +69,7 @@ void ULKBattleHUDWidget::NativeConstruct()
 	BindEvents();
 	// Widget 从视口移除后再次加入时 NativeOnInitialized 不会重跑，因此在这里幂等重绑。
 	BindResultActionButton();
+	BindDeploymentButtons();
 	PushInitialState();
 	// D5：冷启动恢复到结算/终态时，部署阶段直接弹对应面板。
 	TryShowRecoveryPanels();
@@ -160,6 +178,56 @@ void ULKBattleHUDWidget::HandlePhaseChanged(ELKGamePhase NewPhase)
 	RefreshResultActionButton();
 }
 
+FName ULKBattleHUDWidget::GetDeploymentHeroId(int32 SlotIndex) const
+{
+	const ALKBattleGameMode* GM = GetBattleGameMode();
+	return GM && GM->AvailableHeroes.IsValidIndex(SlotIndex) ? GM->AvailableHeroes[SlotIndex] : NAME_None;
+}
+
+void ULKBattleHUDWidget::BindDeploymentButtons()
+{
+	DeploymentButtons.Reset();
+	for (FName Name : {FName("Btn_Knight"), FName("Btn_Mage"), FName("Btn_Ranger")})
+	{
+		UButton* Button = Cast<UButton>(GetWidgetFromName(Name));
+		DeploymentButtons.Add(Button);
+		if (Button) { Button->OnClicked.Clear(); } // Replace old hardcoded hero IDs; keep the authored layout.
+	}
+	if (DeploymentButtons[0]) { DeploymentButtons[0]->OnClicked.AddDynamic(this, &ULKBattleHUDWidget::HandleHeroSlot0Clicked); }
+	if (DeploymentButtons[1]) { DeploymentButtons[1]->OnClicked.AddDynamic(this, &ULKBattleHUDWidget::HandleHeroSlot1Clicked); }
+	if (DeploymentButtons[2]) { DeploymentButtons[2]->OnClicked.AddDynamic(this, &ULKBattleHUDWidget::HandleHeroSlot2Clicked); }
+	RefreshDeploymentButtons();
+}
+
+void ULKBattleHUDWidget::RefreshDeploymentButtons()
+{
+	const ALKBattleGameMode* GM = GetBattleGameMode();
+	for (int32 SlotIndex = 0; SlotIndex < DeploymentButtons.Num(); ++SlotIndex)
+	{
+		UButton* Button = DeploymentButtons[SlotIndex];
+		if (!Button) { continue; }
+		const FName HeroId = GetDeploymentHeroId(SlotIndex);
+		Button->SetIsEnabled(GM && !HeroId.IsNone() && GM->GetPhase() == ELKGamePhase::Deployment && !GM->IsHeroDeployed(HeroId));
+		if (UTextBlock* Label = FindFirstTextBlock(Button))
+		{
+			const FLKUnitRow* Row = GM ? GM->GetUnitRow(HeroId) : nullptr;
+			Label->SetText(Row ? Row->DisplayName : FText::FromString(TEXT("空位")));
+		}
+	}
+}
+
+void ULKBattleHUDWidget::BeginHeroSlotPlacement(int32 SlotIndex)
+{
+	const FName HeroId = GetDeploymentHeroId(SlotIndex);
+	const ALKBattleGameMode* GM = GetBattleGameMode();
+	if (!GM || HeroId.IsNone() || GM->GetPhase() != ELKGamePhase::Deployment || GM->IsHeroDeployed(HeroId)) { return; }
+	if (ALKPlayerController* PC = GetLKPlayerController()) { PC->BeginHeroPlacement(HeroId); }
+}
+
+void ULKBattleHUDWidget::HandleHeroSlot0Clicked() { BeginHeroSlotPlacement(0); }
+void ULKBattleHUDWidget::HandleHeroSlot1Clicked() { BeginHeroSlotPlacement(1); }
+void ULKBattleHUDWidget::HandleHeroSlot2Clicked() { BeginHeroSlotPlacement(2); }
+
 void ULKBattleHUDWidget::HandleHandChanged()
 {
     TArray<FName> Hand;
@@ -178,6 +246,47 @@ void ULKBattleHUDWidget::HandleHandChanged()
         }
     }
     OnHandChanged(Hand, Costs, Playable);
+    // Update the shipped BP hand after its callback, so no manual Blueprint rewiring is required.
+    for (int32 Index = 0; Index < Hand.Num(); ++Index)
+    {
+        const ULKCardDefinition* Card = GetCardDefinition(Hand[Index]);
+        UWidget* CardWidget = GetWidgetFromName(*FString::Printf(TEXT("CardSlot_%d"), Index));
+        if (!Card || !CardWidget) { continue; }
+        const ALKBattleGameMode* GM = GetBattleGameMode();
+        CardWidget->SetToolTipText(LKCardPresentation::Detail(*Card, GM ? GM->GetUnitRow(
+            Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId) : nullptr));
+        if (GetSilverComp() && Card->Cost > GetSilverComp()->GetCap())
+        { CardWidget->SetToolTipText(FText::FromString(CardWidget->GetToolTipText().ToString() + TEXT("\n当前银币上限不足，请在家园升级金库。"))); }
+        if (UTextBlock* Label = FindFirstTextBlock(CardWidget))
+        {
+            FSlateFontInfo Font = Label->GetFont(); Font.Size = 14; Label->SetFont(Font);
+            Label->SetAutoWrapText(true); Label->SetWrapTextAt(136.f);
+            Label->SetJustification(ETextJustify::Center);
+            Label->SetText(FText::FromString(FString::Printf(TEXT("%s\n%s\n%d费 · %d格"), *Card->CardName.ToString(),
+                *LKCardPresentation::Classification(*Card).ToString(), Card->Cost, LKCardRules::Slots(Card->CardId))));
+            Label->SetColorAndOpacity(LKCardPresentation::Color(*Card));
+        }
+        // A null texture still paints the authored Image as a white quad. Give it a
+        // readable quality-colored placeholder and reset its tint when the slot cycles.
+        if (UImage* Icon = FindFirstImage(CardWidget))
+        {
+            UTexture2D* Texture = GetCardIcon(Card->CardId);
+            Icon->SetBrushFromTexture(Texture);
+            const FLinearColor Accent = LKCardPresentation::Color(*Card);
+            Icon->SetColorAndOpacity(Texture ? FLinearColor::White
+                : FLinearColor(Accent.R * .08f, Accent.G * .08f, Accent.B * .08f, 1.f));
+        }
+        if (UButton* Button = Cast<UButton>(CardWidget))
+        {
+            FButtonStyle Style = Button->GetStyle();
+            const FLinearColor Accent = LKCardPresentation::Color(*Card);
+            Style.Normal.TintColor = FSlateColor(FLinearColor(Accent.R * .16f, Accent.G * .16f, Accent.B * .16f, 1.f));
+            Style.Hovered.TintColor = FSlateColor(FLinearColor(Accent.R * .27f, Accent.G * .27f, Accent.B * .27f, 1.f));
+            Style.Pressed.TintColor = FSlateColor(FLinearColor(Accent.R * .2f, Accent.G * .2f, Accent.B * .2f, 1.f));
+            Style.Disabled.TintColor = FSlateColor(FLinearColor(.06f, .07f, .09f));
+            Button->SetStyle(Style);
+        }
+    }
 }
 
 void ULKBattleHUDWidget::HandleSpellLockChanged(bool bUnlocked)
@@ -301,8 +410,20 @@ FText ULKBattleHUDWidget::GetRewardOptionText(int32 Index) const
 
 bool ULKBattleHUDWidget::ChooseRunReward(int32 Index)
 {
+    return ChooseRunRewardReplacing(Index, NAME_None);
+}
+
+bool ULKBattleHUDWidget::ChooseRunRewardReplacing(int32 Index, FName ReplacedCardId)
+{
+    TArray<FName> Replaced;
+    if (!ReplacedCardId.IsNone()) { Replaced.Add(ReplacedCardId); }
+    return ChooseRunRewardReplacingCards(Index, Replaced);
+}
+
+bool ULKBattleHUDWidget::ChooseRunRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds)
+{
 	ALKBattleGameMode* GM = GetBattleGameMode();
-	const bool bChosen = GM && GM->ChooseRunReward(Index);
+	const bool bChosen = GM && GM->ChooseRunRewardReplacingCards(Index, ReplacedCardIds);
 	if (bChosen) { CloseRewardPanel(); SyncResultPanels(); }
 	return bChosen;
 }
@@ -617,6 +738,7 @@ UTexture2D* ULKBattleHUDWidget::GetCardIcon(FName CardId) const
 void ULKBattleHUDWidget::NativeTick(const FGeometry& Geometry, float DeltaTime)
 {
     Super::NativeTick(Geometry, DeltaTime);
+	RefreshDeploymentButtons();
     // Migration bridge until the old aggregate widgets are deleted in the editor.
     for (FName Name : {FName("PlayerHeroBar"), FName("EnemyHeroBar")})
     { if (UWidget* Widget = GetWidgetFromName(Name)) { Widget->SetVisibility(ESlateVisibility::Collapsed); } }

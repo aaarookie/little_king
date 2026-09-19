@@ -25,6 +25,8 @@
 #include "ULKUnitAttributeSet.h"
 #include "ULKUnitMovementComponent.h"
 #include "ULKUnitPassiveComponent.h"
+#include "ULKUnitActiveComponent.h"
+#include "ULKUnitStatusComponent.h"
 #include "LKRunTypes.h"
 
 ALKUnitBase::ALKUnitBase()
@@ -65,6 +67,8 @@ ALKUnitBase::ALKUnitBase()
 	// 光环组件：默认空挂（不启用），有光环特性（InitUnit）时注册修改器后生效
 	TraitAuraComponent = CreateDefaultSubobject<ULKTraitAuraComponent>(TEXT("TraitAura"));
 	PassiveComponent = CreateDefaultSubobject<ULKUnitPassiveComponent>(TEXT("Passive"));
+    ActiveComponent = CreateDefaultSubobject<ULKUnitActiveComponent>(TEXT("NativeActive"));
+    StatusComponent = CreateDefaultSubobject<ULKUnitStatusComponent>(TEXT("CombatStatus"));
 }
 
 void ALKUnitBase::BeginPlay()
@@ -85,6 +89,7 @@ UAbilitySystemComponent* ALKUnitBase::GetAbilitySystemComponent() const
 
 void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId)
 {
+    StatusComponent->Clear();
 	GameDataCached = InGameData;
 
 	// UnitId 以行内字段为准；为空时用行名兜底（并告警提示补齐数据表）
@@ -102,6 +107,10 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	bSkeleton = Row.bSkeleton;
 	PlaceholderColor = Row.PlaceholderColor;
 	PassiveComponent->Initialize(Row);
+    ActiveComponent->Initialize(Row);
+    Race = Row.Race;
+    Quality = Row.Quality;
+    bTargetsBuildingsOnly = Row.bTargetsBuildingsOnly;
 	bIsMage = Row.bIsMage;
 	AttackType = Row.AttackType;
 	HeroTraits = Row.HeroTraits;
@@ -119,6 +128,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	// 索敌范围：行内值优先，0 表示用全局默认（DA_GameData.UnitAcquireRadius）。
 	AcquireRadius = Row.AcquireRadius > 0.f ? Row.AcquireRadius
 		: (InGameData ? InGameData->UnitAcquireRadius : 900.f);
+    if (bTargetsBuildingsOnly) { AcquireRadius = GetAttackRange(); }
 	BodyCollision->SetSphereRadius(BodyRadius);
 	MovementComponent->SetSeparationRadius(BodyRadius);
 	if (InGameData)
@@ -195,6 +205,8 @@ bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
 
 void ALKUnitBase::ResetTransientRoomState()
 {
+    StatusComponent->Clear();
+    if (ActiveComponent) { ActiveComponent->Stop(); }
 	ChangeTarget(nullptr);
 	ForcedTargetActor.Reset();
 	ForcedTargetRemaining = 0.f;
@@ -316,6 +328,7 @@ void ALKUnitBase::RemoveAuraTauntSource(ALKUnitBase* Source)
 void ALKUnitBase::EndPlay(const EEndPlayReason::Type Reason)
 {
     TraitAuraComponent->ResetAuras();
+    ULKUnitStatusComponent::RefreshTeamSupport(GetWorld());
     Super::EndPlay(Reason);
 }
 
@@ -391,11 +404,19 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 		return;
 	}
 
+    StatusComponent->TickStatus(DeltaSeconds);
+    if (IsDead() || !IsCombatEnabled()) { return; }
 	AttackCooldownRemaining = FMath::Max(0.f, AttackCooldownRemaining - DeltaSeconds);
     HitStopRemaining = FMath::Max(0.f, HitStopRemaining - DeltaSeconds);
     FocusWarningRemaining = FMath::Max(0.f, FocusWarningRemaining - DeltaSeconds);
+    if (ActiveComponent->TickAbility(DeltaSeconds)) { State = ELKUnitState::Casting; return; }
+    if (IsControlled()) { MovementComponent->Stop(); CancelAttackWindup(); State = ELKUnitState::Idle; return; }
+    if (IsDead()) { return; }
     UpdateStateMachine(DeltaSeconds);
 }
+
+bool ALKUnitBase::IsSkillMoving() const { return ActiveComponent && ActiveComponent->IsDashing(); }
+bool ALKUnitBase::IsControlled() const { return StatusComponent && StatusComponent->IsControlled(); }
 
 /** S5：攻击脉冲回弹 + 受击闪白恢复（纯视觉） */
 void ALKUnitBase::TickCombatFeedback(float DeltaSeconds)
@@ -490,10 +511,11 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
 bool ALKUnitBase::ShouldReleaseTarget(const ALKUnitBase* Target) const
 {
     if (!Target) { return true; }
+    if (ActiveComponent->GetLockedTarget() == Target) { return false; }
     // 集火指令目标不受索敌范围限制（AI 战术可跨图）。
     if (ForcedTargetActor.Get() == Target) { return false; }
     const float Distance = DistanceTo2D(Target);
-    if (Target->IsTaunting())
+    if (Target->IsTaunting() && PassiveComponent->GetAbility() != ELKPassiveAbility::TauntImmunity)
     {
         // 嘲讽者只在离开嘲讽吸引半径（含滞回）后释放。
         const float TauntRadius = GameDataCached ? GameDataCached->TauntAcquireRadius : 500.f;
@@ -506,6 +528,7 @@ bool ALKUnitBase::ShouldReleaseTarget(const ALKUnitBase* Target) const
 bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
 {
     return Target && Target->IsTargetable() && Target->GetTeam() != Team
+        && (!bTargetsBuildingsOnly || Target->IsBuilding())
         && (!IsBuilding() || DistanceTo2D(Target) <= GetAttackRange());
 }
 
@@ -524,12 +547,14 @@ void ALKUnitBase::ChangeTarget(AActor* NewTarget)
 
 void ALKUnitBase::SetTarget(AActor* NewTarget)
 {
+    if (ALKUnitBase* Locked = ActiveComponent->GetLockedTarget()) { ChangeTarget(Locked); return; }
     AActor* Taunter = FindNearestEnemy(true);
     ChangeTarget(Taunter ? Taunter : (CanPursueTarget(Cast<ALKUnitBase>(NewTarget)) ? NewTarget : nullptr));
 }
 
 void ALKUnitBase::AcquireTarget()
 {
+    if (ALKUnitBase* Locked = ActiveComponent->GetLockedTarget()) { ChangeTarget(Locked); return; }
     // 嘲讽始终高于集火、普通目标指定和最近目标。
     if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); return; }
     if (ALKUnitBase* Forced = Cast<ALKUnitBase>(ForcedTargetActor.Get()))
@@ -562,6 +587,7 @@ void ALKUnitBase::TickForcedTarget(float DeltaSeconds)
 
 AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRange) const
 {
+    if (bTauntersOnly && PassiveComponent->GetAbility() == ELKPassiveAbility::TauntImmunity) { return nullptr; }
     AActor* Best = nullptr;
     float BestDistance = TNumericLimits<float>::Max();
     if (!GetWorld()) { return nullptr; }
@@ -587,6 +613,7 @@ AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRan
 
 void ALKUnitBase::TryAttack(float DeltaSeconds)
 {
+    if (IsControlled()) { CancelAttackWindup(); return; }
     if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); }
     ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
     if (!Target || !CanPursueTarget(Target) || DistanceTo2D(Target) > GetAttackRange() || IsManualMoving())
@@ -617,59 +644,48 @@ void ALKUnitBase::TryAttack(float DeltaSeconds)
 
 void ALKUnitBase::PerformAttack(AActor* Target)
 {
-	if (!IsValid(Target))
-	{
-		return;
-	}
-
-	// S5 命中瞬间反馈：攻击缩放脉冲 + 攻击者命中停顿
-	AttackPulseRemaining = 0.15f;
-	HitStopRemaining = 0.06f;
-
-	if (AttackType == ELKAttackType::Ranged)
-	{
-		UWorld* World = GetWorld();
-		if (!World)
-		{
-			return;
-		}
-
-		// S5 弹道对象池：向 GameMode 取弹道（无 GameMode 时回退旧逻辑直接生成）
-		ALKBattleGameMode* GM = World->GetAuthGameMode<ALKBattleGameMode>();
-		if (GM)
-		{
-			const FVector Muzzle = GetActorLocation() + FVector(0.f, 0.f, 20.f);
-			const FVector Dir = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
-			GM->AcquireProjectile(Muzzle, GetAttackDamage(), Team, this, Dir);
-		}
-		else
-		{
-			FVector Muzzle = GetActorLocation();
-			Muzzle.Z = 20.f;
-			const FVector Dir = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
-
-			FActorSpawnParameters Params;
-			Params.Owner = this;
-			ALKProjectile* Projectile = World->SpawnActor<ALKProjectile>(ALKProjectile::StaticClass(), Muzzle, FRotator::ZeroRotator, Params);
-			if (Projectile)
-			{
-				Projectile->Init(GetAttackDamage(), Team, this, Dir);
-			}
-		}
-
-		// 音效：远程发射
-		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("RangedShoot"), GetActorLocation(), 0.7f);
-	}
-	else
-	{
-		LKGameplay::ApplyDamage(Target, GetAttackDamage(), this);
-
-		// 音效：近战挥击（命中点）
-		if (UWorld* World = GetWorld())
-		{
-			LKGameplay::PlayOneShot(World, GameDataCached, TEXT("MeleeHit"), Target->GetActorLocation(), 0.8f);
-		}
-	}
+    ALKUnitBase* Victim = Cast<ALKUnitBase>(Target);
+    if (!CanPursueTarget(Victim) || IsControlled() || !IsAlive() || !IsCombatEnabled()) { return; }
+    AttackPulseRemaining = .15f; HitStopRemaining = .06f;
+    const bool bKingStrike = StatusComponent->BeginAttack();
+    const float Damage = GetAttackDamage() * (bKingStrike ? 1.5f : 1.f);
+    ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
+    if (GM) { GM->BeginCombatBatch(); }
+    if (AttackType == ELKAttackType::Ranged)
+    {
+        const FVector Muzzle = GetActorLocation() + FVector(0, 0, 20);
+        const FVector Direction = (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+        ELKBreathHead Head = ELKBreathHead::None;
+        if (PassiveComponent->GetAbility() == ELKPassiveAbility::TwinBreath)
+        {
+            const bool bIce = GM ? GM->GetBattleRandom().RandRange(0, 1) == 0 : FMath::RandBool();
+            Head = bIce ? ELKBreathHead::Ice : ELKBreathHead::Fire;
+        }
+        ALKProjectile* Projectile = GM ? GM->AcquireProjectile(Muzzle, Damage, Team, this, Direction)
+            : GetWorld()->SpawnActor<ALKProjectile>(ALKProjectile::StaticClass(), Muzzle, FRotator::ZeroRotator);
+        if (Projectile)
+        {
+            if (!GM) { Projectile->Init(Damage, Team, this, Direction); }
+            Projectile->SetAttackPayload(Head, bTargetsBuildingsOnly ? Victim : nullptr);
+        }
+        LKGameplay::PlayOneShot(GetWorld(), GameDataCached, TEXT("RangedShoot"), GetActorLocation(), .7f);
+    }
+    else
+    {
+        const FLKCombatSource Source = LKGameplay::MakeSource(this, bKingStrike ? ELKCombatSourceKind::Skill : ELKCombatSourceKind::Attack,
+            bKingStrike ? FName("Skill_KillThem") : FName("MeleeAttack"));
+        LKGameplay::ApplyDamage(Victim, Damage, this, false, &Source);
+        if (bKingStrike && Victim->IsAlive())
+        {
+            Victim->CancelAttackWindup();
+            const FVector Away = (Victim->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+            Victim->GetMovementComponent()->MoveSkillDelta(Away * 300.f);
+            Victim->GetStatusComponent()->Stun(2.f);
+        }
+        LKGameplay::PlayOneShot(GetWorld(), GameDataCached, TEXT("MeleeHit"), Target->GetActorLocation(), .8f);
+    }
+    StatusComponent->AfterAttack();
+    if (GM) { GM->EndCombatBatch(); }
 }
 
 float ALKUnitBase::DistanceTo2D(const AActor* Other) const
@@ -698,22 +714,24 @@ float ALKUnitBase::GetBaseMaxHealth() const
 
 float ALKUnitBase::GetAttackDamage() const
 {
-	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackDamageAttribute(), 0.f);
+	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackDamageAttribute(), 0.f) * StatusComponent->AttackMultiplier();
 }
 
 float ALKUnitBase::GetAttackRange() const
 {
+    if (bTargetsBuildingsOnly)
+    { return GameDataCached ? FVector2D(GameDataCached->FieldHalfWidth, GameDataCached->FieldHalfHeight).Size() * 2.f + 200.f : 100000.f; }
 	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackRangeAttribute(), 0.f);
 }
 
 float ALKUnitBase::GetAttackInterval() const
 {
-	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackIntervalAttribute(), 1.f);
+	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackIntervalAttribute(), 1.f) * StatusComponent->IntervalMultiplier();
 }
 
 float ALKUnitBase::GetMoveSpeed() const
 {
-	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMoveSpeedAttribute(), 0.f);
+	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMoveSpeedAttribute(), 0.f) * StatusComponent->MoveMultiplier();
 }
 
 void ALKUnitBase::SetInvulnerable(float DurationSeconds)
@@ -812,6 +830,8 @@ void ALKUnitBase::Die()
 		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("UnitDied"), GetActorLocation(), 1.f);
 	}
 
+    StatusComponent->Clear();
+    ULKUnitStatusComponent::RefreshTeamSupport(GetWorld());
 	OnUnitDied.Broadcast(this);
 
 	UE_LOG(LogLKUnit, Log, TEXT("[Unit] %s (%s) %s"), *UnitId.ToString(), *GetName(), IsHero() ? TEXT("失能") : TEXT("死亡"));
@@ -876,6 +896,8 @@ void ALKUnitBase::DrawDebugShape() const
 
 void ALKUnitBase::SetCombatEnabled(bool bEnabled)
 {
+    if (!bEnabled && ActiveComponent) { ActiveComponent->Stop(); }
+    if (!bEnabled && StatusComponent) { StatusComponent->Clear(); }
     bCombatEnabled = bEnabled;
     if (!bEnabled)
     {

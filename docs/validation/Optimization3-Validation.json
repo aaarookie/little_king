@@ -1,0 +1,142 @@
+{
+  "stage": "Optimization 3",
+  "date": "2026-09-16",
+  "engine": "Unreal Engine 5.8.1",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/Optimization3Build07.log"
+  },
+  "automation": {
+    "filter": "LittleKing",
+    "passed": 65,
+    "passedWithoutWarnings": 29,
+    "passedWithWarnings": 36,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/Optimization3-03/index.json",
+    "log": "Saved/Logs/Optimization3Tests03.log",
+    "buildAtFullRegression": "Saved/Logs/Optimization3Build06.log",
+    "newTests": [
+      {
+        "fullTestPath": "LittleKing.Optimization3.Combat.BackstabAndLoot",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.Combat.DashHitsKnockbackAndObstacles",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.Combat.ElfHealingAndSharedSpring",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.Combat.MimicFullDeckAndFallback",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.Content.QualityGradesAndTemporaryCards",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.Deck.CapacityReplacementAndRollback",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization3.UI.HandLabelsRewardReplacementAndRender",
+        "state": "Success"
+      }
+    ],
+    "coverage": [
+      "21 native units and 17 cards, quality/race identity fallback and 14 spell grades; eight temporary mercenaries excluded from permanent unlocks",
+      "7-to-8 cards, full deck explicit replacement, invalid replacement, atomic save-failure rollback, duplicate reward rejection and 80 unique four-slot card cycles",
+      "Elf melee/projectile renewal, actual healing and overheal, lowest health-ratio hero selection and copied-healing recursion guard",
+      "Rogue farthest enemy, valid behind-target teleport, lock and taunt immunity, deterministic steal and death reset; thief target death without last-hit requirement",
+      "Mimic reads entire carried deck, free cast without cycling, novice grade filter and fireball fallback",
+      "Dash damage once per target, side knockback, static obstacles and camp collision, buildings not moved, bounds and no tunneling",
+      "Authored HUD classification tooltip, native reward/back/replacement button callbacks; Schema 6 nine-card migration retains state and upgrades, blocks progress until manual trimming"
+    ],
+    "warnings": "36 suites include expected invalid-input/save-failure warnings and existing test-world/camera/viewport/GameplayCue warnings; this is not a zero-warning run"
+  },
+  "finalUITest": {
+    "filter": "LittleKing.Optimization3.UI",
+    "passed": 1,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/Optimization3-UI04/index.json",
+    "log": "Saved/Logs/Optimization3UI04.log",
+    "reason": "After full regression, only hand placeholder tint and three-line label presentation changed; rebuilt and reran affected UI suite with rendering enabled."
+  },
+  "visualReview": {
+    "method": "UE RenderOffscreen FWidgetRenderer captures inspected locally",
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "screens": [
+      "hand at 720p",
+      "reward selection at 720p/1080p",
+      "eight-card replacement at 720p/1080p"
+    ],
+    "sharedImages": [
+      "docs/images/Stage3Hand.png",
+      "docs/images/Stage3Rewards.png",
+      "docs/images/Stage3Replacement.png"
+    ],
+    "fixedDuringReview": [
+      "Hand font size and explicit lines avoid overflow",
+      "Missing icon white quad replaced by quality tint",
+      "Long descriptions use scrollable panels",
+      "Eight replacement choices visible in two columns at 720p"
+    ]
+  },
+  "saveProtection": {
+    "files": [
+      {
+        "file": "LittleKing_Profile_A.sav",
+        "sha256": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Profile_B.sav",
+        "sha256": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Profile_A.sav",
+        "sha256": "55D4849EFA1F6286015F29BD472590FADE65B5F539B9F4086F2F63EB15538DAE",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Profile_B.sav",
+        "sha256": "473D2027DA1842EA51CA6A58B1E0FE0407CB93F9E122A2140F190BF02D92FA32",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Run.sav",
+        "sha256": "16C2E66F7ADB6A70861AE5962547ED59E532B17875A2B10D92FB882D1850434B",
+        "unchanged": true
+      }
+    ],
+    "temporarySaveFilesRemoved": true,
+    "finalFiles": [
+      "LittleKing_Profile_A.sav",
+      "LittleKing_Profile_B.sav",
+      "LittleKing_Save02_Profile_A.sav",
+      "LittleKing_Save02_Profile_B.sav",
+      "LittleKing_Save02_Run.sav"
+    ]
+  },
+  "scopeNotes": [
+    "First balance draft; automated combat scenarios are not long-term human balance testing",
+    "All eight new mercenaries use runtime definitions and colored placeholders; no mandatory manual asset or Blueprint setup",
+    "Art, sound, packaging and hardware validation deferred",
+    "No Git commit, push or release tag created during this continuation"
+  ],
+  "documentation": [
+    "docs/19-ContentCatalog.md",
+    "docs/29-OptimizationChangeLog.md",
+    "docs/32-CharacterQualityAndBalance.md",
+    "docs/33-Stage3CharactersTutorial.md"
+  ]
+}

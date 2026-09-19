@@ -34,6 +34,62 @@ bool ULKUnitMovementComponent::CanReach(const FVector& Target) const
     return LKNavigation::FindPath(GetOwner()->GetActorLocation(), FVector(Target.X, Target.Y, 0.f), Obstacles, Bounds, TestPath);
 }
 
+bool ULKUnitMovementComponent::CanStandAt(const FVector& Location, bool bIncludeUnits) const
+{
+    if (!GetOwner() || !GetWorld() || Location.ContainsNaN()) { return false; }
+    TArray<LKNavigation::FObstacle> Obstacles;
+    LKNavigation::FBounds Bounds;
+    CollectNavigation(Obstacles, Bounds);
+    if (!LKNavigation::IsPointValid(Location, Obstacles, Bounds)) { return false; }
+    if (bIncludeUnits)
+    {
+        for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+        {
+            if (*It != GetOwner() && It->IsAlive() && FVector::Dist2D(Location, It->GetActorLocation()) < SeparationRadius + It->GetBodyRadius() + 1.f) { return false; }
+        }
+    }
+    return true;
+}
+
+bool ULKUnitMovementComponent::TeleportToFreePoint(const FVector& Location)
+{
+    if (!CanStandAt(Location, true)) { return false; }
+    Stop(); Path.Reset(); RepathTimer = 0.f;
+    GetOwner()->SetActorLocation(FVector(Location.X, Location.Y, 0.f));
+    return true;
+}
+
+FVector ULKUnitMovementComponent::MoveSkillDelta(const FVector& Delta)
+{
+    ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
+    if (!Self || !Self->IsAlive() || Self->IsBuilding() || Delta.ContainsNaN()) { return Self ? Self->GetActorLocation() : FVector::ZeroVector; }
+    Stop(); Path.Reset(); RepathTimer = 0.f;
+    TArray<LKNavigation::FObstacle> Obstacles;
+    LKNavigation::FBounds Bounds;
+    CollectNavigation(Obstacles, Bounds);
+    const FVector Start = Self->GetActorLocation();
+    FVector Step(Delta.X, Delta.Y, 0.f);
+    auto CanMove = [&](float Fraction)
+    {
+        const FVector End = Start + Step * Fraction;
+        return LKNavigation::IsPointValid(End, Obstacles, Bounds) && LKNavigation::IsSegmentClear(Start, End, Obstacles);
+    };
+    float Fraction = 1.f;
+    if (!CanMove(Fraction))
+    {
+        float Low = 0.f, High = 1.f;
+        // Segment-clear tests catch narrow obstacles even when the destination is beyond them.
+        for (int32 I = 0; I < 16; ++I)
+        {
+            const float Middle = (Low + High) * .5f;
+            if (CanMove(Middle)) { Low = Middle; } else { High = Middle; }
+        }
+        Fraction = Low;
+    }
+    if (CanMove(Fraction)) { Self->SetActorLocation(Start + Step * Fraction); }
+    return Self->GetActorLocation();
+}
+
 void ULKUnitMovementComponent::MoveToward(const FVector& InDestination, float InSpeed)
 {
     if (!bMoving || FVector::DistSquared2D(InDestination, Destination) > FMath::Square(25.f)) { RepathTimer = 0.f; }
@@ -46,6 +102,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
+    if (Self && (Self->IsSkillMoving() || Self->IsControlled())) { return; }
     if (!Self || !Self->IsAlive() || Self->IsBuilding() || DeltaTime <= 0.f
         || (!Self->IsCombatEnabled() && !Self->IsManualMoving())) { return; }
     RepathTimer -= DeltaTime;

@@ -1,0 +1,125 @@
+{
+  "note": "家园 H1～H5 场景与 UI 收尾；保留 Home-Validation.json 的上一批 44 项历史记录。",
+  "date": "2026-09-10",
+  "engine": "UE 5.8.1-56057345",
+  "target": "little_kingEditor Win64 Development",
+  "build": {
+    "result": "Succeeded",
+    "log": "Saved/Logs/HomeUIBuild11.log"
+  },
+  "automation": {
+    "reportCreatedOn": "2026.09.10-06.35.06",
+    "succeeded": 20,
+    "succeededWithWarnings": 27,
+    "total": 47,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/HomeUIFinal3/index.json",
+    "log": "Saved/Logs/HomeUIFinal3Tests.log",
+    "homeUITests": [
+      {
+        "fullTestPath": "LittleKing.HomeUI.AuthoredAssetsAndContent",
+        "state": "Success",
+        "warnings": 0,
+        "errors": 0
+      },
+      {
+        "fullTestPath": "LittleKing.HomeUI.DraftConfirmationAndDetails",
+        "state": "Success",
+        "warnings": 2,
+        "errors": 0
+      },
+      {
+        "fullTestPath": "LittleKing.HomeUI.RosterButtonsAndSafeReturn",
+        "state": "Success",
+        "warnings": 4,
+        "errors": 0
+      }
+    ],
+    "warningContext": "NullRHI 测试世界无 GameViewport、无场景相机及被测回退路径；本轮为 47 项 Success，不宣称自动化日志零警告。"
+  },
+  "blueprints": {
+    "compiled": 6,
+    "errors": 0,
+    "warnings": 0,
+    "failedToLoad": 0,
+    "log": "Saved/Logs/HomeUIFinalBlueprintCompile.log",
+    "assets": [
+      "BP_ALKBattleGameMode",
+      "WBP_BattleHUD",
+      "GA_KnightHeal",
+      "GA_MageNova",
+      "GA_RangerShot",
+      "Home/BP_HomeGameMode"
+    ]
+  },
+  "assetInspection": {
+    "result": "Success",
+    "log": "Saved/Logs/HomeUIFinalAssetInspection.log",
+    "map": "/Game/Maps/L_Home",
+    "gameMode": "/Game/blueprint/Home/BP_HomeGameMode",
+    "gameData": "/Game/Data/DA_GameData",
+    "camera": {
+      "location": [
+        0,
+        0,
+        3000
+      ],
+      "pitch": -90,
+      "yaw": 0,
+      "roll": 0,
+      "projection": "Orthographic",
+      "orthoWidth": 2400
+    }
+  },
+  "rendering": {
+    "method": "UE D3D12 RenderOffscreen（真实游戏渲染，包含 UMG）",
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "capturesPerResolution": 8,
+    "states": [
+      "Home overview",
+      "Statue",
+      "Library",
+      "Hero house",
+      "Treasury",
+      "Barracks",
+      "War room cards",
+      "Gate"
+    ],
+    "logs": [
+      "Saved/Logs/HomeUIRender-1280x720.log",
+      "Saved/Logs/HomeUIRender-1920x1080.log"
+    ],
+    "allCaptures": "Saved/Screenshots/HomeUI",
+    "deliveredExamples": [
+      "docs/images/HomeOverview.png",
+      "docs/images/HomeWarRoom.png",
+      "docs/images/HomeGate.png"
+    ],
+    "fixesVerified": [
+      "中文名称可读",
+      "彩色方块和道路可见",
+      "地面填满视口",
+      "名称牌不会完全遮住建筑",
+      "底部提示不与快捷栏重叠",
+      "面板缩放、可滚动列表/详情和固定操作区",
+      "卡牌勾选标记无换行"
+    ]
+  },
+  "persistenceSafety": {
+    "preview": "随机命名独立 Profile，演示金币不写入正式档，完成后清理",
+    "newTests": "随机命名独立 Profile/Run 槽，析构清理",
+    "regressionBaseline": "Saved/HomeUIValidationBaseline-20260910/manifest.json",
+    "beforeCount": 0,
+    "afterCount": 0
+  },
+  "limitations": [
+    "自动化触发真实 UButton 回调和安全点切图请求，但未用人工鼠标完整手打一轮往返远征；操作手感按教程确认。",
+    "最终美术、音效、打包和硬件测试继续后置。"
+  ],
+  "tutorial": "docs/28-HomeTutorial.md",
+  "changeLog": "docs/27-HomeChangeLog.md"
+}

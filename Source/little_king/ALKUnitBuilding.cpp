@@ -21,7 +21,7 @@ void ALKUnitBuilding::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (IsDead() || !IsCombatEnabled())
+	if (IsDead() || !IsCombatEnabled() || IsControlled())
 	{
 		return;
 	}

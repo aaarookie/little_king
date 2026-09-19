@@ -30,6 +30,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ELKCardType CardType = ELKCardType::Unit;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Content")
+    ELKSpellGrade SpellGrade = ELKSpellGrade::Novice1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Content")
+    bool bExpeditionOnly = false;
+
 	/** 角色卡：生成的单位 ID（DT_Units） */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "CardType==ELKCardType::Unit", EditConditionHides))
 	FName SpawnUnitId = NAME_None;

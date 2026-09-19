@@ -23,12 +23,27 @@ struct FLKTraitModifier
 
 /**
  * DT_Units 行：单位属性与表现参数。
- * 13 个内置核心 ID 的玩法身份字段会由 LKUnitContent 在运行时校正；自定义 ID 完全按表读取。
+ * 内置 ID 的玩法身份字段由 LKUnitContent 在运行时校正；自定义 ID 完全按表读取。
  */
 USTRUCT(BlueprintType)
 struct FLKUnitRow : public FTableRowBase
 {
 	GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") ELKQuality Quality = ELKQuality::Common;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") ELKRace Race = ELKRace::Human;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") ELKActiveAbility ActiveAbility = ELKActiveAbility::None;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity", meta = (ClampMin = "1", ClampMax = "8")) int32 DeckSlots = 1;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") bool bTargetsBuildingsOnly = false;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0.1")) float EmpowerDuration = 8.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "1")) float EmpowerMoveMultiplier = 1.3f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0.1", ClampMax = "1")) float EmpowerIntervalMultiplier = .75f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0")) float SkillDamageMultiplier = 2.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0", ClampMax = "1")) float SkillSilverChance = .3f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0")) float SkillDashDistance = 450.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "1")) float SkillDashSpeed = 1800.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0")) float SkillHitRadius = 100.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0")) float SkillKnockbackDistance = 120.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName UnitId;

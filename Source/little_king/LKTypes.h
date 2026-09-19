@@ -118,7 +118,41 @@ enum class ELKTraitEffect : uint8
 };
 
 UENUM(BlueprintType)
-enum class ELKPassiveAbility : uint8 { None, UndeadSummoning, GiantBones, BoneRegeneration };
+enum class ELKPassiveAbility : uint8
+{
+    None, UndeadSummoning, GiantBones, BoneRegeneration, AttackRenewal, SharedSpring, TauntImmunity, Loot, TrollKing, TwinBreath
+};
+
+UENUM(BlueprintType)
+enum class ELKQuality : uint8
+{
+    Common UMETA(DisplayName = "普通"), Uncommon UMETA(DisplayName = "优秀"),
+    Rare UMETA(DisplayName = "稀有"), Epic UMETA(DisplayName = "史诗"), Legendary UMETA(DisplayName = "传说")
+};
+
+UENUM(BlueprintType)
+enum class ELKRace : uint8
+{
+    Human UMETA(DisplayName = "人类"), Elf UMETA(DisplayName = "精灵"),
+    Goblin UMETA(DisplayName = "哥布林"), Undead UMETA(DisplayName = "亡灵"), None UMETA(DisplayName = "无"),
+    Troll UMETA(DisplayName = "巨魔"), Dragon UMETA(DisplayName = "龙"), Construct UMETA(DisplayName = "构装体")
+};
+
+UENUM(BlueprintType)
+enum class ELKActiveAbility : uint8 { None, Backstab, MimicSpell, MakeWay, TrollEmpower };
+
+UENUM(BlueprintType)
+enum class ELKBreathHead : uint8 { None, Ice, Fire };
+
+UENUM(BlueprintType)
+enum class ELKSpellGrade : uint8
+{
+    Novice1 UMETA(DisplayName = "初阶一级"), Novice2 UMETA(DisplayName = "初阶二级"), Novice3 UMETA(DisplayName = "初阶三级"),
+    Intermediate1 UMETA(DisplayName = "中阶一级"), Intermediate2 UMETA(DisplayName = "中阶二级"), Intermediate3 UMETA(DisplayName = "中阶三级"),
+    Advanced1 UMETA(DisplayName = "高阶一级"), Advanced2 UMETA(DisplayName = "高阶二级"), Advanced3 UMETA(DisplayName = "高阶三级"),
+    Divine1 UMETA(DisplayName = "神阶一级"), Divine2 UMETA(DisplayName = "神阶二级"), Divine3 UMETA(DisplayName = "神阶三级"),
+    Divine4 UMETA(DisplayName = "神阶四级"), Divine5 UMETA(DisplayName = "神阶五级")
+};
 
 /** 遭遇强度只描述内容与奖励层级；路线节点类型仍由 ELKDungeonNodeType 决定。 */
 UENUM(BlueprintType)

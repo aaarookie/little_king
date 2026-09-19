@@ -1,4 +1,6 @@
 #include "ALKPresentationHUD.h"
+#include "LKCardPresentation.h"
+#include "ULKUnitStatusComponent.h"
 #include "ALKBattleGameMode.h"
 #include "ALKPlayerController.h"
 #include "ALKHeroCamp.h"
@@ -95,7 +97,8 @@ void ALKPresentationHUD::DrawHUD()
 			DrawRect(Color, Screen.X - Size * 0.5f, Screen.Y - Size * 0.5f, Size, Size);
 			if (Unit->GetPlaceholderColor().A > 0.f)
 			{
-				DrawText(Unit->GetDisplayName().ToString(), Color, Screen.X - Size, Screen.Y + Size * 0.6f, nullptr, 0.8f * Scale);
+				DrawText(FString::Printf(TEXT("%s·%s"), *Unit->GetDisplayName().ToString(), *LKCardPresentation::QualityName(Unit->GetQuality()).ToString()),
+                    LKCardPresentation::QualityColor(Unit->GetQuality()), Screen.X - Size, Screen.Y + Size * 0.6f, nullptr, 0.8f * Scale);
 			}
 		}
 		const float Width = (Unit->IsHero() ? 52.f : 36.f) * Scale;
@@ -109,6 +112,13 @@ void ALKPresentationHUD::DrawHUD()
 		}
 		if (Unit->IsUnderFocusWarning()) { DrawText(TEXT("!"), FLinearColor::Yellow, Screen.X - 3.f * Scale, Top - 25.f * Scale, nullptr, 1.3f * Scale); }
 		if (Unit->IsTaunting()) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius() + 6.f, FLinearColor(1.f, 0.75f, 0.2f)); }
+        const ULKUnitStatusComponent* Status = Unit->GetStatusComponent();
+        FString StatusLabel;
+        if (Status->IsStunned()) { StatusLabel += TEXT("眩晕 "); }
+        if (Status->IsFrozen()) { StatusLabel += TEXT("冰冻 "); }
+        if (Status->IsEmpowered()) { StatusLabel += FString::Printf(TEXT("强化 %.0f%% "), Status->GetStunMeter() * 100.f); }
+        if (Status->GetBurnStacks() > 0) { StatusLabel += FString::Printf(TEXT("点燃×%d"), Status->GetBurnStacks()); }
+        if (!StatusLabel.IsEmpty()) { DrawText(StatusLabel, FLinearColor(1.f,.8f,.25f), Screen.X - 28.f * Scale, Top - 17.f * Scale, nullptr, .75f * Scale); }
 		if (GM->GetGameData()->bDrawTeamRing) { DrawWorldCircle(Unit->GetActorLocation(), Unit->GetBodyRadius(), TeamColor); }
 	}
 	for (TActorIterator<ALKProjectile> It(GetWorld()); It; ++It)
@@ -118,7 +128,9 @@ void ALKPresentationHUD::DrawHUD()
 		const FVector Head = (*It)->GetActorLocation();
 		if (ProjectPoint(Head, A) && ProjectPoint(Head - (*It)->GetFlightDirection() * 65.f, B))
 		{
-			DrawLine(A.X, A.Y, B.X, B.Y, FLinearColor(1.f, 0.83f, 0.3f), 2.f * Scale);
+            const FLinearColor ShotColor = It->GetBreathHead() == ELKBreathHead::Ice ? FLinearColor(.3f,.8f,1.f)
+                : (It->GetBreathHead() == ELKBreathHead::Fire ? FLinearColor(1.f,.3f,.1f) : FLinearColor(1.f,.83f,.3f));
+			DrawLine(A.X, A.Y, B.X, B.Y, ShotColor, 2.f * Scale);
 			DrawRect(FLinearColor::White, A.X - Scale, A.Y - Scale, 2.f * Scale, 2.f * Scale);
 		}
 	}
@@ -128,7 +140,19 @@ void ALKPresentationHUD::DrawHUD()
 		DrawWorldCircle(Preview, Radius, bValid ? FLinearColor::Green : FLinearColor::Red, 2.f);
 		if (AttackRadius > 0.f)
 		{
-			DrawWorldCircle(Preview, AttackRadius, bValid ? FLinearColor(1.f, 0.75f, 0.15f) : FLinearColor::Red, 1.5f * Scale);
+            const FLinearColor RangeColor = bValid ? FLinearColor(1.f,.75f,.15f) : FLinearColor::Red;
+            const float HalfHeight = GM->GetGameData()->FieldHalfHeight;
+            if (AttackRadius >= FVector2D(HalfWidth, HalfHeight).Size() * 2.f)
+            {
+                const FVector Corners[] = { {-HalfWidth,-HalfHeight,0}, {HalfWidth,-HalfHeight,0}, {HalfWidth,HalfHeight,0}, {-HalfWidth,HalfHeight,0} };
+                for (int32 Edge = 0; Edge < 4; ++Edge)
+                {
+                    FVector2D A, B;
+                    if (ProjectPoint(Corners[Edge], A) && ProjectPoint(Corners[(Edge + 1) % 4], B)) { DrawLine(A.X,A.Y,B.X,B.Y,RangeColor,2.f * Scale); }
+                }
+                DrawText(TEXT("全图射程 · 仅攻击敌方建筑"), RangeColor, 24.f * Scale, 90.f * Scale, nullptr, Scale);
+            }
+            else { DrawWorldCircle(Preview, AttackRadius, RangeColor, 1.5f * Scale); }
 		}
 	}
 	const float Delta = GetWorld()->GetDeltaSeconds();
@@ -148,11 +172,16 @@ void ALKPresentationHUD::DrawHUD()
 	if (TipRemaining > 0.f) { DrawText(Tip, FLinearColor::Yellow, Canvas->ClipX * 0.32f, Canvas->ClipY * 0.16f, nullptr, Scale); }
 	if (GM->GetPhase() == ELKGamePhase::Deployment)
 	{
-		DrawText(FString::Printf(TEXT("部署英雄 %d / %d；全部部署后点击开始"), GM->GetDeployedPlayerHeroCount(), GM->GetRequiredHeroCount()), FLinearColor::White, 24.f * Scale, 30.f * Scale, nullptr, Scale);
+		DrawText(FString::Printf(TEXT("部署英雄 %d / %d；全部部署后点击「开始」或按空格/回车"), GM->GetDeployedPlayerHeroCount(), GM->GetRequiredHeroCount()), FLinearColor::White, 24.f * Scale, 30.f * Scale, nullptr, Scale);
 		if (!GM->HasValidDecks())
 		{
 			DrawText(TEXT("牌库配置无效：每方至少 HandSize + 1 种卡，且均需加入 CardLibrary"), FLinearColor::Yellow, 24.f * Scale, 60.f * Scale, nullptr, Scale);
 		}
+	}
+	else if (GM->GetPhase() == ELKGamePhase::Battle && !GM->IsAnyUnitCombatEnabled())
+	{
+		// 兜底提示：战斗阶段却没有任何单位处于可战斗状态（面对面不攻击类问题一眼可见）。
+		DrawText(TEXT("战斗已开始但单位均被冻结：请查看日志 [Battle] 无法进入战斗阶段"), FLinearColor::Red, 24.f * Scale, 30.f * Scale, nullptr, Scale);
 	}
 }
 

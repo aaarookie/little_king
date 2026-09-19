@@ -10,6 +10,10 @@ class UHorizontalBox;
 class UImage;
 class UTextBlock;
 class ULKBattleHUDWidget;
+class UVerticalBox;
+class UScrollBox;
+class UUniformGridPanel;
+class ULKHomeListButtonWidget;
 
 /**
  * D3 默认奖励界面。纯 C++ 构建完整可用的 UMG 树，零额外资产也能显示；
@@ -28,6 +32,9 @@ public:
 	bool ChooseOption(int32 Index);
 	UFUNCTION(BlueprintCallable, Category = "LK|Run|UI")
 	bool SkipReward();
+    UFUNCTION(BlueprintCallable, Category = "LK|Run|UI") bool ChooseReplacement(int32 CardIndex);
+    UFUNCTION(BlueprintCallable, Category = "LK|Run|UI") bool ConfirmReplacements();
+    UFUNCTION(BlueprintPure, Category = "LK|Run|UI") bool IsChoosingReplacement() const { return PendingOptionIndex != INDEX_NONE || bReducingLegacyDeck; }
 
 	UFUNCTION(BlueprintPure, Category = "LK|Run|UI")
 	int32 GetDisplayedOptionCount() const { return DisplayedOptionCount; }
@@ -49,16 +56,31 @@ private:
 	void SetInteractionEnabled(bool bEnabled);
 	FText BuildOptionDetail(int32 Index) const;
 	FText BuildDeckSummary() const;
+    void ShowReplacementChoices();
+    UFUNCTION() void HandleConfirmReplacements();
+    UPROPERTY(Transient) TObjectPtr<UButton> ConfirmReplacementButton;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> ReplacementBudget;
+    TArray<FName> SelectedReplacementIds;
 
 	UFUNCTION() void HandleOption0Clicked();
 	UFUNCTION() void HandleOption1Clicked();
 	UFUNCTION() void HandleOption2Clicked();
 	UFUNCTION() void HandleSkipClicked();
+	UFUNCTION() void HandleReturnHomeClicked();
 
 	UPROPERTY(Transient) TObjectPtr<UTextBlock> ProgressText;
 	UPROPERTY(Transient) TObjectPtr<UTextBlock> DeckSummaryText;
 	UPROPERTY(Transient) TObjectPtr<UTextBlock> StatusText;
 	UPROPERTY(Transient) TObjectPtr<UButton> SkipButton;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> SkipLabel;
+    UPROPERTY(Transient) TObjectPtr<UHorizontalBox> Options;
+    UPROPERTY(Transient) TObjectPtr<UVerticalBox> ReplacementPanel;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> ReplacementTitle;
+    UPROPERTY(Transient) TObjectPtr<UScrollBox> ReplacementList;
+    UPROPERTY(Transient) TObjectPtr<UUniformGridPanel> ReplacementGrid;
+    TArray<FName> ReplacementCardIds;
+    int32 PendingOptionIndex = INDEX_NONE;
+    bool bReducingLegacyDeck = false;
 	UPROPERTY(Transient) TArray<TObjectPtr<UButton>> OptionButtons;
 	UPROPERTY(Transient) TArray<TObjectPtr<UTextBlock>> OptionKindTexts;
 	UPROPERTY(Transient) TArray<TObjectPtr<UTextBlock>> OptionTitleTexts;

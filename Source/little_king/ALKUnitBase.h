@@ -16,6 +16,8 @@ class ULKUnitMovementComponent;
 class ULKTraitAuraComponent;
 class ULKGameData;
 class ULKUnitPassiveComponent;
+class ULKUnitActiveComponent;
+class ULKUnitStatusComponent;
 struct FLKUnitRow;
 struct FLKRunHeroState;
 
@@ -30,6 +32,7 @@ class ALKUnitBase : public AActor, public IAbilitySystemInterface
 	GENERATED_BODY()
 	friend struct FLKSprint5TestAccess;
 	friend struct FLKD2TestAccess;
+    friend struct FLKTrollTestAccess;
 
 public:
 	ALKUnitBase();
@@ -45,6 +48,14 @@ public:
 	FLinearColor GetPlaceholderColor() const { return PlaceholderColor; }
 	FText GetDisplayName() const { return DisplayName; }
 	ULKUnitPassiveComponent* GetPassiveComponent() const { return PassiveComponent; }
+    ULKUnitActiveComponent* GetActiveComponent() const { return ActiveComponent; }
+    ULKUnitStatusComponent* GetStatusComponent() const { return StatusComponent; }
+    UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsControlled() const;
+    bool TargetsBuildingsOnly() const { return bTargetsBuildingsOnly; }
+    ULKUnitMovementComponent* GetMovementComponent() const { return MovementComponent; }
+    ELKRace GetRace() const { return Race; }
+    ELKQuality GetQuality() const { return Quality; }
+    bool IsSkillMoving() const;
 	TArray<FName> GetTraits() const { return HeroTraits; }
 	float GetTraitEffectValue(ELKTraitEffect Effect) const;
 	void SetFocusWarning(float Seconds) { FocusWarningRemaining = FMath::Max(0.f, Seconds); }
@@ -267,6 +278,11 @@ protected:
 	TObjectPtr<ULKTraitAuraComponent> TraitAuraComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<ULKUnitPassiveComponent> PassiveComponent;
+    UPROPERTY(VisibleAnywhere, Category = "LK|Unit") TObjectPtr<ULKUnitActiveComponent> ActiveComponent;
+    UPROPERTY(VisibleAnywhere, Category = "LK|Unit") TObjectPtr<ULKUnitStatusComponent> StatusComponent;
+    bool bTargetsBuildingsOnly = false;
+    ELKRace Race = ELKRace::Human;
+    ELKQuality Quality = ELKQuality::Common;
 	void RestoreHeroLife(float Health, bool bResumeCombat);
 
 	/** 缓存全局配置（InitUnit 时注入） */

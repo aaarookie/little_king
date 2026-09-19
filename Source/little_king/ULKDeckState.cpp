@@ -1,4 +1,5 @@
 #include "ULKDeckState.h"
+#include "LKCardRules.h"
 
 bool ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimit, int32 Seed)
 {
@@ -53,7 +54,7 @@ TArray<FName> ULKDeckState::GetAllCards() const
 
 bool ULKDeckState::AddCardToDeck(FName CardId)
 {
-    if (!IsReady() || CardId.IsNone() || ContainsCard(CardId)) { return false; }
+    if (!IsReady() || LKCardRules::Used(GetAllCards()) + LKCardRules::Slots(CardId) > LKCardRules::Capacity || CardId.IsNone() || ContainsCard(CardId)) { return false; }
     DrawPile.Add(CardId);
     BroadcastHandChanged();
     return true;
@@ -75,7 +76,8 @@ bool ULKDeckState::RemoveCardFromDeck(FName CardId)
 
 bool ULKDeckState::TransformCard(FName OldCardId, FName NewCardId)
 {
-    if (!IsReady() || NewCardId.IsNone() || ContainsCard(NewCardId)) { return false; }
+    if (!IsReady() || NewCardId.IsNone() || ContainsCard(NewCardId)
+        || LKCardRules::Used(GetAllCards()) - LKCardRules::Slots(OldCardId) + LKCardRules::Slots(NewCardId) > LKCardRules::Capacity) { return false; }
     for (TArray<FName>* Pile : { &Hand, &DrawPile })
     {
         const int32 Index = Pile->IndexOfByKey(OldCardId);

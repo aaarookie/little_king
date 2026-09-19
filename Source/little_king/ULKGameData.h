@@ -223,6 +223,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSoftObjectPtr<class UDataTable> WaveTable;
 
+	// ---------- H3 家园/区域（阶段 3） ----------
+	/** 远征终态"返回家园"的地图名；地图不存在时结算按钮退回"从头开始"（独立战斗调试） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Home")
+	FName HomeMapName = "L_Home";
+
+	/** 家园出征默认打开的战斗地图（区域定义可用自己的 MapName 覆盖） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Home")
+	FName BattleMapName = "L_BattleTest";
+
 	/** D2 遭遇表；为空使用三个内置行，非空时必须包含固定三房的全部稳定 ID。 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSoftObjectPtr<class UDataTable> EncounterTable;
@@ -240,4 +249,11 @@ public:
 
 	/** 确保有可用的默认牌库（编辑器未配置时兜底） */
 	void EnsureDefaultDecks();
+
+	/**
+	 * 确保运行时卡牌目录可用（只改运行时副本，不写资产）：
+	 * CardLibrary 为空时注入七张内置卡；并始终保证 D3 奖励卡（骷髅兵/骷髅射手）存在。
+	 * 战斗 GameMode 与家园 GameMode 共用，避免家园收藏页读到空目录。
+	 */
+	void EnsureCardLibrary();
 };

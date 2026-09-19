@@ -1,0 +1,140 @@
+{
+  "stage": "Optimization 3 extension: troll and siege cards",
+  "date": "2026-09-17",
+  "engine": "Unreal Engine 5.8.1",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/TrollCardsBuild05.log"
+  },
+  "automation": {
+    "filter": "LittleKing",
+    "passed": 72,
+    "passedWithoutWarnings": 30,
+    "passedWithWarnings": 42,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/TrollCards03/index.json",
+    "log": "Saved/Logs/TrollCardsTests03.log",
+    "buildAtFullRegression": "Saved/Logs/TrollCardsBuild04.log",
+    "newTests": [
+      {
+        "fullTestPath": "LittleKing.TrollCards.UI.MultiSelectAndRender",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.ContentAndWeightedDeck",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.EmpowerControlAndSixthAttack",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.KingSupportHealthRatio",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.MultiReplacementAtomicity",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.SharedBreathBurnAndPool",
+        "state": "Success"
+      },
+      {
+        "fullTestPath": "LittleKing.TrollCards.SiegeOnlyBuildingsAcrossMap",
+        "state": "Success"
+      }
+    ],
+    "coverage": [
+      "28 native units, 24 cards, 15 temporary definitions, identity fallback and treasury affordability",
+      "Weighted 8-slot deck, at least 5 distinct cards, 60 unique/full four-slot cycles",
+      "Atomic multi-card replacement, invalid selections, failed save rollback and duplicate claim rejection",
+      "Troll support presence and removal, proportional health without heal/damage, sixth attack",
+      "Empower target priority, self-stun meter, king stun immunity, freeze, controlled movement/attack/skill blocking",
+      "Shared target breath history, burn stacks and refresh cadence, dead launcher payload and pool reset",
+      "Siege building-only eligibility despite taunt/focus, full map travel and mercenary interception exclusion",
+      "Real UMG multi-select, toggle, confirmation and persistence; authored battle HUD card labels"
+    ],
+    "warnings": "42 suites include expected invalid-input/save-failure warnings or existing test-world/camera/GameplayCue warnings; not a zero-warning run."
+  },
+  "finalUITest": {
+    "filter": "LittleKing.TrollCards.UI",
+    "passed": 1,
+    "passedWithoutWarnings": 0,
+    "passedWithWarnings": 1,
+    "failed": 0,
+    "notRun": 0,
+    "report": "Saved/Automation/TrollCardsUI04/index.json",
+    "log": "Saved/Logs/TrollCardsUI04.log",
+    "reason": "After full regression only reward detail and compact replacement row layout changed; rebuilt and reran affected UI test with rendering."
+  },
+  "visualReview": {
+    "method": "UE RenderOffscreen FWidgetRenderer captures inspected locally",
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "screens": [
+      "Weighted hand at 720p",
+      "Rewards at 720p/1080p",
+      "Multi-card replacement with eight visible options and confirm at 720p/1080p"
+    ],
+    "sharedImages": [
+      "docs/images/TrollCardsHand.png",
+      "docs/images/TrollCardsRewards.png",
+      "docs/images/TrollCardsReplacement.png",
+      "docs/images/TrollCardsRewards-1080p.png",
+      "docs/images/TrollCardsReplacement-1080p.png"
+    ]
+  },
+  "saveProtection": {
+    "baseline": "Saved/TrollCardsBaseline-20260916/saves.json",
+    "unchangedOriginalFiles": [
+      {
+        "file": "LittleKing_Profile_A.sav",
+        "sha256": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Profile_B.sav",
+        "sha256": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Profile_A.sav",
+        "sha256": "55D4849EFA1F6286015F29BD472590FADE65B5F539B9F4086F2F63EB15538DAE",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Profile_B.sav",
+        "sha256": "473D2027DA1842EA51CA6A58B1E0FE0407CB93F9E122A2140F190BF02D92FA32",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Save02_Run.sav",
+        "sha256": "16C2E66F7ADB6A70861AE5962547ED59E532B17875A2B10D92FB882D1850434B",
+        "unchanged": true
+      }
+    ],
+    "remainingTemporarySaveFiles": []
+  },
+  "limitations": [
+    "Initial balance only; no long-term playtesting",
+    "No formal art/audio, packaging or hardware acceptance testing",
+    "Troll empower stun meter interpreted as buffed unit self-stun; documented",
+    "Five distinct cards remain required for four unique hand slots and rapid cycling"
+  ],
+  "git": {
+    "commitCreated": false,
+    "tagCreated": false,
+    "preExistingWorkingTreeChangesPreserved": true
+  },
+  "documentationChecks": {
+    "documents": 11,
+    "localLinks": 143,
+    "brokenLinks": 0,
+    "gitDiffCheck": "passed"
+  }
+}

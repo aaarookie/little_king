@@ -90,6 +90,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LK|HUD")
 	FText GetResultActionLabel() const;
+	/** 部署槽跟随本轮队伍顺序，旧按钮名只作为表现挂点。 */
+	UFUNCTION(BlueprintPure, Category = "LK|HUD") FName GetDeploymentHeroId(int32 SlotIndex) const;
 
 	/** 按 CardId 查卡牌定义（图标/名称/费用），HUD 显示卡面用 */
 	UFUNCTION(BlueprintPure, Category = "LK|HUD")
@@ -117,6 +119,8 @@ public:
 	/** 原子领取第 Index 个奖励；成功后自动刷新结算按钮（"下一关"恢复可用） */
 	UFUNCTION(BlueprintCallable, Category = "LK|Run")
 	bool ChooseRunReward(int32 Index);
+    UFUNCTION(BlueprintCallable, Category = "LK|Run|UI") bool ChooseRunRewardReplacing(int32 Index, FName ReplacedCardId);
+    UFUNCTION(BlueprintCallable, Category = "LK|Run") bool ChooseRunRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds);
 
 	UFUNCTION(BlueprintCallable, Category = "LK|Run")
 	bool SkipRunReward();
@@ -209,6 +213,12 @@ protected:
 	void UnbindEvents();
 	void PushInitialState();
 	void BindResultActionButton();
+	void BindDeploymentButtons();
+	void RefreshDeploymentButtons();
+	void BeginHeroSlotPlacement(int32 SlotIndex);
+	UFUNCTION() void HandleHeroSlot0Clicked();
+	UFUNCTION() void HandleHeroSlot1Clicked();
+	UFUNCTION() void HandleHeroSlot2Clicked();
 	void RefreshResultActionButton();
 	void ShowRewardPanel();
 	void CloseRewardPanel();
@@ -222,6 +232,7 @@ protected:
 	/** 兼容现有 WBP_BattleHUD 中名为 Btn_Restart 的结算按钮。 */
 	UPROPERTY(Transient)
 	TObjectPtr<UButton> ResultActionButton;
+	UPROPERTY(Transient) TArray<TObjectPtr<UButton>> DeploymentButtons;
 
 	/** 可选的 ULKRunRewardWidget 蓝图子类；未设置时使用本轮提供的原生完整界面。 */
 	UPROPERTY(EditDefaultsOnly, Category = "LK|Run|UI")

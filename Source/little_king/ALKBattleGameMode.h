@@ -46,6 +46,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LK|Battle")
 	void ForceStartBattle();
 	UFUNCTION(BlueprintPure, Category = "LK|Battle") bool CanStartBattle() const;
+	/** 无法开战时逐条打印判据（部署/牌库/阶段/名单），供 PIE 排障 */
+	void LogStartBattleBlockers() const;
+	/** 是否至少有一个场上单位处于可战斗状态（HUD 兜底提示用） */
+	UFUNCTION(BlueprintPure, Category = "LK|Battle") bool IsAnyUnitCombatEnabled() const;
 	UFUNCTION(BlueprintPure, Category = "LK|Battle") bool HasValidDecks() const;
 	/** 放置预览的基础射程；非攻击建筑返回 0，临时战斗增益不计入。 */
 	UFUNCTION(BlueprintPure, Category = "LK|Battle") float GetBuildingPlacementAttackRange(FName CardId) const;
@@ -63,6 +67,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LK|Run") FText GetResultActionLabel() const;
 	/** 结算按钮入口：推进/重开状态后重载当前战斗地图。 */
 	UFUNCTION(BlueprintCallable, Category = "LK|Run") bool RequestResultAction();
+	UFUNCTION(BlueprintPure, Category = "LK|Home") FName GetHomeMapName() const;
+	/** 保存奖励/路线安全点或终态，然后返回家园；失败留在当前界面。 */
+	UFUNCTION(BlueprintCallable, Category = "LK|Home") bool ReturnToHome();
 
 	// ---------- D3 房间胜利奖励（三选一/跳过；经 RunSubsystem 原子落地） ----------
 	/** 是否存在待领取的奖励批次（有奖励时"下一关"不可点，必须先选或跳过） */
@@ -71,6 +78,8 @@ public:
 	/** 第 Index 个候选（展示用；越界返回空结构） */
 	UFUNCTION(BlueprintPure, Category = "LK|Run") FLKRunRewardOffer GetRunRewardOffer(int32 Index) const;
 	UFUNCTION(BlueprintCallable, Category = "LK|Run") bool ChooseRunReward(int32 Index);
+    UFUNCTION(BlueprintCallable, Category = "LK|Run") bool ChooseRunRewardReplacing(int32 Index, FName ReplacedCardId);
+    UFUNCTION(BlueprintCallable, Category = "LK|Run") bool ChooseRunRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds);
 	UFUNCTION(BlueprintCallable, Category = "LK|Run") bool SkipRunReward();
 
 	// ---------- D4 节点选择（打完并领完奖励后出现；只显示下一排） ----------
@@ -268,6 +277,10 @@ protected:
 	void TryInitPlayerState();
 	/** BUG-017：代码身份特性表（DefaultHeroTraits + 单位行内代码特性），用于载入旧档后补全英雄特性。 */
 	TMap<FName, TArray<FName>> CollectIdentityTraits() const;
+	/** H3：用永久档的已保存战备组装出征输入；没有永久档时返回 false（退回默认名单/独立测试） */
+	bool TryBuildProfileStartRequest(FLKExpeditionStartRequest& OutRequest) const;
+	/** 终态（通关/失败/放弃）判定：结果按钮在终态改为"返回家园" */
+	bool IsTerminalRun() const;
 	void SetPhase(ELKGamePhase NewPhase);
 	/** 统一开关所有单位的战斗状态（部署阶段冻结，开战/结算时更新） */
 	void ApplyCombatEnabledToAllUnits(bool bEnabled);

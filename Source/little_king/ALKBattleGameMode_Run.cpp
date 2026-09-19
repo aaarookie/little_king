@@ -6,9 +6,13 @@
 
 #include "LKDataTypes.h"
 #include "LKEncounterContent.h"
+#include "LKHomeContent.h"
+#include "LKWorldMapContent.h"
 #include "LKLog.h"
 #include "LKUnitContent.h"
+#include "LKExpeditionMercenaryContent.h"
 #include "ULKGameData.h"
+#include "ULKProfileSubsystem.h"
 #include "ULKRunSubsystem.h"
 
 ULKRunSubsystem* ALKBattleGameMode::GetRunSubsystem() const
@@ -48,58 +52,11 @@ TArray<FLKRunHeroState> ALKBattleGameMode::BuildInitialRunHeroes() const
 
 bool ALKBattleGameMode::BuildEncounterCatalog(TArray<FLKEncounterRow>& OutCatalog, FString& OutError) const
 {
-	OutCatalog.Reset();
-	OutError.Reset();
-	if (!GameData) { OutError = TEXT("GameData 为空"); return false; }
-	UDataTable* Table = nullptr;
-	if (!GameData->EncounterTable.IsNull())
-	{
-		Table = GameData->EncounterTable.LoadSynchronous();
-		if (!Table) { OutError = TEXT("EncounterTable 资源加载失败"); return false; }
-	}
-	if (!LKEncounterContent::BuildCatalog(Table, OutCatalog, OutError)) { return false; }
-	for (const FLKEncounterRow& Encounter : OutCatalog)
-	{
-		for (FName HeroId : Encounter.EnemyHeroIds)
-		{
-			const FLKUnitRow* Row = GetUnitRow(HeroId);
-			if (!Row || (Row->UnitClass != ELKUnitClass::Hero && Row->UnitClass != ELKUnitClass::Boss))
-			{
-				OutError = FString::Printf(TEXT("遭遇 %s 的英雄 %s 不存在或类别错误"),
-					*Encounter.EncounterId.ToString(), *HeroId.ToString());
-				OutCatalog.Reset();
-				return false;
-			}
-		}
-		for (const FLKWaveEntry& Wave : Encounter.Waves)
-		{
-			const FLKUnitRow* Row = GetUnitRow(Wave.UnitId);
-			if (!Row || Row->UnitClass == ELKUnitClass::Hero || Row->UnitClass == ELKUnitClass::Boss)
-			{
-				OutError = FString::Printf(TEXT("遭遇 %s 的波次单位 %s 不存在或类别错误"),
-					*Encounter.EncounterId.ToString(), *Wave.UnitId.ToString());
-				OutCatalog.Reset();
-				return false;
-			}
-		}
-		if (Encounter.bEnemyUsesCards && Encounter.EnemyCards.Num() < GameData->HandSize + 1)
-		{
-			OutError = FString::Printf(TEXT("遭遇 %s 的敌方牌组少于 HandSize + 1"), *Encounter.EncounterId.ToString());
-			OutCatalog.Reset();
-			return false;
-		}
-		for (FName CardId : Encounter.EnemyCards)
-		{
-			if (!FindCard(CardId))
-			{
-				OutError = FString::Printf(TEXT("遭遇 %s 引用了未知卡牌 %s"),
-					*Encounter.EncounterId.ToString(), *CardId.ToString());
-				OutCatalog.Reset();
-				return false;
-			}
-		}
-	}
-	return true;
+	// H3：目录构造与逐行校验已抽到 LKEncounterContent，家园出征与战斗共用同一份口径。
+	return LKEncounterContent::BuildValidatedCatalog(GameData,
+		[this](FName UnitId) { return GetUnitRow(UnitId); },
+		[this](FName CardId) { return FindCard(CardId); },
+		OutCatalog, OutError);
 }
 
 TArray<FLKRunCardState> ALKBattleGameMode::BuildInitialRunCards() const
@@ -213,6 +170,26 @@ TMap<FName, TArray<FName>> ALKBattleGameMode::CollectIdentityTraits() const
     return Result;
 }
 
+bool ALKBattleGameMode::TryBuildProfileStartRequest(FLKExpeditionStartRequest& OutRequest) const
+{
+    const UGameInstance* Instance = GetGameInstance();
+    ULKProfileSubsystem* Profile = Instance ? Instance->GetSubsystem<ULKProfileSubsystem>() : nullptr;
+    if (!Profile || !Profile->EnsureProfile() || !Profile->HasProfile()) { return false; }
+
+    FName RegionId = Profile->GetLastSelectedRegionId();
+    if (RegionId.IsNone()) { RegionId = LKHomeContent::DefaultRegionId(); }
+    FString Error;
+    if (LKHomeContent::BuildExpeditionStartRequest(*Profile, GameData, RegionId,
+        [this](FName UnitId) { return GetUnitRow(UnitId); },
+        [this](FName CardId) { return FindCard(CardId); },
+        OutRequest, Error))
+    {
+        return true;
+    }
+    UE_LOG(LogLKBattle, Warning, TEXT("[Run] 永久档战备不可用于出征：%s（退回默认名单）"), *Error);
+    return false;
+}
+
 bool ALKBattleGameMode::InitializeExpeditionContext(bool bAutoStart)
 {
     if (!bAutoStart) { return false; }
@@ -221,6 +198,13 @@ bool ALKBattleGameMode::InitializeExpeditionContext(bool bAutoStart)
 
     bRecoveredJunction = false;
     bRecoveredTerminal = false;
+	// 新世界地图必须由玩家明确选节点；回家/重载不能暗中选择第一场战斗。
+	if (Run->HasRun() && Run->GetRunState().WorldMapVersion > 0
+		&& (Run->CanSelectNextNode() || Run->HasServiceNode() || Run->HasPendingRewardChoice()))
+	{
+		bRecoveredJunction = true; bExpeditionBattle = true;
+		return true;
+	}
 
     // D5：进程冷启动（内存无远征）且存在存档 → 按上次位置恢复。
     if (!Run->HasRun() && Run->HasSavedExpedition())
@@ -277,23 +261,44 @@ bool ALKBattleGameMode::InitializeExpeditionContext(bool bAutoStart)
     const TArray<FLKRunCardState> FreshCards = BuildInitialRunCards();
 	TArray<FLKEncounterRow> FreshEncounters;
 	FString EncounterError;
+
+	// H3：正式出征优先用永久档的已保存战备与区域；没有永久档（独立测试/旧档）才退回代码默认名单。
+	FLKExpeditionStartRequest ProfileRequest;
+	const bool bHasProfileRequest = TryBuildProfileStartRequest(ProfileRequest);
+
     if (!Run->HasRun())
     {
-		if (!BuildEncounterCatalog(FreshEncounters, EncounterError))
+		if (bHasProfileRequest)
 		{
-			UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法开始远征：%s"), *EncounterError);
-			return false;
+			ProfileRequest.Seed = GameData->BattleSeed;
+			if (!Run->StartNewRun(ProfileRequest)) { return false; }
 		}
-		if (!Run->StartNewRun(FreshHeroes, FreshCards, GameData->BattleSeed, FreshEncounters)) { return false; }
+		else
+		{
+			if (!BuildEncounterCatalog(FreshEncounters, EncounterError))
+			{
+				UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法开始远征：%s"), *EncounterError);
+				return false;
+			}
+			if (!Run->StartNewRun(FreshHeroes, FreshCards, GameData->BattleSeed, FreshEncounters)) { return false; }
+		}
     }
     else if (Run->IsTerminal())
     {
-		if (!BuildEncounterCatalog(FreshEncounters, EncounterError))
+		if (bHasProfileRequest)
 		{
-			UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法重新开始远征：%s"), *EncounterError);
-			return false;
+			ProfileRequest.Seed = Run->GetRunState().Seed;
+			if (!Run->RestartRun(ProfileRequest)) { return false; }
 		}
-		if (!Run->RestartRun(FreshHeroes, FreshCards, Run->GetRunState().Seed, FreshEncounters)) { return false; }
+		else
+		{
+			if (!BuildEncounterCatalog(FreshEncounters, EncounterError))
+			{
+				UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法重新开始远征：%s"), *EncounterError);
+				return false;
+			}
+			if (!Run->RestartRun(FreshHeroes, FreshCards, Run->GetRunState().Seed, FreshEncounters)) { return false; }
+		}
     }
     else if (Run->CanAdvance())
     {
@@ -316,6 +321,11 @@ FText ALKBattleGameMode::GetRunSummaryText() const
     else if (State.Phase == ELKRunPhase::Failed) { Header = TEXT("远征失败…"); }
     else { Header = TEXT("远征结束"); }
 
+    if (State.PendingSettlement.SettlementId.IsValid())
+    {
+        Header += FString::Printf(TEXT("\n带回 %d 金币%s"), State.PendingSettlement.GoldAmount,
+            State.PendingSettlement.bProfileApplied ? TEXT("（已入账）") : TEXT("（等待入账）"));
+    }
     if (Battles == 0) { return FText::FromString(Header); }
     const FLKBattleOutcome& Last = State.BattleHistory.Last();
     const FString WinLoss = Last.Stats.Winner == ELKTeam::Player ? TEXT("最后一战获胜") : TEXT("最后一战落败");
@@ -333,17 +343,69 @@ bool ALKBattleGameMode::StartNewRunFromRecovery()
         UE_LOG(LogLKBattle, Log, TEXT("[Run] 开始新远征被拒绝：当前不在恢复/终态世界"));
         return false;
     }
-    TArray<FLKEncounterRow> Encounters;
-    FString Error;
-    if (!BuildEncounterCatalog(Encounters, Error)
-        || !Run->RestartRun(BuildInitialRunHeroes(), BuildInitialRunCards(), Run->GetRunState().Seed, Encounters))
+
+    FLKExpeditionStartRequest ProfileRequest;
+    if (TryBuildProfileStartRequest(ProfileRequest))
     {
-        if (!Error.IsEmpty()) { UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法从头开始：%s"), *Error); }
-        return false;
+        ProfileRequest.Seed = Run->GetRunState().Seed;
+        if (!Run->RestartRun(ProfileRequest)) { return false; }
+    }
+    else
+    {
+        TArray<FLKEncounterRow> Encounters;
+        FString Error;
+        if (!BuildEncounterCatalog(Encounters, Error)
+            || !Run->RestartRun(BuildInitialRunHeroes(), BuildInitialRunCards(), Run->GetRunState().Seed, Encounters))
+        {
+            if (!Error.IsEmpty()) { UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法从头开始：%s"), *Error); }
+            return false;
+        }
     }
     bRecoveredJunction = false;
     bRecoveredTerminal = false;
     return ReloadBattleLevel();
+}
+
+bool ALKBattleGameMode::IsTerminalRun() const
+{
+    const ULKRunSubsystem* Run = GetRunSubsystem();
+    return bExpeditionBattle && Run && Run->IsTerminal();
+}
+
+FName ALKBattleGameMode::GetHomeMapName() const
+{
+    if (GameData && !GameData->HomeMapName.IsNone()) { return GameData->HomeMapName; }
+    return LKHomeContent::DefaultHomeMapName();
+}
+
+bool ALKBattleGameMode::ReturnToHome()
+{
+	if (bResultActionInProgress) { return false; }
+	ULKRunSubsystem* CurrentRun = GetRunSubsystem();
+	if (!CurrentRun || !CurrentRun->HasRun() || (Phase != ELKGamePhase::Result && !bRecoveredJunction && !bRecoveredTerminal)
+		|| (!CurrentRun->IsTerminal() && CurrentRun->GetRunPhase() != ELKRunPhase::ChoosingReward
+			&& CurrentRun->GetRunPhase() != ELKRunPhase::ChoosingNode && !CurrentRun->HasServiceNode())) { return false; }
+	if (!CurrentRun->SaveExpedition())
+	{
+		UE_LOG(LogLKBattle, Warning, TEXT("[Home] 当前安全点未保存，留在此处重试"));
+		return false;
+	}
+    const FName MapName = GetHomeMapName();
+    if (!LKHomeContent::DoesMapExist(MapName))
+    {
+        UE_LOG(LogLKBattle, Warning, TEXT("[Home] 找不到家园地图 %s：请按 docs/28 教程创建 L_Home；本次留在战斗结算界面"),
+            *MapName.ToString());
+        return false;
+    }
+    if (ULKRunSubsystem* Run = GetRunSubsystem())
+    {
+        // 终态金币交接（幂等；写失败保留待交接状态，下次进家园或重启会重试）。
+        Run->ApplyPendingSettlementToProfile();
+    }
+    bResultActionInProgress = true;
+    UE_LOG(LogLKBattle, Log, TEXT("[Home] 返回家园 %s"), *MapName.ToString());
+    UGameplayStatics::OpenLevel(this, MapName);
+    return true;
 }
 
 int32 ALKBattleGameMode::GetExpeditionRoomIndex() const
@@ -367,14 +429,19 @@ bool ALKBattleGameMode::IsResultActionNext() const
 
 FText ALKBattleGameMode::GetResultActionLabel() const
 {
-    // 胜利且有下一排：按钮被节点选择面板取代（禁用态）；失败/通关：从头开始。
-    return FText::FromString(IsResultActionNext() ? TEXT("选择路线") : TEXT("从头开始"));
+    // 胜利且有下一排：按钮被节点选择面板取代（禁用态）。
+    if (IsResultActionNext()) { return FText::FromString(TEXT("选择路线")); }
+    // H3：终态（通关/失败/放弃）优先"返回家园"；家园地图不存在时退回"从头开始"（独立战斗调试）。
+    if (IsTerminalRun() && LKHomeContent::DoesMapExist(GetHomeMapName()))
+    {
+        return FText::FromString(TEXT("返回家园"));
+    }
+    return FText::FromString(TEXT("从头开始"));
 }
 
 bool ALKBattleGameMode::RequestResultAction()
 {
     if (Phase != ELKGamePhase::Result || bResultActionInProgress) { return false; }
-    const FText ActionLabel = GetResultActionLabel();
     if (bExpeditionBattle)
     {
         ULKRunSubsystem* Run = GetRunSubsystem();
@@ -391,14 +458,28 @@ bool ALKBattleGameMode::RequestResultAction()
             UE_LOG(LogLKBattle, Log, TEXT("[Run] 存在下一排可选节点，请通过节点选择面板推进"));
             return false;
         }
-        // 失败 / 通关 / 无可选节点：从头开始。
-        TArray<FLKEncounterRow> Encounters;
-        FString Error;
-        if (!BuildEncounterCatalog(Encounters, Error)
-            || !Run->RestartRun(BuildInitialRunHeroes(), BuildInitialRunCards(), Run->GetRunState().Seed, Encounters))
+        // H3：终态且家园地图存在 → 返回家园（金币交接）；否则退回"从头开始"。
+        if (Run->IsTerminal() && LKHomeContent::DoesMapExist(GetHomeMapName()))
         {
-            if (!Error.IsEmpty()) { UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法从头开始：%s"), *Error); }
-            return false;
+            return ReturnToHome();
+        }
+        // 失败 / 通关 / 无可选节点：从头开始。
+        FLKExpeditionStartRequest ProfileRequest;
+        if (TryBuildProfileStartRequest(ProfileRequest))
+        {
+            ProfileRequest.Seed = Run->GetRunState().Seed;
+            if (!Run->RestartRun(ProfileRequest)) { return false; }
+        }
+        else
+        {
+            TArray<FLKEncounterRow> Encounters;
+            FString Error;
+            if (!BuildEncounterCatalog(Encounters, Error)
+                || !Run->RestartRun(BuildInitialRunHeroes(), BuildInitialRunCards(), Run->GetRunState().Seed, Encounters))
+            {
+                if (!Error.IsEmpty()) { UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无法从头开始：%s"), *Error); }
+                return false;
+            }
         }
     }
     return ReloadBattleLevel();
@@ -418,7 +499,7 @@ bool ALKBattleGameMode::ReloadBattleLevel()
 bool ALKBattleGameMode::CanSelectNextNode() const
 {
 	const ULKRunSubsystem* Run = GetRunSubsystem();
-	return Run && Run->CanSelectNextNode();
+	return Run && !Run->NeedsDeckReduction() && (Run->CanSelectNextNode() || Run->HasServiceNode());
 }
 
 int32 ALKBattleGameMode::GetNextNodeCount() const
@@ -445,13 +526,7 @@ ELKDungeonNodeType ALKBattleGameMode::GetNextNodeType(int32 Index) const
 
 FText ALKBattleGameMode::GetNextNodeTitle(int32 Index) const
 {
-	switch (GetNextNodeType(Index))
-	{
-	case ELKDungeonNodeType::Elite: return FText::FromString(TEXT("精英战"));
-	case ELKDungeonNodeType::Boss: return FText::FromString(TEXT("首领战"));
-	case ELKDungeonNodeType::Rest: return FText::FromString(TEXT("休息营地"));
-	default: return FText::FromString(TEXT("普通战"));
-	}
+	return LKWorldMapContent::NodeTitle(GetNextNodeType(Index));
 }
 
 FText ALKBattleGameMode::GetNextNodeSubtitle(int32 Index) const
@@ -460,9 +535,9 @@ FText ALKBattleGameMode::GetNextNodeSubtitle(int32 Index) const
 	if (!Run) { return FText::GetEmpty(); }
 	const FLKDungeonNode Node = Run->GetNode(GetNextNodeId(Index));
 	if (Node.NodeId.IsNone()) { return FText::GetEmpty(); }
-	if (Node.Type == ELKDungeonNodeType::Rest)
+	if (!LKWorldMapContent::IsCombat(Node.Type))
 	{
-		return FText::FromString(TEXT("恢复 30% 最大生命（全体英雄）"));
+		return LKWorldMapContent::NodeDescription(Node.Type);
 	}
 
 	// 战斗类：列出敌方英雄（动态遭遇快照里的名单）。
@@ -481,6 +556,7 @@ FText ALKBattleGameMode::GetNextNodeSubtitle(int32 Index) const
 
 ELKNodeSelectionResult ALKBattleGameMode::SelectNextNode(int32 Index)
 {
+	if (bResultActionInProgress) { return ELKNodeSelectionResult::Rejected; }
 	ULKRunSubsystem* Run = GetRunSubsystem();
 	if (!Run) { return ELKNodeSelectionResult::Rejected; }
 	const FName NodeId = GetNextNodeId(Index);
@@ -513,9 +589,11 @@ bool ALKBattleGameMode::BuildRunRewardOffers(TArray<FLKRunRewardOffer>& OutOffer
 		}
 	};
 
-	// 1) 新卡池：骷髅兵 / 骷髅射手（1 费文字卡；只有未持有才可作为加牌候选）
+	// Stable native pool order; never TMap iteration order. Owned cards cannot appear twice.
 	TArray<FLKRunRewardOffer> NewCards;
-	for (const FName Id : { FName(TEXT("Unit_Skeleton")), FName(TEXT("Unit_SkeletonArcher")) })
+    TArray<FName> RewardCardIds = { "Unit_Skeleton", "Unit_SkeletonArcher" };
+    for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All()) { RewardCardIds.Add(Definition.Unit.UnitId); }
+	for (const FName Id : RewardCardIds)
 	{
 		if (!FindCard(Id)) { continue; }
 		if (State.Cards.ContainsByPredicate([Id](const FLKRunCardState& Card) { return Card.CardId == Id; })) { continue; }
@@ -561,7 +639,7 @@ bool ALKBattleGameMode::BuildRunRewardOffers(TArray<FLKRunRewardOffer>& OutOffer
 bool ALKBattleGameMode::HasPendingRewardChoice() const
 {
 	const ULKRunSubsystem* Run = GetRunSubsystem();
-	return Run && Run->HasPendingRewardChoice();
+	return Run && (Run->HasPendingRewardChoice() || Run->NeedsDeckReduction());
 }
 
 int32 ALKBattleGameMode::GetPendingRewardCount() const
@@ -578,12 +656,26 @@ FLKRunRewardOffer ALKBattleGameMode::GetRunRewardOffer(int32 Index) const
 
 bool ALKBattleGameMode::ChooseRunReward(int32 Index)
 {
+    return ChooseRunRewardReplacing(Index, NAME_None);
+}
+
+bool ALKBattleGameMode::ChooseRunRewardReplacing(int32 Index, FName ReplacedCardId)
+{
+    TArray<FName> Replaced;
+    if (!ReplacedCardId.IsNone()) { Replaced.Add(ReplacedCardId); }
+    return ChooseRunRewardReplacingCards(Index, Replaced);
+}
+
+bool ALKBattleGameMode::ChooseRunRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds)
+{
+	if (bResultActionInProgress) { return false; }
 	ULKRunSubsystem* Run = GetRunSubsystem();
-	return Run && Run->ChooseReward(Index);
+	return Run && Run->ChooseRewardReplacingCards(Index, ReplacedCardIds);
 }
 
 bool ALKBattleGameMode::SkipRunReward()
 {
+	if (bResultActionInProgress) { return false; }
 	ULKRunSubsystem* Run = GetRunSubsystem();
 	return Run && Run->SkipReward();
 }

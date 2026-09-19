@@ -7,6 +7,7 @@
 
 class USphereComponent;
 class UPaperSpriteComponent;
+class ALKUnitBase;
 
 /**
  * 远程攻击的直线弹道：命中敌方单位造成伤害后【回收】（S5 对象池），
@@ -34,6 +35,8 @@ public:
 
 	bool IsPooledActive() const { return bPooledActive; }
 	FVector GetFlightDirection() const { return Direction; }
+    ELKBreathHead GetBreathHead() const { return BreathHead; }
+    void SetAttackPayload(ELKBreathHead Head, ALKUnitBase* BuildingTarget = nullptr);
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -57,4 +60,7 @@ protected:
 	float Lifetime = 3.f;
 	bool bPooledActive = false;
 	FLKCombatSource LaunchSource;
+    ELKBreathHead BreathHead = ELKBreathHead::None;
+    bool bSiegeShot = false;
+    TWeakObjectPtr<ALKUnitBase> SiegeTarget;
 };

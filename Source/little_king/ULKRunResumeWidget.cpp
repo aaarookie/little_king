@@ -15,6 +15,7 @@
 #include "ALKBattleGameMode.h"
 #include "ULKBattleHUDWidget.h"
 #include "ULKRunSubsystem.h"
+#include "LKHomeContent.h"
 
 namespace
 {
@@ -134,7 +135,7 @@ void ULKRunResumeWidget::RefreshResume()
 		bTerminal = true;
 		if (TitleText) { TitleText->SetText(FText::FromString(TEXT("远征总结"))); }
 		if (SummaryText) { SummaryText->SetText(GM->GetRunSummaryText()); }
-		if (PrimaryLabel) { PrimaryLabel->SetText(FText::FromString(TEXT("开始新远征"))); }
+		if (PrimaryLabel) { PrimaryLabel->SetText(FText::FromString(LKHomeContent::DoesMapExist(GM->GetHomeMapName()) ? TEXT("返回家园") : TEXT("开始新远征"))); }
 	}
 	else
 	{
@@ -143,9 +144,9 @@ void ULKRunResumeWidget::RefreshResume()
 		{
 			const ULKRunSubsystem* Run = OwnerHUD->GetWorld()
 				? OwnerHUD->GetWorld()->GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
-			const int32 Room = Run ? Run->GetCurrentRoomIndex() : 0;
+			const int32 Room = Run ? Run->GetRunState().BattleHistory.Num() : 0;
 			SummaryText->SetText(FText::FromString(FString::Printf(
-				TEXT("上次退出于第 %d 战结算后。继续后领取待选奖励并选择下一排节点。"), Room)));
+				TEXT("已完成 %d 场战斗。继续后回到保存的奖励、地图或服务节点。"), Room)));
 		}
 		if (PrimaryLabel) { PrimaryLabel->SetText(FText::FromString(TEXT("继续远征"))); }
 	}
@@ -157,8 +158,9 @@ void ULKRunResumeWidget::HandlePrimaryClicked()
 	if (!OwnerHUD) { return; }
 	if (OwnerHUD->GetBattleGameMode() && OwnerHUD->GetBattleGameMode()->IsRecoveryTerminal())
 	{
-		// 终态：开始新远征（RestartRun + 重载战场）。
-		if (OwnerHUD->StartNewRunFromRecovery())
+		// 正式终态返回家园；缺少家园地图的独立测试保留重开入口。
+		ALKBattleGameMode* GM = OwnerHUD->GetBattleGameMode();
+		if (LKHomeContent::DoesMapExist(GM->GetHomeMapName()) ? GM->ReturnToHome() : OwnerHUD->StartNewRunFromRecovery())
 		{
 			SetVisibility(ESlateVisibility::Collapsed);
 		}

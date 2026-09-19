@@ -22,4 +22,5 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "LK|Run")
 	FLKRunState RunState;
+	UPROPERTY() FDateTime SavedAtUtc;
 };

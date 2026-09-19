@@ -48,7 +48,7 @@ void ALKUnitHero::Tick(float DeltaSeconds)
 
 	// 冷却自然流逝（简单冷却：一个计时字段，不用 GE 冷却资产）
 	SkillCooldownRemaining = FMath::Max(0.f, SkillCooldownRemaining - DeltaSeconds);
-    if (IsManualMoving()) { return; }
+    if (IsManualMoving() || IsControlled()) { return; }
 
 	AbilityCheckTimer -= DeltaSeconds;
 	if (AbilityCheckTimer <= 0.f)
@@ -118,7 +118,7 @@ void ALKUnitHero::ResetTransientRoomState()
 
 void ALKUnitHero::TryCastAbilities()
 {
-	if (!IsAlive() || !IsCombatEnabled() || !AbilitySystem || !bAbilitiesResolved || !GetTarget() || IsManualMoving())
+	if (!IsAlive() || !IsCombatEnabled() || !AbilitySystem || !bAbilitiesResolved || !GetTarget() || IsManualMoving() || IsControlled())
 	{
 		return;
 	}

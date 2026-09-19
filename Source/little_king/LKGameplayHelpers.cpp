@@ -9,6 +9,7 @@
 #include "ALKBattleGameMode.h"
 #include "ULKGameData.h"
 #include "ULKUnitAttributeSet.h"
+#include "ULKUnitStatusComponent.h"
 #include "LKLog.h"
 
 namespace LKGameplay
@@ -128,7 +129,9 @@ namespace LKGameplay
         if (GM) { GM->BeginCombatBatch(); }
         const bool bRemoteDamage = Event.Source.Kind == ELKCombatSourceKind::Spell
             || (Event.Source.bRangedSource && Event.Source.Kind != ELKCombatSourceKind::Overtime && Event.Source.Kind != ELKCombatSourceKind::HealthCost);
-        const float Damage = Amount * (bRemoteDamage ? 1.f - Unit->GetTraitEffectValue(ELKTraitEffect::RangedDamageReduction) : 1.f);
+        const bool bOrdinaryDamage = Event.Source.Kind != ELKCombatSourceKind::Overtime && Event.Source.Kind != ELKCombatSourceKind::HealthCost;
+        const float Damage = Amount * (bRemoteDamage ? 1.f - Unit->GetTraitEffectValue(ELKTraitEffect::RangedDamageReduction) : 1.f)
+            * (bOrdinaryDamage ? Unit->GetStatusComponent()->DamageTakenMultiplier() : 1.f);
         if (bBypassInvulnerability || !Unit->IsInvulnerable()) { ApplyHealthDelta(Unit, DamageDataName, -Damage, Instigator); }
         Event.HealthAfter = IsValid(Unit) ? Unit->GetHealth() : 0.f;
         Event.ActualAmount = FMath::Clamp(Event.HealthBefore - Event.HealthAfter, 0.f, Event.HealthBefore);

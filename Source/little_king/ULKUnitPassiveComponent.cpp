@@ -4,6 +4,9 @@
 #include "LKGameplayHelpers.h"
 #include "LKLog.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
+#include "ULKUnitActiveComponent.h"
+#include "ULKSilverComponent.h"
 
 ULKUnitPassiveComponent::ULKUnitPassiveComponent() { PrimaryComponentTick.bCanEverTick = false; }
 
@@ -42,6 +45,15 @@ bool ULKUnitPassiveComponent::TrySummonFrom(ALKUnitBase* Victim)
 void ULKUnitPassiveComponent::ObserveDefeat(const ALKUnitBase* Victim, bool bOwnerDefeatedInBatch)
 {
     ALKUnitBase* OwnerUnit = Cast<ALKUnitBase>(GetOwner());
+    if (OwnerUnit && Victim && OwnerUnit->IsAlive())
+    {
+        OwnerUnit->GetActiveComponent()->ObserveDefeat(Victim);
+        if (Ability == ELKPassiveAbility::Loot && OwnerUnit->GetTarget() == Victim && Victim->GetTeam() != OwnerUnit->GetTeam())
+        {
+            if (ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>())
+            { if (ULKSilverComponent* Silver = GM->GetTeamSilver(OwnerUnit->GetTeam())) { Silver->AddSilver(1.f); } }
+        }
+    }
     if (!OwnerUnit || !Victim || Victim == OwnerUnit || Victim->GetTeam() != OwnerUnit->GetTeam()) { return; }
     if (Ability == ELKPassiveAbility::GiantBones && OwnerUnit->IsAlive()
         && (Victim->GetUnitId() == "Unit_Skeleton" || Victim->GetUnitId() == "Unit_SkeletonArcher"))
@@ -54,6 +66,39 @@ void ULKUnitPassiveComponent::ObserveDefeat(const ALKUnitBase* Victim, bool bOwn
     {
         BoneCount = int32(FMath::Min(int64(RevivalThreshold), int64(BoneCount) + (Victim->IsHero() ? 5 : 1)));
         UE_LOG(LogLKUnit, Log, TEXT("[Passive] 朽骨再生 %s %d/%d"), *OwnerUnit->GetName(), BoneCount, RevivalThreshold);
+    }
+}
+
+void ULKUnitPassiveComponent::ObserveCombatEvent(const FLKCombatEvent& Event)
+{
+    ALKUnitBase* OwnerUnit = Cast<ALKUnitBase>(GetOwner());
+    if (!OwnerUnit || !OwnerUnit->IsTargetable() || !OwnerUnit->IsCombatEnabled() || Event.ActualAmount <= 0.f) { return; }
+    if (Ability == ELKPassiveAbility::AttackRenewal && !Event.bIsHeal && Event.Source.InstanceId == OwnerUnit->GetFName()
+        && Event.TargetTeam != OwnerUnit->GetTeam()
+        && (Event.Source.Kind == ELKCombatSourceKind::Attack || Event.Source.Kind == ELKCombatSourceKind::Projectile))
+    {
+        const FLKCombatSource Source = LKGameplay::MakeSource(OwnerUnit, ELKCombatSourceKind::Skill, "Skill_AttackRenewal");
+        LKGameplay::ApplyHeal(OwnerUnit, OwnerUnit->GetMaxHealth() * HealPercent, OwnerUnit, &Source);
+    }
+    if (Ability != ELKPassiveAbility::SharedSpring || !Event.bIsHeal || Event.TargetTeam != OwnerUnit->GetTeam()
+        || Event.Source.ActionId == "Skill_SharedSpring") { return; }
+    bool bElfHealed = false;
+    ALKUnitBase* Lowest = nullptr;
+    float LowestRatio = TNumericLimits<float>::Max();
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        ALKUnitBase* Unit = *It;
+        if (!Unit->IsTargetable() || Unit->GetTeam() != OwnerUnit->GetTeam()) { continue; }
+        if (Unit->GetFName() == Event.TargetInstanceId && Unit->GetRace() == ELKRace::Elf) { bElfHealed = true; }
+        if (!Unit->IsHero()) { continue; }
+        const float Ratio = Unit->GetHealth() / FMath::Max(1.f, Unit->GetMaxHealth());
+        if (Ratio < LowestRatio || (Ratio == LowestRatio && Lowest && Unit->GetFName().LexicalLess(Lowest->GetFName())))
+        { Lowest = Unit; LowestRatio = Ratio; }
+    }
+    if (bElfHealed && Lowest)
+    {
+        const FLKCombatSource Source = LKGameplay::MakeSource(OwnerUnit, ELKCombatSourceKind::Skill, "Skill_SharedSpring");
+        LKGameplay::ApplyHeal(Lowest, Event.ActualAmount, OwnerUnit, &Source);
     }
 }
 

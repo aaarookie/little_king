@@ -17,6 +17,7 @@ public:
     bool CanSummonFrom(const ALKUnitBase* Victim) const;
     bool TrySummonFrom(ALKUnitBase* Victim);
     void ObserveDefeat(const ALKUnitBase* Victim, bool bOwnerDefeatedInBatch);
+    void ObserveCombatEvent(const FLKCombatEvent& Event);
     bool TryRevive();
     UFUNCTION(BlueprintPure, Category = "LK|Passive") ELKPassiveAbility GetAbility() const { return Ability; }
     UFUNCTION(BlueprintPure, Category = "LK|Passive") int32 GetBoneCount() const { return BoneCount; }

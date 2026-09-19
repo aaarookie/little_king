@@ -4,6 +4,8 @@
 #include "LKDataTypes.h"
 
 class UDataTable;
+class ULKGameData;
+class ULKCardDefinition;
 
 /** D2 遭遇内容入口：内置零资产回退、DT_Encounters 读取、规范化与结构校验。 */
 namespace LKEncounterContent
@@ -21,6 +23,15 @@ namespace LKEncounterContent
 	 */
 	bool BuildCatalog(const UDataTable* Table, TArray<FLKEncounterRow>& OutRows, FString& OutError);
 	const FLKEncounterRow* Find(const TArray<FLKEncounterRow>& Rows, FName EncounterId);
+
+	/**
+	 * H3：不依赖战斗世界的目录构造与校验（家园出征与战斗 GameMode 共用）。
+	 * ResolveUnitRow / ResolveCard 由调用方提供，保证"自定义 UnitId / 卡牌定义"的口径一致。
+	 */
+	bool BuildValidatedCatalog(const ULKGameData* Data,
+		TFunctionRef<const FLKUnitRow*(FName)> ResolveUnitRow,
+		TFunctionRef<const ULKCardDefinition*(FName)> ResolveCard,
+		TArray<FLKEncounterRow>& OutRows, FString& OutError);
 
 	// ---------- D4：随机敌阵容与动态遭遇 ----------
 	/** 从目录收集敌方"英雄池"与"首领池"（数据驱动：以后往表里加新遭遇行即自动入池）。 */

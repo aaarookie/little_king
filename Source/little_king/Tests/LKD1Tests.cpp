@@ -144,7 +144,7 @@ bool FLKD1RunFlowTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKD1UnitRulesTest, "LittleKing.D1.Configuration.BuiltInUnitRules", D1Flags)
 bool FLKD1UnitRulesTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("All thirteen shipped combat units are registered"), LKUnitContent::Units().Num(), 13);
+    TestEqual(TEXT("All shipped combat units including stage-three mercenaries are registered"), LKUnitContent::Units().Num(), 28);
     for (const TPair<FName, FLKUnitRow>& Pair : LKUnitContent::Units())
     {
         const FLKUnitRow& Canonical = Pair.Value;

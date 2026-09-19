@@ -48,6 +48,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LK|Input")
 	ELKPlacementMode GetPlacementMode() const { return PlacementMode; }
+	UFUNCTION(BlueprintPure, Category = "LK|Input")
+	FName GetPlacingHeroId() const { return PlacingHeroId; }
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnPlacementStateChanged, bool, bPlacing, ELKPlacementMode, Mode, int32, HandIndex, FName, ItemId);
 	UPROPERTY(BlueprintAssignable, Category = "LK|Input")

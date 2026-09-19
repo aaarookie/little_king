@@ -1,222 +1,324 @@
 #include "ULKRunNodeSelectWidget.h"
-
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
-#include "Components/Button.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
-#include "Components/Overlay.h"
-#include "Components/OverlaySlot.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "Components/ScrollBox.h"
 #include "Components/ScaleBox.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
-#include "Components/VerticalBox.h"
-#include "Components/VerticalBoxSlot.h"
-
+#include "Engine/GameInstance.h"
 #include "ALKBattleGameMode.h"
-#include "LKRunTypes.h"
 #include "ULKBattleHUDWidget.h"
+#include "ULKRunSubsystem.h"
+#include "ULKWorldMapWidget.h"
+#include "ULKHomeListButtonWidget.h"
+#include "LKWorldMapContent.h"
+#include "LKUnitContent.h"
+#include "LKEncounterContent.h"
 
 namespace
 {
-	const FLinearColor BackdropColor(0.006f, 0.012f, 0.027f, 0.86f);
-	const FLinearColor PanelColor(0.025f, 0.045f, 0.075f, 0.99f);
-	const FLinearColor CardColor(0.055f, 0.085f, 0.13f, 1.f);
-	const FLinearColor GoldColor(0.96f, 0.69f, 0.22f, 1.f);
-	const FLinearColor PaleColor(0.88f, 0.92f, 0.96f, 1.f);
-	const FLinearColor MutedColor(0.58f, 0.67f, 0.76f, 1.f);
-
-	UTextBlock* MakeText(UWidgetTree* Tree, const TCHAR* Name, int32 Size, const FLinearColor& Color,
-		ETextJustify::Type Justification = ETextJustify::Center)
-	{
-		UTextBlock* Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
-		FSlateFontInfo Font = Text->GetFont();
-		Font.Size = Size;
-		Text->SetFont(Font);
-		Text->SetColorAndOpacity(FSlateColor(Color));
-		Text->SetJustification(Justification);
-		Text->SetAutoWrapText(true);
-		return Text;
-	}
-
-	void StyleButton(UButton* Button, const FLinearColor& Normal, const FLinearColor& Hovered)
-	{
-		FButtonStyle Style = Button->GetStyle();
-		Style.Normal.TintColor = FSlateColor(Normal);
-		Style.Hovered.TintColor = FSlateColor(Hovered);
-		Style.Pressed.TintColor = FSlateColor(Hovered * 0.82f);
-		Style.Disabled.TintColor = FSlateColor(FLinearColor(Normal.R, Normal.G, Normal.B, 0.42f));
-		Button->SetStyle(Style);
-	}
-}
-
-void ULKRunNodeSelectWidget::InitializeNodeSelect(ULKBattleHUDWidget* InOwnerHUD)
+UTextBlock *MakeText(UWidgetTree *Tree, const FString &Copy, int32 Size, FName Name = NAME_None)
 {
-	OwnerHUD = InOwnerHUD;
+    UTextBlock *Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
+    FSlateFontInfo Font = Text->GetFont();
+    Font.Size = Size;
+    Text->SetFont(Font);
+    Text->SetText(FText::FromString(Copy));
+    Text->SetAutoWrapText(true);
+    Text->SetColorAndOpacity(FLinearColor(.85f, .91f, .95f));
+    return Text;
 }
-
+} // namespace
+void ULKRunNodeSelectWidget::InitializeNodeSelect(ULKBattleHUDWidget *InOwnerHUD)
+{
+    OwnerHUD = InOwnerHUD;
+}
+void ULKRunNodeSelectWidget::InitializeRunView(ULKRunSubsystem *InRun)
+{
+    ExplicitRun = InRun;
+}
+ULKRunSubsystem *ULKRunNodeSelectWidget::GetRun() const
+{
+    if (ExplicitRun)
+    {
+        return ExplicitRun;
+    }
+    return GetGameInstance() ? GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
+}
 TSharedRef<SWidget> ULKRunNodeSelectWidget::RebuildWidget()
 {
-	if (WidgetTree && !WidgetTree->RootWidget)
-	{
-		BuildNativeTree();
-	}
-	return Super::RebuildWidget();
+    if (WidgetTree && !WidgetTree->RootWidget)
+    {
+        BuildNativeTree();
+    }
+    return Super::RebuildWidget();
 }
-
 void ULKRunNodeSelectWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
-	SetVisibility(ESlateVisibility::Visible);
-	RefreshNodeSelect();
-	if (OptionButtons.IsValidIndex(0) && OptionButtons[0]->GetVisibility() == ESlateVisibility::Visible)
-	{
-		OptionButtons[0]->SetKeyboardFocus();
-	}
+    Super::NativeConstruct();
+    RefreshNodeSelect();
 }
-
+ULKHomeListButtonWidget *ULKRunNodeSelectWidget::AddAction(UPanelWidget *Parent, const FString &Name,
+                                                           const FString &Label, int32 Index, bool bEnabled)
+{
+    ULKHomeListButtonWidget *Entry =
+        CreateWidget<ULKHomeListButtonWidget>(this, ULKHomeListButtonWidget::StaticClass(), FName(*Name));
+    FLKHomePanelAction Action;
+    Action.Label = FText::FromString(Label);
+    Action.bEnabled = bEnabled;
+    Action.ActionId = TEXT("Start");
+    Entry->SetupAction(Index, Action);
+    Entry->OnHomeListClicked.BindUObject(this, &ULKRunNodeSelectWidget::HandleAction);
+    if (UVerticalBox *Column = Cast<UVerticalBox>(Parent))
+    {
+        Column->AddChildToVerticalBox(Entry)->SetPadding(FMargin(0, 3));
+    }
+    else if (UHorizontalBox *Row = Cast<UHorizontalBox>(Parent))
+    {
+        UHorizontalBoxSlot *Layout = Row->AddChildToHorizontalBox(Entry);
+        Layout->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+        Layout->SetPadding(FMargin(3, 0));
+    }
+    return Entry;
+}
 void ULKRunNodeSelectWidget::BuildNativeTree()
 {
-	UOverlay* Root = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), TEXT("NodeRoot"));
-	WidgetTree->RootWidget = Root;
-
-	UBorder* Backdrop = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("Backdrop"));
-	Backdrop->SetBrushColor(BackdropColor);
-	if (UOverlaySlot* LayoutSlot = Root->AddChildToOverlay(Backdrop))
-	{
-		LayoutSlot->SetHorizontalAlignment(HAlign_Fill);
-		LayoutSlot->SetVerticalAlignment(VAlign_Fill);
-	}
-
-	UScaleBox* Scale = WidgetTree->ConstructWidget<UScaleBox>(UScaleBox::StaticClass(), TEXT("ResponsiveScale"));
-	Scale->SetStretch(EStretch::ScaleToFit);
-	Scale->SetStretchDirection(EStretchDirection::DownOnly);
-	if (UOverlaySlot* LayoutSlot = Root->AddChildToOverlay(Scale))
-	{
-		LayoutSlot->SetHorizontalAlignment(HAlign_Center);
-		LayoutSlot->SetVerticalAlignment(VAlign_Center);
-		LayoutSlot->SetPadding(FMargin(28.f));
-	}
-
-	USizeBox* PanelSize = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), TEXT("PanelSize"));
-	PanelSize->SetWidthOverride(860.f);
-	PanelSize->SetHeightOverride(420.f);
-	Scale->SetContent(PanelSize);
-
-	UBorder* Panel = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("NodePanel"));
-	Panel->SetBrushColor(PanelColor);
-	Panel->SetPadding(FMargin(34.f, 26.f));
-	PanelSize->SetContent(Panel);
-
-	UVerticalBox* Content = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("Content"));
-	Panel->SetContent(Content);
-
-	UTextBlock* Title = MakeText(WidgetTree, TEXT("Title"), 34, GoldColor);
-	Title->SetText(FText::FromString(TEXT("选择下一站")));
-	Content->AddChildToVerticalBox(Title);
-
-	UTextBlock* SubTitle = MakeText(WidgetTree, TEXT("SubTitle"), 16, MutedColor);
-	SubTitle->SetText(FText::FromString(TEXT("只能看到下一排节点；休息营地可恢复 30% 最大生命")));
-	Content->AddChildToVerticalBox(SubTitle);
-
-	UHorizontalBox* Options = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Options"));
-	Content->AddChildToVerticalBox(Options);
-
-	for (int32 Index = 0; Index < 2; ++Index)
-	{
-		UButton* Button = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass(),
-			*FString::Printf(TEXT("Btn_Node%d"), Index));
-		StyleButton(Button, CardColor, FLinearColor(0.10f, 0.16f, 0.24f, 1.f));
-		if (UHorizontalBoxSlot* LayoutSlot = Options->AddChildToHorizontalBox(Button))
-		{
-			LayoutSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
-			LayoutSlot->SetPadding(FMargin(12.f, 18.f));
-			LayoutSlot->SetVerticalAlignment(VAlign_Center);
-		}
-
-		UVerticalBox* Card = WidgetTree->ConstructWidget<UVerticalBox>();
-		Button->SetContent(Card);
-
-		UTextBlock* NodeTitle = MakeText(WidgetTree, *FString::Printf(TEXT("NodeTitle%d"), Index), 26, PaleColor);
-		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(NodeTitle)) { LayoutSlot->SetPadding(FMargin(14.f, 16.f, 14.f, 6.f)); }
-
-		UTextBlock* Subtitle = MakeText(WidgetTree, *FString::Printf(TEXT("NodeSubtitle%d"), Index), 17, MutedColor, ETextJustify::Center);
-		Subtitle->SetLineHeightPercentage(1.2f);
-		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(Subtitle))
-		{
-			LayoutSlot->SetPadding(FMargin(18.f, 2.f, 18.f, 18.f));
-		}
-
-		OptionButtons.Add(Button);
-		OptionTitleTexts.Add(NodeTitle);
-		OptionSubtitleTexts.Add(Subtitle);
-	}
-
-	OptionButtons[0]->OnClicked.AddDynamic(this, &ULKRunNodeSelectWidget::HandleOption0Clicked);
-	OptionButtons[1]->OnClicked.AddDynamic(this, &ULKRunNodeSelectWidget::HandleOption1Clicked);
-
-	StatusText = MakeText(WidgetTree, TEXT("Status"), 16, MutedColor, ETextJustify::Left);
-	Content->AddChildToVerticalBox(StatusText);
+    UBorder *Back = WidgetTree->ConstructWidget<UBorder>();
+    Back->SetBrushColor(FLinearColor(.008f, .015f, .025f, .99f));
+    Back->SetPadding(FMargin(22));
+    WidgetTree->RootWidget = Back;
+    UScaleBox *Scale = WidgetTree->ConstructWidget<UScaleBox>();
+    Scale->SetStretch(EStretch::ScaleToFit);
+    Back->SetContent(Scale);
+    USizeBox *Frame = WidgetTree->ConstructWidget<USizeBox>();
+    Frame->SetWidthOverride(1320);
+    Frame->SetHeightOverride(810);
+    Scale->SetContent(Frame);
+    UVerticalBox *Layout = WidgetTree->ConstructWidget<UVerticalBox>();
+    Frame->SetContent(Layout);
+    Layout->AddChildToVerticalBox(MakeText(WidgetTree, TEXT("远征 · 五境之路"), 30));
+    Summary = MakeText(WidgetTree, TEXT(""), 17, TEXT("WorldMapSummary"));
+    Layout->AddChildToVerticalBox(Summary)->SetPadding(FMargin(0, 6, 0, 12));
+    RegionTabs = WidgetTree->ConstructWidget<UHorizontalBox>();
+    Layout->AddChildToVerticalBox(RegionTabs)->SetPadding(FMargin(0, 0, 0, 12));
+    UHorizontalBox *Body = WidgetTree->ConstructWidget<UHorizontalBox>();
+    Layout->AddChildToVerticalBox(Body)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    UVerticalBox *MapColumn = WidgetTree->ConstructWidget<UVerticalBox>();
+    Body->AddChildToHorizontalBox(MapColumn)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    Map = CreateWidget<ULKWorldMapWidget>(this, ULKWorldMapWidget::StaticClass(), TEXT("WorldMapCanvas"));
+    Map->OnNodePicked.BindUObject(this, &ULKRunNodeSelectWidget::SelectMapNode);
+    MapColumn->AddChildToVerticalBox(Map)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    MapColumn
+        ->AddChildToVerticalBox(MakeText(WidgetTree,
+                                         TEXT("普 普通遭遇   精 精英战   王 Boss   商 市场   休 休息\n金边：可前往   "
+                                              "绿边：当前位置   白边：已选中 · 点击区域按钮可放大查看"),
+                                         15))
+        ->SetPadding(FMargin(0, 10));
+    USizeBox *SidebarSize = WidgetTree->ConstructWidget<USizeBox>();
+    SidebarSize->SetWidthOverride(315);
+    Body->AddChildToHorizontalBox(SidebarSize)->SetPadding(FMargin(18, 0, 0, 0));
+    UVerticalBox *Sidebar = WidgetTree->ConstructWidget<UVerticalBox>();
+    SidebarSize->SetContent(Sidebar);
+    ChoicesTitle = MakeText(WidgetTree, TEXT("下一站"), 23);
+    Sidebar->AddChildToVerticalBox(ChoicesTitle)->SetPadding(FMargin(0, 0, 0, 8));
+    ChoicesFrame = WidgetTree->ConstructWidget<USizeBox>();
+    ChoicesFrame->SetHeightOverride(205);
+    Sidebar->AddChildToVerticalBox(ChoicesFrame);
+    UScrollBox *ChoicesScroll = WidgetTree->ConstructWidget<UScrollBox>();
+    ChoicesFrame->SetContent(ChoicesScroll);
+    Choices = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("NextNodeChoices"));
+    ChoicesScroll->AddChild(Choices);
+    UScrollBox *DetailScroll = WidgetTree->ConstructWidget<UScrollBox>();
+    Sidebar->AddChildToVerticalBox(DetailScroll)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    Detail = MakeText(WidgetTree, TEXT(""), 17, TEXT("NodeDetail"));
+    DetailScroll->AddChild(Detail);
+    PrimaryAction = AddAction(Sidebar, TEXT("ConfirmNodeButton"), TEXT("前往此节点"), 1, false);
+    AddAction(Sidebar, TEXT("ReturnHomeButton"), TEXT("暂回家园 · 保留远征"), 2);
+    Status = MakeText(WidgetTree, TEXT(""), 16, TEXT("WorldMapStatus"));
+    USizeBox *StatusSize = WidgetTree->ConstructWidget<USizeBox>();
+    StatusSize->SetHeightOverride(44);
+    StatusSize->SetContent(Status);
+    Layout->AddChildToVerticalBox(StatusSize)->SetPadding(FMargin(0, 12, 0, 0));
 }
-
 void ULKRunNodeSelectWidget::RefreshNodeSelect()
 {
-	if (!OwnerHUD) { return; }
-	const int32 Count = OwnerHUD->GetNextNodeCount();
-	DisplayedNodeCount = FMath::Clamp(Count, 0, 2);
-	if (OptionButtons.Num() != 2)
-	{
-		OnNodeDataReadyBP(DisplayedNodeCount);
-		return;
-	}
-
-	for (int32 Index = 0; Index < 2; ++Index)
-	{
-		const bool bVisible = Index < DisplayedNodeCount;
-		OptionButtons[Index]->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-		if (!bVisible) { continue; }
-		OptionTitleTexts[Index]->SetText(OwnerHUD->GetNextNodeTitle(Index));
-		OptionSubtitleTexts[Index]->SetText(OwnerHUD->GetNextNodeSubtitle(Index));
-	}
-
-	if (StatusText && Count == 0)
-	{
-		StatusText->SetText(FText::FromString(TEXT("没有可选节点，请返回结果界面操作")));
-	}
-	SetInteractionEnabled(Count > 0);
-	OnNodeDataReadyBP(DisplayedNodeCount);
+    ULKRunSubsystem *Run = GetRun();
+    if (!Run || !Map)
+    {
+        return;
+    }
+    const FLKRunState State = Run->GetRunState();
+    ChoicesFrame->SetVisibility(Run->HasServiceNode() ? ESlateVisibility::Collapsed
+                                                      : ESlateVisibility::SelfHitTestInvisible);
+    ChoicesTitle->SetText(FText::FromString(Run->HasServiceNode() ? TEXT("当前节点") : TEXT("下一站")));
+    DisplayedNodeIds = Run->CanSelectNextNode() ? Run->GetNextNodeIds() : TArray<FName>();
+    if (LastCurrentNodeId != State.CurrentNodeId || SelectedNodeId.IsNone())
+    {
+        SelectedNodeId = Run->HasServiceNode()        ? State.CurrentNodeId
+                         : DisplayedNodeIds.IsEmpty() ? NAME_None
+                                                      : DisplayedNodeIds[0];
+        LastCurrentNodeId = State.CurrentNodeId;
+    }
+    FString RegionName = TEXT("旧版路线");
+    if (const FLKWorldRegion *Region = State.WorldRegions.FindByPredicate(
+            [&State](const FLKWorldRegion &R) { return R.RegionId == State.RegionId; }))
+    {
+        RegionName = Region->DisplayName.ToString();
+    }
+    Summary->SetText(FText::FromString(
+        FString::Printf(TEXT("%s  /  已完成 %d 场战斗  /  部队容量 %d/8（%d 张）  /  远征金币 %d（携带 %d）"),
+                        *RegionName, State.BattleHistory.Num(), Run->GetDeckCapacityUsed(), State.Cards.Num(), Run->GetWalletGold(), State.StartingGold)));
+    RegionTabs->ClearChildren();
+    RegionIds.Reset();
+    AddAction(RegionTabs, TEXT("MapOverviewButton"), TEXT("全图"), 10);
+    for (int32 I = 0; I < State.WorldRegions.Num(); ++I)
+    {
+        RegionIds.Add(State.WorldRegions[I].RegionId);
+        AddAction(RegionTabs, FString::Printf(TEXT("Region%dButton"), I), State.WorldRegions[I].DisplayName.ToString(),
+                  11 + I);
+    }
+    Choices->ClearChildren();
+    for (int32 I = 0; I < DisplayedNodeIds.Num(); ++I)
+    {
+        const FLKDungeonNode Node = Run->GetNode(DisplayedNodeIds[I]);
+        FString Label = FString::Printf(TEXT("%d · %s"), I + 1, *LKWorldMapContent::NodeTitle(Node.Type).ToString());
+        if (Node.RegionId != State.RegionId)
+        {
+            Label += TEXT(" · 跨区");
+        }
+        AddAction(Choices, FString::Printf(TEXT("NextNode%dButton"), I), Label, 100 + I);
+    }
+    Map->SetMapState(State, SelectedNodeId);
+    RefreshDetail();
+    OnNodeDataReadyBP(DisplayedNodeIds.Num());
 }
-
-void ULKRunNodeSelectWidget::SetInteractionEnabled(bool bEnabled)
+void ULKRunNodeSelectWidget::SelectMapNode(FName NodeId)
 {
-	bInteractionLocked = !bEnabled;
-	for (UButton* Button : OptionButtons)
-	{
-		if (Button) { Button->SetIsEnabled(bEnabled); }
-	}
+    ULKRunSubsystem *Run = GetRun();
+    if (!Run || Run->HasServiceNode())
+    {
+        return;
+    }
+    if (Run->GetNode(NodeId).NodeId.IsNone())
+    {
+        return;
+    }
+    SelectedNodeId = NodeId;
+    Map->SetMapState(Run->GetRunState(), SelectedNodeId);
+    RefreshDetail();
 }
-
-void ULKRunNodeSelectWidget::TrySelect(int32 Index)
+void ULKRunNodeSelectWidget::RefreshDetail()
 {
-	if (bInteractionLocked || !OwnerHUD || Index < 0 || Index >= DisplayedNodeCount) { return; }
-	SetInteractionEnabled(false);
-	const ELKNodeSelectionResult Result = OwnerHUD->SelectNextNode(Index);
-	if (Result == ELKNodeSelectionResult::RestResolved)
-	{
-		// 休息完成：回血已应用，继续显示再下一排。
-		if (StatusText) { StatusText->SetText(FText::FromString(TEXT("已休息：全体英雄恢复 30% 生命，可继续选择下一排"))); }
-		RefreshNodeSelect();
-	}
-	else if (Result == ELKNodeSelectionResult::BattleEntered)
-	{
-		// 进入战斗：世界即将重载，本面板随旧世界销毁。
-	}
-	else
-	{
-		if (StatusText) { StatusText->SetText(FText::FromString(TEXT("该节点不可选（状态已变化），请重新选择"))); }
-		RefreshNodeSelect();
-	}
+    ULKRunSubsystem *Run = GetRun();
+    if (!Run)
+    {
+        return;
+    }
+    const FLKRunState State = Run->GetRunState();
+    const bool Service = Run->HasServiceNode();
+    const FLKDungeonNode Node = Run->GetNode(Service ? State.CurrentNodeId : SelectedNodeId);
+    FString Copy = LKWorldMapContent::NodeTitle(Node.Type).ToString() + TEXT("\n\n") +
+                   LKWorldMapContent::NodeDescription(Node.Type).ToString();
+    if (const FLKEncounterRow *Encounter = LKEncounterContent::Find(State.Encounters, Node.EncounterId))
+    {
+        Copy += TEXT("\n\n敌方阵容：");
+        for (FName HeroId : Encounter->EnemyHeroIds)
+        {
+            const FLKUnitRow *Unit = LKUnitContent::Find(HeroId);
+            Copy += TEXT("\n") + (Unit ? Unit->DisplayName.ToString() : HeroId.ToString());
+        }
+    }
+    if (Service)
+    {
+        Copy += FString::Printf(TEXT("\n\n钱包：%d 金币"), State.WalletGold);
+        for (const FLKRunHeroState &Hero : State.Heroes)
+        {
+            const FLKUnitRow *Unit = LKUnitContent::Find(Hero.HeroId);
+            Copy += FString::Printf(TEXT("\n%s %.0f / %.0f"),
+                                    Unit ? *Unit->DisplayName.ToString() : *Hero.HeroId.ToString(), Hero.Health,
+                                    Hero.MaxHealth);
+        }
+    }
+    else if (!DisplayedNodeIds.Contains(Node.NodeId))
+    {
+        Copy += TEXT("\n\n仅可查看，当前位置不能前往此节点。");
+    }
+    Detail->SetText(FText::FromString(Copy));
+    FLKHomePanelAction Action;
+    Action.ActionId = TEXT("Start");
+    Action.bEnabled = Service || DisplayedNodeIds.Contains(Node.NodeId);
+    Action.Label = FText::FromString(
+        Service ? (Node.Type == ELKDungeonNodeType::Rest ? TEXT("休息 · 恢复 30% 生命") : TEXT("离开市场"))
+                : TEXT("前往此节点"));
+    PrimaryAction->SetupAction(1, Action);
 }
-
-void ULKRunNodeSelectWidget::HandleOption0Clicked() { TrySelect(0); }
-void ULKRunNodeSelectWidget::HandleOption1Clicked() { TrySelect(1); }
+void ULKRunNodeSelectWidget::HandleAction(int32 Index)
+{
+    ULKRunSubsystem *Run = GetRun();
+    if (!Run)
+    {
+        return;
+    }
+    if (Index >= 100)
+    {
+        const int32 Choice = Index - 100;
+        if (DisplayedNodeIds.IsValidIndex(Choice))
+        {
+            SelectMapNode(DisplayedNodeIds[Choice]);
+        }
+        return;
+    }
+    if (Index >= 10)
+    {
+        const int32 Region = Index - 11;
+        Map->FocusRegion(RegionIds.IsValidIndex(Region) ? RegionIds[Region] : NAME_None);
+        return;
+    }
+    if (Index == 2)
+    {
+        ALKBattleGameMode *GM = OwnerHUD ? OwnerHUD->GetBattleGameMode() : nullptr;
+        if (!GM || !GM->ReturnToHome())
+        {
+            Status->SetText(FText::FromString(TEXT("暂时无法返回家园，请检查存档后重试。")));
+        }
+        return;
+    }
+    if (Index != 1)
+    {
+        return;
+    }
+    if (Run->HasServiceNode())
+    {
+        const bool Rest = Run->GetNode(Run->GetRunState().CurrentNodeId).Type == ELKDungeonNodeType::Rest;
+        const bool Success = Run->ResolveServiceNode(Rest ? TEXT("RestHeal") : TEXT("LeaveMarket"));
+        if (Success)
+        {
+            SelectedNodeId = NAME_None;
+        }
+        Status->SetText(FText::FromString(Success ? (Rest ? TEXT("已休息，英雄恢复 30% 最大生命。请选择下一站。")
+                                                          : TEXT("已离开市场。请选择下一站。"))
+                                                  : TEXT("操作未保存，请重试。")));
+    }
+    else
+    {
+        const int32 Choice = DisplayedNodeIds.IndexOfByKey(SelectedNodeId);
+        if (Choice == INDEX_NONE)
+        {
+            return;
+        }
+        const ELKNodeSelectionResult Result =
+            OwnerHUD ? OwnerHUD->SelectNextNode(Choice) : Run->SelectNode(SelectedNodeId);
+        if (Result == ELKNodeSelectionResult::BattleEntered)
+        {
+            SetIsEnabled(false);
+            return;
+        }
+        Status->SetText(FText::FromString(
+            Result == ELKNodeSelectionResult::Rejected ? TEXT("该节点不可前往或保存失败，请重试。") : TEXT("")));
+    }
+    RefreshNodeSelect();
+}

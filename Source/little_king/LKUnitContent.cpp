@@ -1,6 +1,7 @@
 #include "LKUnitContent.h"
 
 #include "LKUndeadContent.h"
+#include "LKExpeditionMercenaryContent.h"
 
 namespace LKUnitContent
 {
@@ -61,6 +62,17 @@ const TMap<FName, FLKUnitRow>& Units()
         {
             Result.Add(Pair.Key, Pair.Value);
         }
+        for (TPair<FName, FLKUnitRow>& Pair : Result)
+        {
+            FLKUnitRow& Row = Pair.Value;
+            const bool bUndead = LKUndeadContent::Units().Contains(Pair.Key);
+            Row.Race = bUndead ? ELKRace::Undead : (Row.UnitClass == ELKUnitClass::Building ? ELKRace::None : ELKRace::Human);
+            if (Row.UnitClass == ELKUnitClass::Hero) { Row.Quality = bUndead ? ELKQuality::Rare : ELKQuality::Epic; }
+            if (Row.UnitClass == ELKUnitClass::Boss) { Row.Quality = ELKQuality::Epic; }
+            if (Pair.Key == "Unit_Shieldbearer" || Pair.Key == "Building_Barracks") { Row.Quality = ELKQuality::Uncommon; }
+        }
+        for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
+        { Result.Add(Definition.Unit.UnitId, Definition.Unit); }
         return Result;
     }();
     return Rows;
@@ -81,6 +93,12 @@ FLKUnitRow MergeAuthoredTuning(const FLKUnitRow& Canonical, const FLKUnitRow* Au
     Result.AttackType = Canonical.AttackType;
     Result.ProjectileId = Canonical.ProjectileId;
     Result.UnitClass = Canonical.UnitClass;
+    Result.Quality = Canonical.Quality;
+    Result.Race = Canonical.Race;
+    Result.ActiveAbility = Canonical.ActiveAbility;
+    Result.DeckSlots = Canonical.DeckSlots;
+    Result.bTargetsBuildingsOnly = Canonical.bTargetsBuildingsOnly;
+    if (Canonical.ActiveAbility != ELKActiveAbility::None && Result.SkillCooldown <= 0.f) { Result.SkillCooldown = Canonical.SkillCooldown; }
     Result.bSkeleton = Canonical.bSkeleton;
     Result.PassiveAbility = Canonical.PassiveAbility;
     Result.PassiveHealPercent = Canonical.PassiveHealPercent;

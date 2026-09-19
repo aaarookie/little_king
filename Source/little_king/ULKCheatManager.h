@@ -23,6 +23,10 @@ class ALKBattleGameMode;
  *   RunHeroMaxHealth 英雄ID 数值  房间间修改英雄永久基础最大生命
  *   RunHeroTrait 英雄ID 特性ID 0/1 房间间删除/添加英雄永久特性
  *   ListRunState               列出远征、当前遭遇奖励档和英雄永久状态
+ *   HomeGold 数量              给家园永久档加/减金币（调试；负数扣减，最低 0）
+ *   HomeUpgrade 建筑ID         按当前等级升级一座家园建筑（跳过 UI，走同一事务）
+ *   HomeReset                  重置家园永久档为默认（三英雄七卡、神像/金库 1 级、0 金币）
+ *   ListHomeState              列出金币、建筑等级、已保存战备、远征状态与待结算金币
  */
 UCLASS()
 class ULKCheatManager : public UCheatManager
@@ -30,6 +34,7 @@ class ULKCheatManager : public UCheatManager
 	GENERATED_BODY()
 
 public:
+	virtual bool ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, UObject* Executor) override;
 	UFUNCTION(Exec)
 	void AddSilver(float Amount);
 
@@ -70,6 +75,16 @@ public:
 	UFUNCTION(Exec) void RunHeroTrait(const FString& HeroId, const FString& TraitId, int32 Enabled);
 	/** 输出当前远征、房间、遭遇奖励档和英雄永久状态。 */
 	UFUNCTION(Exec) void ListRunState();
+
+	// ---------- H 阶段 3：家园调试 ----------
+	/** 仅调试：给家园永久档加金币（负数扣减，最低 0；写盘失败会明确提示）。 */
+	UFUNCTION(Exec) void HomeGold(int32 Amount);
+	/** 仅调试：按建筑稳定 ID 升级一级（Home_StatueSaintMaria / Home_Treasury 等），走与 UI 相同的事务。 */
+	UFUNCTION(Exec) void HomeUpgrade(const FString& BuildingId);
+	/** 仅调试：重置家园永久档为默认值。 */
+	UFUNCTION(Exec) void HomeReset();
+	/** 输出家园金币、建筑等级、战备、远征状态与待结算金币。 */
+	UFUNCTION(Exec) void ListHomeState();
 
 private:
 	ALKBattleGameMode* GetGameMode() const;

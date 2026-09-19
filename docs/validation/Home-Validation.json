@@ -1,0 +1,56 @@
+﻿{
+    "note":  "家园 H0~H5 验证（精简摘要；完整报告见 Saved/Automation/Home6/index.json 与 Saved/Logs/Home6.log）",
+    "reportCreatedOn":  "2026.09.09-13.51.32",
+    "engine":  "UE 5.8.1-56057345",
+    "target":  "little_kingEditor Win64 Development",
+    "succeeded":  19,
+    "succeededWithWarnings":  25,
+    "failed":  0,
+    "notRun":  0,
+    "total":  44,
+    "homeTests":  [
+                      {
+                          "fullTestPath":  "LittleKing.H1.Profile.CreateRotateAndRecover",
+                          "state":  "Success",
+                          "warnings":  2,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H2.Loadout.ValidationAndPersistence",
+                          "state":  "Success",
+                          "warnings":  1,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H3.Expedition.SnapshotAndApplication",
+                          "state":  "Success",
+                          "warnings":  0,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H3.World.BuildingsAndPanels",
+                          "state":  "Success",
+                          "warnings":  9,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H4.Settlement.MathAndHandoff",
+                          "state":  "Success",
+                          "warnings":  0,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H4.Upgrade.TransactionAndCurves",
+                          "state":  "Success",
+                          "warnings":  0,
+                          "errors":  0
+                      },
+                      {
+                          "fullTestPath":  "LittleKing.H5.Migration.LegacyRunToSchema5",
+                          "state":  "Success",
+                          "warnings":  1,
+                          "errors":  0
+                      }
+                  ],
+    "otherTests":  37
+}

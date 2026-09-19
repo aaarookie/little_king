@@ -81,6 +81,9 @@ void ALKPlayerController::SetupInputComponent()
 
 	InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &ALKPlayerController::HandleLeftClick);
 	InputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &ALKPlayerController::HandleRightClick);
+	// 原生兜底快捷键：即使蓝图 HUD 的"开始"按钮因为界面状态没能触发，也能开始战斗。
+	InputComponent->BindKey(EKeys::SpaceBar, IE_Pressed, this, &ALKPlayerController::RequestStartBattle);
+	InputComponent->BindKey(EKeys::Enter, IE_Pressed, this, &ALKPlayerController::RequestStartBattle);
 }
 
 void ALKPlayerController::HandleLeftClick()
@@ -256,9 +259,14 @@ void ALKPlayerController::RequestStartBattle()
 {
     if (ALKBattleGameMode* GM = GetBattleGameMode())
     {
-        if (GM->CanStartBattle()) { CancelPlacement(); GM->ForceStartBattle(); }
+        const bool bCanStart = GM->CanStartBattle();
+        // 每次请求都记一行：确认"点击有没有到达 C++"以及被哪条判据挡住（面对面不攻击类问题靠这行定位）。
+        UE_LOG(LogLKBattle, Log, TEXT("[Battle] 请求开始战斗：可开始=%d（阶段=%d，玩家英雄 %d/%d）"),
+            int32(bCanStart), int32(GM->GetPhase()), GM->GetDeployedPlayerHeroCount(), GM->GetRequiredHeroCount());
+        if (bCanStart) { CancelPlacement(); GM->ForceStartBattle(); }
         else
         {
+            GM->LogStartBattleBlockers();
             OnPlayResult.Broadcast(GetPhase() != ELKGamePhase::Deployment ? ELKPlayResult::WrongPhase
                 : (!GM->HasValidDecks() ? ELKPlayResult::InvalidCardData : ELKPlayResult::DeploymentIncomplete));
         }

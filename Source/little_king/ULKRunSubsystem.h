@@ -5,6 +5,9 @@
 #include "LKRunTypes.h"
 #include "ULKRunSubsystem.generated.h"
 
+class ULKProfileSubsystem;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnServiceNodeEntered, FName, NodeId, ELKDungeonNodeType, NodeType);
+
 /**
  * D2 远征状态机。它保存英雄永久状态和开局遭遇快照；
  * 战场 Actor、临时光环、强制目标、银币、手牌位置、弹道与技能冷却均由每个世界重建。
@@ -16,6 +19,14 @@ class ULKRunSubsystem : public UGameInstanceSubsystem
     GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, Category="LK|Run") bool HasServiceNode() const { return State.Phase == ELKRunPhase::ResolvingNode; }
+	UFUNCTION(BlueprintCallable, Category="LK|Run") bool ResolveServiceNode(FName ActionId);
+	UPROPERTY(BlueprintAssignable, Category="LK|Run") FOnServiceNodeEntered OnServiceNodeEntered;
+	UFUNCTION(BlueprintPure, Category="LK|Run") int32 GetWalletGold() const { return State.WalletGold; }
+	/** 节点奖励/未来商品共用幂等钱包接口；只有安全节点阶段允许交易。 */
+	bool ChangeWalletGold(int32 Delta, FGuid TransactionId);
+	/** 读档/进入家园后对齐出发资金；不向不存在的 Profile 借钱。 */
+	bool ReconcileDepartureFunding();
     /** 新建远征；已有未结束远征时拒绝覆盖。 */
     bool StartNewRun(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards, int32 Seed);
 	bool StartNewRun(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards, int32 Seed,
@@ -24,6 +35,13 @@ public:
     bool RestartRun(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards, int32 Seed);
 	bool RestartRun(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards, int32 Seed,
 		const TArray<FLKEncounterRow>& Encounters);
+
+    // ---------- H3：家园出征（区域 + 战备 + 加成快照一次写入） ----------
+    /** 家园大门组装的完整出征输入；所有字段在第一次 AutoSave 之前就位 */
+    bool StartNewRun(const FLKExpeditionStartRequest& Request);
+    /** 终态后重新开始（家园"开始新远征"）；进行中的远征不允许覆盖 */
+    bool RestartRun(const FLKExpeditionStartRequest& Request);
+
     /** 当前世界领取待进入的房间上下文；重复加载同一战斗返回同一个 AttemptId。 */
     bool BeginCurrentBattle(FLKBattleContext& OutContext);
     /** 只接受身份完整且未处理过的当前结果；成功后保存恢复后英雄状态。 */
@@ -56,7 +74,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "LK|Run")
     FLKRunRewardOffer GetPendingRewardOffer(int32 Index) const;
     /** 原子领取第 Index 个选项：只允许一次，成功后回到 ChoosingNode（可点"下一关"） */
-    bool ChooseReward(int32 Index);
+    bool ChooseReward(int32 Index, FName ReplacedCardId = NAME_None);
+    bool ChooseRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds);
+    UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetDeckCapacityUsed() const;
+    /** 旧版本超额卡组先由玩家裁减，不在读档时丢弃卡牌。 */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") bool NeedsDeckReduction() const { return !IsTerminal() && GetDeckCapacityUsed() > 8; }
+    bool DiscardExcessCard(FName CardId);
     /** 原子跳过本批奖励：消费批次并回到 ChoosingNode；不可回头补领 */
     bool SkipReward();
 	/** 供后续奖励/事件使用：只允许在两场之间修改永久基础最大生命。 */
@@ -77,6 +100,14 @@ public:
     // ---------- D5 安全节点存档 ----------
     /** 固定远征存档槽名 */
     static FString GetRunSlotName();
+    /** 仅自动化测试：改写远征槽名（避免测试覆盖玩家真实远征档）；传空串恢复默认 */
+    static void SetRunSlotNameOverrideForTest(const FString& InSlotName);
+    void ConfigureStorage(const FString& SlotName);
+    FString GetStorageSlot() const;
+    /** 仅自动化测试：迁移旧档时用它作为关联的 ProfileId（测试实例没有注册的 Profile 子系统） */
+    void SetProfileIdOverrideForTest(const FGuid& InProfileId) { ProfileIdOverrideForTest = InProfileId; }
+    /** 仅自动化测试：入账交接时使用指定永久档（测试的两个子系统不共享 GameInstance） */
+    void SetProfileSubsystemOverrideForTest(ULKProfileSubsystem* InProfile);
     /** 载入前校验：版本/数值/结构/引用；未知版本与损坏内容明确拒绝 */
     static bool ValidateStoredRun(const FLKRunState& State, FString& OutError);
     /** 写盘到指定槽（测试可指定唯一槽）；失败返回 false 且不改内存 */
@@ -92,6 +123,19 @@ public:
     /** 自动化测试关闭自动落盘，避免并行写同一槽 */
     void SetAutoSaveEnabled(bool bEnabled) { bAutoSaveEnabled = bEnabled; }
 
+    // ---------- H4：金币结算（远征终态 → 家园永久档，幂等交接） ----------
+    /** 本轮已暂存金币（每房胜利累加；终态按规则折算） */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetPendingGold() const { return State.PendingGold; }
+    /** 终态冻结的结算回执（未终态时 SettlementId 无效） */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") FLKSettlementReceipt GetPendingSettlement() const { return State.PendingSettlement; }
+    UFUNCTION(BlueprintPure, Category = "LK|Run") bool HasPendingSettlement() const { return State.PendingSettlement.SettlementId.IsValid(); }
+    /** 标记 Run 侧交接完成（Profile 已入账）；写盘失败返回 false，可重试 */
+    bool MarkPendingSettlementApplied();
+    /** 让 Profile 幂等入账并标记交接；返回是否已完成交接（无 Profile/不参与结算时返回 false） */
+    bool ApplyPendingSettlementToProfile();
+    /** 明确结束当前远征：终态 Abandoned，全额带回钱包剩余金币 */
+    bool AbandonCurrentRun();
+
     UFUNCTION(BlueprintPure, Category = "LK|Run") FLKRunState GetRunState() const { return State; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") ELKRunPhase GetRunPhase() const { return State.Phase; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool HasRun() const { return State.RunId.IsValid(); }
@@ -99,13 +143,36 @@ public:
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool CanAdvance() const { return State.Phase == ELKRunPhase::ChoosingNode; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool IsTerminal() const;
     UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetCurrentRoomIndex() const;
-    UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetTotalRoomCount() const { return 4; }
+    /** 已完成战斗 + 从当前节点出发最多还需的战斗数；选路后可能减少。 */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetTotalRoomCount() const;
+    UFUNCTION(BlueprintPure, Category = "LK|Run") FName GetRegionId() const { return State.RegionId; }
+    UFUNCTION(BlueprintPure, Category = "LK|Run") FLKMetaBonusSnapshot GetBonusSnapshot() const { return State.BonusSnapshot; }
+    UFUNCTION(BlueprintPure, Category = "LK|Run") FLKHomeRewardRules GetRewardRules() const { return State.RewardRules; }
+    UFUNCTION(BlueprintPure, Category = "LK|Run") bool IsHomeRewardEligible() const { return State.bHomeRewardEligible; }
+
+    /** Stage 3 content/capacity contract; version 6 routes and wallets are preserved. */
+    static constexpr int32 CurrentSchemaVersion = 8;
 
 private:
     UPROPERTY(Transient) FLKRunState State;
+    FString StorageSlot;
     bool bAutoSaveEnabled = true;
+    /** 仅自动化测试：迁移旧档时的 ProfileId 关联值 */
+    FGuid ProfileIdOverrideForTest;
+    /** 仅自动化测试：入账交接使用的永久档 */
+    TWeakObjectPtr<ULKProfileSubsystem> ProfileSubsystemOverrideForTest;
     /** 安全点自动保存（成功路径末尾调用；写失败仅 Warning，不影响内存状态） */
     void AutoSave();
+
+    /** 家园出征/重开的公共实现（bRestart = 允许覆盖终态） */
+    bool StartRunInternal(const FLKExpeditionStartRequest& Request, bool bRestart);
+    /** 旧签名（独立测试/调试）构造的出征输入：不关联 Profile、不参与金币结算 */
+    FLKExpeditionStartRequest MakeStandaloneRequest(const TArray<FLKRunHeroState>& Heroes,
+        const TArray<FLKRunCardState>& Cards, int32 Seed, const TArray<FLKEncounterRow>& Encounters) const;
+    /** 终态时冻结金币结算回执（同一轮只冻结一次） */
+    void FreezeTerminalSettlement();
+    /** v0.6 档迁移到 Schema 5：补默认加成/区域/战备并标记旧轮不参与金币结算 */
+    void MigrateStoredRun(FLKRunState& InOutState) const;
 
     bool ValidateStartingParty(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards) const;
 	bool ValidateEncounterCatalog(const TArray<FLKEncounterRow>& Encounters) const;

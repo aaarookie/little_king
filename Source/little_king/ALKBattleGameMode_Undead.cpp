@@ -71,9 +71,12 @@ void ALKBattleGameMode::FinalizeHeroRecovery()
         Snapshot.HealthBeforeRecovery = Hero->IsDead() ? 0.f : Hero->GetHealth();
         if (bPlayerSide || !bExpeditionBattle)
         {
-            // 跨房继承只存在于玩家英雄：远征房间对玩家执行战后 +40% 恢复。
+            // 跨房继承只存在于玩家英雄：远征房间按本轮冻结的神像快照恢复（默认 40%）。
             // 独立单场（无远征）保留旧的双方恢复，仅供结算展示与调试。
-            Hero->RecoverAfterBattle(GameData->HeroPostBattleRecovery);
+            const float RecoveryPercent = bExpeditionBattle
+                ? BattleContext.BonusSnapshot.HeroRecoveryPercent
+                : GameData->HeroPostBattleRecovery;
+            Hero->RecoverAfterBattle(RecoveryPercent);
         }
         else
         {

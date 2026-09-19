@@ -23,6 +23,10 @@ public:
 	/** 朝目标点移动（Speed 由调用方每帧传入，便于读 GAS 属性） */
 	void MoveToward(const FVector& Destination, float Speed);
 	bool CanReach(const FVector& Target) const;
+    /** Skill movement obeys the same field/static-body geometry as normal navigation. */
+    bool CanStandAt(const FVector& Location, bool bIncludeUnits = false) const;
+    bool TeleportToFreePoint(const FVector& Location);
+    FVector MoveSkillDelta(const FVector& Delta);
 
 	void Stop() { bMoving = false; }
 

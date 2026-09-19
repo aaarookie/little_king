@@ -1,4 +1,5 @@
 #include "ULKCheatManager.h"
+#include "LKMoneyCommand.h"
 
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -6,11 +7,18 @@
 
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
+#include "LKHomeContent.h"
 #include "LKLog.h"
 #include "LKGameplayHelpers.h"
 #include "ULKDeckState.h"
+#include "ULKProfileSubsystem.h"
 #include "ULKSilverComponent.h"
 #include "ULKRunSubsystem.h"
+
+bool ULKCheatManager::ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, UObject* Executor)
+{
+	return LKMoneyCommand::TryExecute(GetWorld(), Cmd, Ar) || Super::ProcessConsoleExec(Cmd, Ar, Executor);
+}
 
 ALKBattleGameMode* ULKCheatManager::GetGameMode() const
 {
@@ -265,4 +273,98 @@ void ULKCheatManager::DamageUnit(const FString& UnitId, int32 TeamIdx, float Amo
         }
     }
     UE_LOG(LogLK, Warning, TEXT("[Cheat] 未找到目标单位 %s 阵营%d"), *UnitId, TeamIdx);
+}
+
+// ---------- H 阶段 3：家园调试 ----------
+
+namespace
+{
+	ULKProfileSubsystem* GetProfileSubsystemFromWorld(UWorld* World)
+	{
+		UGameInstance* Instance = World ? World->GetGameInstance() : nullptr;
+		return Instance ? Instance->GetSubsystem<ULKProfileSubsystem>() : nullptr;
+	}
+}
+
+void ULKCheatManager::HomeGold(int32 Amount)
+{
+	ULKProfileSubsystem* Profile = GetProfileSubsystemFromWorld(GetWorld());
+	if (!Profile || !Profile->EnsureProfile() || !Profile->HasProfile())
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] 家园永久档不可用"));
+		return;
+	}
+	const int32 Before = Profile->GetGold();
+	const bool bOk = Profile->AddGold(Amount);
+	if (bOk)
+	{
+		UE_LOG(LogLK, Log, TEXT("[Cheat] HomeGold %+d: %d -> %d（已保存）"), Amount, Before, Profile->GetGold());
+	}
+	else
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] HomeGold %+d 失败：永久档写盘不可用"), Amount);
+	}
+}
+
+void ULKCheatManager::HomeUpgrade(const FString& BuildingId)
+{
+	ULKProfileSubsystem* Profile = GetProfileSubsystemFromWorld(GetWorld());
+	if (!Profile || !Profile->EnsureProfile() || !Profile->HasProfile())
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] 家园永久档不可用"));
+		return;
+	}
+	const FName Id(*BuildingId);
+	const int32 Level = Profile->GetBuildingLevel(Id);
+	const ELKUpgradeResult Result = Profile->UpgradeBuilding(Id, Level, FGuid::NewGuid());
+	if (Result == ELKUpgradeResult::Success)
+	{
+		UE_LOG(LogLK, Log, TEXT("[Cheat] HomeUpgrade %s：Lv%d -> Lv%d，金币 %d"),
+			*BuildingId, Level, Profile->GetBuildingLevel(Id), Profile->GetGold());
+	}
+	else
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] HomeUpgrade %s 失败：Lv%d，结果 %d，金币 %d"),
+			*BuildingId, Level, int32(Result), Profile->GetGold());
+	}
+}
+
+void ULKCheatManager::HomeReset()
+{
+	ULKProfileSubsystem* Profile = GetProfileSubsystemFromWorld(GetWorld());
+	if (!Profile)
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] 没有 ProfileSubsystem"));
+		return;
+	}
+	const bool bOk = Profile->ResetProfile();
+	if (bOk) { UE_LOG(LogLK, Log, TEXT("[Cheat] HomeReset：已重置")); }
+	else { UE_LOG(LogLK, Warning, TEXT("[Cheat] HomeReset 失败")); }
+}
+
+void ULKCheatManager::ListHomeState()
+{
+	ULKProfileSubsystem* Profile = GetProfileSubsystemFromWorld(GetWorld());
+	if (!Profile || !Profile->EnsureProfile() || !Profile->HasProfile())
+	{
+		UE_LOG(LogLK, Warning, TEXT("[Cheat] 家园永久档不可用：%s"), *Profile->GetLastError());
+		return;
+	}
+	UE_LOG(LogLK, Log, TEXT("[Cheat] Home 金币=%d Revision=%d 可写=%d 解锁英雄=%d 解锁卡=%d 已保存战备=%d 英雄/%d 卡"),
+		Profile->GetGold(), Profile->GetProfile().Revision, int32(Profile->IsProfileUsable()),
+		Profile->GetProfile().UnlockedHeroIds.Num(), Profile->GetProfile().UnlockedCardIds.Num(),
+		Profile->GetSavedLoadout().HeroIds.Num(), Profile->GetSavedLoadout().CardIds.Num());
+	for (const FLKBuildingDefinition& Definition : LKHomeContent::Buildings())
+	{
+		UE_LOG(LogLK, Log, TEXT("[Cheat] Home 建筑 %s（%s）Lv%d/%d%s"),
+			*Definition.BuildingId.ToString(), *Definition.DisplayName.ToString(),
+			Profile->GetBuildingLevel(Definition.BuildingId), Definition.MaxLevel,
+			Definition.bUpgradable ? TEXT("") : TEXT("（不可升级）"));
+	}
+	if (const ULKRunSubsystem* Run = GetWorld()->GetGameInstance()->GetSubsystem<ULKRunSubsystem>())
+	{
+		UE_LOG(LogLK, Log, TEXT("[Cheat] Home 远征：HasRun=%d 进行中=%d 阶段=%d 区域=%s 暂存金币=%d 待交接=%d"),
+			int32(Run->HasRun()), int32(Run->HasRunInProgress()), int32(Run->GetRunPhase()),
+			*Run->GetRegionId().ToString(), Run->GetPendingGold(), int32(Run->HasPendingSettlement()));
+	}
 }

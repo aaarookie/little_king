@@ -22,6 +22,14 @@
 #include "ULKBattleHUDWidget.h"
 #include "ULKCardDefinition.h"
 #include "ULKRunSubsystem.h"
+#include "LKCardPresentation.h"
+#include "LKCardRules.h"
+#include "ULKSilverComponent.h"
+#include "ULKHomeListButtonWidget.h"
+#include "Components/ScrollBox.h"
+#include "Components/UniformGridPanel.h"
+#include "Components/UniformGridSlot.h"
+#include "Kismet/GameplayStatics.h"
 
 namespace
 {
@@ -139,7 +147,7 @@ void ULKRunRewardWidget::BuildNativeTree()
 	Content->AddChildToVerticalBox(ProgressText);
 	AddVerticalSpace(WidgetTree, Content, 20.f);
 
-	UHorizontalBox* Options = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Options"));
+	Options = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Options"));
 	if (UVerticalBoxSlot* LayoutSlot = Content->AddChildToVerticalBox(Options))
 	{
 		LayoutSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
@@ -167,8 +175,8 @@ void ULKRunRewardWidget::BuildNativeTree()
 		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(Kind)) { LayoutSlot->SetPadding(FMargin(12.f, 13.f, 12.f, 5.f)); }
 
 		USizeBox* IconSize = WidgetTree->ConstructWidget<USizeBox>();
-		IconSize->SetWidthOverride(96.f);
-		IconSize->SetHeightOverride(96.f);
+		IconSize->SetWidthOverride(54.f);
+		IconSize->SetHeightOverride(54.f);
 		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(IconSize))
 		{
 			LayoutSlot->SetHorizontalAlignment(HAlign_Center);
@@ -186,7 +194,7 @@ void ULKRunRewardWidget::BuildNativeTree()
 			LayoutSlot->SetHorizontalAlignment(HAlign_Fill);
 			LayoutSlot->SetVerticalAlignment(VAlign_Fill);
 		}
-		UTextBlock* Placeholder = MakeText(WidgetTree, *FString::Printf(TEXT("RewardGlyph%d"), Index), 42, GoldColor);
+		UTextBlock* Placeholder = MakeText(WidgetTree, *FString::Printf(TEXT("RewardGlyph%d"), Index), 26, GoldColor);
 		if (UOverlaySlot* LayoutSlot = IconOverlay->AddChildToOverlay(Placeholder))
 		{
 			LayoutSlot->SetHorizontalAlignment(HAlign_Center);
@@ -198,11 +206,14 @@ void ULKRunRewardWidget::BuildNativeTree()
 
 		UTextBlock* Detail = MakeText(WidgetTree, *FString::Printf(TEXT("RewardDetail%d"), Index), 17, MutedColor);
 		Detail->SetLineHeightPercentage(1.15f);
-		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(Detail))
+        Detail->SetWrapTextAt(260.f);
+        UScrollBox* DetailScroll = WidgetTree->ConstructWidget<UScrollBox>();
+        DetailScroll->AddChild(Detail);
+		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(DetailScroll))
 		{
 			LayoutSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 			LayoutSlot->SetPadding(FMargin(18.f, 2.f, 18.f, 14.f));
-			LayoutSlot->SetVerticalAlignment(VAlign_Center);
+			LayoutSlot->SetVerticalAlignment(VAlign_Fill);
 		}
 
 		OptionButtons.Add(Button);
@@ -217,6 +228,26 @@ void ULKRunRewardWidget::BuildNativeTree()
 	OptionButtons[1]->OnClicked.AddDynamic(this, &ULKRunRewardWidget::HandleOption1Clicked);
 	OptionButtons[2]->OnClicked.AddDynamic(this, &ULKRunRewardWidget::HandleOption2Clicked);
 
+    ReplacementPanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("ReplacementPanel"));
+    Content->AddChildToVerticalBox(ReplacementPanel)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    ReplacementPanel->SetVisibility(ESlateVisibility::Collapsed);
+    ReplacementTitle = MakeText(WidgetTree, TEXT("ReplacementTitle"), 22, GoldColor);
+    ReplacementPanel->AddChildToVerticalBox(ReplacementTitle);
+    ReplacementList = WidgetTree->ConstructWidget<UScrollBox>(UScrollBox::StaticClass(), TEXT("ReplacementList"));
+    ReplacementPanel->AddChildToVerticalBox(ReplacementList)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    ReplacementGrid = WidgetTree->ConstructWidget<UUniformGridPanel>(UUniformGridPanel::StaticClass(), TEXT("ReplacementGrid"));
+    ReplacementGrid->SetSlotPadding(FMargin(4.f));
+    ReplacementList->AddChild(ReplacementGrid);
+    ReplacementBudget = MakeText(WidgetTree, TEXT("ReplacementBudget"), 15, MutedColor);
+    ReplacementPanel->AddChildToVerticalBox(ReplacementBudget);
+    ConfirmReplacementButton = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass(), TEXT("Btn_ConfirmReplacement"));
+    StyleButton(ConfirmReplacementButton, FLinearColor(.08f,.20f,.17f), FLinearColor(.12f,.30f,.24f));
+    UTextBlock* ConfirmText = MakeText(WidgetTree, TEXT("ConfirmReplacementLabel"), 17, PaleColor);
+    ConfirmText->SetText(FText::FromString(TEXT("确认替换")));
+    ConfirmReplacementButton->SetContent(ConfirmText);
+    ConfirmReplacementButton->OnClicked.AddDynamic(this, &ULKRunRewardWidget::HandleConfirmReplacements);
+    ReplacementPanel->AddChildToVerticalBox(ConfirmReplacementButton);
+
 	AddVerticalSpace(WidgetTree, Content, 17.f);
 	DeckSummaryText = MakeText(WidgetTree, TEXT("DeckSummary"), 15, MutedColor, ETextJustify::Left);
 	if (UVerticalBoxSlot* LayoutSlot = Content->AddChildToVerticalBox(DeckSummaryText))
@@ -227,7 +258,7 @@ void ULKRunRewardWidget::BuildNativeTree()
 	UHorizontalBox* Footer = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Footer"));
 	Content->AddChildToVerticalBox(Footer);
 	StatusText = MakeText(WidgetTree, TEXT("Status"), 15, MutedColor, ETextJustify::Left);
-	StatusText->SetText(FText::FromString(TEXT("奖励在本次远征后续房间中生效")));
+	StatusText->SetText(FText::FromString(TEXT("临时佣兵仅本次远征有效 · 滚轮查看技能详情")));
 	if (UHorizontalBoxSlot* LayoutSlot = Footer->AddChildToHorizontalBox(StatusText))
 	{
 		LayoutSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
@@ -244,14 +275,26 @@ void ULKRunRewardWidget::BuildNativeTree()
 		LayoutSlot->SetPadding(FMargin(20.f, 0.f, 0.f, 0.f));
 		LayoutSlot->SetVerticalAlignment(VAlign_Center);
 	}
-	UTextBlock* SkipLabel = MakeText(WidgetTree, TEXT("SkipLabel"), 17, PaleColor);
+	SkipLabel = MakeText(WidgetTree, TEXT("SkipLabel"), 17, PaleColor);
+    SkipLabel->SetAutoWrapText(false);
 	SkipLabel->SetText(FText::FromString(TEXT("跳过奖励")));
 	SkipButton->SetContent(SkipLabel);
+	UButton* Home = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass(), TEXT("Btn_ReturnHome"));
+	StyleButton(Home, FLinearColor(0.10f, 0.14f, 0.18f), FLinearColor(0.17f, 0.22f, 0.27f));
+	Home->OnClicked.AddDynamic(this, &ULKRunRewardWidget::HandleReturnHomeClicked);
+	Footer->AddChildToHorizontalBox(Home)->SetPadding(FMargin(12.f, 0.f, 0.f, 0.f));
+	UTextBlock* HomeText = MakeText(WidgetTree, TEXT("ReturnHomeText"), 17, PaleColor);
+	HomeText->SetText(FText::FromString(TEXT("暂回家园")));
+	Home->SetContent(HomeText);
+	Home->SetToolTipText(FText::FromString(TEXT("保留当前奖励，继续远征时再选择")));
 }
 
 void ULKRunRewardWidget::RefreshReward()
 {
 	if (!OwnerHUD) { return; }
+    const ULKRunSubsystem* Run = GetGameInstance() ? GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
+    bReducingLegacyDeck = Run && Run->NeedsDeckReduction();
+    if (Options && IsChoosingReplacement()) { ShowReplacementChoices(); return; }
 	DisplayedOptionCount = FMath::Clamp(OwnerHUD->GetPendingRewardCount(), 0, 3);
 	if (OptionButtons.Num() != 3)
 	{
@@ -261,11 +304,10 @@ void ULKRunRewardWidget::RefreshReward()
 	const ALKBattleGameMode* GM = OwnerHUD->GetBattleGameMode();
 	if (ProgressText)
 	{
-		const int32 Room = GM ? GM->GetExpeditionRoomIndex() : 0;
-		const int32 Total = GM ? GM->GetExpeditionRoomCount() : 3;
+		const int32 Room = Run ? Run->GetRunState().BattleHistory.Num() : 0;
 		const int32 Tier = GM ? GM->GetCurrentEncounter().RewardTier : 0;
 		ProgressText->SetText(FText::FromString(FString::Printf(
-			TEXT("第 %d / %d 间完成  ·  奖励档 %d  ·  选择一项继续"), Room, Total, Tier)));
+			TEXT("已完成 %d 场战斗  ·  奖励档 %d  ·  选择一项继续"), Room, Tier)));
 	}
 
 	for (int32 Index = 0; Index < 3; ++Index)
@@ -280,6 +322,14 @@ void ULKRunRewardWidget::RefreshReward()
 		OptionKindTexts[Index]->SetText(FText::FromString(
 			Offer.Kind == ELKRunRewardKind::AddCard ? TEXT("新卡入队") : TEXT("卡牌强化")));
 		OptionTitleTexts[Index]->SetText(FText::FromString(CardName));
+        if (Definition)
+        {
+            OptionTitleTexts[Index]->SetColorAndOpacity(LKCardPresentation::Color(*Definition));
+            OptionPlaceholderTexts[Index]->SetColorAndOpacity(LKCardPresentation::Color(*Definition));
+            OptionKindTexts[Index]->SetText(FText::FromString(FString::Printf(TEXT("%s · %s"),
+                *LKCardPresentation::Classification(*Definition).ToString(), Offer.Kind == ELKRunRewardKind::AddCard ? TEXT("新卡入队") : TEXT("卡牌强化"))));
+            OptionButtons[Index]->SetToolTipText(LKCardPresentation::Detail(*Definition));
+        }
 		OptionDetailTexts[Index]->SetText(BuildOptionDetail(Index));
 
 		UTexture2D* Icon = OwnerHUD->GetCardIcon(Offer.CardId);
@@ -304,9 +354,11 @@ FText ULKRunRewardWidget::BuildOptionDetail(int32 Index) const
 
 	if (Offer.Kind == ELKRunRewardKind::AddCard)
 	{
-		const FLKUnitRow* Unit = GM->GetUnitRow(Definition->SpawnUnitId);
-		const FString Role = Unit && Unit->AttackType == ELKAttackType::Ranged ? TEXT("远程佣兵") : TEXT("近战佣兵");
-		return FText::FromString(FString::Printf(TEXT("%d 费 · %s\n加入本轮牌组\n每种卡始终只有一张"), Definition->Cost, *Role));
+        FString Detail = LKCardPresentation::Detail(*Definition, GM->GetUnitRow(Definition->CardType == ELKCardType::Building ? Definition->BuildingUnitId : Definition->SpawnUnitId)).ToString();
+        const ULKSilverComponent* Silver = GM->GetTeamSilver(ELKTeam::Player);
+        if (Silver && Definition->Cost > Silver->GetCap())
+        { Detail += FString::Printf(TEXT("\n\n本轮银币上限 %.0f，当前无法部署此卡。金库升级对下次新远征生效。"), Silver->GetCap()); }
+        return FText::FromString(Detail);
 	}
 
 	const FName UnitId = Definition->CardType == ELKCardType::Building ? Definition->BuildingUnitId : Definition->SpawnUnitId;
@@ -336,7 +388,7 @@ FText ULKRunRewardWidget::BuildDeckSummary() const
 		if (State.UpgradeLevel > 0) { Label += FString::Printf(TEXT(" Lv%d"), State.UpgradeLevel); }
 		Cards.Add(MoveTemp(Label));
 	}
-	return FText::FromString(FString::Printf(TEXT("当前牌组（%d）：%s"), Cards.Num(), *FString::Join(Cards, TEXT("  ·  "))));
+	return FText::FromString(FString::Printf(TEXT("容量 %d / 8 · %d 张：%s"), Run->GetDeckCapacityUsed(), Cards.Num(), *FString::Join(Cards, TEXT("  ·  "))));
 }
 
 void ULKRunRewardWidget::SetInteractionEnabled(bool bEnabled)
@@ -363,6 +415,18 @@ void ULKRunRewardWidget::HandleOption2Clicked() { TryChoose(2); }
 
 void ULKRunRewardWidget::HandleSkipClicked()
 {
+    if (bReducingLegacyDeck) { return; }
+    if (PendingOptionIndex != INDEX_NONE)
+    {
+        PendingOptionIndex = INDEX_NONE;
+        SelectedReplacementIds.Reset();
+        ReplacementPanel->SetVisibility(ESlateVisibility::Collapsed);
+        Options->SetVisibility(ESlateVisibility::Visible);
+        SkipLabel->SetText(FText::FromString(TEXT("跳过奖励")));
+        StatusText->SetText(FText::FromString(TEXT("临时佣兵仅本次远征有效 · 滚轮查看技能详情")));
+        RefreshReward();
+        return;
+    }
 	if (bInteractionLocked || !OwnerHUD) { return; }
 	SetInteractionEnabled(false);
 	if (!SkipReward())
@@ -374,10 +438,113 @@ void ULKRunRewardWidget::HandleSkipClicked()
 
 bool ULKRunRewardWidget::ChooseOption(int32 Index)
 {
+    if (!OwnerHUD) { return false; }
+    const ULKRunSubsystem* Run = GetGameInstance() ? GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
+    if (Run && Index >= 0 && Index < Run->GetPendingRewardCount()
+        && Run->GetPendingRewardOffer(Index).Kind == ELKRunRewardKind::AddCard
+        && Run->GetDeckCapacityUsed() + LKCardRules::Slots(Run->GetPendingRewardOffer(Index).CardId) > LKCardRules::Capacity)
+    {
+        PendingOptionIndex = Index;
+        SelectedReplacementIds.Reset();
+        ShowReplacementChoices();
+        return true;
+    }
 	return OwnerHUD && OwnerHUD->ChooseRunReward(Index);
+}
+
+void ULKRunRewardWidget::ShowReplacementChoices()
+{
+    ULKRunSubsystem* Run = GetGameInstance() ? GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
+    if (!Run || !ReplacementPanel || !OwnerHUD) { return; }
+    Options->SetVisibility(ESlateVisibility::Collapsed);
+    ReplacementPanel->SetVisibility(ESlateVisibility::Visible);
+    ReplacementGrid->ClearChildren();
+    ReplacementCardIds.Reset();
+    const ULKCardDefinition* Incoming = OwnerHUD->GetCardDefinition(Run->GetPendingRewardOffer(PendingOptionIndex).CardId);
+    ReplacementTitle->SetText(FText::FromString(bReducingLegacyDeck
+        ? TEXT("旧档容量超额：移除卡牌至不超过 8 格")
+        : FString::Printf(TEXT("获取「%s」：勾选要替换的旧卡"), Incoming ? *Incoming->CardName.ToString() : TEXT("新卡"))));
+    StatusText->SetText(FText::FromString(bReducingLegacyDeck ? TEXT("至少保留 5 种卡牌") : TEXT("可多选；确认前保留原卡，强化不转移")));
+    SkipLabel->SetText(FText::FromString(TEXT("返回奖励选择")));
+    SetInteractionEnabled(true);
+    SkipButton->SetIsEnabled(!bReducingLegacyDeck);
+    const FLKRunState State = Run->GetRunState();
+    const int32 Released = LKCardRules::Used(SelectedReplacementIds);
+    const int32 AfterSlots = Run->GetDeckCapacityUsed() - Released + (Incoming ? LKCardRules::Slots(Incoming->CardId) : 0);
+    const int32 AfterCount = State.Cards.Num() - SelectedReplacementIds.Num() + 1;
+    ReplacementBudget->SetText(FText::FromString(FString::Printf(TEXT("已选 %d 张 / 释放 %d 格 · 替换后 %d/8 格、%d 张（至少 5 张）"),
+        SelectedReplacementIds.Num(), Released, AfterSlots, AfterCount)));
+    ReplacementBudget->SetVisibility(bReducingLegacyDeck ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+    ConfirmReplacementButton->SetVisibility(bReducingLegacyDeck ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+    ConfirmReplacementButton->SetIsEnabled(!SelectedReplacementIds.IsEmpty() && AfterSlots <= LKCardRules::Capacity && AfterCount >= LKCardRules::MinimumCards);
+    for (int32 Index = 0; Index < State.Cards.Num(); ++Index)
+    {
+        const FLKRunCardState& CardState = State.Cards[Index];
+        ReplacementCardIds.Add(CardState.CardId);
+        const ULKCardDefinition* Card = OwnerHUD->GetCardDefinition(CardState.CardId);
+        FLKHomePanelRow Row;
+        Row.Label = Card ? LKCardPresentation::Label(*Card) : FText::FromName(CardState.CardId);
+        Row.Value = FText::FromString(FString::Printf(TEXT("%d 格 · Lv%d · %d 银币"), LKCardRules::Slots(CardState.CardId), CardState.UpgradeLevel, Card ? Card->Cost : 0));
+        Row.Detail = Card ? LKCardPresentation::Detail(*Card) : FText::GetEmpty();
+        Row.RowId = CardState.CardId;
+        Row.bSelectable = true;
+        Row.bToggleable = !bReducingLegacyDeck;
+        Row.bChecked = SelectedReplacementIds.Contains(CardState.CardId);
+        ULKHomeListButtonWidget* Button = CreateWidget<ULKHomeListButtonWidget>(GetWorld());
+        ReplacementGrid->AddChildToUniformGrid(Button, Index / 2, Index % 2)->SetHorizontalAlignment(HAlign_Fill);
+        Button->SetupRow(Index, Row, false);
+        Button->SetCompactRow();
+        Button->SetToolTipText(Row.Detail);
+        Button->OnHomeListClicked.BindLambda([this](int32 CardIndex) { ChooseReplacement(CardIndex); });
+    }
+    DeckSummaryText->SetText(BuildDeckSummary());
+}
+
+bool ULKRunRewardWidget::ChooseReplacement(int32 CardIndex)
+{
+    if (bInteractionLocked || !ReplacementCardIds.IsValidIndex(CardIndex) || !OwnerHUD) { return false; }
+    ULKRunSubsystem* Run = GetGameInstance()->GetSubsystem<ULKRunSubsystem>();
+    if (!Run) { return false; }
+    const FName CardId = ReplacementCardIds[CardIndex];
+    if (bReducingLegacyDeck)
+    {
+        if (!Run->DiscardExcessCard(CardId)) { StatusText->SetText(FText::FromString(TEXT("保存失败，卡组保持原状，请重试"))); return false; }
+        bReducingLegacyDeck = Run->NeedsDeckReduction();
+        if (bReducingLegacyDeck) { ShowReplacementChoices(); }
+        else { UGameplayStatics::OpenLevel(this, FName(*UGameplayStatics::GetCurrentLevelName(this, true))); }
+        return true;
+    }
+    if (SelectedReplacementIds.Contains(CardId)) { SelectedReplacementIds.Remove(CardId); }
+    else { SelectedReplacementIds.Add(CardId); }
+    ShowReplacementChoices();
+    return true;
+}
+
+void ULKRunRewardWidget::HandleConfirmReplacements() { ConfirmReplacements(); }
+
+bool ULKRunRewardWidget::ConfirmReplacements()
+{
+    if (bInteractionLocked || !OwnerHUD || bReducingLegacyDeck || PendingOptionIndex == INDEX_NONE || SelectedReplacementIds.IsEmpty()) { return false; }
+    SetInteractionEnabled(false);
+    ConfirmReplacementButton->SetIsEnabled(false);
+    if (OwnerHUD->ChooseRunRewardReplacingCards(PendingOptionIndex, SelectedReplacementIds))
+    { PendingOptionIndex = INDEX_NONE; SelectedReplacementIds.Reset(); return true; }
+    SetInteractionEnabled(true);
+    ShowReplacementChoices();
+    StatusText->SetText(FText::FromString(TEXT("容量/张数不符或保存失败；原卡和奖励均已保留")));
+    return false;
 }
 
 bool ULKRunRewardWidget::SkipReward()
 {
 	return OwnerHUD && OwnerHUD->SkipRunReward();
+}
+
+void ULKRunRewardWidget::HandleReturnHomeClicked()
+{
+	ALKBattleGameMode* GM = OwnerHUD ? OwnerHUD->GetBattleGameMode() : nullptr;
+	if (!GM || !GM->ReturnToHome())
+	{
+		if (StatusText) { StatusText->SetText(FText::FromString(TEXT("暂时无法返回，请检查存档并重试"))); }
+	}
 }

@@ -1,0 +1,96 @@
+{
+  "stage": "Optimization stage 1",
+  "date": "2026-09-13",
+  "engine": "UE 5.8.1",
+  "target": "little_kingEditor Win64 Development",
+  "build": {
+    "result": "Succeeded",
+    "log": "Saved/Logs/Optimization1Build05.log"
+  },
+  "automation": {
+    "report": "Saved/Automation/Optimization1Final/index.json",
+    "total": 52,
+    "succeeded": 23,
+    "succeededWithWarnings": 29,
+    "failed": 0,
+    "notRun": 0,
+    "added": [
+      {
+        "fullTestPath": "LittleKing.Optimization1.LegacyAndCrossSlotProtection",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization1.MenuButtonsAndAssets",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization1.MoneyConsoleCommand",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "fullTestPath": "LittleKing.Optimization1.SaveIsolationAndRecovery",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      }
+    ],
+    "warningNotes": [
+      "No game viewport / camera in headless test worlds",
+      "Existing negative-case validation messages and GameplayCue path fallback"
+    ]
+  },
+  "visual": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "states": [
+      "Empty main menu",
+      "Full main menu",
+      "Eight save slots",
+      "Delete confirmation"
+    ],
+    "images": [
+      "docs/images/StartMenu.png",
+      "docs/images/StartMenuSaves.png",
+      "docs/images/StartMenuDelete.png"
+    ],
+    "method": "UE RenderOffscreen with isolated generated preview saves; images visually inspected",
+    "startupRoutes": [
+      "L_Home -> L_StartMenu (StartMenuHome720.log)",
+      "L_BattleTest -> L_StartMenu (StartMenuBattle1080.log)"
+    ],
+    "notes": "Eight-slot overlap found on first capture, fixed and re-rendered. Native buttons tested through UButton delegates; interactive editor mouse feel remains user verification."
+  },
+  "persistence": {
+    "baseline": "Saved/Optimization1Baseline-20260913/manifest.json",
+    "checks": [
+      {
+        "file": "LittleKing_Profile_A.sav",
+        "sha256": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+        "unchanged": true
+      },
+      {
+        "file": "LittleKing_Profile_B.sav",
+        "sha256": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+        "unchanged": true
+      }
+    ],
+    "remainingFiles": [
+      "LittleKing_Profile_A.sav",
+      "LittleKing_Profile_B.sav"
+    ],
+    "isolatedTestFilesCleaned": true
+  },
+  "scopeNotes": [
+    "Preserved existing home and BUG-019 collaborator changes",
+    "No packaging, hardware qualification, audio or final art work",
+    "No release tag or git submission created in this stage"
+  ]
+}

@@ -8,6 +8,7 @@
 #include "ALKBattleGameMode.h"
 #include "LKGameplayHelpers.h"
 #include "ULKGameData.h"
+#include "ULKUnitStatusComponent.h"
 #include "LKLog.h"
 #include "EngineUtils.h"
 
@@ -35,6 +36,7 @@ ALKProjectile::ALKProjectile()
 void ALKProjectile::ApplyLaunchParams(float InDamage, ELKTeam InTeam, AActor* InInstigator, const FVector& InDirection)
 {
 	Damage = InDamage;
+    BreathHead = ELKBreathHead::None; bSiegeShot = false; SiegeTarget.Reset();
 	Team = InTeam;
 	InstigatorActor = InInstigator;
     LaunchSource = LKGameplay::MakeSource(InInstigator, ELKCombatSourceKind::Projectile, TEXT("RangedAttack"));
@@ -60,6 +62,17 @@ void ALKProjectile::Init(float InDamage, ELKTeam InTeam, AActor* InInstigator, c
     SetActorTickEnabled(true);
 }
 
+void ALKProjectile::SetAttackPayload(ELKBreathHead Head, ALKUnitBase* BuildingTarget)
+{
+    BreathHead = Head; bSiegeShot = BuildingTarget != nullptr; SiegeTarget = BuildingTarget;
+    if (Head != ELKBreathHead::None) { LaunchSource.ActionId = Head == ELKBreathHead::Ice ? FName("Attack_IceHead") : FName("Attack_FireHead"); }
+    if (BuildingTarget)
+    {
+        LaunchSource.ActionId = "Attack_Siege";
+        Lifetime = FMath::Max(Lifetime, FVector::Dist2D(GetActorLocation(), BuildingTarget->GetActorLocation()) / FMath::Max(1.f, Speed) + 1.f);
+    }
+}
+
 void ALKProjectile::ActivateFromPool(const FVector& InLocation, float InDamage, ELKTeam InTeam, AActor* InInstigator, const FVector& InDirection)
 {
 	SetActorLocation(InLocation);
@@ -72,6 +85,7 @@ void ALKProjectile::ActivateFromPool(const FVector& InLocation, float InDamage, 
 
 void ALKProjectile::DeactivateToPool()
 {
+    BreathHead = ELKBreathHead::None; bSiegeShot = false; SiegeTarget.Reset();
     bPooledActive = false;
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
@@ -92,11 +106,19 @@ void ALKProjectile::Tick(float DeltaSeconds)
     const FVector Start = GetActorLocation();
     ALKUnitBase* Closest = nullptr;
     float ClosestDistance = Travel + 1.f;
+    if (bSiegeShot)
+    {
+        ALKUnitBase* Target = SiegeTarget.Get();
+        if (!Target || !Target->IsTargetable() || !Target->IsBuilding() || Target->GetTeam() == Team)
+        { if (GM) { GM->ReleaseProjectile(this); } else { Destroy(); } return; }
+        Direction = (Target->GetActorLocation() - Start).GetSafeNormal2D();
+        if (FVector::Dist2D(Start, Target->GetActorLocation()) <= Travel + Target->GetBodyRadius()) { Closest = Target; }
+    }
     // 沿整段路径找最早命中的敌方体积，避免低帧率下跨过目标。
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         ALKUnitBase* Unit = *It;
-        if (!Unit->IsTargetable() || Unit->GetTeam() == Team) { continue; }
+        if (bSiegeShot || !Unit->IsTargetable() || Unit->GetTeam() == Team) { continue; }
         FVector Offset = Unit->GetActorLocation() - Start; Offset.Z = 0.f;
         const float Radius = Unit->GetBodyRadius() + 12.f;
         const float Along = FVector::DotProduct(Offset, Direction);
@@ -110,9 +132,11 @@ void ALKProjectile::Tick(float DeltaSeconds)
     {
         const float HitDamage = Damage;
         const FLKCombatSource Source = LaunchSource;
+        const ELKBreathHead Head = BreathHead;
         AActor* SourceActor = InstigatorActor.Get();
         if (GM) { GM->ReleaseProjectile(this); } else { DeactivateToPool(); }
-        LKGameplay::ApplyDamage(Closest, HitDamage, SourceActor, false, &Source);
+        if (Head != ELKBreathHead::None) { Closest->GetStatusComponent()->ReceiveBreath(Head, HitDamage, SourceActor, Source); }
+        else { LKGameplay::ApplyDamage(Closest, HitDamage, SourceActor, false, &Source); }
         if (!GM) { Destroy(); }
         return;
     }

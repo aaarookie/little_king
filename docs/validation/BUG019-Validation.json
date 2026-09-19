@@ -1,0 +1,61 @@
+﻿{
+    "note":  "BUG-019 修复验证（精简摘要；完整报告见 Saved/Automation/Home7/index.json 与 Saved/Logs/Home7.log）",
+    "reportCreatedOn":  "2026.09.10-10.28.05",
+    "engine":  "UE 5.8.1-56057345",
+    "target":  "little_kingEditor Win64 Development",
+    "succeeded":  20,
+    "succeededWithWarnings":  28,
+    "failed":  0,
+    "notRun":  0,
+    "total":  48,
+    "highlighted":  [
+                        {
+                            "fullTestPath":  "LittleKing.H3.Expedition.SnapshotAndApplication",
+                            "state":  "Success",
+                            "warnings":  0,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.H3.Resume.SafePointLeaveAndContinue",
+                            "state":  "Success",
+                            "warnings":  4,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.H3.World.BuildingsAndPanels",
+                            "state":  "Success",
+                            "warnings":  2,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.H4.Settlement.MathAndHandoff",
+                            "state":  "Success",
+                            "warnings":  0,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.H4.Upgrade.TransactionAndCurves",
+                            "state":  "Success",
+                            "warnings":  0,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.HomeUI.AuthoredAssetsAndContent",
+                            "state":  "Success",
+                            "warnings":  0,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.HomeUI.DraftConfirmationAndDetails",
+                            "state":  "Success",
+                            "warnings":  2,
+                            "errors":  0
+                        },
+                        {
+                            "fullTestPath":  "LittleKing.HomeUI.RosterButtonsAndSafeReturn",
+                            "state":  "Success",
+                            "warnings":  4,
+                            "errors":  0
+                        }
+                    ]
+}

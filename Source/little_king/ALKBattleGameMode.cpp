@@ -1,4 +1,5 @@
 #include "ALKBattleGameMode.h"
+#include "ULKUnitPassiveComponent.h"
 #include "ALKHeroCamp.h"
 #include "ALKUnitHero.h"
 #include "ALKPresentationHUD.h"
@@ -21,6 +22,7 @@
 #include "ALKPlayerState.h"
 #include "ALKProjectile.h"
 #include "ALKUnitBase.h"
+#include "ULKUnitStatusComponent.h"
 #include "ALKUnitBuilding.h"
 #include "ALKUnitHero.h"
 #include "LKDataTypes.h"
@@ -33,6 +35,7 @@
 #include "ULKGameData.h"
 #include "ULKSilverComponent.h"
 #include "ULKRunSubsystem.h"
+#include "ULKSaveSlotSubsystem.h"
 
 ALKBattleGameMode::ALKBattleGameMode()
 {
@@ -49,10 +52,25 @@ ALKBattleGameMode::ALKBattleGameMode()
 void ALKBattleGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	if (ULKSaveSlotSubsystem::RouteInitialPlayToMenu(GetWorld())) { SetActorTickEnabled(false); return; }
 
 	const bool bHasAuthoredGameData = IsValid(GameData);
 	EnsureGameData();
-	InitializeExpeditionContext(bHasAuthoredGameData && GameData->bEnableExpeditionFlow);
+	if (!InitializeExpeditionContext(bHasAuthoredGameData && GameData->bEnableExpeditionFlow))
+	{
+		// H3 修复（用户报告"继续远征后双方面对面不攻击"）：
+		// 远征还在进行中、但当前不是开战点（例如安全点停在奖励面板时点"继续"，或恢复中枢）——
+		// 这时不能静默退回独立单场（那会让这一房变成没有远征身份的假战斗，双方站着不动也推不动远征），
+		// 而是进入"恢复中枢"：只显示奖励/路线面板，由玩家处理完再进下一房。
+		ULKRunSubsystem* Run = GetRunSubsystem();
+		if (bHasAuthoredGameData && GameData->bEnableExpeditionFlow && Run && Run->HasRun() && !Run->IsTerminal())
+		{
+			bRecoveredJunction = true;
+			bExpeditionBattle = true;
+			UE_LOG(LogLKBattle, Log, TEXT("[Run] 远征进行中但当前不是开战点（Phase=%d）：进入恢复中枢显示奖励/路线面板，不创建假战斗"),
+				int32(Run->GetRunPhase()));
+		}
+	}
 	SetPhase(ELKGamePhase::Deployment);
 
 	// 生成敌方 AI
@@ -252,55 +270,8 @@ void ALKBattleGameMode::EnsureGameData()
 		FallbackUnitRows.Add(Pair.Key, LKUnitContent::MergeAuthoredTuning(Pair.Value, Authored));
 	}
 
-	// 原型期内置卡牌库（编辑器配置 CardLibrary 后不再走这里）
-	if (GameData->CardLibrary.Num() == 0)
-	{
-		auto AddCard = [this](FName Id, const TCHAR* Name, int32 Cost, ELKCardType Type,
-			FName SpawnId, ELKSpellEffect SpellFx, float SpellValue, float SpellRadius)
-		{
-			ULKCardDefinition* Card = NewObject<ULKCardDefinition>(GameData, Id);
-			Card->CardId = Id;
-			Card->CardName = FText::FromString(Name);
-			Card->Cost = Cost;
-			Card->CardType = Type;
-			Card->SpawnUnitId = SpawnId;
-			Card->BuildingUnitId = SpawnId;
-			Card->SpellEffect = SpellFx;
-			Card->SpellValue = SpellValue;
-			Card->SpellRadius = SpellRadius;
-			GameData->CardLibrary.Add(Card);
-		};
-
-		AddCard(TEXT("Unit_Swordsman"),    TEXT("剑士"),   2, ELKCardType::Unit,     TEXT("Unit_Swordsman"),    ELKSpellEffect::None,   0.f,   0.f);
-		AddCard(TEXT("Unit_Archer"),       TEXT("弓箭手"), 3, ELKCardType::Unit,     TEXT("Unit_Archer"),       ELKSpellEffect::None,   0.f,   0.f);
-		AddCard(TEXT("Unit_Shieldbearer"), TEXT("盾卫"),   3, ELKCardType::Unit,     TEXT("Unit_Shieldbearer"), ELKSpellEffect::None,   0.f,   0.f);
-		AddCard(TEXT("Spell_Fireball"),    TEXT("火球术"), 4, ELKCardType::Spell,    NAME_None,                 ELKSpellEffect::Damage, 60.f,  250.f);
-		AddCard(TEXT("Spell_HealWave"),    TEXT("治疗波"), 3, ELKCardType::Spell,    NAME_None,                 ELKSpellEffect::Heal,   40.f,  300.f);
-		AddCard(TEXT("Building_ArrowTower"), TEXT("箭塔"), 5, ELKCardType::Building, TEXT("Building_ArrowTower"), ELKSpellEffect::None, 0.f,   0.f);
-		AddCard(TEXT("Building_Barracks"), TEXT("兵营"),   4, ELKCardType::Building, TEXT("Building_Barracks"), ELKSpellEffect::None,   0.f,   0.f);
-	}
-
-	// D3 奖励新卡：骷髅兵/骷髅射手（1 费文字卡，暂无美术）。
-	// 无论 DA_GameData 是否已配置 CardLibrary，都保证运行时目录存在（只改运行时副本，不写资产）。
-	const TPair<FName, const TCHAR*> SkeletonCards[] = {
-		{ TEXT("Unit_Skeleton"), TEXT("骷髅兵") },
-		{ TEXT("Unit_SkeletonArcher"), TEXT("骷髅射手") },
-	};
-	for (const TPair<FName, const TCHAR*>& Entry : SkeletonCards)
-	{
-		const bool bExists = GameData->CardLibrary.ContainsByPredicate(
-			[&Entry](const TObjectPtr<ULKCardDefinition>& Card) { return Card && Card->CardId == Entry.Key; });
-		if (bExists) { continue; }
-		ULKCardDefinition* Card = NewObject<ULKCardDefinition>(GameData, Entry.Key);
-		Card->CardId = Entry.Key;
-		Card->CardName = FText::FromString(Entry.Value);
-		Card->Cost = 1;
-		Card->CardType = ELKCardType::Unit;
-		Card->SpawnUnitId = Entry.Key;
-		Card->BuildingUnitId = Entry.Key;
-		GameData->CardLibrary.Add(Card);
-		UE_LOG(LogLKBattle, Log, TEXT("[Battle] 注入 D3 奖励卡：%s（%s，1 费，文字卡）"), *Entry.Key.ToString(), Entry.Value);
-	}
+	// 运行时卡牌目录（内置卡 + D3 奖励卡）；编辑器配置了 CardLibrary 时只补奖励卡。
+	GameData->EnsureCardLibrary();
 
 	if (AvailableHeroes.Num() == 0)
 	{
@@ -357,7 +328,15 @@ void ALKBattleGameMode::TryInitPlayerState()
 		return;
 	}
 
-	PS->Silver->Init(GameData->SilverPerSecond, GameData->SilverCap);
+	// H3：远征使用本轮冻结的家园加成（金库）；独立单场沿用 DA_GameData 基础值。
+	// 只覆盖玩家经济，敌方银币仍由遭遇配置负责。
+	const FLKMetaBonusSnapshot& Bonus = BattleContext.BonusSnapshot;
+	const float PlayerSilverPerSecond = (bExpeditionBattle && FMath::IsFinite(Bonus.PlayerSilverPerSecond) && Bonus.PlayerSilverPerSecond > 0.f)
+		? Bonus.PlayerSilverPerSecond : GameData->SilverPerSecond;
+	const float PlayerSilverCap = (bExpeditionBattle && FMath::IsFinite(Bonus.PlayerSilverCap) && Bonus.PlayerSilverCap > 0.f)
+		? Bonus.PlayerSilverCap : GameData->SilverCap;
+
+	PS->Silver->Init(PlayerSilverPerSecond, PlayerSilverCap);
 	if (!PS->Deck->InitDeck(GameData->DefaultPlayerDeck, GameData->HandSize, GameData->BattleSeed + 1))
 	{
 		UE_LOG(LogLKBattle, Warning, TEXT("[Deck] 玩家牌库无效：去重后至少需要 HandSize + 1 种卡，禁止开战"));
@@ -380,8 +359,8 @@ void ALKBattleGameMode::TryInitPlayerState()
 		}
 	}
 
-	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 玩家状态就绪：银币 %.1f/s（上限 %.1f），牌库 %d 张"),
-		GameData->SilverPerSecond, GameData->SilverCap, GameData->DefaultPlayerDeck.Num());
+	UE_LOG(LogLKBattle, Log, TEXT("[Battle] 玩家状态就绪：银币 %.3f/s（上限 %.1f），牌库 %d 张"),
+		PlayerSilverPerSecond, PlayerSilverCap, GameData->DefaultPlayerDeck.Num());
 }
 
 void ALKBattleGameMode::TickBattle(float DeltaSeconds)
@@ -448,11 +427,44 @@ void ALKBattleGameMode::TickPlayerSilver(float DeltaSeconds)
 void ALKBattleGameMode::SetPhase(ELKGamePhase NewPhase)
 {
     if (Phase == NewPhase) { return; }
-    if (NewPhase == ELKGamePhase::Battle && !CanStartBattle()) { return; }
+    if (NewPhase == ELKGamePhase::Battle && !CanStartBattle())
+    {
+        // 拒绝时必须可诊断：以前这里静默返回，画面上表现为"双方面对面却不攻击"，很难定位。
+        LogStartBattleBlockers();
+        return;
+    }
     Phase = NewPhase;
     ApplyCombatEnabledToAllUnits(NewPhase == ELKGamePhase::Battle);
     if (NewPhase == ELKGamePhase::Battle) { PlayLKOneShot(TEXT("BattleStart"), FVector::ZeroVector); }
     if (ALKBattleGameState* GS = GetGameState<ALKBattleGameState>()) { GS->SetPhase(NewPhase); }
+}
+
+void ALKBattleGameMode::LogStartBattleBlockers() const
+{
+    UE_LOG(LogLKBattle, Warning,
+        TEXT("[Battle] 无法进入战斗阶段（单位保持冻结、面对面也不会攻击）：阶段=%d 玩家状态就绪=%d 玩家牌库有效=%d 敌方用牌=%d"),
+        int32(Phase), int32(bPlayerStateReady), int32(HasValidDecks()), int32(bEnemyUsesCards));
+    for (int32 Side = 0; Side < 2; ++Side)
+    {
+        const TArray<FName>& Roster = Side == 0 ? AvailableHeroes : EnemyHeroIds;
+        FString Deployed;
+        for (FName Id : Roster)
+        {
+            Deployed += FString::Printf(TEXT("%s%s "), *Id.ToString(),
+                DeployedHeroes[Side].Contains(Id) ? TEXT("已部署") : TEXT("未部署"));
+        }
+        UE_LOG(LogLKBattle, Warning, TEXT("[Battle]   阵营%d：名单 %d 名［%s］；场上英雄 %d 名，登记部署 %d 名"),
+            Side, Roster.Num(), *Deployed, HeroCounts[Side], DeployedHeroes[Side].Num());
+    }
+}
+
+bool ALKBattleGameMode::IsAnyUnitCombatEnabled() const
+{
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        if (!It->IsCamp() && It->IsCombatEnabled()) { return true; }
+    }
+    return false;
 }
 
 void ALKBattleGameMode::ApplyCombatEnabledToAllUnits(bool bEnabled)
@@ -507,6 +519,7 @@ float ALKBattleGameMode::GetBuildingPlacementAttackRange(FName CardId) const
 
 bool ALKBattleGameMode::CanStartBattle() const
 {
+    if (const ULKRunSubsystem* Run = GetRunSubsystem(); Run && Run->NeedsDeckReduction()) { return false; }
     if (Phase != ELKGamePhase::Deployment || !bPlayerStateReady || AvailableHeroes.IsEmpty() || !HasValidDecks()) { return false; }
     for (int32 Side = 0; Side < 2; ++Side)
     {
@@ -632,6 +645,14 @@ void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
         }
     }
     OnCombatEvent.Broadcast(Event);
+    // Snapshot and stable order: nested healing must not invalidate iteration or reorder equal-health picks.
+    if (Event.ActualAmount > 0.f)
+    {
+        TArray<ALKUnitBase*> Listeners;
+        for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It) { if (It->IsAlive()) { Listeners.Add(*It); } }
+        Listeners.Sort([](const ALKUnitBase& A, const ALKUnitBase& B) { return A.GetFName().LexicalLess(B.GetFName()); });
+        for (ALKUnitBase* Unit : Listeners) { if (IsValid(Unit)) { Unit->GetPassiveComponent()->ObserveCombatEvent(Event); } }
+    }
     if (Event.ActualAmount > 0.f) { OnDamageEvent.Broadcast(Event.Location, Event.ActualAmount, Event.bIsHeal); }
 }
 
@@ -721,6 +742,8 @@ ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, 
 ELKPlayResult ALKBattleGameMode::ValidateHeroDeployment(ELKTeam Team, FName HeroUnitId, const FVector& Location, FVector* OutHeroPosition) const
 {
     if (Phase != ELKGamePhase::Deployment) { return ELKPlayResult::WrongPhase; }
+    // 恢复中枢/终态世界不是战斗场景：不允许部署（否则会出现"能摆兵但永远开不了战"的假战斗）。
+    if (bRecoveredJunction || bRecoveredTerminal) { return ELKPlayResult::WrongPhase; }
     const int32 Side = int32(Team);
     const TArray<FName>& Roster = Team == ELKTeam::Player ? AvailableHeroes : EnemyHeroIds;
     if (!Roster.Contains(HeroUnitId)) { return ELKPlayResult::InvalidCardData; }
@@ -859,6 +882,7 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	Unit->InitUnit(Data, GameData, UnitId);
 	Unit->SetCombatEnabled(Phase == ELKGamePhase::Battle);
 	Unit->OnUnitDied.AddDynamic(this, &ALKBattleGameMode::HandleUnitDied);
+    ULKUnitStatusComponent::RefreshTeamSupport(World);
 
 	const int32 TeamIdx = (int32)Team;
 

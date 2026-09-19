@@ -2,6 +2,8 @@
 
 #include "Engine/DataTable.h"
 #include "LKUnitContent.h"
+#include "ULKCardDefinition.h"
+#include "ULKGameData.h"
 
 namespace
 {
@@ -177,6 +179,67 @@ const FLKEncounterRow* Find(const TArray<FLKEncounterRow>& Rows, FName Encounter
 {
 	const FName Canonical = CanonicalId(EncounterId);
 	return Rows.FindByPredicate([Canonical](const FLKEncounterRow& Row) { return Row.EncounterId == Canonical; });
+}
+
+bool BuildValidatedCatalog(const ULKGameData* Data,
+	TFunctionRef<const FLKUnitRow*(FName)> ResolveUnitRow,
+	TFunctionRef<const ULKCardDefinition*(FName)> ResolveCard,
+	TArray<FLKEncounterRow>& OutRows, FString& OutError)
+{
+	OutRows.Reset();
+	OutError.Reset();
+	if (!Data) { OutError = TEXT("GameData 为空"); return false; }
+
+	UDataTable* Table = nullptr;
+	if (!Data->EncounterTable.IsNull())
+	{
+		Table = Data->EncounterTable.LoadSynchronous();
+		if (!Table) { OutError = TEXT("EncounterTable 资源加载失败"); return false; }
+	}
+	if (!BuildCatalog(Table, OutRows, OutError)) { return false; }
+
+	for (const FLKEncounterRow& Encounter : OutRows)
+	{
+		for (FName HeroId : Encounter.EnemyHeroIds)
+		{
+			const FLKUnitRow* Row = ResolveUnitRow(HeroId);
+			if (!Row || (Row->UnitClass != ELKUnitClass::Hero && Row->UnitClass != ELKUnitClass::Boss))
+			{
+				OutError = FString::Printf(TEXT("遭遇 %s 的英雄 %s 不存在或类别错误"),
+					*Encounter.EncounterId.ToString(), *HeroId.ToString());
+				OutRows.Reset();
+				return false;
+			}
+		}
+		for (const FLKWaveEntry& Wave : Encounter.Waves)
+		{
+			const FLKUnitRow* Row = ResolveUnitRow(Wave.UnitId);
+			if (!Row || Row->UnitClass == ELKUnitClass::Hero || Row->UnitClass == ELKUnitClass::Boss)
+			{
+				OutError = FString::Printf(TEXT("遭遇 %s 的波次单位 %s 不存在或类别错误"),
+					*Encounter.EncounterId.ToString(), *Wave.UnitId.ToString());
+				OutRows.Reset();
+				return false;
+			}
+		}
+		if (Encounter.bEnemyUsesCards && Encounter.EnemyCards.Num() < Data->HandSize + 1)
+		{
+			OutError = FString::Printf(TEXT("遭遇 %s 的敌方牌组少于 HandSize + 1"), *Encounter.EncounterId.ToString());
+			OutRows.Reset();
+			return false;
+		}
+		for (FName CardId : Encounter.EnemyCards)
+		{
+			if (!ResolveCard(CardId))
+			{
+				OutError = FString::Printf(TEXT("遭遇 %s 的敌方卡牌 %s 不存在"),
+					*Encounter.EncounterId.ToString(), *CardId.ToString());
+				OutRows.Reset();
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 void CollectRosterPools(const TArray<FLKEncounterRow>& Catalog, TArray<FName>& OutHeroPool, TArray<FName>& OutBossPool)
