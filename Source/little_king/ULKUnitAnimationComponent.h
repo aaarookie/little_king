@@ -19,6 +19,10 @@ public:
     bool HasAnimations() const { return Clips.Num()==5; }
     FName GetVisualState() const { return State; }
     FBoxSphereBounds GetIdleBounds() const;
+    /** Stable ground contact used for ordering, independent of the current pose. */
+    float GetVisualFootX() const;
+    bool IsFacingRight() const { return bFacingRight; }
+    float GetWalkPhase() const { return WalkPhase; }
     virtual void TickComponent(float DeltaTime,ELevelTick TickType,FActorComponentTickFunction* Function) override;
 private:
     UPROPERTY(Transient) TArray<TObjectPtr<UPaperFlipbook>> Clips;
@@ -27,4 +31,11 @@ private:
     float Clock=0.f, AttackRemaining=0.f, AttackDuration=.32f, HitRemaining=0.f;
     FVector LastPosition=FVector::ZeroVector;
     bool bWasDead=false;
+    bool bFacingRight=true;
+    bool bLastEnemy=false;
+    float FootOffsetX=0.f;
+    float WalkPhase=0.f;
+    float StrideDistance=150.f;
+    void UpdateDepth();
+    void UpdateFacing(const FVector& Travel);
 };

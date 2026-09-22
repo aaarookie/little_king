@@ -1,0 +1,758 @@
+{
+  "auditedAt": "2026-09-23T02:52:19.053497+08:00",
+  "version": "v0.8.1",
+  "projectVersion": "0.8.1",
+  "baseline": "v0.8",
+  "baselineCommit": "8cfd39ef061456d11c5571603076564ff6f9ce70",
+  "publicationTarget": {
+    "branch": "main",
+    "annotatedTag": "v0.8.1",
+    "note": "Commit and tag hashes are recorded by Git, not embedded in their own commit."
+  },
+  "build": {
+    "path": "Saved/Logs/Release081Build.log",
+    "sha256": "53b848d5f5b1c470490ea54b7567e1bd5cfc594d90c8a0c037b214715f96e38c",
+    "result": "Succeeded",
+    "engine": "UE 5.8.1",
+    "target": "little_kingEditor Win64 Development"
+  },
+  "priorFixEvidence": {
+    "path": "docs/validation/MovementFix-Validation.json",
+    "sha256": "953887db74f63d402512e94aa2aa3e365c1e448c5e0b6f5641146af5fdd3ba72"
+  },
+  "automation": {
+    "path": "Saved/Automation/MovementFix02/index.json",
+    "sha256": "313dad7b355e76718a41cdd9d2a813f49013073434b7e8a4725a27cf56fae079",
+    "succeeded": 43,
+    "succeededWithWarnings": 44,
+    "failed": 0,
+    "notRun": 0,
+    "newTests": [
+      {
+        "name": "LittleKing.Presentation.CorrectedWalkAtlases",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.FacingFollowsVoluntaryTravel",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.OverlapDepthAndCamps",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.WalkDistanceAndInterruption",
+        "state": "Success"
+      }
+    ],
+    "reusedVerifiedRun": true,
+    "note": "Verified the prior full regression report hash. Release-only metadata/documentation changes did not rerun the suite."
+  },
+  "assets": {
+    "newCount": 144,
+    "storybookTotal": 919,
+    "sourceImages": 24,
+    "sourceFrames": 96,
+    "assetHashesRechecked": true,
+    "originalGeneratedBytesRechecked": true,
+    "referencesAndReceiptPromptsRechecked": true,
+    "manifest": {
+      "path": "ArtSource/StorybookV1/MovementFix/manifest.json",
+      "sha256": "71f3259f3c012b58725be59886352a7fbb508f2f2a0c37e4279520172725cce0"
+    }
+  },
+  "render": {
+    "samples": 48,
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "archivedDocumentationImages": 8,
+    "allRecordedHashesRechecked": true,
+    "note": "Existing actual-renderer captures from the fix verification, not a new release capture run."
+  },
+  "preservation": {
+    "saves": [
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+        "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+        "matchesPreReleaseBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+        "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+        "matchesPreReleaseBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+        "sha256": "d93d05f3e6562e294629d7ecd6c8cb08a91210572fb6a37e6709e11f71a7e499",
+        "matchesPreReleaseBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+        "sha256": "bb5d400f0ea7302403d7ea45fb89a00404833679d678604870b073d83bc9d6e6",
+        "matchesPreReleaseBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+        "sha256": "670e09b45d3315b88e710a584457d25d3a47c9cc566e6b26c9d21d3dd44eeda5",
+        "matchesPreReleaseBaseline": true
+      }
+    ],
+    "extraSaveFiles": 0,
+    "unitTable": {
+      "path": "Content/Data/DT_Units.uasset",
+      "sha256": "5bd2282930b84cf9430bd2a2d86e5a6ccc500b0ab1be4487784181a5e576b782"
+    }
+  },
+  "staticChecks": {
+    "localLinks": 319,
+    "pythonSyntax": "passed",
+    "gitDiffCheck": "passed",
+    "versionMetadata": "passed"
+  },
+  "sourceFiles": [
+    {
+      "path": "Source/little_king/ALKBattleGameMode.cpp",
+      "sha256": "7c74136fd3a6ef485ad9b239901fc5dc7da65ebe26af40c502a51c49ae2f04fa"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode_Run.cpp",
+      "sha256": "152fd42119dcba711483b0b4965713b539abc943b89c75a99b4fe953a22fa594"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode_Undead.cpp",
+      "sha256": "1f485e8620cf277c04844a8f7152c77643428c4c2991df9a9ed2d600446340aa"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameState.cpp",
+      "sha256": "7417405d3b1ec79c378b38c125054abeaf0209ce59741b57bcdc20f65efb0542"
+    },
+    {
+      "path": "Source/little_king/ALKHeroCamp.cpp",
+      "sha256": "c6284a1ff20c8cae3166626a69b4cd055b85072135d921db4482eddb932febcd"
+    },
+    {
+      "path": "Source/little_king/ALKHomeBuildingActor.cpp",
+      "sha256": "eccc483444245d64a053f570cb7d4c0ce03b2070adac7aacd8cfb7d9e48cb060"
+    },
+    {
+      "path": "Source/little_king/ALKHomeGameMode.cpp",
+      "sha256": "4392a7d5043fcf98fcf5c8369357e2f1e7796ad302fbce7b31ebd02c6325b9b0"
+    },
+    {
+      "path": "Source/little_king/ALKHomePlayerController.cpp",
+      "sha256": "7781d850cb7af567424893adec7521e9bb992a138c3916e4268dbdccd793072c"
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.cpp",
+      "sha256": "617dd82a96497f119c5b6f28ff08519facdce77f4763abad865527a61bd3dec6"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.cpp",
+      "sha256": "e3bfaccd8cd821243d29c2b240323aa3f33afa746ed6d0573416b63cb6376bbd"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerState.cpp",
+      "sha256": "9e93d549ea24d4fb8f62cd04c9633cf5c4e62f2757d76492e8e81fa3e667e636"
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.cpp",
+      "sha256": "99dfc68db871d41d6dd380b21e240c68273fbf7b300ca6f16d5d0ac3844d31f5"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.cpp",
+      "sha256": "ec42eb227ba11463f6d8e81eea24e7e09a164326e90a7df559139d135010bb00"
+    },
+    {
+      "path": "Source/little_king/ALKStartMenuGameMode.cpp",
+      "sha256": "aa9672b78a6c2c9ffa6798cad10a551dbad868fd8d04109a78cd33df4f84bb30"
+    },
+    {
+      "path": "Source/little_king/ALKStartMenuPlayerController.cpp",
+      "sha256": "d64dfd0a36972aee1892a653dbfb6a7734aa4ce47d3d76a9448a0fdd14a8bafd"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.cpp",
+      "sha256": "fe457be361867f85db2becc35f74d1d99620b5b612899313cda9c05882641bac"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.cpp",
+      "sha256": "eaa1628799f5f7a424a147e7f933a6af51eabaeedc9aabe9625d20eec52e5b24"
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.cpp",
+      "sha256": "8b37097a569da7bcac6cadaadb09bf54110f7c5ed8189ea336a381509082daaa"
+    },
+    {
+      "path": "Source/little_king/little_king.cpp",
+      "sha256": "362bedef8aca974e246fd60edfb9fa1acd5c5c1092a7e5a757e071978e5ad915"
+    },
+    {
+      "path": "Source/little_king/LKBattleArt.cpp",
+      "sha256": "78df4d35a75a7bfac387536a88503783396f855533cedd9ccfce2e2a9fb0572e"
+    },
+    {
+      "path": "Source/little_king/LKBattleArtPreview.cpp",
+      "sha256": "5332e1e77a3cfbf617835dcc6f7f046ec70bfb6fbc9d778d5b5a5bd61c487b8d"
+    },
+    {
+      "path": "Source/little_king/LKCardPresentation.cpp",
+      "sha256": "336f20bf4acf9ca2ffff49127a8a4b7237edca974701c72b45549c3bafb92e31"
+    },
+    {
+      "path": "Source/little_king/LKCardRules.cpp",
+      "sha256": "7d6197297b3aae26a1890527583d60c1ddac3b5adb6ff8ee53f0384d59eecd15"
+    },
+    {
+      "path": "Source/little_king/LKEncounterContent.cpp",
+      "sha256": "a1a65bc9fdc1cc24a3a871275c55e90ece1c9c3d9ba010bf78891bd611ce3e3f"
+    },
+    {
+      "path": "Source/little_king/LKExpeditionMercenaryContent.cpp",
+      "sha256": "9613c6c0b1e08fe1b1a60abf951cb5515480f12f49601a31a7bad309cd74d7e2"
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.cpp",
+      "sha256": "17c461d4f092da68d2c3e00041ac7c6f4b87fc092b7645c0e73adcb28a6f5f94"
+    },
+    {
+      "path": "Source/little_king/LKHomeContent.cpp",
+      "sha256": "3e5eb3369c22b5bba1e96370db26fae85e4e378453b08c8a054f3c783289fded"
+    },
+    {
+      "path": "Source/little_king/LKLog.cpp",
+      "sha256": "96debc4d2f779fd5796d822d6325835cf0152a0688666b277a41de7a532912b4"
+    },
+    {
+      "path": "Source/little_king/LKMoneyCommand.cpp",
+      "sha256": "c488afd95b72160dc6c956e243a4668e15fdfb45988b8d8d5d09fd6418b2e8a8"
+    },
+    {
+      "path": "Source/little_king/LKMovementFixPreview.cpp",
+      "sha256": "0ef2036cdedee883e12fdda705fa8e2ef5d26fcc924f9683dde300e7a75791bf"
+    },
+    {
+      "path": "Source/little_king/LKNavigation.cpp",
+      "sha256": "c203202361a1181e745cf8668805e22493488551d23fae283f40c87dcf93d537"
+    },
+    {
+      "path": "Source/little_king/LKPolishArt.cpp",
+      "sha256": "d6f9a4445a8e1ea6dabacec98da27b3cdd45a9f3a3fcff9614db2b42ead375ce"
+    },
+    {
+      "path": "Source/little_king/LKPolishArtPreview.cpp",
+      "sha256": "e78fee5d86ec8f27cec7517009214bdcf1eea8160ad0f53a55ca674c5ef1e2e8"
+    },
+    {
+      "path": "Source/little_king/LKPolishTravelPreview.cpp",
+      "sha256": "4dfc0c60dcbf1921ce5fb856d26aa918f80a30e6ef8018ee0c5012574306cd51"
+    },
+    {
+      "path": "Source/little_king/LKUndeadContent.cpp",
+      "sha256": "a54533ef8079a02d401878d150d46c073086f60ecd4faf46bea34767fcd089b5"
+    },
+    {
+      "path": "Source/little_king/LKUnitContent.cpp",
+      "sha256": "ccc5c7a98222beee86163331e1e97baa05e0ef9c7bd59112bbc28529cd121078"
+    },
+    {
+      "path": "Source/little_king/LKWorldArt.cpp",
+      "sha256": "c4a5be8f8a6348480fe3540b9a327234691b6004aad7af8106799ac2ef48bf05"
+    },
+    {
+      "path": "Source/little_king/LKWorldArtPreview.cpp",
+      "sha256": "c8ddd773ddda29f7fa79163daf2236f40176f2001a309e24d5beaf151bcd79b8"
+    },
+    {
+      "path": "Source/little_king/LKWorldMapContent.cpp",
+      "sha256": "a0705248a5f386120b053a003c6069c1d9d4bff882770f382cbe5d5e2a3ee10e"
+    },
+    {
+      "path": "Source/little_king/Tests/LKBattleArtTests.cpp",
+      "sha256": "82522c8862179a9af1d5c3f9027b7b77572fda79bde22c4b4dec4bac03b9c2f7"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD0Tests.cpp",
+      "sha256": "8fb3ff15e0903d0539fa8df88777df0558f3b9e807c5e5c7fc23b5ed4e28b31e"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD1Tests.cpp",
+      "sha256": "6375dbb36d30ab8ba4857d5e42dd2e1dcedee6bcfa9c8ed92925e181b681ea96"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD2Tests.cpp",
+      "sha256": "c66c3353caf1fb64b32a8b7eb4991bf29a3ac2b91db91c33ad5ea906fcd3831e"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD3Tests.cpp",
+      "sha256": "f9dedae8fa6012831f243de446b4ba740318a862e4428a0aa8016c95f0458573"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD4Tests.cpp",
+      "sha256": "cb6307a11229695f5a53d99c8648a8bb06101c7c8563d1898b385d7b6364f563"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD5Tests.cpp",
+      "sha256": "e92c1b7fbfd5811df3f51fce5e223393f6f41b3dfd6ff0a15f3a4ed758c2041b"
+    },
+    {
+      "path": "Source/little_king/Tests/LKHomeTests.cpp",
+      "sha256": "8c64ab3a26a22fe36458422c8f4c51cd4dc9c98c677c44421c6da8a1f0a9209f"
+    },
+    {
+      "path": "Source/little_king/Tests/LKHomeUITests.cpp",
+      "sha256": "d382aad7571650d7a8efe0936648098a0392ee7d89ca8437bc17d7085dff4200"
+    },
+    {
+      "path": "Source/little_king/Tests/LKMovementPresentationTests.cpp",
+      "sha256": "e5c5d58f7df71aa1242b2fe17692dbf4e99c78a4901951d08c1d092a22cc8df8"
+    },
+    {
+      "path": "Source/little_king/Tests/LKOptimization3Tests.cpp",
+      "sha256": "b843299921068ea27291a331bc180725e55d05c274c7f601efeb4dacc758bdc6"
+    },
+    {
+      "path": "Source/little_king/Tests/LKPolishArtTests.cpp",
+      "sha256": "a5a44e56c81d24ece6557067d56a2fea542295aca505fe8f350f815ed7408d90"
+    },
+    {
+      "path": "Source/little_king/Tests/LKPresentationAssetsTests.cpp",
+      "sha256": "01c7a005bbcd92f147f50b32eafe9fc8194fff965c764ed8de452aeeb0e81a00"
+    },
+    {
+      "path": "Source/little_king/Tests/LKSprint5Tests.cpp",
+      "sha256": "fc2d2d981b40fa2c39d265c2483ea29692545d9e2612349e479c7b3d7f02ab26"
+    },
+    {
+      "path": "Source/little_king/Tests/LKStartMenuTests.cpp",
+      "sha256": "145ec6678821c46c3840c21fdb69a3ea4054cd599e07b898ab3a12aa2489d39b"
+    },
+    {
+      "path": "Source/little_king/Tests/LKTrollCardsTests.cpp",
+      "sha256": "d6bfc7de6f3609ec688d6d6c20bb1debbe14661be568d2692039d20ed084dad4"
+    },
+    {
+      "path": "Source/little_king/Tests/LKWorldArtTests.cpp",
+      "sha256": "21145dee0b0dfcda9a35943a6cb2e5fc0d0a1576c5fcf0537c31b02c1258223a"
+    },
+    {
+      "path": "Source/little_king/Tests/LKWorldMapTests.cpp",
+      "sha256": "b34f40f310d115589c471ddc847028070ffc0078f889edd6a9f823859f123103"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.cpp",
+      "sha256": "7d6f33a6fdd6f7c563fa76f852d572a30ffa0fa3e70900fb80f10fc1048fc7d8"
+    },
+    {
+      "path": "Source/little_king/ULKCheatManager.cpp",
+      "sha256": "960b270abd4848ff6a3295f8751021a8a5ec6807e133a29f85381a7f9109a545"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.cpp",
+      "sha256": "b5665d833567360d7ff251856651ac45a32a57cc84c849b3ec16ecdb8e46b019"
+    },
+    {
+      "path": "Source/little_king/ULKGameData.cpp",
+      "sha256": "e7cd9cfa01c0f77cd6f10b4686cc10453543f343d023bbe359fdfcd97c564106"
+    },
+    {
+      "path": "Source/little_king/ULKGameplayLibrary.cpp",
+      "sha256": "0fd458d55e3d4dfa241551ba5a9a37e6e1d926ab237fcc1c455ec821ed742c03"
+    },
+    {
+      "path": "Source/little_king/ULKGameViewportClient.cpp",
+      "sha256": "da91f6513dfbc4e35f7f784c3c21d83e61c3b38f3cfa61e29a932b8ba643dc8b"
+    },
+    {
+      "path": "Source/little_king/ULKHomeBuildingLabelWidget.cpp",
+      "sha256": "05e72347e6b688dea7927793fdc6cc5e8fcecd7d029b84669d283d1d3125045d"
+    },
+    {
+      "path": "Source/little_king/ULKHomeHUDWidget.cpp",
+      "sha256": "32bc439b2acc5640e1c7b9458a09b735def6fdff67fd3efc18522447f21aa643"
+    },
+    {
+      "path": "Source/little_king/ULKHomeListButtonWidget.cpp",
+      "sha256": "65dcc34a06428e52bc5f3a6b809d7305ee2baf1e31dbbb481afa7518167ec124"
+    },
+    {
+      "path": "Source/little_king/ULKJourneyPresentationSubsystem.cpp",
+      "sha256": "ef778df02262ef2422648cd83694188b45702be543921d1b8525294be3f5acc6"
+    },
+    {
+      "path": "Source/little_king/ULKPresentationSubsystem.cpp",
+      "sha256": "90d30ca64edd9fac37f9a594476343f83dd47902bd309276135af9ded01f7168"
+    },
+    {
+      "path": "Source/little_king/ULKProfileSaveGame.cpp",
+      "sha256": "84d2212f2613f8529a3326dd1b87ab8711a36530840480c7bb3df974c31df170"
+    },
+    {
+      "path": "Source/little_king/ULKProfileSubsystem.cpp",
+      "sha256": "44a03e1599b44dc13a84abdacd092452577497b07129a79bc9c418430897c75e"
+    },
+    {
+      "path": "Source/little_king/ULKRunNodeSelectWidget.cpp",
+      "sha256": "2593dc7addecfd001281d8a9c7f9b9e993f83b883a83b5d8b45c07c89d0ccc2d"
+    },
+    {
+      "path": "Source/little_king/ULKRunResumeWidget.cpp",
+      "sha256": "d346b2ef91f129111b4aba6d387e5d5e19e2967888338890f03ffe0b003437a5"
+    },
+    {
+      "path": "Source/little_king/ULKRunRewardWidget.cpp",
+      "sha256": "1104bef09febdb8d673a7fa804709103c7dae5168e07ac1bf41e1f0a3a895028"
+    },
+    {
+      "path": "Source/little_king/ULKRunSaveGame.cpp",
+      "sha256": "a218c5e3bfc818c8403f36513102e62270fbebf2396116c4621ce9f4dc818f23"
+    },
+    {
+      "path": "Source/little_king/ULKRunSubsystem.cpp",
+      "sha256": "a3b1023e4b786f9e6e9c969cf13c89d7f3996c3e91dc4eed0fee70e16d3df337"
+    },
+    {
+      "path": "Source/little_king/ULKSaveSlotSubsystem.cpp",
+      "sha256": "a89926f4e34b751f031c82201f6ddd47fcbd3e9be152964791e11c2e2b710877"
+    },
+    {
+      "path": "Source/little_king/ULKSilverComponent.cpp",
+      "sha256": "0f0cfc5dd37c7e32a3f2a8977b7b13f2a03b36d4b90c8de825ef04434f9aa04c"
+    },
+    {
+      "path": "Source/little_king/ULKStartMenuWidget.cpp",
+      "sha256": "a72468c0d2947e2826a41277e0b30bbc92d1a4240e52509dd5fff1d8560c22c0"
+    },
+    {
+      "path": "Source/little_king/ULKTraitAuraComponent.cpp",
+      "sha256": "6f58537b59abbd9b87e2f63b647809854c5fd73b50035da6718756f4309d8c33"
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.cpp",
+      "sha256": "567c0891a12bcb39f9b4f3ce1de30f74df5f1e097a9d7db7d06b779bb15d7231"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAnimationComponent.cpp",
+      "sha256": "47c1623249a7b5ce74360567fc66f0bda9acf259ca36b6b57a4aeebb282ae9c7"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAttributeSet.cpp",
+      "sha256": "f587b7b6d1c7aa43e3d55be135d7aaab1139240d3fc19703aa72d3c06d8445c5"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.cpp",
+      "sha256": "b90990011a4f4a33b799d780069f2db1ad4520e15612f829d659ddf1e85d8bab"
+    },
+    {
+      "path": "Source/little_king/ULKUnitPassiveComponent.cpp",
+      "sha256": "a343c998a90e15cc8486f3a7304eb98c603c688abf9d795667a0f6b8128fb22a"
+    },
+    {
+      "path": "Source/little_king/ULKUnitStatusComponent.cpp",
+      "sha256": "9f0f9020dd6b0fc23e9f24ebe81982bbaf5c0d155fe9b933421ef6080f967edb"
+    },
+    {
+      "path": "Source/little_king/ULKWorldMapWidget.cpp",
+      "sha256": "831e5555a3b7942ce3ea58e8b1db41ed9c8ddd4b6b7922244aaa0cae72e6a710"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.h",
+      "sha256": "c3d40cdbfada62ec3ab1d29b6a2ae809ff916f16945cd9b393ec8cc54150d433"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameState.h",
+      "sha256": "c9c81d4d14b4ea12d0d6f0ac3592a12215ccf1b07edf64255c854e46edf90ae9"
+    },
+    {
+      "path": "Source/little_king/ALKHeroCamp.h",
+      "sha256": "ba39a6a25f2f19ecc865b57a36c6aac33246c952d613d23893c3b4599849e6e8"
+    },
+    {
+      "path": "Source/little_king/ALKHomeBuildingActor.h",
+      "sha256": "0c381cc86388c5c06653c3e65313341354306c2d296c903716c9aa7f497798d6"
+    },
+    {
+      "path": "Source/little_king/ALKHomeGameMode.h",
+      "sha256": "885eba479b0ed018dc3c331d9a905c6d5c5fb4ed95ac7901ff96bfb376aa8e74"
+    },
+    {
+      "path": "Source/little_king/ALKHomePlayerController.h",
+      "sha256": "a17e98e27187dce5d217fac0716e04afd6d2caba8aba3fbcb1078e5cd2a2d5e3"
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.h",
+      "sha256": "ee468e62f0cc40ba847631a3f70cdad317b46141c42b2993a219fff0a5b39c44"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.h",
+      "sha256": "7dd267eaf94e466310581bcf5ff584ec98c9a4d87773b40b93fd9a35dfd6b1a3"
+    },
+    {
+      "path": "Source/little_king/ALKPlayerState.h",
+      "sha256": "b110207b264cfe2fbdbdca13c33603d2593340a7116979b3426ab60465146a43"
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.h",
+      "sha256": "e65082127ef916b0531c1966f6e1df638c5f33f6e200b6a44bcac2c6886eb0ad"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.h",
+      "sha256": "e6ea37aa8d7656151aa2076752729344403e84fcab68644939094a989019fda6"
+    },
+    {
+      "path": "Source/little_king/ALKStartMenuGameMode.h",
+      "sha256": "2495ce7d773f604292f4f610563a9cca0b3f953d55b937d102905d8f16742cac"
+    },
+    {
+      "path": "Source/little_king/ALKStartMenuPlayerController.h",
+      "sha256": "91a336eae723aee7fd56b4edf85e1201ac9fdb727b06b8a63e7f375e658fd06a"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.h",
+      "sha256": "6696c8bfa4015c24bb0a53044976560bbaca312afba473647d02468b61a4bbd6"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.h",
+      "sha256": "8192c53b7b9107893341562a46a170df1a2c2f3604ec52e16a4c3a414507208d"
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.h",
+      "sha256": "025abc4a402e8b2d773a3158cab9f9a38b2c744bb24150ab7462607a62b3792a"
+    },
+    {
+      "path": "Source/little_king/little_king.h",
+      "sha256": "4694b655856b269fc41b195971214f8e629857c7e5d6f34002a066cd4af3037c"
+    },
+    {
+      "path": "Source/little_king/LKBattleArt.h",
+      "sha256": "05e1d671c9cfaed950a4a4ac7801578b66c795274293739240a64f9a3e294534"
+    },
+    {
+      "path": "Source/little_king/LKBattleArtPreview.h",
+      "sha256": "fb34f81cbdd40ffad063b16fc41e1908ed3ac6993b7a7e2954ad006434ab283c"
+    },
+    {
+      "path": "Source/little_king/LKCardPresentation.h",
+      "sha256": "65b350fcc11c3373424fcbbcc486e80c0f2f50e408f7b3b93c3c4fe4c0502a51"
+    },
+    {
+      "path": "Source/little_king/LKCardRules.h",
+      "sha256": "5728c4848b5287f4da2191e5b3f779f41dca3893a234705687b8c545b3c129f4"
+    },
+    {
+      "path": "Source/little_king/LKDataTypes.h",
+      "sha256": "8d13b82f2747bb87b6465ade3efe3d86653acc2efdd50992f531a7ac50222b34"
+    },
+    {
+      "path": "Source/little_king/LKEncounterContent.h",
+      "sha256": "487cb1274d0198d83a141654d3d6490c3ad2e37a0d7d62e9798435c49d7dc6c3"
+    },
+    {
+      "path": "Source/little_king/LKExpeditionMercenaryContent.h",
+      "sha256": "bf409323d60633798fe170a1dca702be30a53f46ace96496bc6b7845e6f82310"
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.h",
+      "sha256": "20925dc48a513b777e3a120f52647d947ccebb3087f048956e3ffe3851d4c0cf"
+    },
+    {
+      "path": "Source/little_king/LKHomeContent.h",
+      "sha256": "45e25db7a926789694d8340115afea6905b0ed0aba43b35ce4fcb253765f5400"
+    },
+    {
+      "path": "Source/little_king/LKHomeTypes.h",
+      "sha256": "b70472445d1e0a9e2a17cba7eb1b4b64cc80bf484d3b455135dea1faeec979bc"
+    },
+    {
+      "path": "Source/little_king/LKHomeUIStyle.h",
+      "sha256": "9c34212ae43ffa529c31becc89bdeab88c83ed6a51ad55b798c171f8a77913a1"
+    },
+    {
+      "path": "Source/little_king/LKLog.h",
+      "sha256": "bf4e7bf7f9766318d2decdd69fda2737dc9151da2263c5b908af165b97a12255"
+    },
+    {
+      "path": "Source/little_king/LKMoneyCommand.h",
+      "sha256": "b005223819faa467e5c587666e7974afadc670d4ee011b037d531ebd0943452d"
+    },
+    {
+      "path": "Source/little_king/LKMovementFixPreview.h",
+      "sha256": "21917936e702576664c2b687a22d48ab6dc66d49085619c3a0279938dc036e97"
+    },
+    {
+      "path": "Source/little_king/LKNavigation.h",
+      "sha256": "2d2cfeddf968b3ee4aadbc478815880983ae943c666da73c4af643e7b53c9462"
+    },
+    {
+      "path": "Source/little_king/LKPolishArt.h",
+      "sha256": "dc29a429221bd1204c3b473cbc4e732166c6ae13f79a9ded32a3702230015da1"
+    },
+    {
+      "path": "Source/little_king/LKPolishArtPreview.h",
+      "sha256": "8a34c33a8fd5a9599e810f17eea02297321076c494795a4762ccb57cdf7bbc96"
+    },
+    {
+      "path": "Source/little_king/LKPresentationStyle.h",
+      "sha256": "882cb9c67b8a71ad032123f27732ba310e4427fbdd9601a8606b83f3acb05c71"
+    },
+    {
+      "path": "Source/little_king/LKRunTypes.h",
+      "sha256": "215fba49e9fbc4519fb630af6f2405e290b9546823e1de0238189593c6ac4be2"
+    },
+    {
+      "path": "Source/little_king/LKTypes.h",
+      "sha256": "98f1fb6b4c1a67fd82da9916547f865d089b87761d480c1beb5e993f0563e9fb"
+    },
+    {
+      "path": "Source/little_king/LKUndeadContent.h",
+      "sha256": "fd127bc5fab7f0d471b29f16eb046670cd0121b06111f71830dce26e64412bd4"
+    },
+    {
+      "path": "Source/little_king/LKUnitContent.h",
+      "sha256": "b3c128aa12258e19b0ab24855fd3fa34cfc9654717e4285606d1399d2b563ea1"
+    },
+    {
+      "path": "Source/little_king/LKWorldArt.h",
+      "sha256": "3af867e94019e5f48467c08fd67aa638501b9363b61c2b96c24ecee11e2144e5"
+    },
+    {
+      "path": "Source/little_king/LKWorldArtPreview.h",
+      "sha256": "fcb844afa6931925bb20e659591c37f1374470fe9b404e5a069f5a92722e6a6c"
+    },
+    {
+      "path": "Source/little_king/LKWorldMapContent.h",
+      "sha256": "64adc2da6df07a650d753b3b239df127c2e2b4f56966121769f4cd4753259a90"
+    },
+    {
+      "path": "Source/little_king/Tests/LKWorldMapTestHelpers.h",
+      "sha256": "ee6fcf7b7eff1b1423655dd8de2c293263c92684065245cd13172db17885a771"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.h",
+      "sha256": "53d8643b52e55c922ce1228b2e75aefa6a9130a7a3322a8822b2323429620987"
+    },
+    {
+      "path": "Source/little_king/ULKCardDefinition.h",
+      "sha256": "62c0c988f544ec8468f394340679c1f7c26f34970945ea98cc9c38fb5f4733db"
+    },
+    {
+      "path": "Source/little_king/ULKCheatManager.h",
+      "sha256": "bba7af7dad6776132f53157a9ed320a777ea60339613b6a862ff6951ae61c057"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.h",
+      "sha256": "9cbb8240bcc68def070a05f576a8dbf1694c82984cba58d8af4e94d912fb1edc"
+    },
+    {
+      "path": "Source/little_king/ULKGameData.h",
+      "sha256": "0f8fa0cf2072a2c2c36e810839ddc9ca6f76232c27777ca4d450e5670079da1e"
+    },
+    {
+      "path": "Source/little_king/ULKGameplayLibrary.h",
+      "sha256": "9d8eb9d9ff5222d45682bec7a02d7d90ae21727a9a88c7734524c9951f2aa55e"
+    },
+    {
+      "path": "Source/little_king/ULKGameViewportClient.h",
+      "sha256": "58960eff82867dab36d0c6349768abc946162d76faac19f0fc1290b1fb11123c"
+    },
+    {
+      "path": "Source/little_king/ULKHomeBuildingLabelWidget.h",
+      "sha256": "873c89e364ef5e2639792c3e923533e559e54b3269b1a9baae6af05cf140c795"
+    },
+    {
+      "path": "Source/little_king/ULKHomeHUDWidget.h",
+      "sha256": "02959548939b8d76f55e595f74770552d7844ae7dc6c5d764b2603efa599b21e"
+    },
+    {
+      "path": "Source/little_king/ULKHomeListButtonWidget.h",
+      "sha256": "fb74532482c844d052d98c763b45da5be035581bcfd86c28c6e45653aa0af3e0"
+    },
+    {
+      "path": "Source/little_king/ULKJourneyPresentationSubsystem.h",
+      "sha256": "2d203438c4e57cb765c360ed8c42d30568eaaecb9ae42bf446851b42128e6858"
+    },
+    {
+      "path": "Source/little_king/ULKPresentationSubsystem.h",
+      "sha256": "66d0fb87386093ff23336daebb8539e174fc2413e22cd22eb640c01455acfc3b"
+    },
+    {
+      "path": "Source/little_king/ULKProfileSaveGame.h",
+      "sha256": "c0d42295ad1fd2616eb855fa08a17e2f6fed5e43386ceb8139649b49463fa7a5"
+    },
+    {
+      "path": "Source/little_king/ULKProfileSubsystem.h",
+      "sha256": "3adafe4a2c42ed83131ba89364cfc3f122bc1a9abb57f61c7e0afc49851b8408"
+    },
+    {
+      "path": "Source/little_king/ULKRunNodeSelectWidget.h",
+      "sha256": "71d354c7c468786306f9ffbb1b9c24b24fd3218c251a1ca7be2f4bc29584ce28"
+    },
+    {
+      "path": "Source/little_king/ULKRunResumeWidget.h",
+      "sha256": "dfaa48999e360e3878bc50541ad766b51311d216b80688786377e6d70534f4f0"
+    },
+    {
+      "path": "Source/little_king/ULKRunRewardWidget.h",
+      "sha256": "ccb0995f215562254abadd18bc1c3841d903d34d8c85b14af0720a54802e5fc1"
+    },
+    {
+      "path": "Source/little_king/ULKRunSaveGame.h",
+      "sha256": "57cd407f6439b28077e1f19faaf2f8845cca4ff7dc24f9a76a5bec768632038e"
+    },
+    {
+      "path": "Source/little_king/ULKRunSubsystem.h",
+      "sha256": "5b2c612d1f9b754d4161fc5f4c4fe1943b75fa8518922e75c2a872663ad0bd50"
+    },
+    {
+      "path": "Source/little_king/ULKSaveSlotSubsystem.h",
+      "sha256": "eb0c676061d147ca8733480d2ffdfe168d0c88f355bcc6f773635ef9bc868b1b"
+    },
+    {
+      "path": "Source/little_king/ULKSilverComponent.h",
+      "sha256": "683aaf76b59b2664f55f4796a546d8ca52c2e3fe8b2a35d88fe840de575e20b7"
+    },
+    {
+      "path": "Source/little_king/ULKStartMenuWidget.h",
+      "sha256": "397385bcc1c62b1c58bfe8df32fa9724ac218ccabb2ce147a7d91b6e74caff54"
+    },
+    {
+      "path": "Source/little_king/ULKTraitAuraComponent.h",
+      "sha256": "bda68109cc07632e64b8cdc9b949097f0f9aaf0ca20103929fac2f507daa6808"
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.h",
+      "sha256": "9a7f77a7d86933c5fd4c4025649fcf583195ddbede73995dac39b8cd4b5169c1"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAnimationComponent.h",
+      "sha256": "7c1a555dac932c55191af518e26086a912a3f4126552d5b9723350ef31c259bc"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAttributeSet.h",
+      "sha256": "b8d609f538881cef177b6334478bac737a2f5fc33734288af89ecd12f435bb1a"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.h",
+      "sha256": "898128a5aec1a975541ac45e15633eb10916827ed9583ca5b398e2620108f5a8"
+    },
+    {
+      "path": "Source/little_king/ULKUnitPassiveComponent.h",
+      "sha256": "b9019c4e84c3c0569393ca5746a97529da5ab76576e563ab2bb8ddc1e757d3de"
+    },
+    {
+      "path": "Source/little_king/ULKUnitStatusComponent.h",
+      "sha256": "6a48ff28e66d8ec01e73f1f36e232f0059f0df764b374ad8e632ed0bb9ba5a2c"
+    },
+    {
+      "path": "Source/little_king/ULKWorldMapWidget.h",
+      "sha256": "82bdcc93e42a33430758479513e5cfb80de8f27df11822881a51ab64256f6154"
+    }
+  ],
+  "limitations": [
+    "Two horizontal facings; vertical travel retains last facing.",
+    "Four-pose generated walking, not a hand-cleaned eight-direction animation set.",
+    "Historical non-movement artwork is retained.",
+    "Packaging and hardware acceptance remain deferred."
+  ]
+}

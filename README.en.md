@@ -6,11 +6,13 @@ A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, 
 
 Prepare your heroes and deck at home, set out through the gate, and explore a fixed world map with randomized routes. Deploy three heroes before each battle, command them through their camps, and cycle cards to support your army. Bring expedition gold home to upgrade your settlement.
 
-The current version is **v0.8** (`ProjectVersion=0.8.0`). The game UI and most detailed design documents are currently in Simplified Chinese.
+The current version is **v0.8.1** (`ProjectVersion=0.8.1`). The game UI and most detailed design documents are currently in Simplified Chinese.
+
+v0.8.1 fixes flickering and dark intersections between overlapping units and camps, makes facing follow movement, and replaces walking clips for 24 biped characters. Gait follows voluntary travel distance, and battle motion blur is disabled. The update adds 144 Unreal assets, bringing the total to 919. See the [v0.8.1 release notes](docs/47-v0.8.1ReleaseNotes.md), [fix record and UE 5.8 guide](docs/45-BattlePresentationFixes.md), and [exact art prompts](docs/46-MovementFixPrompts.md).
 
 ![Main menu](docs/images/PolishMenu_1080.png)
 
-## What's new in v0.8
+## Previous release: v0.8 art and audio
 
 This release integrates all four art and audio batches, adding **775 Unreal assets** together with source files, import scripts, provenance records, and generation prompts.
 
@@ -81,7 +83,9 @@ All runtime artwork, audio, fonts, maps, and UI integration are already included
 
 ## Validation and saves
 
-The final D-batch build succeeded on UE 5.8.1. The full `LittleKing` automation suite passed **83/83 tests**: 39 without warnings and 44 with warnings from synthetic test worlds, existing engine fallbacks, or deliberately rejected input/save cases. There were no failed or unexecuted tests.
+The v0.8.1 fixes were built with UE 5.8.1. The full `LittleKing` automation suite passed **87/87 tests**: 43 without warnings and 44 with warnings from synthetic test worlds, existing engine fallbacks, or deliberately rejected input/save cases. There were no failed or unexecuted tests. The four new regression tests cover overlap ordering, facing, distance-driven gait, and walking-asset completeness. See the [v0.8.1 release validation](docs/validation/v0.8.1-Release.json).
+
+The movement-fix review produced 48 actual-renderer screenshots across 720p and 1080p, covering movement in both directions, stopping, and front/back overlap with camps. Existing saves and the unit balance table were unchanged. The following D-batch records remain historical evidence for v0.8.
 
 Real-engine captures cover 720p and 1080p: 76 screenshots were produced, representative layouts and animation states were inspected, and 28 images were archived for D. Travel checks completed menu → home → battle map → home without leaving a transition curtain or extra music voices. See the [D validation record](docs/validation/PolishArt-Validation.json) and [v0.8 release validation](docs/validation/v0.8-Release.json).
 
@@ -120,7 +124,7 @@ Detailed linked documents are currently in Chinese. Older tutorials are historic
 | Art direction and authoring | [Style guide](docs/07-ArtStyleGuide.md), [inventory](docs/12-AssetRequest.md), [integration tutorial](docs/13_Asset_Solutions.md), [sources and licenses](docs/36-ArtAudioSources.md) |
 | Art/audio implementation | [A: home and UI](docs/37-ArtAudioIntegration.md), [B: battle art](docs/38-BattleArtIntegration.md), [C: world and effects](docs/40-WorldSkillsArtIntegration.md), [D: animation and music](docs/42-PolishArtIntegration.md) |
 | Exact generation prompts | [Battle](docs/39-BattleArtPrompts.md), [world/effects](docs/41-WorldArtPrompts.md), [animation/buildings/music](docs/43-PolishArtPrompts.md) |
-| Releases | [v0.8 notes](docs/44-v0.8ReleaseNotes.md), [v0.8 validation](docs/validation/v0.8-Release.json), [historical v0.7 validation](docs/validation/v0.7-Release.json) |
+| Releases | [v0.8.1 notes](docs/47-v0.8.1ReleaseNotes.md), [v0.8.1 validation](docs/validation/v0.8.1-Release.json), [v0.8 notes](docs/44-v0.8ReleaseNotes.md), [v0.8 validation](docs/validation/v0.8-Release.json), [historical v0.7 validation](docs/validation/v0.7-Release.json) |
 
 ## Asset credits
 

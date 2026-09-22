@@ -1,6 +1,6 @@
 # 美术与声音统一规范 · Storybook V1
 
-更新：2026-09-21。A/B/C/D 批已接入，替代本文早期的极繁装饰与斜视建议。需求见 [12](12-AssetRequest.md)，来源/完整提示词见 [36](36-ArtAudioSources.md)，操作见 [13](13_Asset_Solutions.md)。Sprint 6 不恢复，打包与硬件验收仍后置。
+更新：2026-09-23。A/B/C/D 批与后续步行显示修复已接入，替代本文早期的极繁装饰与斜视建议。需求见 [12](12-AssetRequest.md)，来源/完整提示词见 [36](36-ArtAudioSources.md)，操作见 [13](13_Asset_Solutions.md)。Sprint 6 不恢复，打包与硬件验收仍后置。
 
 ## 视觉方向
 
@@ -48,6 +48,8 @@ C 批已补五区地面、三帐篷、五节点徽记及三 FX 零件；绘本�
 透明检查实际 alpha，禁止假棋盘背景。保存原图；改变外观另存版本。首版家园使用 MaskedUnlitSpriteMaterial、双线性过滤、无 mip、UI 贴图组。大范围相机缩放时再评估 mip 与内存，不把当前配置当作最终性能方案。
 
 ## 生成锚点与留档
+
+战斗步行修复补充（2026-09-23）：默认角色图统一朝右，运行时镜像为左；双足步行必须包含可辨识的接触/抬脚/换脚姿势，身体高度与脚底基线一致。当前 24 个双足单位使用独立四帧图集；双头龙保留原四足图。步态随主动移动距离推进，战场禁用运动模糊，平面精灵不投影。遮挡根据固定脚底位置排序，不能根据每帧武器/抬脚边界排序。见 [45](45-BattlePresentationFixes.md) 与 [46 实际提示词](46-MovementFixPrompts.md)。
 
 ```text
 Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game.

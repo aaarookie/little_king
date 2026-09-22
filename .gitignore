@@ -21,3 +21,7 @@ Saved/
 # ===== 系统文件 =====
 .DS_Store
 Thumbs.db
+
+# Python asset-tool caches
+__pycache__/
+*.pyc

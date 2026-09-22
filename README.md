@@ -6,7 +6,11 @@ UE 5.8 · C++ / Paper2D / GAS / UMG · 单机 PvE 自动战斗原型。
 
 玩家在家园配置战备、从大门出征，在战场部署三名英雄、指挥营地并循环出牌。当前可完成家园 → 五区域固定大地图（各区 10～20 个随机节点、普通/精英/Boss/市场/休息）→ 家园的循环，包括随机敌阵容、房间奖励、路线选择、存档恢复及永久金币升级。
 
-## 当前版本：v0.8 · 素材制作 A/B/C/D 批完成
+## 当前版本：v0.8.1 · 战斗显示修复
+
+战斗精灵按脚底稳定分层，修复角色、敌人与营地重叠闪黑；朝向跟随主动移动；24 个双足角色更新步行帧、按距离推进步态，关闭战场运动模糊。新增 144 个引擎资源，累计 919 个；87/87 全量回归通过，720p/1080p 实际画面已检查，原五存档和单位数值表保持不变。工程版本为 `0.8.1`，详见 [v0.8.1 发布说明](docs/47-v0.8.1ReleaseNotes.md)、[显示修复与 UE 5.8 教程](docs/45-BattlePresentationFixes.md)、[素材提示词](docs/46-MovementFixPrompts.md) 和 [发布验证](docs/validation/v0.8.1-Release.json)。
+
+### v0.8 历史：素材制作 A/B/C/D 批完成
 
 D 批 UE 5.8.1 构建成功，83/83 全量自动化通过，720p/1080p 实际画面已检查，五个玩家存档哈希不变。
 
@@ -22,7 +26,7 @@ A 批已接入菜单插画、七座家园建筑、绘本 UI 与九条声音；B 
 
 v0.7 是 v0.6 之后的合并发布，把家园、开始界面、五区域远征与优化阶段二三一次性收进主线：家园 H0～H5（永久档 `LittleKing_Profile_A/B`、七建筑、战备、金币结算与神像/金库升级）、`L_StartMenu` 与 8 个独立存档、五区域大地图远征（各区 10～20 节点与钱包全额带回）、五档品质与临时佣兵、巨魔与攻城七卡，并修复 BUG-014~019（含"继续远征后双方不攻击"）。远征 Schema 已升至 8，旧档自动迁移。**Sprint 6 已删除并跳过**；发布时后置的音效与美术现已完成 A/B/C/D 批整合，打包和硬件测试仍后置。
 
-v0.7 发布时状态：UE 5.8.1 `little_kingEditor / Win64 / Development` 构建成功，`LittleKing` 全量自动化 72/72 通过（0 失败，报告 `Saved/Automation/V07Release01`）。v0.8 的最终回归为上方所述 83/83，发布证据见 [v0.8-Release](docs/validation/v0.8-Release.json)。
+历史发布：v0.7 全量回归 72/72，v0.8 为 83/83；本次 v0.8.1 为 87/87。UE 5.8.1 构建及发布证据见 [v0.8.1-Release](docs/validation/v0.8.1-Release.json)，历史证据见 [v0.8-Release](docs/validation/v0.8-Release.json)。
 
 - 开战前必须部署骑士、法师、游侠；部署不限时。
 - 每个英雄有固定实体营地。点击己方营地再点**任意可达地点**即可下达移动指令：指令会强行打断战斗（移动中不索敌不攻击），到达落点或卡住超时（默认 1.5 秒）后恢复自动战斗；右键取消选中。
@@ -92,6 +96,8 @@ v0.7 发布时状态：UE 5.8.1 `little_kingEditor / Win64 / Development` 构建
 | [42 动画音乐等整合](docs/42-PolishArtIntegration.md) | D 批 639 资源、代码协作记录、验证与 UE 5.8 教程 |
 | [43 动画与音乐提示词](docs/43-PolishArtPrompts.md) | 35 张图与四首 Music3 的实际完整输入 |
 | [44 v0.8 发布说明](docs/44-v0.8ReleaseNotes.md) | A～D 批发布范围、版本号、英文 README 与验证证据 |
+| [45 战斗显示修复](docs/45-BattlePresentationFixes.md) / [46 提示词](docs/46-MovementFixPrompts.md) | 重叠排序、朝向、步态、24 个角色素材与 UE 5.8 教程 |
+| [47 v0.8.1 发布说明](docs/47-v0.8.1ReleaseNotes.md) | 显示修复发布范围、版本号与验证证据 |
 | [14 原始评审](docs/14-ProjectReview.md) | 建议来源；本轮采用项以 01 / 15 为准 |
 | [05 BugLog](docs/05-BugLog.md) | 历史问题与新修复入口 |
 
@@ -99,7 +105,7 @@ v0.7 发布时状态：UE 5.8.1 `little_kingEditor / Win64 / Development` 构建
 
 ## 协作与验收
 
-A/C/D 批未重存既有战斗资产；B 批仅在 `DT_Units` 修正旧兵营 `SpriteScale.Y=0.5`，其他数值/字段不变。`DT_Traits`、三个 GA、`DA_GameData`、`L_BattleTest` 和 `WBP_BattleHUD` 未重存。家园地图、Home 目录下的 GameMode/材质和原生 UI 由 Codex 助手制作；旧战斗 HUD 的部署按钮在运行时按本轮英雄顺序绑定。接手先读 18、27 与素材记录 37/38/40/42，避免多人保存同一资产。素材验证见 [A 批](docs/validation/StorybookAssets-Validation.json)、[B 批](docs/validation/BattleArt-Validation.json)、[C 批](docs/validation/WorldArt-Validation.json) 与 [D 批](docs/validation/PolishArt-Validation.json)。**当前发布验证见 [v0.8-Release](docs/validation/v0.8-Release.json)**；[v0.7-Release](docs/validation/v0.7-Release.json) 保留当时构建及 72 项测试记录。分阶段证据见 [HomeUI-Validation](docs/validation/HomeUI-Validation.json)、[Optimization1](docs/validation/Optimization1-Validation.json)、[Optimization2](docs/validation/Optimization2-Validation.json)、[Optimization3](docs/validation/Optimization3-Validation.json)、[TrollCards](docs/validation/TrollCards-Validation.json)，更早的 44 项记录保留在 [Home-Validation](docs/validation/Home-Validation.json)。
+A/C/D 批未重存既有战斗资产；B 批仅在 `DT_Units` 修正旧兵营 `SpriteScale.Y=0.5`，其他数值/字段不变。`DT_Traits`、三个 GA、`DA_GameData`、`L_BattleTest` 和 `WBP_BattleHUD` 未重存。家园地图、Home 目录下的 GameMode/材质和原生 UI 由 Codex 助手制作；旧战斗 HUD 的部署按钮在运行时按本轮英雄顺序绑定。接手先读 18、27 与素材记录 37/38/40/42，避免多人保存同一资产。素材验证见 [A 批](docs/validation/StorybookAssets-Validation.json)、[B 批](docs/validation/BattleArt-Validation.json)、[C 批](docs/validation/WorldArt-Validation.json) 与 [D 批](docs/validation/PolishArt-Validation.json)。**当前发布验证见 [v0.8.1-Release](docs/validation/v0.8.1-Release.json)**；[v0.8-Release](docs/validation/v0.8-Release.json) 保留上一版本证据；[v0.7-Release](docs/validation/v0.7-Release.json) 保留当时构建及 72 项测试记录。分阶段证据见 [HomeUI-Validation](docs/validation/HomeUI-Validation.json)、[Optimization1](docs/validation/Optimization1-Validation.json)、[Optimization2](docs/validation/Optimization2-Validation.json)、[Optimization3](docs/validation/Optimization3-Validation.json)、[TrollCards](docs/validation/TrollCards-Validation.json)，更早的 44 项记录保留在 [Home-Validation](docs/validation/Home-Validation.json)。
 
 存档 01 的家园永久档写在 `LittleKing_Profile_A/B`，远征档为 `LittleKing_Run`；02～08 使用编号前缀。远征 Schema 8 兼容旧图、钱包和已冻结回执；占格超过 8 的旧卡组先保留，再由玩家选择裁减。自动化测试默认不读写真实永久档，跑测试不会给玩家加金币。`little_king.Build.cs` 关闭了 Unity 合并编译（多个 .cpp 有同名文件内辅助符号）。
 

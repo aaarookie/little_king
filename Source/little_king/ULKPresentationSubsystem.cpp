@@ -81,6 +81,11 @@ void ULKPresentationSubsystem::SetupBattlefield(ALKBattleGameMode* GM)
         Settings.AutoExposureApplyPhysicalCameraExposure = false;
         Settings.bOverride_AutoExposureBias = true;
         Settings.AutoExposureBias = 0.f;
+        // Discrete Paper2D poses must remain readable while their actors move.
+        Settings.bOverride_MotionBlurAmount = true;
+        Settings.MotionBlurAmount = 0.f;
+        Settings.bOverride_MotionBlurMax = true;
+        Settings.MotionBlurMax = 0.f;
         Settings.bOverride_BloomIntensity = true;
         Settings.BloomIntensity = 0.f;
     }

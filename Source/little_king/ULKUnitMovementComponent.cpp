@@ -102,6 +102,7 @@ void ULKUnitMovementComponent::MoveToward(const FVector& InDestination, float In
 void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    VisualTravel = FVector::ZeroVector;
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
     if (Self && (Self->IsSkillMoving() || Self->IsControlled())) { return; }
     if (!Self || !Self->IsAlive() || Self->IsBuilding() || DeltaTime <= 0.f
@@ -134,6 +135,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
             RemainingStep -= Step;
             if (Distance <= Step + 0.1f) { Path.RemoveAt(0); } else { break; }
         }
+        VisualTravel = Self->GetActorLocation() - BeforeMovement;
         if (FVector::Dist2D(Self->GetActorLocation(), Destination) <= 2.f) { bMoving = false; }
         if (Self->GetUnitId() == "Unit_Colossus" && FVector::DistSquared2D(BeforeMovement, Self->GetActorLocation()) > .01f)
         { ULKPresentationSubsystem::Sound(GetWorld(), "Footstep", Self->GetActorLocation()); }

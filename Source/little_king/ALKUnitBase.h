@@ -45,6 +45,8 @@ public:
 	bool IsTargetable() const { return !bDead && !IsCamp(); }
 	float GetBodyRadius() const { return BodyRadius; }
 	UPaperSpriteComponent* GetSpriteComponent() const { return SpriteComponent; }
+    /** Flip artwork only; keep the logical actor and body collision unrotated. */
+    void SetVisualFacingRight(bool bRight);
 	bool IsUnderFocusWarning() const { return FocusWarningRemaining > 0.f; }
 	FLinearColor GetPlaceholderColor() const { return PlaceholderColor; }
 	FText GetDisplayName() const { return DisplayName; }

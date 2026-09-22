@@ -1,0 +1,1999 @@
+{
+  "partial": false,
+  "count": 24,
+  "expectedCount": 24,
+  "items": [
+    {
+      "id": "Boss_SkeletonKing",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Boss_SkeletonKing.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Boss_SkeletonKing.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Skeletal king with gold crown, gold armor, plum cloak and a large sword.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-2e304b99-a0af-4c4f-9373-d304afcb3ac6.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "e8f4a085e67f99a1232bd97a1e69cdc94015fe08eeb647971585ced7fbab0b3e",
+      "referenceSha256": "61c7b0ac53b6089ba2d38d732d842192acda0d0f56c580e3c70448e714a7bf5b",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.5352365677626303,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            83,
+            16
+          ],
+          "size": [
+            483,
+            574
+          ],
+          "pivot": [
+            385.0,
+            302.1431435445068
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            699,
+            17
+          ],
+          "size": [
+            404,
+            576
+          ],
+          "pivot": [
+            969.0,
+            305.1431435445068
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            83,
+            631
+          ],
+          "size": [
+            506,
+            571
+          ],
+          "pivot": [
+            399.0,
+            914.1431435445068
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            698,
+            632
+          ],
+          "size": [
+            413,
+            571
+          ],
+          "pivot": [
+            973.0,
+            915.1431435445068
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Move"
+    },
+    {
+      "id": "Hero_Knight",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_Knight.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Knight.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the KNIGHT in the supplied identity reference. The reference is an older atlas: keep exactly the same young blond knight, white armour, pine-green cloak, gold edging and lion crest, sword. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire knight per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Sword carried still, no slashing or arm gestures. Match the reference clean storybook cartoon outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-d0ed98ea-067d-4947-98b4-397aca0a4565.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "d7b3f4ac7edb2b6378bcfbe7ed75d4679a19717a209f1360a48a135affff7f95",
+      "referenceSha256": "df8e230502d068880f90a632974172d56d23ba25b14659a8a8db0764ab994128",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 0.4073260073260073,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            93,
+            39
+          ],
+          "size": [
+            495,
+            557
+          ],
+          "pivot": [
+            393.0,
+            318.203663003663
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            722,
+            40
+          ],
+          "size": [
+            476,
+            563
+          ],
+          "pivot": [
+            1005.0,
+            325.203663003663
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            96,
+            665
+          ],
+          "size": [
+            495,
+            555
+          ],
+          "pivot": [
+            393.0,
+            942.203663003663
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            710,
+            666
+          ],
+          "size": [
+            481,
+            551
+          ],
+          "pivot": [
+            996.0,
+            939.203663003663
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Move"
+    },
+    {
+      "id": "Hero_Mage",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_Mage.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Mage.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Elderly white-haired and bearded mage in a purple robe with cream front panel, gold-star staff. Clear alternating boots visible below robe, coat hem follows each knee. Preserve simple cartoon style.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-b4b94e64-ef01-4a3a-8d13-e377138060b5.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "2dacf857fc5ca8d3f2acc499d2d880e4b4d595dfce55becbd21c74b351333886",
+      "referenceSha256": "b57ef9f87d107ac09c12ba67c69cb30d6e0e7f18e3e95d2abf5bae1dd7bfcb58",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.1669051317690022,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            157,
+            13
+          ],
+          "size": [
+            372,
+            578
+          ],
+          "pivot": [
+            366.0,
+            318.52765173193796
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            739,
+            23
+          ],
+          "size": [
+            358,
+            568
+          ],
+          "pivot": [
+            933.0,
+            318.52765173193796
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            158,
+            632
+          ],
+          "size": [
+            377,
+            569
+          ],
+          "pivot": [
+            374.0,
+            928.527651731938
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            763,
+            632
+          ],
+          "size": [
+            352,
+            569
+          ],
+          "pivot": [
+            951.0,
+            928.527651731938
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Move"
+    },
+    {
+      "id": "Hero_Necromancer",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_Necromancer.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Necromancer.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Tall pale necromancer wearing plum-brown gold-trimmed robe and hood, skull-tipped wooden staff. Keep robe but expose alternating boots below hem; calm walking, no casting.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-bc6ed8a0-c223-4691-b946-409d1ecf8f2b.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "004a495ce1a705c94a9f58de9e93de4c6f0eb61b391419db1e414c9441b69213",
+      "referenceSha256": "ab624f5356bf988da7551af9aa477fda103d11f479762cf847d65289451ba701",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.080996491067877,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            145,
+            16
+          ],
+          "size": [
+            412,
+            594
+          ],
+          "pivot": [
+            379.0,
+            315.47427652733114
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            759,
+            15
+          ],
+          "size": [
+            359,
+            599
+          ],
+          "pivot": [
+            964.0,
+            319.47427652733114
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            158,
+            638
+          ],
+          "size": [
+            417,
+            581
+          ],
+          "pivot": [
+            392.0,
+            924.4742765273311
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            753,
+            636
+          ],
+          "size": [
+            363,
+            586
+          ],
+          "pivot": [
+            962.0,
+            927.4742765273311
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Move"
+    },
+    {
+      "id": "Hero_Ranger",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_Ranger.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Ranger.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Young brown-haired ranger, green cloak and olive tunic, bow, brown boots. Preserve simple cartoon style.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-e210de23-712a-4d51-9cd4-36f13bedc6b6.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "d2b28d02cd42bc75939c89bfb7862253e8daecacee379383064d46a561ad94ba",
+      "referenceSha256": "15ec30086ed87af635d41724645d6bfe39a9bbf95ca583cde0f24b6c85884552",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.213684210526316,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            122,
+            29
+          ],
+          "size": [
+            407,
+            584
+          ],
+          "pivot": [
+            357.0,
+            332.03210526315786
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            715,
+            29
+          ],
+          "size": [
+            395,
+            584
+          ],
+          "pivot": [
+            940.0,
+            332.03210526315786
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            111,
+            643
+          ],
+          "size": [
+            419,
+            567
+          ],
+          "pivot": [
+            358.0,
+            929.0321052631579
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            714,
+            641
+          ],
+          "size": [
+            397,
+            569
+          ],
+          "pivot": [
+            938.0,
+            929.0321052631579
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Move"
+    },
+    {
+      "id": "Hero_SkeletonGiant",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_SkeletonGiant.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_SkeletonGiant.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Broad skeletal giant with skull head, ragged moss cloth, rusty shoulder armor and heavy stone/bone club.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-3d6b17f8-f2e4-4c9d-a12e-04d09be0526d.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "d1cb3d57eb022e21a8434311e2a8f51be7e69553d4bbab0ca66db1ab15ea8d21",
+      "referenceSha256": "4444c783509d8d11d65f654d771f478d40a8b816b197225308ae1be609f66e11",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.5583962912087912,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            136,
+            29
+          ],
+          "size": [
+            442,
+            564
+          ],
+          "pivot": [
+            327.0,
+            312.4886675824176
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            745,
+            34
+          ],
+          "size": [
+            429,
+            559
+          ],
+          "pivot": [
+            934.0,
+            312.4886675824176
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            147,
+            648
+          ],
+          "size": [
+            460,
+            551
+          ],
+          "pivot": [
+            334.0,
+            918.4886675824175
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            764,
+            646
+          ],
+          "size": [
+            424,
+            556
+          ],
+          "pivot": [
+            948.0,
+            921.4886675824175
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Move"
+    },
+    {
+      "id": "Unit_ApprenticeMage",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_ApprenticeMage.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ApprenticeMage.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Young human apprentice with round spectacles, brown hair, floppy olive green pointed hat, brown cape, green trousers, open spellbook and a small wand carried steady, boots clearly alternating.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-a00925a8-89e0-4790-a295-d99753c63cb3.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "0c47d3f908a2228eae4319be3f8ec1b153a2af658fc009c2a1dff153af52b249",
+      "referenceSha256": "8afb805cfd5ec0a821dbbb7c12a80f8e0bf2a25fbfdef961b9fccacdbdd74e21",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.333565737730616,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            136,
+            39
+          ],
+          "size": [
+            430,
+            598
+          ],
+          "pivot": [
+            352.0,
+            339.4703684393465
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            756,
+            39
+          ],
+          "size": [
+            388,
+            599
+          ],
+          "pivot": [
+            940.0,
+            340.4703684393465
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            139,
+            640
+          ],
+          "size": [
+            422,
+            576
+          ],
+          "pivot": [
+            357.0,
+            918.4703684393464
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            743,
+            644
+          ],
+          "size": [
+            402,
+            574
+          ],
+          "pivot": [
+            948.0,
+            920.4703684393464
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Move"
+    },
+    {
+      "id": "Unit_Archer",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Archer.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Archer.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Brown-haired archer with small braids, mustard leather tunic, green hooded cloak and leggings, bow, brown boots. Preserve simple cartoon style.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-bc6ad0dd-ba02-4ae7-83c5-3dfa91df856e.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "93fbf85da085df8d6e4251c02ca6378153109719434bb0b1dd19bd09bba57503",
+      "referenceSha256": "a6319c6c03ea6f1ab6882d420ca580c03763ef068f998f8b2c4eafb67a3ddfb3",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.0888598847400346,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            203,
+            26
+          ],
+          "size": [
+            348,
+            582
+          ],
+          "pivot": [
+            372.0,
+            317.27441077441074
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            782,
+            26
+          ],
+          "size": [
+            316,
+            587
+          ],
+          "pivot": [
+            933.0,
+            322.27441077441074
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            202,
+            642
+          ],
+          "size": [
+            370,
+            575
+          ],
+          "pivot": [
+            372.0,
+            926.2744107744107
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            787,
+            646
+          ],
+          "size": [
+            315,
+            577
+          ],
+          "pivot": [
+            939.0,
+            932.2744107744107
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Move"
+    },
+    {
+      "id": "Unit_Colossus",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Colossus.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Colossus.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Enormous humanoid stone colossus of pale limestone blocks, moss joints, old gold geometric armor and crown. Empty heavy fists. Slow heavy march with unmistakably alternating large block feet; preserve same size across poses.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-b8d479ac-3bc0-486a-8f3d-7f30190360fe.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "2f86baa3be2a350ad03cea26f3f6b3c202896db2c74ada6bca4d184117c46a35",
+      "referenceSha256": "85d2e463a97d6a1c57b69a1f0b41c6fe6c9ee20beade663e7ccf29f444c53e23",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.4350879122317792,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            106,
+            29
+          ],
+          "size": [
+            494,
+            573
+          ],
+          "pivot": [
+            354.0,
+            307.80697799248526
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            714,
+            29
+          ],
+          "size": [
+            481,
+            574
+          ],
+          "pivot": [
+            944.0,
+            308.80697799248526
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            112,
+            644
+          ],
+          "size": [
+            516,
+            569
+          ],
+          "pivot": [
+            355.0,
+            918.8069779924853
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            754,
+            644
+          ],
+          "size": [
+            474,
+            571
+          ],
+          "pivot": [
+            972.0,
+            920.8069779924853
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Move"
+    },
+    {
+      "id": "Unit_ElfArcher",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_ElfArcher.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfArcher.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Elf archer with green cloak and bow.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-b97350ca-7c79-40bd-bba1-1d28e59e8ade.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "1312de7cda33cb25fb5f749c6c7b2d99e74c0c1d7018c556245c46bc8ecbb203",
+      "referenceSha256": "a2aa21cfcaf726ff909cc2091f30e58c9b4b5fc4453366aa649f0bab4421a568",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.2321026479652812,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            102,
+            38
+          ],
+          "size": [
+            502,
+            568
+          ],
+          "pivot": [
+            379.0,
+            324.15699100572357
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            702,
+            40
+          ],
+          "size": [
+            420,
+            568
+          ],
+          "pivot": [
+            927.0,
+            326.15699100572357
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            107,
+            643
+          ],
+          "size": [
+            497,
+            558
+          ],
+          "pivot": [
+            387.0,
+            919.1569910057235
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            693,
+            640
+          ],
+          "size": [
+            461,
+            564
+          ],
+          "pivot": [
+            946.0,
+            922.1569910057235
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Move"
+    },
+    {
+      "id": "Unit_ElfGuard",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_ElfGuard.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfGuard.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Long blond-haired male elf in green and ivory armor with a large leaf shield and spear.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-37b7a5e9-c17a-443d-bb36-ccae5c27ed8d.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "e1409e5a1b690005e03346f95bf161c6b02b522c0fedf865c450d13f73d136e6",
+      "referenceSha256": "4aa331d81f2e7c747308413e50c9de1253281be7911bc662483b1bc362dadc65",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.162447478991597,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            165,
+            6
+          ],
+          "size": [
+            424,
+            596
+          ],
+          "pivot": [
+            406.0,
+            307.4656862745098
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            748,
+            4
+          ],
+          "size": [
+            404,
+            601
+          ],
+          "pivot": [
+            974.0,
+            310.4656862745098
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            161,
+            623
+          ],
+          "size": [
+            452,
+            577
+          ],
+          "pivot": [
+            402.0,
+            905.4656862745098
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            783,
+            617
+          ],
+          "size": [
+            394,
+            586
+          ],
+          "pivot": [
+            1000.0,
+            908.4656862745098
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Move"
+    },
+    {
+      "id": "Unit_ElfPriest",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_ElfPriest.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfPriest.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: White-haired elf priestess, ivory flowing robe trimmed in green and gold, leafy golden staff held steadily at her side. Show alternating boots clearly below the lifted walking hem.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-c64a6664-5fe1-466e-b067-44a6f6053e74.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "fc81caa754aa2a830f8cbd04a4612e1efaa7cc56ff74a5ce19e98309be240d6e",
+      "referenceSha256": "fee624b5b13522661559b2e6c17c575282f5d8c17a5bea3bffcf0094043ca7b1",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.222004057828447,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            190,
+            29
+          ],
+          "size": [
+            407,
+            573
+          ],
+          "pivot": [
+            390.0,
+            321.432119205298
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            794,
+            34
+          ],
+          "size": [
+            314,
+            568
+          ],
+          "pivot": [
+            940.0,
+            321.432119205298
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            220,
+            647
+          ],
+          "size": [
+            409,
+            544
+          ],
+          "pivot": [
+            412.0,
+            910.432119205298
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            801,
+            634
+          ],
+          "size": [
+            325,
+            558
+          ],
+          "pivot": [
+            958.0,
+            911.432119205298
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Move"
+    },
+    {
+      "id": "Unit_ElfWarrior",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_ElfWarrior.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfWarrior.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Auburn-haired male elf in green and ivory armor, with a small leaf shield and curved sword.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-e635d06c-0544-4b46-bb58-f08501951e40.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "9238f383f652ced346fa2c44e9dc66d999f4516c71c1c13c596d125d86fdb949",
+      "referenceSha256": "97f5fcff0e8bf85ed0491740c8dcb533c9f076f0a5dd4a643d10a3fc7c59e95d",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.1907087644932055,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            145,
+            41
+          ],
+          "size": [
+            428,
+            568
+          ],
+          "pivot": [
+            383.0,
+            324.2078606158833
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            710,
+            41
+          ],
+          "size": [
+            394,
+            566
+          ],
+          "pivot": [
+            949.0,
+            322.2078606158833
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            146,
+            640
+          ],
+          "size": [
+            442,
+            553
+          ],
+          "pivot": [
+            378.0,
+            908.2078606158833
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            737,
+            639
+          ],
+          "size": [
+            390,
+            555
+          ],
+          "pivot": [
+            967.0,
+            909.2078606158833
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Move"
+    },
+    {
+      "id": "Unit_GoblinBlade",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_GoblinBlade.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinBlade.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Muscular green goblin blade fighter with brown mohawk, bronze brown armor, red sash, massive curved cleaver held steady horizontally while walking.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-01d65cdc-adde-47a9-b3af-e43d7c26f682.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "84f573a13239cf45f1a430dd766641998b4801d9b3c288dc3a34f4b41081f809",
+      "referenceSha256": "70136f9b948f8e5951999da894e166f729ce1b5ed5beae7fd1a187fc78e05797",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.11849607492081,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            87,
+            59
+          ],
+          "size": [
+            523,
+            556
+          ],
+          "pivot": [
+            345.0,
+            334.29927007299267
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            770,
+            59
+          ],
+          "size": [
+            462,
+            556
+          ],
+          "pivot": [
+            965.0,
+            334.29927007299267
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            110,
+            643
+          ],
+          "size": [
+            506,
+            548
+          ],
+          "pivot": [
+            357.0,
+            910.2992700729926
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            782,
+            643
+          ],
+          "size": [
+            450,
+            547
+          ],
+          "pivot": [
+            961.0,
+            909.2992700729926
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Move"
+    },
+    {
+      "id": "Unit_GoblinRogue",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_GoblinRogue.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinRogue.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Short green goblin rogue, plum hood, brown leather vest, dark trousers, curved daggers carried lowered while walking.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-02b4f24c-588a-4323-9200-a17c0f10467e.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "a480c9a08a558f9afc45eb6a2cf1dd3ca24d63a788a5a930ebd5fd2beaa98a2f",
+      "referenceSha256": "49104092430f5ef446ab87faffa153a10d846e4b1d96cd0573adb8070c8cd458",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.185619844096102,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            114,
+            78
+          ],
+          "size": [
+            485,
+            531
+          ],
+          "pivot": [
+            367.0,
+            351.5099300896829
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            708,
+            78
+          ],
+          "size": [
+            467,
+            532
+          ],
+          "pivot": [
+            938.0,
+            352.5099300896829
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            109,
+            661
+          ],
+          "size": [
+            496,
+            516
+          ],
+          "pivot": [
+            373.0,
+            919.5099300896829
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            699,
+            661
+          ],
+          "size": [
+            470,
+            517
+          ],
+          "pivot": [
+            932.0,
+            920.5099300896829
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Move"
+    },
+    {
+      "id": "Unit_Shieldbearer",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Shieldbearer.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Shieldbearer.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Stout red-haired and red-bearded shieldbearer in bronze armor and green cloak, round golden sun-face shield. Heavy alternating armored boots; preserve simple cartoon style.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-ff96cf25-581b-4eae-86c5-5576982ad99b.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "8ea3b63d41cafcfd0b023bec839635f256629e36ced73f51e9e263c077fd1063",
+      "referenceSha256": "f878c5454464075052227d48cfa66c70ad991e51fcc5db75d2803a88bd401e53",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.2449668113258636,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            54,
+            35
+          ],
+          "size": [
+            564,
+            574
+          ],
+          "pivot": [
+            366.0,
+            337.59723513096174
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            659,
+            38
+          ],
+          "size": [
+            549,
+            573
+          ],
+          "pivot": [
+            954.0,
+            339.59723513096174
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            58,
+            641
+          ],
+          "size": [
+            559,
+            561
+          ],
+          "pivot": [
+            364.0,
+            930.5972351309617
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            655,
+            640
+          ],
+          "size": [
+            556,
+            563
+          ],
+          "pivot": [
+            954.0,
+            931.5972351309617
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Move"
+    },
+    {
+      "id": "Unit_Skeleton",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Skeleton.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Skeleton.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Small skeleton in ragged moss tunic, wooden round shield and short sword. Show both skeletal knees and alternating bare bony feet; no gore.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-ed980e4a-de51-4934-b5ef-7cd486293bf3.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "2dbc759629fdc06159b5c6bc48a5e077880e3386c27f755be51506959a159547",
+      "referenceSha256": "5a17d4ca4f31c547239815fedb1a385b2c2aef5ba320c263154def7fff41cb3d",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.3930771766601953,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            152,
+            88
+          ],
+          "size": [
+            432,
+            523
+          ],
+          "pivot": [
+            361.0,
+            355.9865206402696
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            768,
+            84
+          ],
+          "size": [
+            349,
+            535
+          ],
+          "pivot": [
+            933.0,
+            363.9865206402696
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            183,
+            672
+          ],
+          "size": [
+            391,
+            518
+          ],
+          "pivot": [
+            385.0,
+            934.9865206402696
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            768,
+            671
+          ],
+          "size": [
+            366,
+            519
+          ],
+          "pivot": [
+            942.0,
+            934.9865206402696
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Move"
+    },
+    {
+      "id": "Unit_SkeletonArcher",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_SkeletonArcher.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_SkeletonArcher.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Small hooded skeleton archer, brown patched hood, green shoulder cloak, bow and quiver, brown boots. Alternating skeletal knees and boots.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-72ed1665-2116-4bfc-874d-e2a4089e625a.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "e6e03a8bef1e759690753a8fb44beab43e98a6c6bf297d6b42b24f636c376046",
+      "referenceSha256": "cbbc536a0e9740148711c34586b8bdb34b6737a3b9949672dbb16338eacff035",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.5130028443722066,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            157,
+            56
+          ],
+          "size": [
+            431,
+            542
+          ],
+          "pivot": [
+            345.0,
+            320.0666949872557
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            751,
+            58
+          ],
+          "size": [
+            425,
+            540
+          ],
+          "pivot": [
+            929.0,
+            320.0666949872557
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            167,
+            653
+          ],
+          "size": [
+            426,
+            543
+          ],
+          "pivot": [
+            346.0,
+            918.0666949872557
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            748,
+            655
+          ],
+          "size": [
+            425,
+            543
+          ],
+          "pivot": [
+            927.0,
+            920.0666949872557
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Move"
+    },
+    {
+      "id": "Unit_Swordsman",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Swordsman.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Swordsman.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Young brown-haired swordsman with red headband, blue tunic, cream sleeves and brown boots, sheathed sword. Preserve simple cartoon style.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-7d6bea4e-35fb-4502-a072-c2ab22294a43.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "c91d53ddbe3e4e65bd377c6b60a98086cf3f60627dc1e7572c3ce044e6ca4a2a",
+      "referenceSha256": "9a5a5a95841717351df341773cfe17403bea3def6dae62143e11e384a1ef376a",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.2473684210526317,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            167,
+            21
+          ],
+          "size": [
+            384,
+            596
+          ],
+          "pivot": [
+            342.0,
+            317.0078947368421
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            781,
+            21
+          ],
+          "size": [
+            295,
+            595
+          ],
+          "pivot": [
+            942.0,
+            316.0078947368421
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            183,
+            640
+          ],
+          "size": [
+            402,
+            580
+          ],
+          "pivot": [
+            354.0,
+            920.0078947368421
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            793,
+            637
+          ],
+          "size": [
+            295,
+            590
+          ],
+          "pivot": [
+            951.0,
+            927.0078947368421
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Move"
+    },
+    {
+      "id": "Unit_Thief",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_Thief.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Thief.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Young human thief with tousled brown hair, black eye mask, brown leather jacket, green scarf and trousers, small dagger held lowered.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-dc623233-45f7-48c7-a04f-d40fa696252d.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "dc4e3854391b963abc6dcbb939e330831b741d87a367c8f6fc93b1a26340ff86",
+      "referenceSha256": "852d9001de131613ceee1f213831d7fe284c45aba20b993d56d7a8866b99945d",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 2.4398441470982015,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            123,
+            29
+          ],
+          "size": [
+            458,
+            597
+          ],
+          "pivot": [
+            351.0,
+            332.69337705338603
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            727,
+            30
+          ],
+          "size": [
+            352,
+            598
+          ],
+          "pivot": [
+            948.0,
+            334.69337705338603
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            141,
+            642
+          ],
+          "size": [
+            454,
+            576
+          ],
+          "pivot": [
+            370.0,
+            924.693377053386
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            738,
+            635
+          ],
+          "size": [
+            341,
+            583
+          ],
+          "pivot": [
+            947.0,
+            924.693377053386
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Move"
+    },
+    {
+      "id": "Unit_TrollKing",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_TrollKing.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollKing.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Tall broad teal troll king with orange braided beard, gold crown, moss green fur-lined royal cloak, leather/gold armor and massive stone hammer carried steadily. Clear powerful alternate stepping feet.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-650254e1-6b44-4b90-b9f2-0af909a67443.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "2381c238583f72f242f4a81c2d36d6d516bd8056d2164fe57ff856d1d507bd2d",
+      "referenceSha256": "683fe389d49a7c90e7a62e1fad8f251cf613e2e38564aa9720a91cf995838e43",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.5296242141121659,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            36,
+            43
+          ],
+          "size": [
+            581,
+            565
+          ],
+          "pivot": [
+            367.0,
+            325.0195203892493
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            650,
+            40
+          ],
+          "size": [
+            551,
+            569
+          ],
+          "pivot": [
+            953.0,
+            326.0195203892493
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            59,
+            638
+          ],
+          "size": [
+            563,
+            554
+          ],
+          "pivot": [
+            383.0,
+            909.0195203892492
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            675,
+            636
+          ],
+          "size": [
+            550,
+            557
+          ],
+          "pivot": [
+            978.0,
+            910.0195203892492
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Move"
+    },
+    {
+      "id": "Unit_TrollMage",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_TrollMage.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollMage.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Bulky teal troll mage with ivory tusks, small crooked cream hat, olive robe with gold trim, cream under-robe, green crystal staff held steady. Show alternate sandaled feet below robe.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-959d8952-01e6-45d3-ad5c-9306b305abf1.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "2930ed53ef5ea392dafefb50f1f6700fc7ba2aefafcc02e6c65b4bb2ff644f0a",
+      "referenceSha256": "e414014a0c765203ad8ea797f173f169c4a3c74c3ed6916257e56def4724eb9c",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.8623868338044325,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            129,
+            33
+          ],
+          "size": [
+            468,
+            565
+          ],
+          "pivot": [
+            338.0,
+            311.4241120806194
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            749,
+            33
+          ],
+          "size": [
+            433,
+            565
+          ],
+          "pivot": [
+            937.0,
+            311.4241120806194
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            118,
+            645
+          ],
+          "size": [
+            474,
+            564
+          ],
+          "pivot": [
+            335.0,
+            922.4241120806194
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            752,
+            645
+          ],
+          "size": [
+            450,
+            567
+          ],
+          "pivot": [
+            951.0,
+            925.4241120806194
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Move"
+    },
+    {
+      "id": "Unit_TrollSpearman",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_TrollSpearman.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollSpearman.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Teal troll spearman with orange mohawk, ivory tusks, leather shoulder armor, moss ragged skirt, spear carried diagonally and spare spears over the shoulder.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-2524e26a-6bfa-4663-b4af-08ac46a00908.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "04aae9b72fb526c1d4ae940b000ab081d389a7021e668389805e91a8ef8be980",
+      "referenceSha256": "1d86f73ac0abf0d76a49ff286db3a076d76431c5c585a247eaeb7884d2405ffe",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.8091525423728811,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            121,
+            19
+          ],
+          "size": [
+            545,
+            589
+          ],
+          "pivot": [
+            360.0,
+            309.4898305084746
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            718,
+            10
+          ],
+          "size": [
+            522,
+            599
+          ],
+          "pivot": [
+            944.0,
+            310.4898305084746
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            128,
+            635
+          ],
+          "size": [
+            553,
+            590
+          ],
+          "pivot": [
+            383.0,
+            926.4898305084746
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            739,
+            631
+          ],
+          "size": [
+            499,
+            598
+          ],
+          "pivot": [
+            956.0,
+            930.4898305084746
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Move"
+    },
+    {
+      "id": "Unit_TrollWarrior",
+      "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Unit_TrollWarrior.png",
+      "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollWarrior.png",
+      "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the character in the supplied identity reference. The reference is an older atlas: keep exactly the same character identity, face, clothes, equipment, species, colors and rendering style. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire character per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Weapon carried still, no attacks or arm gestures. Make the near leg clearly switch: in poses 1 and 2 it is FORWARD, in poses 3 and 4 it is BEHIND the hip. The farther leg has darker natural shading. In pose 4 the NEAR foot bends BACKWARD under the rump while the FAR leg is planted. Match the reference hand-painted storybook outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.\nSubject specifics: Bulky teal-skinned troll with red mohawk and wooden club. Heavy weight-shifting steps, not running.",
+      "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-714d95de-7726-4ef5-8518-2bb716db1306.png",
+      "generatedDate": "2026-09-22",
+      "tool": "image_gen",
+      "layout": {
+        "columns": 2,
+        "rows": 2
+      },
+      "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata.",
+      "sha256": "96ccbe47bb99dddabb0e0802a004305173ea97c08a6e426f1fb8ce97bd44ad51",
+      "referenceSha256": "3bace79b43248f9d08ed51e987dc32fdd06006f3cbe622b8f8a0d6e8e6bc0634",
+      "width": 1254,
+      "height": 1254,
+      "ppu": 1.7869617254706394,
+      "frames": [
+        {
+          "index": 0,
+          "uv": [
+            101,
+            35
+          ],
+          "size": [
+            502,
+            572
+          ],
+          "pivot": [
+            326.0,
+            316.6187196110211
+          ]
+        },
+        {
+          "index": 1,
+          "uv": [
+            696,
+            35
+          ],
+          "size": [
+            475,
+            571
+          ],
+          "pivot": [
+            921.0,
+            315.6187196110211
+          ]
+        },
+        {
+          "index": 2,
+          "uv": [
+            111,
+            645
+          ],
+          "size": [
+            511,
+            566
+          ],
+          "pivot": [
+            353.0,
+            920.6187196110211
+          ]
+        },
+        {
+          "index": 3,
+          "uv": [
+            694,
+            644
+          ],
+          "size": [
+            495,
+            574
+          ],
+          "pivot": [
+            923.0,
+            927.6187196110211
+          ]
+        }
+      ],
+      "originalToolFileHashVerified": true,
+      "replacesClip": "/Game/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Move"
+    }
+  ]
+}

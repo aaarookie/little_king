@@ -40,6 +40,7 @@ ALKUnitBase::ALKUnitBase()
     SetRootComponent(LogicRoot);
     SpriteComponent->SetupAttachment(LogicRoot);
 	SpriteComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    SpriteComponent->SetCastShadow(false);
     // Masked sprites need a small visual lift above the battle floor at Z=0.
     // Keep the logic root / body collision on the ground plane.
     SpriteComponent->SetRelativeLocation(FVector(0.f, 0.f, 8.f));
@@ -142,6 +143,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 		MovementComponent->SetFieldBounds(FVector2D(InGameData->FieldHalfWidth, InGameData->FieldHalfHeight));
 	}
 
+    SpriteComponent->SetCastShadow(false);
 	// 精灵（占位期可能没有，用调试色块代替）
 	BaseSpriteLocalScale = FVector(1.f, 1.f, 1.f);
 	if (!Row.Sprite.IsNull())
@@ -441,6 +443,15 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 
 bool ALKUnitBase::IsSkillMoving() const { return ActiveComponent && ActiveComponent->IsDashing(); }
 bool ALKUnitBase::IsControlled() const { return StatusComponent && StatusComponent->IsControlled(); }
+
+void ALKUnitBase::SetVisualFacingRight(bool bRight)
+{
+    const float Sign = bRight ? 1.f : -1.f;
+    BaseSpriteLocalScale.X = FMath::Abs(BaseSpriteLocalScale.X) * Sign;
+    FVector Scale = SpriteComponent->GetRelativeScale3D();
+    Scale.X = FMath::Abs(Scale.X) * Sign;
+    SpriteComponent->SetRelativeScale3D(Scale);
+}
 
 /** S5：攻击脉冲回弹 + 受击闪白恢复（纯视觉） */
 void ALKUnitBase::TickCombatFeedback(float DeltaSeconds)

@@ -32,6 +32,9 @@ public:
 
 	bool IsMoving() const { return bMoving; }
 
+    /** Presentation consumes only voluntary path travel, never soft separation/knockback. */
+    FVector ConsumeVisualTravel() { const FVector Delta = VisualTravel; VisualTravel = FVector::ZeroVector; return Delta; }
+
 	void SetSeparationRadius(float Radius) { SeparationRadius = FMath::Max(1.f, Radius); }
 
 	/** 设置战场边界（InitUnit 时由单位注入），移动/分离后钳制位置，防止单位走出战场 */
@@ -45,6 +48,7 @@ private:
 	bool bMoving = false;
 	FVector Destination = FVector::ZeroVector;
 	float Speed = 0.f;
+    FVector VisualTravel = FVector::ZeroVector;
 	float SeparationRadius = 50.f;
 
 	FVector2D FieldHalfExtent = FVector2D(1200.f, 2000.f);

@@ -205,6 +205,24 @@
 
 ---
 
-## 附：调试工具（同批加入）
+## BUG-020：战斗精灵重叠闪黑/闪烁
+
+- **原因**：角色、建筑和营地的 Masked Paper2D 图片都在同一 Z 平面写深度；单纯设置透明排序优先级对这种材质无效。
+- **修复**：固定待机脚底偏移，以脚底屏幕位置及稳定对象 ID 排序，为图片分配独立相对 Z；关闭平面精灵 CastShadow。逻辑根、碰撞半径和场地坐标不抬高。营地和自定义单帧同样覆盖。
+- **验证**：`LittleKing.Presentation.OverlapDepthAndCamps`，同位置三对象深度唯一、动画切帧排序稳定、交错后次序反转；真实渲染覆盖营地与双方角色重叠。详见 [45](45-BattlePresentationFixes.md)。
+
+## BUG-021：移动方向与图片朝向不一致
+
+- **原因**：此前未按主动位移翻面，部分旧 Move 原图朝向与其他动作相反。
+- **修复**：统一右向步行图；实际行走位移决定镜像，站定后朝攻击目标，纯上下行走保留最近左右方向。镜像符号同时写入反馈基准，避免攻击脉冲或死亡缩放将其还原。
+- **验证**：`LittleKing.Presentation.FacingFollowsVoluntaryTravel` 覆盖敌方初始方向、背向目标撤退、竖直移动、站定索敌及死亡缩放；左右各八张游戏渲染样本。详见 [45](45-BattlePresentationFixes.md)。
+
+## BUG-022：步行重复、滑行与拖影
+
+- **原因**：旧步行图抬腿变化不足，Idle/Move 切换会重置时间，软分离可能被误判成走路，默认运动模糊抹掉脚步细节。
+- **修复**：24 双足单位新增独立四姿势 Move，动画按主动行走距离推进，停止保留步态进度；忽略普通推挤/击退/瞬移，控制期间不推进；关闭战场运动模糊。双头龙原四足步行保留。
+- **验证**：`LittleKing.Presentation.WalkDistanceAndInterruption`、`CorrectedWalkAtlases`，另保留已有 `PolishAnimationIsolation` 对控制/失能/复活/自定义图的验证。源码、素材来源与完整结果见 [45](45-BattlePresentationFixes.md)。
+
+## 附：调试工具
 
 - **索敌线**：`bDrawDebugShapes` 开启时，每个单位绘制"单位→当前目标"的连线（绿=玩家/红=敌方），调 AI 行为一眼可见。文件：`ALKUnitBase.cpp`（DrawDebugShape）

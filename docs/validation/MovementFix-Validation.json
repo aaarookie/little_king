@@ -1,0 +1,932 @@
+{
+  "auditedAt": "2026-09-23T02:37:21.632178+08:00",
+  "baseline": "v0.8",
+  "build": {
+    "path": "Saved/Logs/MovementFixBuild05.log",
+    "sha256": "1f66867356a363b5c24056a5ef03b97ebac9ccdc14c8f4c92e9c7bd86a4f1077",
+    "result": "Succeeded",
+    "engine": "UE 5.8.1",
+    "note": "Build04 runtime passed full regression; Build05 only adds shader-ready waiting to editor preview."
+  },
+  "automation": {
+    "path": "Saved/Automation/MovementFix02/index.json",
+    "sha256": "313dad7b355e76718a41cdd9d2a813f49013073434b7e8a4725a27cf56fae079",
+    "succeeded": 43,
+    "succeededWithWarnings": 44,
+    "failed": 0,
+    "notRun": 0,
+    "newTests": [
+      {
+        "name": "LittleKing.Presentation.CorrectedWalkAtlases",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.FacingFollowsVoluntaryTravel",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.OverlapDepthAndCamps",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.WalkDistanceAndInterruption",
+        "state": "Success"
+      }
+    ]
+  },
+  "source": {
+    "path": "ArtSource/StorybookV1/MovementFix/manifest.json",
+    "sha256": "71f3259f3c012b58725be59886352a7fbb508f2f2a0c37e4279520172725cce0",
+    "images": 24,
+    "frames": 96
+  },
+  "assets": {
+    "newCount": 144,
+    "storybookTotal": 919,
+    "items": [
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Boss_SkeletonKing.uasset",
+        "sha256": "46d70d896eab314d2bbee44666cbb9218a789667e20dc3af867c7369f9d61822"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Boss_SkeletonKing_00.uasset",
+        "sha256": "e4bb7f5898af05a29fd74eb1d82848fee20268ccdabfa29bf092eba3314e6485"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Boss_SkeletonKing_01.uasset",
+        "sha256": "19fef1db8cd37de9e5517fd2bc9e320d465aee5d1dddfd0f34c7b980a2c896ba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Boss_SkeletonKing_02.uasset",
+        "sha256": "2993af2bffe1d0d390219e0a201cd025d53a831f2b1d19a8b8435d10894cf52f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Boss_SkeletonKing_03.uasset",
+        "sha256": "48d144f3c7d7f6c6ca1c1fbb75832be20e01f55c7ce017a578abaa39d7a0da4a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Boss_SkeletonKing.uasset",
+        "sha256": "cb4eafdc879938f7e6b3f9de9fa14cc52be4733024c622f8deb5414dcd569374"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Hero_Knight.uasset",
+        "sha256": "1b2b9c94f947655f2323da517269924801356d00de3ec64a39a842149e25a036"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Knight_00.uasset",
+        "sha256": "144b45d2076f6ff1e036b862cf38e54f35714b5519df1b267964cede6b6d0ff7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Knight_01.uasset",
+        "sha256": "5f976dd2d5f2c023de59ac9eccf451e7ad18fdfcd401121cb21ccf89fd8cb4ba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Knight_02.uasset",
+        "sha256": "be6fff0cd1ad85ee88551e90ad4d0d9675b8d71973662b04e63346d97fbb793e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Knight_03.uasset",
+        "sha256": "786cfecc5968f4b0d688fee5cc5d8433550603335f11836828bb10b86dff5b9b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Hero_Knight.uasset",
+        "sha256": "900d8705095e7ce51b0afea51efa6375a64c366f5b0038fc4c5cb19ff7f8d92b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Hero_Mage.uasset",
+        "sha256": "4ee85c9f1360fe2a7078c3801c4ef94b117261c86cd40cd81f1790ebcbd7b341"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Mage_00.uasset",
+        "sha256": "8ed0d36926d6fe0192af809f9a601e8eac64b259de05546ce597df2f6ebf785f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Mage_01.uasset",
+        "sha256": "6320abab85b3bdb4cacb57e5b2d653fd3317f1e4d881a54f81848375bd2cb024"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Mage_02.uasset",
+        "sha256": "5bcbd8c7b42cd2decc51a5fa57ee7b0d37079d4a2f8af7144a597721a53fe9b1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Mage_03.uasset",
+        "sha256": "203b6b50ef6c32003529e67220f4ace1104fb641fb2d9c6ddfdbc9521a815714"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Hero_Mage.uasset",
+        "sha256": "57593464b7b6ab6e9e55e2652f856a8c1bb17bd0f4beb0f0cb68254c3cd93f55"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Hero_Necromancer.uasset",
+        "sha256": "f96ae6e1ada344b4a72901ea1dcdc24c058841cd71de13b39de71e8789ce78e4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Necromancer_00.uasset",
+        "sha256": "3c1244b87b00e178dfca6ae02faaccd41b4e90454f33caa33f78cc57aba0ad93"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Necromancer_01.uasset",
+        "sha256": "88566eedb4f40dddd333478d3d6c0a71bb9f1632de4aa5709a4055534f9c970d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Necromancer_02.uasset",
+        "sha256": "76c131bbca309ed15f5ab0f7252d9da261436672922bde9d82d77039c267e284"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Necromancer_03.uasset",
+        "sha256": "6c3f87ce8cf9296971e90826929455f5ce67ef01366946c3cbe12023b1fd008d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Hero_Necromancer.uasset",
+        "sha256": "d27a0c8d00c8970358b4f3ee3b93851718f6351a2231b5fd88927c9976c2897e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Hero_Ranger.uasset",
+        "sha256": "cd1b7522139dd665e2ed30bc0bf16197275d3085711d1f6887e7fc302baf1147"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Ranger_00.uasset",
+        "sha256": "a4902508bff739640d59e4c86d1b45e833e8dc7da12e8be0cd3274a056250b8a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Ranger_01.uasset",
+        "sha256": "292ea44945b90fbb2a7f06fb23ec51217185eb1fd994b92c989a0bbe556dcf51"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Ranger_02.uasset",
+        "sha256": "87b843aeb33761c762bf6a6a666509898313db6ed740841055eb6464ed7fed5d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_Ranger_03.uasset",
+        "sha256": "e4e35d4968be5a1c4f1ecba712eeb3124cda761859faf77fe209a2792687a5d1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Hero_Ranger.uasset",
+        "sha256": "342648c940a8385a801933873f7b5af4ae204cac16eed65f8f84a8641f8ea3e1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Hero_SkeletonGiant.uasset",
+        "sha256": "e8b183a556d737a8f24fc6ad294ee931b9dfbae885843d84dd25b974e92dfa98"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_SkeletonGiant_00.uasset",
+        "sha256": "16c285d70f9ad67c79abf255c7b985028827581843eb6d443d24970261a8a284"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_SkeletonGiant_01.uasset",
+        "sha256": "537fd247c740577b586240b580043b38bce2ec0297af139b1452165b084ad5d3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_SkeletonGiant_02.uasset",
+        "sha256": "dd7ab859471ba1ccf05b76a94f751f41f49927fa815db445861e1453878ee7b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Hero_SkeletonGiant_03.uasset",
+        "sha256": "e9de549c6689b00e7901b5d11ac348bcee50c4a6a4307857a16ba2a77f20852d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Hero_SkeletonGiant.uasset",
+        "sha256": "dfb471ddc18abe13d607eb6abe02609dd797fb060ccacabaeb3cd374eb571412"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_ApprenticeMage.uasset",
+        "sha256": "ac13b4b01071e2d3c684bdcd9fdc2f313a82dbae01d84a9850265e379fc55334"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ApprenticeMage_00.uasset",
+        "sha256": "4a62b602af89d37221e2006fa9dd5981301e0d011217992163a87ac42eb01978"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ApprenticeMage_01.uasset",
+        "sha256": "e483a2092b2084443be08ab57e897bc49667dfb7f24c6d0180924bda0387e8ab"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ApprenticeMage_02.uasset",
+        "sha256": "c4aaf32103d3dc05dead3d2ddafddafb4f057ee20cab4ca0e8623d8d4fb85a8d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ApprenticeMage_03.uasset",
+        "sha256": "9db06b690feca68deae916a70b2d991bdcfd4635690cc5f020c67622c472a9ba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_ApprenticeMage.uasset",
+        "sha256": "1d76bb996cbc06e82c6ef10569adcd5a61df0807a57a0467ae0632d21cdb2110"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Archer.uasset",
+        "sha256": "93ff1fedd15062e755407ef210cf4a06a125fde3127b7ffd8774a7fc691378d7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Archer_00.uasset",
+        "sha256": "a89756f0d70b2f25e951a50e89c60ae362100253f954f488a2b69308fb1fe292"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Archer_01.uasset",
+        "sha256": "f40e7bc1323fad49ebbb736e96dc6375132dc4922cf8fc8eaf8e818457b8fd90"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Archer_02.uasset",
+        "sha256": "c5979ff66c796380f2c9a5cc081b912a832c1da3c5cfe50710ef6e1525a102e0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Archer_03.uasset",
+        "sha256": "3dda0f354c70f217ab08c56bce02956d3f4503dc4c5723d26c45d1d7cf7694bd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Archer.uasset",
+        "sha256": "0e816640cfbc7dcdb0086cdf33c9c702af91a6bf609ec3658a1c93bb6f462e37"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Colossus.uasset",
+        "sha256": "abef723d84d4f38b16788e35fdba80022c66c9b23eac7cb39b636e547bfae6b4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Colossus_00.uasset",
+        "sha256": "e657f0507e358b022e67e713e880905ec4534abc846934a75f2e227f8bfa7894"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Colossus_01.uasset",
+        "sha256": "c4e03c77aed9bb6caff80bcb187f671348472759d6cdaf30f8ba60b8b9cb0d19"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Colossus_02.uasset",
+        "sha256": "21e362957cd0ea91af0202c79abaca549713a2ef345077b9758b29d5f4d3c1fd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Colossus_03.uasset",
+        "sha256": "4420c20b9b2af9c6f162bdb2db48d00dcb0261feb06419161c4b5f3386d5d8b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Colossus.uasset",
+        "sha256": "25d364da31221c770f5f60acc94c70889b317b813308d50139a420d7c377ddac"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_ElfArcher.uasset",
+        "sha256": "17d614bca46d34f266009defdd2b81ada23ca2bb15d10c719163c27109e14729"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfArcher_00.uasset",
+        "sha256": "c8a8f4660dc2d73a2faf49685334afb4f6c16b6155450f93bcd7118623f03ea1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfArcher_01.uasset",
+        "sha256": "5e1a10dd1ca3042c101b0f3adf9d80a70dbd3390b2796396121a3530417a5a1a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfArcher_02.uasset",
+        "sha256": "799a0d4ad1ca615a4e5068c31f944083bef35ea5b0a729a3f19ecafea1f0ec1a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfArcher_03.uasset",
+        "sha256": "2a66977470ae3c1846465a150c6a06898dcabda91ee680b6632d1c7617d5a149"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_ElfArcher.uasset",
+        "sha256": "bca9f650c06bb3844e331e868443f3f89bdc5fe69109433ccabdbc8f092d91f0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_ElfGuard.uasset",
+        "sha256": "66731807f356131f715628046a4af3ff5824075ebebf1eef137fd1c33a9f743c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfGuard_00.uasset",
+        "sha256": "69312cf4887c1d4d5c765f13ab4796cacf46a7889ade5a82f559d4073ebaac1a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfGuard_01.uasset",
+        "sha256": "9a3f1b4ed57e2529cc3bb89093f2c90391963eed039e84a1bcee00017e9c7826"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfGuard_02.uasset",
+        "sha256": "82cc1cb36ff108b378ce368638ecde39717e0fc924b9918752698bbe4fdeb23d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfGuard_03.uasset",
+        "sha256": "b0bfd06fc7fdc2c28f602394da6a83f75ba694f8258ebbc9f4cc09068cd2b983"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_ElfGuard.uasset",
+        "sha256": "b711a15e5a4baccf98c160740cd7343254ffa2786473cd2cb154561609579934"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_ElfPriest.uasset",
+        "sha256": "acdba187d89d82a361c2d520a382f64aabfc8d7edac436bcc9e548415a60f09e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfPriest_00.uasset",
+        "sha256": "57a8a7c8ac90106d079671143fd267ea03d503fc5ff7c8087ab4b65f52b90324"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfPriest_01.uasset",
+        "sha256": "13b4d7e25cc67a1cd549137bb2cdba92380b92f63d636a86c17bcf4c45c4fea0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfPriest_02.uasset",
+        "sha256": "186cab62b3a87f777f966c0801003969e22e0fe24eda146edd0bdedd63fd487c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfPriest_03.uasset",
+        "sha256": "b6ae7869b17730afc159f809d8f1e59688696b65cbe3fce0a816c6d0d9ae6492"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_ElfPriest.uasset",
+        "sha256": "54ccd74950f4c913bb9c4ce5dd1fbb27a52e5cdcb97664e45f57876d5e2b2345"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_ElfWarrior.uasset",
+        "sha256": "69fe5f9a8df7d511544df3313708e27e6777c22005a370bf841f60e64152b6aa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfWarrior_00.uasset",
+        "sha256": "6cc24f53e36a4518b5d7b88a3e0b7307e8f84e86419001c8a38194e370a8b9ec"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfWarrior_01.uasset",
+        "sha256": "10a2864eb034e1956eb8df6892702eea73d77b75cea28b4703c3f3cb2339373c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfWarrior_02.uasset",
+        "sha256": "6de65bf829f4aee0bc35c41e6b95b7cb8e51c06b115a2e76f286dfffa9cf06a8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_ElfWarrior_03.uasset",
+        "sha256": "387379b5c2c70d3ac99b6b7733b4c0676bd9dcc0539ae11ca1f9d2dc27200106"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_ElfWarrior.uasset",
+        "sha256": "792fc4630508f90210ca6bd3a5484abe953633969ea299f94b1a3b8580535522"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_GoblinBlade.uasset",
+        "sha256": "546da9e23dc7c13f5d9469b24fcd5cf331c87a8700669c6294457d2baadeec3d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinBlade_00.uasset",
+        "sha256": "9d6926be52009825019747a05ec51486522e19eed8e5c9529c9e631c1aeff4d2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinBlade_01.uasset",
+        "sha256": "8ec86a4bf8923e1c19eff31ed5644e962247b83d4f7cd0b4638b017f0ad34f2b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinBlade_02.uasset",
+        "sha256": "7d1f6ec4303c6af4e6f06d593c00a9343a6fa7e5b569218042c664f61da12cf1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinBlade_03.uasset",
+        "sha256": "208bb1b1f8f9c7dabafd4507507a70db5adb87d6de3c8edd29916ed10d873752"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_GoblinBlade.uasset",
+        "sha256": "cf1cc4a7af8218f148a83c788459d6a91b419f8ad9d16d7f33462cc8dae288cc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_GoblinRogue.uasset",
+        "sha256": "9ddae94d6c506c078d2ebc69f2ba42ee87b6eba975d432179cca016fe690881c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinRogue_00.uasset",
+        "sha256": "5a241ac1db4ba1eb01f0d9681f38d90f67510b6c8d5b3b880cd500b3def8a5ad"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinRogue_01.uasset",
+        "sha256": "38792be0c7619acd3bd25002da6db07155e8508b72db8a4c9ca914c980a49a29"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinRogue_02.uasset",
+        "sha256": "8883642b7e8264a04b42d0ab59d80b6006567dcc6fa1963f676b6f043f794752"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_GoblinRogue_03.uasset",
+        "sha256": "46462e82143646d5608340267aec78ee24ad6c1c02778efe86d86bc863fab7d3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_GoblinRogue.uasset",
+        "sha256": "9e38b25dd07a105cf7de47190fdbcde4682a3f867851b326d22d15193736f9be"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Shieldbearer.uasset",
+        "sha256": "2dd6de0e368f6508391b8ce9b8f68e99e6e54f95820b64a9fed5788b6a888179"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Shieldbearer_00.uasset",
+        "sha256": "9b8bea4cb04105fd9d2105919785779138b4e251f93d4b2e1aafc818a9e35f39"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Shieldbearer_01.uasset",
+        "sha256": "a6ad78d0e31a595922a04b115fdd551d9d8545c063fb5c7199ffa26bc5d00de8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Shieldbearer_02.uasset",
+        "sha256": "642cbc5c329537cc60cb10335bc97f3190764ce11d4ca3133a551302d2071eed"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Shieldbearer_03.uasset",
+        "sha256": "ece5acae6117a13391a290c19d0ef15f9bcd9844468f44aafab7eb3fd70717e5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Shieldbearer.uasset",
+        "sha256": "20c5e129bde78397ec6cce0e964e398d309e2bc4c0dfa80356105934c3568586"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Skeleton.uasset",
+        "sha256": "adaf9bd7c601da0cd418b334a9e0948e32b6d31909189c72ea31608c0c04d315"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Skeleton_00.uasset",
+        "sha256": "1b0ef06dfe1a07e95b0093dfd4d5e77ffae6076e7c5cc3e970203d41b1dac5e9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Skeleton_01.uasset",
+        "sha256": "b178514f00c27b00e9ced4b5fba861c66c254acfd6901b6ea4b7e6407a75f2f2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Skeleton_02.uasset",
+        "sha256": "94efff77ef72fcb5c845b5d135d58b2394e49fac5188373f6e7fe1f304a235b6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Skeleton_03.uasset",
+        "sha256": "9c03810a527b99818e5dba4b94decdaef7a728dc441c28b3537afb956aa6d337"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Skeleton.uasset",
+        "sha256": "19076f31b18bae5fbac95ade15094eab2f5c2b27c6eade9db96fae4a8ba9b9b8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_SkeletonArcher.uasset",
+        "sha256": "d3b935275e2e31de27a8b9acbf5279ac93b21bd88a3dba555763e5b7a70e52cc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_SkeletonArcher_00.uasset",
+        "sha256": "f106a7444b59ece7a9ece43b4be0d2ff336befb9af1dcf29421c8f22116281ba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_SkeletonArcher_01.uasset",
+        "sha256": "e765d38de19c276c0ad5fa7d881d666444fd25623f364cbcea953ce05eceb598"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_SkeletonArcher_02.uasset",
+        "sha256": "509a8251050f39ceeeb8bfad527c805a7b3fe455175a5f1b081fea7bc19dca2a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_SkeletonArcher_03.uasset",
+        "sha256": "e69088fc5c5d13381da8988185e2b08d3d5911c7922777ee4e7a0577a63401f7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_SkeletonArcher.uasset",
+        "sha256": "a1f84f94dc4570384a35ec42ab4648fb9ef1f7ab950b09afed44c91a35a8ec43"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Swordsman.uasset",
+        "sha256": "c6d62ee51020c8be64c2cbe1d988aa0973eaf6cba29d9becc6d25cf0dfede033"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Swordsman_00.uasset",
+        "sha256": "37d60f047acef9b14ebb702cbe16ff541b74716b145c05b02594231597bf849b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Swordsman_01.uasset",
+        "sha256": "65789bfd5c970ffe27b4f5d8119c4e66e1849c8b5d1a15fbacce59e87ad67651"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Swordsman_02.uasset",
+        "sha256": "1f9eb25baba2a321c0c288d0664a4aba6603b4f0479572a285cdc05b1a65c148"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Swordsman_03.uasset",
+        "sha256": "869077c9391cd9e61f19cb5d558dc049bd57bf2267b469b51e6714855bf439fa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Swordsman.uasset",
+        "sha256": "50ab7e2abdc48b11615a117b4837611af7171bad6a7b9e9bf66215b5229e8a21"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_Thief.uasset",
+        "sha256": "b0491412f7adda35dcaeebefe39e2b439605745278a1e49522b6b07c1943d999"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Thief_00.uasset",
+        "sha256": "dc94178d623e7551cb442c185bd5d7c768871827e0c389e628577ddb73d6b40d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Thief_01.uasset",
+        "sha256": "5d8a555b310a9357545f7a97133878429312d1be735a6cc1b2e2e8baf82cac62"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Thief_02.uasset",
+        "sha256": "911d58d4a45637b9ce83c25aa918769db38f3d2c1ce73415deeb6fd04a7d6bb6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_Thief_03.uasset",
+        "sha256": "5542f313ef8eab135ea2b21c33a406b49bfb8db66cea2d78a3ec1236ee75108b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_Thief.uasset",
+        "sha256": "ee88f395ba2a66db2efd97be47a4b512a6b4a49802de7653f7f5b470ef20d6d1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_TrollKing.uasset",
+        "sha256": "45de0ebc12d3ecdc8d05d6ea77003137ba6e208b146377372b64d121786d35c0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollKing_00.uasset",
+        "sha256": "f2f7a8166f419d5dfaa7770cb5ac6b85235d04fd9850def1726115d7e773bdfa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollKing_01.uasset",
+        "sha256": "94b10af93f96af1c2466ab955fcee8026407fba2d2185a6f919172af6e5f3b5c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollKing_02.uasset",
+        "sha256": "c49024248446525f854866587c067f7df19386ba2371d0abd03ed45a1a6b1d20"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollKing_03.uasset",
+        "sha256": "c4142b2a7cfe3fe1554beda5c9386f5e3d1b96b0c5b233759c25e4da01688044"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_TrollKing.uasset",
+        "sha256": "84e301a175a4a5f95b5073a2b1e431f52bffcc8bdfc39e23e04314cbaa060711"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_TrollMage.uasset",
+        "sha256": "1334ffdeb06294690e0278ad86c6499d85f80e1e4b92ef6b737aaa95a7d9e515"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollMage_00.uasset",
+        "sha256": "0e206071b3cb49801be5e83ef3632c1212968abf120a9222633ca54f11f225b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollMage_01.uasset",
+        "sha256": "56458f4025829f1ca0b7e34a670b8a758469978f83c27bd63c350912afd00fda"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollMage_02.uasset",
+        "sha256": "04d48ce2696f6ea6c138cca758e9a983b35dee869db957491d5426c18b6e8af3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollMage_03.uasset",
+        "sha256": "40c66fedd9665d0f4647fad2b35ff017fd2755f08cc2489b62b11690c25c49ce"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_TrollMage.uasset",
+        "sha256": "1a7d72c09a8826d1a51f33469e1a54d948f9273eed6d5939106a4785c5fa5c25"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_TrollSpearman.uasset",
+        "sha256": "591df194138dd1e6070d592b335f54638f2021bbb429b31416503e48d7306b76"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollSpearman_00.uasset",
+        "sha256": "b1d072b438c53301e59a32093e28735a3c4d2cc60d67bdafc1fa3f5d1e04174f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollSpearman_01.uasset",
+        "sha256": "0a6f31356c52c33bfb213d2fe21ddc710b32cc75f21f1df44ffcbc866fbfe3a6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollSpearman_02.uasset",
+        "sha256": "6c122f4e7f976eaa6137cb95acc8384612bf3c7484df7f1e78ea8a33dd0b0100"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollSpearman_03.uasset",
+        "sha256": "004f9702ccc3609fe9316eece6f2f6f78839a959137f6ccfe692c10abae69906"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_TrollSpearman.uasset",
+        "sha256": "f413ff63a2d357f340ccd6e5277d8af750a426c5bc803235bc3579dafc566f9b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/T_Walk_Unit_TrollWarrior.uasset",
+        "sha256": "132700ebfe5c74e8e230a2eebb13464aebea0dfc0c97dd00647c655f536fb72b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollWarrior_00.uasset",
+        "sha256": "f61d59a63a3fd8f22a67b62d39adf683f6899390bc838700bc99e4e1211375f2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollWarrior_01.uasset",
+        "sha256": "bc778a2a67187278fc6734dc084807484c0bf70d6c9688fe4221dcad1b2e4b00"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollWarrior_02.uasset",
+        "sha256": "8697e0e754e858410fa2f3628a8003ea6d988ed193221a6a7e72844c97a6b33b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/SP_Walk_Unit_TrollWarrior_03.uasset",
+        "sha256": "1a7322438967df0298052b8a0bb5236132e51e1bc5da58c39414d3ee31ebcb42"
+      },
+      {
+        "path": "Content/Art/StorybookV1/MovementFix/FB_Walk_Unit_TrollWarrior.uasset",
+        "sha256": "598d071fec5165319313ca19e449acceffc1877375bee53ab41cf880e56199dc"
+      }
+    ]
+  },
+  "render": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "samples": [
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_205_720.png",
+        "sha256": "32e7edfdae1ea032ee35379c0f0a2d99bdbd503adce964ff4085633cdc10b13a"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_210_720.png",
+        "sha256": "bc82ccbd728045ecda45a0634245ed679a5608ee44dbcbeccc3ed5095c0df1e6"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_225_720.png",
+        "sha256": "d06ce2f745fceec21c2d85be8c0e5a2e55bc2dba43723e222bba4f6722e5f03d"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_230_720.png",
+        "sha256": "c76e7a187fddf286debbe139943b9a09c83f4972f68c698a6b9a9f06a00229ef"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_245_720.png",
+        "sha256": "8e992b17e5401ecbc1ac86e5b9ca1bb080873e1f10ea5bb65ace90d1f45f137c"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_250_720.png",
+        "sha256": "ea00e18a575d7390b26f1f0c215cc825f03d872a1ad739498c3543d4a8faf5fa"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Stopped_Left_720.png",
+        "sha256": "0a0e7e9008c33a3c1280ae7c8381501aa64abe5c6d54397e6a0ea4df7da0d3b3"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Stopped_Right_720.png",
+        "sha256": "017fd97b239ee44dd5b0f5c1748a16652936e40a289af4ade511ebe4926edd68"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_00_720.png",
+        "sha256": "7a39ae9b296c4f5e7a766e8ab68987ff2bfc8e324cf92d3d34a2f09605e93a3c"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_01_720.png",
+        "sha256": "1bed974611801cdfdd09de40bf6aae2589872554c9779a0952207e3bfcf29dba"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_02_720.png",
+        "sha256": "22a8485a1cd9039b20578981abb105d0cda98ffa9f795ace33f85d44a2644cee"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_03_720.png",
+        "sha256": "67fdf0b948574de9cd2d04708b989964e634686c2a4861feb58a4f0cfc1b13b2"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_04_720.png",
+        "sha256": "bdadb7e0b22414794af3e046e44743e8eedaa930295e5f0365e675196be59518"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_05_720.png",
+        "sha256": "04d82eb174f809985a15d4303c043c3259f3560b6c654ee8a83ead16347dcd21"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_06_720.png",
+        "sha256": "c9cb90d3599703434504fc91263864c7dc65201fa50c22daa0f3d31107085ae6"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_07_720.png",
+        "sha256": "10cd9169e94b6708b150c4d76de2f4dd1f0733b53dbc3fefbe5d52c44b90e187"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_00_720.png",
+        "sha256": "9ecdbcc63ee4e6778a4fd89d00c929dc3d6718f93bde1c2b34627356ae1895c8"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_01_720.png",
+        "sha256": "93a42ad12cff610a6aa34f3ec3ff4bd89717cbbd60b9cc9caea7e93a499855ba"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_02_720.png",
+        "sha256": "0857a41a182a2f6f09704b88325fc3806f4169680d25ffa5b261a78bdd3d1fd5"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_03_720.png",
+        "sha256": "3dd9db0ec5e6a4276203f741c77a1d8fc90b2b717111f6e8df87d32375b4b6e1"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_04_720.png",
+        "sha256": "edc18ceff95ac62c7c59b411a15e5bdc36094f3690dd3cbae1a538bee56e217d"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_05_720.png",
+        "sha256": "cee06a2e16f262e9fa36fcde7f3045070f8c86438ba6d24d03e212b07aaa0dde"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_06_720.png",
+        "sha256": "e77ae0a38a65d52c5a9d3d6f1cfea0d421ec981c1f0682a92155fed5a87497b7"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_07_720.png",
+        "sha256": "e33456bbfa86f7c59928bf4063b6122bfbf43c0f337f00ecee3bf8bc7bc7d227"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_205_1080.png",
+        "sha256": "d454ce181e687f133173823cd36358a3f76436369a882d2b5e2634ed78d4f495"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_210_1080.png",
+        "sha256": "706ed80fda73eb340956227a11f7df8ad8f1e1aec7dbae9cc7b13ecc88ba6e48"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_225_1080.png",
+        "sha256": "5e17c3c2b91fecb34e8b36cff47fbddc91852b133bbc1e55014e45573ac2a9c1"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_230_1080.png",
+        "sha256": "3d4d9717cfef9a3766cf714816f733dae605186eb8e5e18f1b228747bae24be9"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_245_1080.png",
+        "sha256": "98abec1a80ad683974c0eda1711f885d552fbcb1a5e996e989dbea16fac8ba5e"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Overlap_250_1080.png",
+        "sha256": "dd164b30c9a6753ebe6bf871f4820002c9fe870edb7fe300b168e6a6c5aa0a69"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Stopped_Left_1080.png",
+        "sha256": "cfea2dafb84b540d63b65db5b7b16f79d8df3ea49dae9ee9872e9475cb464a70"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Stopped_Right_1080.png",
+        "sha256": "cb99cfcde8343d1e716c766192c11fe7a0798feac0f31b69c514ca5325e4386f"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_00_1080.png",
+        "sha256": "9a991edfff2ef8c98ad658894d50e501ed2f6a3e7adc2baa1fc0ede10609cfce"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_01_1080.png",
+        "sha256": "ce875730c4a4b41d7734a010472343bdad66653cb2869505bb9816f5a750a4c7"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_02_1080.png",
+        "sha256": "aadc5e77d64cb98da761b782523f5c4c5adc8b2d83a1ed06c1f122731396f70b"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_03_1080.png",
+        "sha256": "2d6c4c116a01373bdedd206bf3b9f6d850bea83acfbc01af240c29cf1baa17f7"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_04_1080.png",
+        "sha256": "cbe329b800e50e4b5e84a78d59ff623cd11e02b1672e0b65aa21d82baf275fbd"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_05_1080.png",
+        "sha256": "abe027206efb696541064d7fcf6c9b66230bc3a02863d7c878ef4bb49e8f96db"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_06_1080.png",
+        "sha256": "540b9c72ede81f8d999ca270133993adf990f11eacfde8af4c793eb1cc43e72d"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Left_07_1080.png",
+        "sha256": "84b8983852399a116a51111a0b5334a67a3b9c4a0b300ea30d56dc0dafe777a5"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_00_1080.png",
+        "sha256": "2ed66e11a47fd945ad339f7ff8c5329a194ed91f8d1fcac9b604427acc035bdf"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_01_1080.png",
+        "sha256": "dfe301fd521af01afea667ede9fbcb48931f80c4f5bf9027380b0dca6e356ee0"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_02_1080.png",
+        "sha256": "6e02f145b7fda5122cfbf7decb4a5868c4b81c789ed1276021206ef85875a842"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_03_1080.png",
+        "sha256": "f5ce9bab649d90cda19efed89e5948b829f6e6719b89e97266fc502233036568"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_04_1080.png",
+        "sha256": "4fab366c7a44ace4076d635c2d440fa86f1e380032e44e7ca9e03e9a86ccde7f"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_05_1080.png",
+        "sha256": "d93131637e2433b53c92903427e895d78d17d67ec01a41905e7724b35ac74ca0"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_06_1080.png",
+        "sha256": "1635b14a37d23e50c5ff41b1f9950dab42e6a991230961ae85bec79709d70a65"
+      },
+      {
+        "path": "Saved/Screenshots/MovementFix/Walk_Right_07_1080.png",
+        "sha256": "3e00a9edc13c9d1f2951a09ac1fe4fef497c43a9766ee23dc9b571eb392c1806"
+      }
+    ],
+    "logs": [
+      {
+        "path": "Saved/Logs/MovementFixFinal720.log",
+        "sha256": "0feda261b189e920038a63558b60e703ddf7254e5d1d65701eed086714fa54cc"
+      },
+      {
+        "path": "Saved/Logs/MovementFixFinal1080.log",
+        "sha256": "835f6719c9cb8f75b5c8fa7415874ee8ec1009fc57cf8524bbcfc3efc4fb844a"
+      }
+    ],
+    "documentationImages": [
+      {
+        "path": "docs/images/MovementFix_Walk_Right_02_720.png",
+        "sha256": "0857a41a182a2f6f09704b88325fc3806f4169680d25ffa5b261a78bdd3d1fd5",
+        "source": "Saved/Screenshots/MovementFix/Walk_Right_02_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Walk_Left_02_720.png",
+        "sha256": "22a8485a1cd9039b20578981abb105d0cda98ffa9f795ace33f85d44a2644cee",
+        "source": "Saved/Screenshots/MovementFix/Walk_Left_02_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Overlap_230_720.png",
+        "sha256": "c76e7a187fddf286debbe139943b9a09c83f4972f68c698a6b9a9f06a00229ef",
+        "source": "Saved/Screenshots/MovementFix/Overlap_230_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Overlap_250_720.png",
+        "sha256": "ea00e18a575d7390b26f1f0c215cc825f03d872a1ad739498c3543d4a8faf5fa",
+        "source": "Saved/Screenshots/MovementFix/Overlap_250_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Walk_Right_02_1080.png",
+        "sha256": "6e02f145b7fda5122cfbf7decb4a5868c4b81c789ed1276021206ef85875a842",
+        "source": "Saved/Screenshots/MovementFix/Walk_Right_02_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Walk_Left_02_1080.png",
+        "sha256": "aadc5e77d64cb98da761b782523f5c4c5adc8b2d83a1ed06c1f122731396f70b",
+        "source": "Saved/Screenshots/MovementFix/Walk_Left_02_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Overlap_230_1080.png",
+        "sha256": "3d4d9717cfef9a3766cf714816f733dae605186eb8e5e18f1b228747bae24be9",
+        "source": "Saved/Screenshots/MovementFix/Overlap_230_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/MovementFix_Overlap_250_1080.png",
+        "sha256": "dd164b30c9a6753ebe6bf871f4820002c9fe870edb7fe300b168e6a6c5aa0a69",
+        "source": "Saved/Screenshots/MovementFix/Overlap_250_1080.png",
+        "copiedUnmodified": true
+      }
+    ],
+    "review": "Verified left/right walking poses, stop states and front/back unit/camp overlap in actual renderer screenshots."
+  },
+  "preservation": {
+    "saves": [
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+        "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+        "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+        "sha256": "d93d05f3e6562e294629d7ecd6c8cb08a91210572fb6a37e6709e11f71a7e499",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+        "sha256": "bb5d400f0ea7302403d7ea45fb89a00404833679d678604870b073d83bc9d6e6",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+        "sha256": "670e09b45d3315b88e710a584457d25d3a47c9cc566e6b26c9d21d3dd44eeda5",
+        "matchesBaseline": true
+      }
+    ],
+    "extraSaveFiles": 0,
+    "unitTable": {
+      "path": "Content/Data/DT_Units.uasset",
+      "sha256": "5bd2282930b84cf9430bd2a2d86e5a6ccc500b0ab1be4487784181a5e576b782"
+    }
+  },
+  "staticChecks": {
+    "localLinks": 299,
+    "pythonSyntax": "passed",
+    "gitDiffCheck": "passed",
+    "untrackedTextFilesChecked": 34
+  },
+  "limitations": [
+    "Two horizontal facings; vertical travel retains last facing.",
+    "Four-pose generated walking, not a hand-cleaned eight-direction animation set.",
+    "Historical non-movement artwork is retained.",
+    "Packaging and hardware acceptance remain deferred."
+  ]
+}

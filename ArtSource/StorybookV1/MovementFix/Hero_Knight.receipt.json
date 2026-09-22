@@ -1,0 +1,14 @@
+{
+  "id": "Hero_Knight",
+  "file": "ArtSource/StorybookV1/MovementFix/T_Walk_Hero_Knight.png",
+  "reference": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Knight.png",
+  "prompt": "Use case: identity-preserve. Create a corrected FOUR-frame walking cycle sprite atlas for the KNIGHT in the supplied identity reference. The reference is an older atlas: keep exactly the same young blond knight, white armour, pine-green cloak, gold edging and lion crest, sword. Replace ONLY the motion concept; output ONLY walking poses, not idle, attack, or defeat. Square RGBA PNG, true transparent background. EXACTLY 2 columns by 2 rows, one entire knight per equal cell, all feet at the same ground baseline, all heads same size, fixed camera, 12% empty transparent margin around each character. All four figures face and travel SCREEN RIGHT in a clear right-facing three-quarter side view. The pelvis and shoulders stay centered. Read order top left, top right, bottom left, bottom right. Pose 1: LEFT foot far forward to screen right, heel touches ground, RIGHT foot far behind to screen left, toe on ground. Pose 2: LEFT leg supports the body beneath hip, RIGHT knee bends visibly and right foot lifts forward past the supporting leg. Pose 3: RIGHT foot far forward to screen right, heel touches ground, LEFT foot far behind to screen left, toe on ground. Pose 4: RIGHT leg supports body beneath hip, LEFT knee bends visibly and left foot lifts forward past supporting leg. The two legs MUST trade their front/back roles; do NOT repeat the same extended leg in every frame. Clear knee bends and alternating planted/lifted feet, cloak responds subtly. Sword carried still, no slashing or arm gestures. Match the reference clean storybook cartoon outlines and palette. No scene, floor, shadows, letters, grid, text, particles, duplicate poses, cropping, or background colour. This will be played cyclically 1-2-3-4-1 to depict actual walking.",
+  "originalToolFile": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-d0ed98ea-067d-4947-98b4-397aca0a4565.png",
+  "generatedDate": "2026-09-22",
+  "tool": "image_gen",
+  "layout": {
+    "columns": 2,
+    "rows": 2
+  },
+  "processing": "Original generated RGBA file copied unchanged; cropping and pivot only in UE sprite metadata."
+}

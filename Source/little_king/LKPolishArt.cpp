@@ -23,9 +23,26 @@ bool IsDefaultSprite(FName Id,const UPaperSprite* Sprite)
         :TEXT("/Game/Sprites/")+Id.ToString()+TEXT("_sprite.")+Id.ToString()+TEXT("_sprite");
     return Path==Legacy || Path==LKBattleArt::Sprite(Id).ToString();
 }
+const TArray<FName>& WalkingUnitIds()
+{
+    static const TArray<FName> Ids=[]
+    {
+        TArray<FName> Result;
+        for(FName Id:UnitIds())
+        {if(!Id.ToString().StartsWith(TEXT("Building_"))&&Id!="Unit_TwoHeadedDragon"){Result.Add(Id);}}
+        return Result;
+    }();
+    return Ids;
+}
 UPaperFlipbook* Animation(FName Id,FName State)
 {
     if(!UnitIds().Contains(Id)){return nullptr;}
+    if(State=="Move"&&WalkingUnitIds().Contains(Id))
+    {
+        const FString Walk=TEXT("FB_Walk_")+Id.ToString();
+        if(auto* Clip=LoadObject<UPaperFlipbook>(nullptr,*(TEXT("/Game/Art/StorybookV1/MovementFix/")+Walk+TEXT(".")+Walk),nullptr,LOAD_NoWarn))
+        {return Clip;}
+    }
     const FString Name=TEXT("FB_")+Id.ToString()+TEXT("_")+State.ToString();
     return LoadObject<UPaperFlipbook>(nullptr,*(TEXT("/Game/Art/StorybookV1/Polish/Animations/")+Name+TEXT(".")+Name),nullptr,LOAD_NoWarn);
 }

@@ -1,6 +1,7 @@
 #include "LKBattleArtPreview.h"
 #include "LKWorldArtPreview.h"
 #include "LKPolishArtPreview.h"
+#include "LKMovementFixPreview.h"
 #if WITH_EDITOR
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
@@ -26,7 +27,7 @@
 
 namespace LKBattleArtPreview
 {
-bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")); }
+bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview")); }
 void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
 {
     // Separate process, explicit editor-only option, no player save reads or writes.
@@ -41,6 +42,7 @@ void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
 }
 void Tick(ALKBattleGameMode* Mode)
 {
+    if (FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview"))) { LKMovementFixPreview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview"))) { LKPolishArtPreview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview"))) { LKWorldArtPreview::Tick(Mode); return; }
     static int32 Frame = 0;

@@ -1,6 +1,10 @@
 # 美术与音频来源台账
 
-更新：2026-09-21。A/B/C/D 素材已整合，各批历史来源分别记录；Sprint 6 仍不恢复，打包与硬件验收不在本轮范围。需求与缺口见 [12](12-AssetRequest.md)，风格规范见 [07](07-ArtStyleGuide.md)。
+更新：2026-09-23。A/B/C/D 素材与后续步行修复已整合，各批历史来源分别记录；Sprint 6 仍不恢复，打包与硬件验收不在本轮范围。需求与缺口见 [12](12-AssetRequest.md)，风格规范见 [07](07-ArtStyleGuide.md)。
+
+## v0.8 后续：步行显示修复
+
+2026-09-23 追加的战斗显示修复新增 24 张 RGBA 步行图，全部使用内置 `image_gen`，分别参考本项目对应的 D 批旧角色图集；没有外部图片、采样、音乐或音效新增。原输出 PNG 按字节复制留档，UE 只按元数据裁取四姿势和设置枢轴/显示比例。生成图按适用工具条款管理，不标为 CC0，不编造种子或工具未提供的模型版本。实际完整提示词见 [46](46-MovementFixPrompts.md)，逐项输入参考、原始输出路径、日期、哈希与裁取参数见 [MovementFix manifest](../ArtSource/StorybookV1/MovementFix/manifest.json)，144 个新增引擎资源及修复记录见 [45](45-BattlePresentationFixes.md)。以下 A～D 历史来源保留。
 
 ## 制作批次 A：家园与声音基础
 
