@@ -154,9 +154,12 @@ public:
 	float ProjectileLifetime = 3.f;
 
 	// ---------- 音频（S5） ----------
-	/** 音效触发点 ID -> 音频资产；没配的键静默跳过，不报错 */
+	/** 音效触发点 ID -> 音频资产；缺少的键可自动补全，显式空条目静音。 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
 	TMap<FName, TSoftObjectPtr<class USoundBase>> SoundMap;
+	/** Fill absent sound keys from Storybook V1. Explicit entries (including empty) are respected. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio") bool bUseDefaultSoundSet = true;
+	void EnsurePresentationDefaults();
 
 	// ---------- 手感（S5） ----------
 	/** 屏幕震动幅度倍率（0 = 关闭震屏） */

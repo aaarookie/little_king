@@ -22,6 +22,8 @@ protected:
 private:
 	FVector2D Project(FVector2D Point, FVector2D Size) const;
 	UPROPERTY(Transient) FLKRunState Snapshot;
+    UPROPERTY(Transient) TMap<FName, TObjectPtr<class UTexture2D>> RegionTextures;
+    UPROPERTY(Transient) TMap<uint8, TObjectPtr<class UTexture2D>> NodeTextures;
 	FName Selected, Focus;
 	FVector2D ViewMin = FVector2D::ZeroVector, ViewMax = FVector2D(1,1);
 };

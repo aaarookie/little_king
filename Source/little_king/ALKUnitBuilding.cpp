@@ -1,4 +1,5 @@
 #include "ALKUnitBuilding.h"
+#include "ULKUnitAnimationComponent.h"
 
 #include "Engine/World.h"
 
@@ -76,6 +77,7 @@ void ALKUnitBuilding::TrySpawnUnit()
         const FVector Location = GetActorLocation() + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f) * Distance;
         if (GM->SpawnUnitForTeam(SpawnUnitId, Team, Location))
         {
+            GetAnimationComponent()->Attack();
             UE_LOG(LogLKUnit, Log, TEXT("[Building] %s 出兵 %s"), *UnitId.ToString(), *SpawnUnitId.ToString());
             return;
         }

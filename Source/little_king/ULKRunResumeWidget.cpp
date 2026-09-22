@@ -1,4 +1,6 @@
 #include "ULKRunResumeWidget.h"
+#include "ULKJourneyPresentationSubsystem.h"
+#include "LKPresentationStyle.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
@@ -19,13 +21,13 @@
 
 namespace
 {
-	const FLinearColor BackdropColor(0.006f, 0.012f, 0.027f, 0.88f);
-	const FLinearColor PanelColor(0.025f, 0.045f, 0.075f, 0.99f);
-	const FLinearColor GoldColor(0.96f, 0.69f, 0.22f, 1.f);
-	const FLinearColor PaleColor(0.88f, 0.92f, 0.96f, 1.f);
-	const FLinearColor MutedColor(0.58f, 0.67f, 0.76f, 1.f);
-	const FLinearColor ButtonColor(0.13f, 0.16f, 0.20f, 1.f);
-	const FLinearColor ButtonHover(0.20f, 0.24f, 0.30f, 1.f);
+	const FLinearColor BackdropColor = LKPresentationStyle::Ink().CopyWithNewOpacity(.92f);
+	const FLinearColor PanelColor = LKPresentationStyle::Panel();
+	const FLinearColor GoldColor = LKPresentationStyle::Gold();
+	const FLinearColor PaleColor = LKPresentationStyle::Paper();
+	const FLinearColor MutedColor = LKPresentationStyle::Muted();
+	const FLinearColor ButtonColor = LKPresentationStyle::Card();
+	const FLinearColor ButtonHover = LKPresentationStyle::Hover();
 
 	UTextBlock* MakeText(UWidgetTree* Tree, const TCHAR* Name, int32 Size, const FLinearColor& Color,
 		ETextJustify::Type Justification = ETextJustify::Center)
@@ -33,7 +35,7 @@ namespace
 		UTextBlock* Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
 		FSlateFontInfo Font = Text->GetFont();
 		Font.Size = Size;
-		Text->SetFont(Font);
+		Text->SetFont(LKPresentationStyle::Font(Font.Size));
 		Text->SetColorAndOpacity(FSlateColor(Color));
 		Text->SetJustification(Justification);
 		Text->SetAutoWrapText(true);
@@ -42,11 +44,7 @@ namespace
 
 	void StyleButton(UButton* Button, const FLinearColor& Normal, const FLinearColor& Hovered)
 	{
-		FButtonStyle Style = Button->GetStyle();
-		Style.Normal.TintColor = FSlateColor(Normal);
-		Style.Hovered.TintColor = FSlateColor(Hovered);
-		Style.Pressed.TintColor = FSlateColor(Hovered * 0.82f);
-		Button->SetStyle(Style);
+        LKPresentationStyle::StyleButton(Button);
 	}
 }
 
@@ -66,7 +64,7 @@ TSharedRef<SWidget> ULKRunResumeWidget::RebuildWidget()
 
 void ULKRunResumeWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativeConstruct(); ULKJourneyPresentationSubsystem::Reveal(this);
 	SetVisibility(ESlateVisibility::Visible);
 	RefreshResume();
 }

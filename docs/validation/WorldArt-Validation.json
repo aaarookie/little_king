@@ -1,0 +1,710 @@
+{
+  "batch": "C",
+  "date": "2026-09-21",
+  "engine": "5.8.1",
+  "releaseUnchanged": "v0.7",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/WorldArtBuildFinal.log"
+  },
+  "automation": {
+    "succeeded": 36,
+    "succeededWithWarnings": 43,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "total": 79,
+    "report": "Saved/Automation/WorldArtFinal02/index.json",
+    "reportSha256": "a910929e1f86d27a660d1d42e30efab0406e1d2a3c0f233d854a36ebba3ed975",
+    "log": "Saved/Logs/WorldArtTestsFinal02.log",
+    "warnings": "43 successful tests include synthetic worlds without level cameras/viewports and intentional invalid-save/unit-cap cases; no failed assertions in the LittleKing report.",
+    "presentationTests": [
+      "LittleKing.Presentation.AssetsAndAudioDefaults",
+      "LittleKing.Presentation.BattleArtDefaultsAndOverrides",
+      "LittleKing.Presentation.BattleArtSpawnGeometry",
+      "LittleKing.Presentation.CampsGroundAndCombatEvents",
+      "LittleKing.Presentation.CueBudgetAndThrottling",
+      "LittleKing.Presentation.HomeIllustrations",
+      "LittleKing.Presentation.WorldArtCatalogue"
+    ]
+  },
+  "imports": {
+    "assetCount": 52,
+    "reimportPassed": true,
+    "reimportAssetListIdentical": true,
+    "log": "Saved/Logs/WorldArtImport04.log",
+    "assets": [
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Ground_0.uasset",
+        "sha256": "f345c919050b7d65e11cdc3eb1bf568f20894a2cb4e2d162b0b68e2f5c9878a0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Ground_0.uasset",
+        "sha256": "15cfe772d19e21c1de3e672d6fedb90fcee9e53cc509246b342b650611150923"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Ground_1.uasset",
+        "sha256": "6dbf974e99e09849ca193026a375099984e96db6ab44addb41823c5b702ffa54"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Ground_1.uasset",
+        "sha256": "713ca4b72986eddf2588f54deb9ead26fff48b7e7d31c75fd402c89bc4f8f5f4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Ground_2.uasset",
+        "sha256": "3e44bab308624aa0d227fe1e0f87335355ea9f0c33f14e2e27be1bba08c9c696"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Ground_2.uasset",
+        "sha256": "c56f89593990f6bd1cb18ee990ee61070ebc2912d0d65574af7cdaf6594ac7e9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Ground_3.uasset",
+        "sha256": "16997e8b2ef742f532a0dbb170c29fc15091ee721b986c9771f3affaca10ca86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Ground_3.uasset",
+        "sha256": "5fca27a55a3beb795761b47016b3235fad9bdea9f4e0712751e63f7e93eefe44"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Ground_4.uasset",
+        "sha256": "b767768c8d1e90e4fb08eebb1e47de2ef1b2bccd55ed83153cabdeb2c9f2f04f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Ground_4.uasset",
+        "sha256": "4d641e977b55f93f0c603fa295cd6438b5b62800def6014953209e5559baffe9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Camp_Knight.uasset",
+        "sha256": "8f2970ddc2c72d8e071768d7bf9628dc0cf261eaa72152f86fe7fd1089e274f3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Camp_Knight.uasset",
+        "sha256": "248009f4e06041171ef20bdadfa364b3fd4bf2284e69fcfc7f4c81e9c2794f25"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Camp_Mage.uasset",
+        "sha256": "88e4785604cee3a04240a7691d16d29a85893ec9ab25eab74ac5e852d3beb201"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Camp_Mage.uasset",
+        "sha256": "35f56384264e02f91e5ca910ee5deeb8f851400d3b4afc14bbb0cdb825c45b9d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Camp_Ranger.uasset",
+        "sha256": "93bb0fdf9dbf9f86334b10b2bc60358083ea542f7747de098f70a315c5b312c9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Sprites/SP_Camp_Ranger.uasset",
+        "sha256": "db58a3b04a810ee570076a36e079b6990642ded796200d14a72f9b661a84e688"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Node_Battle.uasset",
+        "sha256": "3625fff5b3992a6c074ae4f41bffe50ca69675c985d9c641c480605a73021fe4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Node_Elite.uasset",
+        "sha256": "60db1a754685f13d6fdeb75f93ca5248e6c54efbe35a680c7855020be2abe38b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Node_Boss.uasset",
+        "sha256": "db5d47a33d0042dbf7eb5f9c4d11b95b6626b6c40588865c9462213ee77da911"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Node_Market.uasset",
+        "sha256": "e4c0999c13f87c443c84ca067b30ba0c167d741810ef8a1ae564b86255bb050d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_Node_Rest.uasset",
+        "sha256": "b868ec70751ec9068e9efadefcfc8e3ed1c033550aa6012894c7e400cf350e2e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_FX_EmberBurst.uasset",
+        "sha256": "9208bef92c94d4a445cb9d6378cc781ce019b20047e30685f4b4f9cf342a42b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_FX_Leaf.uasset",
+        "sha256": "74e906e0f834bb13a3d907efa889b010c897385dd969c899f983ed5951a6c079"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Textures/T_FX_Dust.uasset",
+        "sha256": "24d224d7fd4b91602761bf3c25889695b168327c0620976eba9053ddc778a76e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_BowShot.uasset",
+        "sha256": "d12b3cfbf5d16fe4a022ba8965000a37aabfbfe2ce441e56d0331974855d1258"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_SpearShot.uasset",
+        "sha256": "7f869782b5bc9417006bd202ea4cc072e0ef9613e7ac70095a78c62295a55c32"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_MagicShot.uasset",
+        "sha256": "d1917e704d70b19126b5f2e453a536be37e5d5b34a83cc10ed78b41fdea85b1d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_FireballCast.uasset",
+        "sha256": "32cafdcb1c7e4a3e08cdaed7286d58448e9a0fbb1f6d455ece42fd54631683f4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_FireballImpact.uasset",
+        "sha256": "990797e15c019975423242041f60ea2bec522f894aa7c70ec6bfca2c634833b1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Heal.uasset",
+        "sha256": "aedbfe5509635945aae0dd8c93971dfc252aa1fb17e44b3e23b260fdd74f8083"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Summon.uasset",
+        "sha256": "fd6d443123a6ec986a7706216e4a20be7085e04bd180399819b918f2b49e569e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Sacrifice.uasset",
+        "sha256": "3119598f012c370fbd6179fd951ad0465cd9a31047248d1c034bd7f12ce9eac1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Revive.uasset",
+        "sha256": "cd32d0cd1f25962ebbd62e45da073d27ddb37bb15bc814819edbaade8da2758c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Backstab.uasset",
+        "sha256": "e7fea8f8004d4b6eaac83df354ac5104447ebb9486e59f60b0ab2a234985aeea"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Coin.uasset",
+        "sha256": "333acfff78e1ac5835170e0a443215cf33513d83d1c276b61e7dd3a755100b6e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Mimic.uasset",
+        "sha256": "d210229c34731690b83d01784d2d765265bfc164d045d16d38d30bf8271c9189"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Dash.uasset",
+        "sha256": "1a2a416f853e6b6ed26bce3c23c46ec41e3bc975abaa324fe917e83df17fa013"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Empower.uasset",
+        "sha256": "4f36df7d334fb0cca6c1728e875e06c9c938aa032db379243001883cc0c98074"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_HeavyHit.uasset",
+        "sha256": "7abcd219b2dbe2545913931ad9498af7bbf04b6ece55cb0b8af05ea9e66c375d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Stun.uasset",
+        "sha256": "6b42087c897a10f9a0eec20ae44be6e852e1b71282b36468330f26ff314ebd2e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Freeze.uasset",
+        "sha256": "eaa81633a54ba25a1ab6301b5515a47a2c68fd96372ca7c28387291cc2fb52a8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Burn.uasset",
+        "sha256": "16f0156dd6b9d718bbb2a564519e47b6afabc07eb619dd9b8f595ee8cef234de"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_IceBreath.uasset",
+        "sha256": "99a6b608650bc66046b0aad4df52d46e653c8a403ea3a9639df57910e7d578ae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_FireBreath.uasset",
+        "sha256": "f64c373bd1f01ffef00fd9ce063b44c43760f47ade53266880edc9732e4672f7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_SiegeShot.uasset",
+        "sha256": "7214657ab6aea9fb4b9ea6f1611d361246c5a8014be5e6786900be9e0dbf5bb5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_SiegeImpact.uasset",
+        "sha256": "93ca27585c95a115e77bf631d49c68e53358a8d665c89db3f30e74ad2958eb60"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Footstep.uasset",
+        "sha256": "865a66a497160592feae94e48e9e181ff3832dec8d77a8a45cb01a6c567f4612"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_CampCommand.uasset",
+        "sha256": "c4b956f1fb13a29c71fc4f50ab603bd6f31c2461cc890f42eb3ac6d38b45e6fe"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_NodeEnter.uasset",
+        "sha256": "34c93d9eef6fa145ed9256ec606414771c73266638385d7a953ee60c62e8de30"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Rest.uasset",
+        "sha256": "78a442e5ac1d88cd3600c00a9d47fea07c1fae2053565bfdfc04b067851d226e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Market.uasset",
+        "sha256": "78ca42c34128239b10985e842dafee51c5db284b016890bd1b69859b590d2e12"
+      },
+      {
+        "path": "Content/Art/StorybookV1/World/Audio/S_Upgrade.uasset",
+        "sha256": "60bc49d5053be5063d3a725ba5ed85efbce4fd2b997879cf16c26778d6a8bfd5"
+      }
+    ]
+  },
+  "sources": {
+    "imageCount": 16,
+    "audioCount": 28,
+    "imageManifest": "ArtSource/StorybookV1/World/manifest.json",
+    "audioManifest": "ArtSource/StorybookV1/World/Audio/manifest.json",
+    "promptDocument": "docs/41-WorldArtPrompts.md",
+    "sourceAudit": {
+      "images": 16,
+      "audio": [
+        {
+          "key": "BowShot",
+          "duration": 0.25,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -35.55677517738899,
+          "edgesZero": true
+        },
+        {
+          "key": "SpearShot",
+          "duration": 0.32,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -35.51473543765786,
+          "edgesZero": true
+        },
+        {
+          "key": "MagicShot",
+          "duration": 0.32,
+          "measuredPeakDbFS": -22.999239001376367,
+          "rmsDbFS": -37.503529789095545,
+          "edgesZero": true
+        },
+        {
+          "key": "FireballCast",
+          "duration": 0.35,
+          "measuredPeakDbFS": -18.99912610181711,
+          "rmsDbFS": -33.15589821223541,
+          "edgesZero": true
+        },
+        {
+          "key": "FireballImpact",
+          "duration": 0.55,
+          "measuredPeakDbFS": -18.00051964147548,
+          "rmsDbFS": -35.49122183713857,
+          "edgesZero": true
+        },
+        {
+          "key": "Heal",
+          "duration": 0.65,
+          "measuredPeakDbFS": -24.00218916664859,
+          "rmsDbFS": -36.77928659349692,
+          "edgesZero": true
+        },
+        {
+          "key": "Summon",
+          "duration": 0.55,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -36.181040730900975,
+          "edgesZero": true
+        },
+        {
+          "key": "Sacrifice",
+          "duration": 0.28,
+          "measuredPeakDbFS": -24.99849199481288,
+          "rmsDbFS": -39.630665937922785,
+          "edgesZero": true
+        },
+        {
+          "key": "Revive",
+          "duration": 1.05,
+          "measuredPeakDbFS": -18.00051964147548,
+          "rmsDbFS": -32.21985554524061,
+          "edgesZero": true
+        },
+        {
+          "key": "Backstab",
+          "duration": 0.22,
+          "measuredPeakDbFS": -19.999469871546843,
+          "rmsDbFS": -33.86003433781705,
+          "edgesZero": true
+        },
+        {
+          "key": "Coin",
+          "duration": 0.28,
+          "measuredPeakDbFS": -22.999239001376367,
+          "rmsDbFS": -37.367171155002495,
+          "edgesZero": true
+        },
+        {
+          "key": "Mimic",
+          "duration": 0.4,
+          "measuredPeakDbFS": -21.999515337009644,
+          "rmsDbFS": -31.59020270659446,
+          "edgesZero": true
+        },
+        {
+          "key": "Dash",
+          "duration": 0.35,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -36.50455148798289,
+          "edgesZero": true
+        },
+        {
+          "key": "Empower",
+          "duration": 0.6,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -33.35352469133165,
+          "edgesZero": true
+        },
+        {
+          "key": "HeavyHit",
+          "duration": 0.4,
+          "measuredPeakDbFS": -19.999469871546843,
+          "rmsDbFS": -38.862723733786524,
+          "edgesZero": true
+        },
+        {
+          "key": "Stun",
+          "duration": 0.35,
+          "measuredPeakDbFS": -24.00218916664859,
+          "rmsDbFS": -38.61220506209676,
+          "edgesZero": true
+        },
+        {
+          "key": "Freeze",
+          "duration": 0.5,
+          "measuredPeakDbFS": -24.99849199481288,
+          "rmsDbFS": -40.01904153272359,
+          "edgesZero": true
+        },
+        {
+          "key": "Burn",
+          "duration": 0.4,
+          "measuredPeakDbFS": -26.00153564352592,
+          "rmsDbFS": -40.26791320321617,
+          "edgesZero": true
+        },
+        {
+          "key": "IceBreath",
+          "duration": 0.48,
+          "measuredPeakDbFS": -22.999239001376367,
+          "rmsDbFS": -38.01354078836405,
+          "edgesZero": true
+        },
+        {
+          "key": "FireBreath",
+          "duration": 0.45,
+          "measuredPeakDbFS": -22.999239001376367,
+          "rmsDbFS": -41.98366796706543,
+          "edgesZero": true
+        },
+        {
+          "key": "SiegeShot",
+          "duration": 0.4,
+          "measuredPeakDbFS": -19.999469871546843,
+          "rmsDbFS": -34.26479898561087,
+          "edgesZero": true
+        },
+        {
+          "key": "SiegeImpact",
+          "duration": 0.65,
+          "measuredPeakDbFS": -18.99912610181711,
+          "rmsDbFS": -36.80502273312757,
+          "edgesZero": true
+        },
+        {
+          "key": "Footstep",
+          "duration": 0.18,
+          "measuredPeakDbFS": -28.00344687127633,
+          "rmsDbFS": -45.281596640858304,
+          "edgesZero": true
+        },
+        {
+          "key": "CampCommand",
+          "duration": 0.24,
+          "measuredPeakDbFS": -21.999515337009644,
+          "rmsDbFS": -37.16616394558987,
+          "edgesZero": true
+        },
+        {
+          "key": "NodeEnter",
+          "duration": 0.55,
+          "measuredPeakDbFS": -21.001341670225994,
+          "rmsDbFS": -32.85836854190237,
+          "edgesZero": true
+        },
+        {
+          "key": "Rest",
+          "duration": 1.0,
+          "measuredPeakDbFS": -19.999469871546843,
+          "rmsDbFS": -33.555512879460714,
+          "edgesZero": true
+        },
+        {
+          "key": "Market",
+          "duration": 0.65,
+          "measuredPeakDbFS": -22.999239001376367,
+          "rmsDbFS": -37.891519862782474,
+          "edgesZero": true
+        },
+        {
+          "key": "Upgrade",
+          "duration": 1.15,
+          "measuredPeakDbFS": -18.99912610181711,
+          "rmsDbFS": -34.05131670667684,
+          "edgesZero": true
+        }
+      ]
+    },
+    "originalImageHashesVerified": true,
+    "originalAudioHashesVerified": true,
+    "imagesNotPixelProcessed": true
+  },
+  "screenshots": [
+    {
+      "file": "docs/images/WorldArtDeployment_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "d1becda47085b05f18d4dc0dd407dcf3a20d454ba19cc327f4f6d16e6913c0d1"
+    },
+    {
+      "file": "docs/images/WorldArtDeployment_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "d85389482746632f4f00fa4939e1020b0397be1332acfa559a35f3ab8f35b005"
+    },
+    {
+      "file": "docs/images/WorldArtEffects_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "cc843f61a9404aad5fc72bcaa3f814543413d0f1b61ece1971a557418a240839"
+    },
+    {
+      "file": "docs/images/WorldArtEffects_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "584750f77bc327d98ea5c595291f32ae637cf912945689d001228d4797dcf3c5"
+    },
+    {
+      "file": "docs/images/WorldArtMarket_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "d614d91ca8e70c5b78080371382c7eeff62cd5c1497c8b711ef371edea4d7d58"
+    },
+    {
+      "file": "docs/images/WorldArtMarket_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "0dff6961945edcfe584b7333eb28db8f9840ec366e45f220c302c7dd0b5b633f"
+    },
+    {
+      "file": "docs/images/WorldArtRegion0_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "6690a30e86d5400b5c8ecfa169a6682ab3a227aef0dcbca53f7a42d4b774cf94"
+    },
+    {
+      "file": "docs/images/WorldArtRegion0_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "4e8e884a08533a60aa83713d34bbd6598ce90adf08403ce583fc3f66493aabac"
+    },
+    {
+      "file": "docs/images/WorldArtRegion1_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "66b21c63b44b12593b8ecc0564642af8a3b53eb209b3b13a296002de5a68e0cb"
+    },
+    {
+      "file": "docs/images/WorldArtRegion1_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "3aeca51df40466f6cd8512794a7c1be0766227f87d1c36461632927b58f3a2a0"
+    },
+    {
+      "file": "docs/images/WorldArtRegion2_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "4b994dcdb2ce68a12bb5ebd0e80ba35f5b3fe16f04c20ab96616c3e7dbe25681"
+    },
+    {
+      "file": "docs/images/WorldArtRegion2_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "c8a9ad1848a3d486bff6e2630a5fecdebd2c0725e220c42101e25e2240036e30"
+    },
+    {
+      "file": "docs/images/WorldArtRegion3_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "7a76c7dff8c75fbaa81ddf7b0939a8e8853ab4ede5bd25df8713a2bbfdfcf315"
+    },
+    {
+      "file": "docs/images/WorldArtRegion3_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "a5d33652f8f338ada5487a9a3323e3d32decbd0f72580b393c12af803b9eadfa"
+    },
+    {
+      "file": "docs/images/WorldArtRegion4_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "c56784cd040e2a34721543ab4f377fbd01539c727d71dccf929fb6cef0d622d3"
+    },
+    {
+      "file": "docs/images/WorldArtRegion4_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "80b4d471c9a7b15148410fe2a58cc26f11695b0dee36a073ba3992f0c89a4eb6"
+    },
+    {
+      "file": "docs/images/WorldArtRegionMap_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "46c80aec945be07919dc0dd41e4001338cfd25288f18cd56571d3fe89f8d2179"
+    },
+    {
+      "file": "docs/images/WorldArtRegionMap_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "95497378d120e0cd4b7119da294c2545d5ba0a37c3682d94c39077a5b282282d"
+    },
+    {
+      "file": "docs/images/WorldArtRest_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "65516517155d466d4b72b1062c9cfe3b290a3b145d66da263f369e87e5b415e1"
+    },
+    {
+      "file": "docs/images/WorldArtRest_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "b89b134b7545f3531e51b8fd5afd618dcd5b3f4bacb0ed809c7b1b3f74690b63"
+    },
+    {
+      "file": "docs/images/WorldArtUpgrade_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "540dd2301a0a54b0ce237b5723934e0ae3beeed2bb4d66f4bdcbf6c46800f2f8"
+    },
+    {
+      "file": "docs/images/WorldArtWorldMap_1080.png",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "sha256": "c621c355ba3336968111a984511e152c71d40c7e85b9882098560cf0163d2e09"
+    },
+    {
+      "file": "docs/images/WorldArtWorldMap_720.png",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "9f901c62ff112f3aa9ffa5c2e14813e5c6d565666761cd44487f04aaa52af8b6"
+    }
+  ],
+  "viewportVerification": {
+    "mode": "Unreal rendered offscreen game viewport, isolated preview fixtures; not a packaging/hardware or full-match playtest",
+    "logs": [
+      "Saved/Logs/WorldArtViewportFinal1080.log",
+      "Saved/Logs/WorldArtViewportFinal720.log",
+      "Saved/Logs/WorldArtHome01.log"
+    ],
+    "checked": [
+      "Five distinct region grounds and elite/Boss tint",
+      "Manual battle exposure and non-colliding backdrop",
+      "Three camp sprites and deployment portraits/labels",
+      "Yellow half-field line and per-unit health bars",
+      "World and focused maps, icons, entry/exit labels",
+      "Market and rest panels",
+      "Skill/status overlay examples",
+      "Real home upgrade button and leaf feedback"
+    ]
+  },
+  "saveFiles": [
+    {
+      "file": "LittleKing_Profile_A.sav",
+      "before": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+      "after": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_B.sav",
+      "before": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+      "after": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_A.sav",
+      "before": "562461A0083C4CE8CB8D44D9A5D31DF2CF58C90C0CC699732D26CFABF89AAFD3",
+      "after": "562461A0083C4CE8CB8D44D9A5D31DF2CF58C90C0CC699732D26CFABF89AAFD3",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_B.sav",
+      "before": "A0DAFC14DF99C85AD936BE3F2FC71BED94F9EB34675FAB4C5CFF5B298E5DDF69",
+      "after": "A0DAFC14DF99C85AD936BE3F2FC71BED94F9EB34675FAB4C5CFF5B298E5DDF69",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Run.sav",
+      "before": "B311821A2BAC29C93182835FF9EE24CFD370861875D0B1E71AE3DEF4DA17B800",
+      "after": "B311821A2BAC29C93182835FF9EE24CFD370861875D0B1E71AE3DEF4DA17B800",
+      "unchanged": true
+    }
+  ],
+  "saveCount": 5,
+  "noPreviewSaveFilesLeft": true,
+  "existingAssetChanges": [
+    "Content/Data/DT_Units.uasset"
+  ],
+  "existingAssetNote": "DT_Units is the pre-existing B-batch Building_Barracks SpriteScale.Y 1 to 0.5 change. C import writes only Content/Art/StorybookV1/World; no maps, GA, GameData, or HUD blueprint resaved.",
+  "totalABCAssets": 136,
+  "localDocumentLinksChecked": 225,
+  "diffCheckPassed": true,
+  "limitations": [
+    "Single-frame sprites and three FX texture pieces with native timed geometry; no character animation sequences.",
+    "No looping BGM, tier-specific home building art, authored transitions or new fonts (D batch).",
+    "No packaging, hardware performance testing, or speaker/headphone subjective mix validation.",
+    "Market goods remain undesigned; no invented item art."
+  ]
+}

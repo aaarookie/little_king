@@ -1,4 +1,8 @@
 #include "ULKStartMenuWidget.h"
+#include "ULKJourneyPresentationSubsystem.h"
+#include "LKPresentationStyle.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
 #include "Components/HorizontalBox.h"
@@ -17,20 +21,20 @@
 
 namespace
 {
-	const FLinearColor Gold(0.94f, 0.67f, 0.28f);
-	const FLinearColor Muted(0.57f, 0.67f, 0.76f);
-	UTextBlock* Text(UWidgetTree* Tree, const FString& Copy, int32 Size, FLinearColor Color = FLinearColor(0.91f, 0.94f, 0.97f), FName Name = NAME_None)
+	const FLinearColor Gold = LKPresentationStyle::Gold();
+	const FLinearColor Muted = LKPresentationStyle::Muted();
+	UTextBlock* Text(UWidgetTree* Tree, const FString& Copy, int32 Size, FLinearColor Color = LKPresentationStyle::Paper(), FName Name = NAME_None)
 	{
 		UTextBlock* Result = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
 		FSlateFontInfo Font = Result->GetFont(); Font.Size = Size;
-		Result->SetFont(Font); Result->SetText(FText::FromString(Copy));
+		Result->SetFont(LKPresentationStyle::Font(Font.Size)); Result->SetText(FText::FromString(Copy));
 		Result->SetColorAndOpacity(Color); Result->SetAutoWrapText(true);
 		return Result;
 	}
 	UBorder* Panel(UWidgetTree* Tree, FLinearColor Color, float Padding = 20.f)
 	{
 		UBorder* Result = Tree->ConstructWidget<UBorder>();
-		Result->SetBrushColor(Color); Result->SetPadding(FMargin(Padding));
+		LKPresentationStyle::StylePanel(Result, Color); Result->SetPadding(FMargin(Padding));
 		return Result;
 	}
 	FString RunDescription(const FLKSaveSlotSummary& Row)
@@ -47,10 +51,10 @@ TSharedRef<SWidget> ULKStartMenuWidget::RebuildWidget()
 	if (WidgetTree && !WidgetTree->RootWidget) { BuildTree(); }
 	return Super::RebuildWidget();
 }
-void ULKStartMenuWidget::NativeConstruct() { Super::NativeConstruct(); Refresh(); }
+void ULKStartMenuWidget::NativeConstruct() { Super::NativeConstruct(); ULKJourneyPresentationSubsystem::Reveal(this); Refresh(); }
 void ULKStartMenuWidget::BuildTree()
 {
-	UBorder* Background = Panel(WidgetTree, FLinearColor(0.008f, 0.017f, 0.03f), 32.f);
+	UBorder* Background = Panel(WidgetTree, LKPresentationStyle::Ink(), 32.f);
 	WidgetTree->RootWidget = Background;
 	UScaleBox* Scale = WidgetTree->ConstructWidget<UScaleBox>();
 	Scale->SetStretch(EStretch::ScaleToFit); Background->SetContent(Scale);
@@ -67,6 +71,7 @@ void ULKStartMenuWidget::BuildTree()
 	Status = Text(WidgetTree, TEXT(""), 16, Gold, TEXT("MenuStatus"));
 	USizeBox* StatusSize = WidgetTree->ConstructWidget<USizeBox>(); StatusSize->SetHeightOverride(50); StatusSize->SetContent(Status);
 	Layout->AddChildToVerticalBox(StatusSize)->SetPadding(FMargin(0, 14, 0, 0));
+    Layout->AddChildToVerticalBox(Text(WidgetTree, TEXT("音乐：MiniMax-Music3 · AI 生成    字体：Noto Sans / Serif CJK"), 13, Muted));
 }
 void ULKStartMenuWidget::AddButton(UPanelWidget* Parent, const TCHAR* Name, const FString& Label, int32 Action, bool bEnabled, bool bPrimary)
 {
@@ -78,6 +83,7 @@ void ULKStartMenuWidget::AddButton(UPanelWidget* Parent, const TCHAR* Name, cons
 	if (UVerticalBox* Column = Cast<UVerticalBox>(Parent)) { Column->AddChildToVerticalBox(Entry)->SetPadding(FMargin(0, 5)); }
 	else if (UHorizontalBox* Row = Cast<UHorizontalBox>(Parent))
 	{
+        Entry->SetCompactRow(); // Eight-slot load grid must fit the Chinese font's line metrics.
 		UHorizontalBoxSlot* LayoutSlot = Row->AddChildToHorizontalBox(Entry);
 		LayoutSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill)); LayoutSlot->SetPadding(FMargin(4, 2));
 	}
@@ -90,7 +96,7 @@ void ULKStartMenuWidget::Refresh()
 {
 	if (!Body || !Saves) { return; }
 	Body->ClearChildren();
-	MenuFrame->SetHeightOverride(bLoadMenu && PendingDelete == INDEX_NONE ? 800.f : 670.f);
+	MenuFrame->SetHeightOverride(bLoadMenu && PendingDelete == INDEX_NONE ? 840.f : 670.f);
 	const TArray<FLKSaveSlotSummary> Rows = Saves->ListSlots();
 	const int32 Used = Rows.FilterByPredicate([](const FLKSaveSlotSummary& Row) { return Row.bExists; }).Num();
 	if (PendingDelete != INDEX_NONE)
@@ -112,22 +118,18 @@ void ULKStartMenuWidget::Refresh()
 		PageTitle->SetText(FText::FromString(TEXT("从家园，走向未知")));
 		PageSubtitle->SetText(FText::FromString(TEXT("集结英雄，筹备远征。每一次归来，都是新的开始。")));
 		UHorizontalBox* Columns = WidgetTree->ConstructWidget<UHorizontalBox>(); Body->AddChildToVerticalBox(Columns)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
-		UBorder* Scene = Panel(WidgetTree, FLinearColor(0.023f, 0.047f, 0.071f), 30);
+		UBorder* Scene = Panel(WidgetTree, LKPresentationStyle::Panel(), 30);
 		UHorizontalBoxSlot* SceneSlot = Columns->AddChildToHorizontalBox(Scene); SceneSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill)); SceneSlot->SetPadding(FMargin(0, 0, 32, 0));
 		UVerticalBox* SceneCopy = WidgetTree->ConstructWidget<UVerticalBox>(); Scene->SetContent(SceneCopy);
 		SceneCopy->AddChildToVerticalBox(Text(WidgetTree, TEXT("H O M E   &   E X P E D I T I O N"), 14, Muted));
-		SceneCopy->AddChildToVerticalBox(Text(WidgetTree, TEXT("你的王国\n等待下一场冒险"), 30))->SetPadding(FMargin(0, 20));
-		UHorizontalBox* Blocks = WidgetTree->ConstructWidget<UHorizontalBox>();
-		SceneCopy->AddChildToVerticalBox(Blocks)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
-		const TArray<FString> Labels = {TEXT("骑士"), TEXT("法师"), TEXT("游侠")};
-		const TArray<FLinearColor> Colors = {FLinearColor(0.32f, 0.22f, 0.11f), FLinearColor(0.16f, 0.14f, 0.31f), FLinearColor(0.10f, 0.26f, 0.21f)};
-		for (int32 Index = 0; Index < 3; ++Index)
-		{
-			USizeBox* Block = WidgetTree->ConstructWidget<USizeBox>(); Block->SetHeightOverride(Index == 1 ? 155 : 120);
-			UBorder* Color = Panel(WidgetTree, Colors[Index], 12); Block->SetContent(Color); Color->SetVerticalAlignment(VAlign_Bottom);
-			Color->SetContent(Text(WidgetTree, Labels[Index], 20));
-			UHorizontalBoxSlot* BlockSlot = Blocks->AddChildToHorizontalBox(Block); BlockSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill)); BlockSlot->SetPadding(FMargin(0, 0, 12, 0)); BlockSlot->SetVerticalAlignment(VAlign_Bottom);
-		}
+        UScaleBox* ArtScale = WidgetTree->ConstructWidget<UScaleBox>();
+        ArtScale->SetStretch(EStretch::ScaleToFit);
+        SceneCopy->AddChildToVerticalBox(ArtScale)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+        UImage* Art = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("KingdomIllustration"));
+        Art->SetBrushFromTexture(LoadObject<UTexture2D>(nullptr,
+            TEXT("/Game/Art/StorybookV1/Textures/T_MenuKingdom.T_MenuKingdom")), true);
+        Art->SetVisibility(ESlateVisibility::HitTestInvisible);
+        ArtScale->SetContent(Art);
 		USizeBox* MenuSize = WidgetTree->ConstructWidget<USizeBox>(); MenuSize->SetWidthOverride(375);
 		Columns->AddChildToHorizontalBox(MenuSize)->SetVerticalAlignment(VAlign_Center);
 		UVerticalBox* Actions = WidgetTree->ConstructWidget<UVerticalBox>(); MenuSize->SetContent(Actions);
@@ -147,7 +149,7 @@ void ULKStartMenuWidget::Refresh()
 	Body->AddChildToVerticalBox(Grid)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 	for (const FLKSaveSlotSummary& Row : Rows)
 	{
-		UBorder* Card = Panel(WidgetTree, FLinearColor(0.025f, 0.043f, 0.065f), 12);
+		UBorder* Card = Panel(WidgetTree, LKPresentationStyle::Panel(), 12);
 		UVerticalBox* Copy = WidgetTree->ConstructWidget<UVerticalBox>(); Card->SetContent(Copy);
 		FString Label = FString::Printf(TEXT("%02d    %s"), Row.Index + 1, Row.bExists ? *FString::Printf(TEXT("%d 金币   /   %s"), Row.Gold, *RunDescription(Row)) : TEXT("空存档"));
 		Copy->AddChildToVerticalBox(Text(WidgetTree, Label, 17, Row.bExists ? FLinearColor::White : Muted));
@@ -177,7 +179,7 @@ void ULKStartMenuWidget::EnterGame(int32 SlotIndex, bool bNew)
 	if (!bSuppressTravel)
 	{
 		bTravelQueued = true; SetIsEnabled(false);
-		UGameplayStatics::OpenLevel(this, Saves->GetEntryMap());
+		ULKJourneyPresentationSubsystem::Travel(this, Saves->GetEntryMap());
 	}
 }
 void ULKStartMenuWidget::HandleAction(int32 Action)

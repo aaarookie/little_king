@@ -1,0 +1,243 @@
+{
+  "date": "2026-09-19",
+  "engine": "UE 5.8.1",
+  "scope": "StorybookV1 batch A; editor development, no packaging or hardware acceptance",
+  "baselineCommit": "faff76145ebf77e25848cda277cf68a0662e95da",
+  "images": {
+    "generated": 8,
+    "transparentBuildings": 7,
+    "menuSize": [
+      1536,
+      1024
+    ],
+    "buildingSize": [
+      1254,
+      1254
+    ],
+    "manifestHashesVerified": true,
+    "promptsMatched": true
+  },
+  "audio": {
+    "count": 9,
+    "kenneyCC0": 6,
+    "originalSynthesized": 3,
+    "format": "48kHz 16-bit mono PCM WAV",
+    "noIndividualFileClipping": true,
+    "fadeEdgesZero": true,
+    "auditoryMixingAcceptance": false,
+    "files": [
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_MeleeHit.wav",
+        "durationSeconds": 0.43054,
+        "peakDbFS": -16.999,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_RangedShoot.wav",
+        "durationSeconds": 0.59954,
+        "peakDbFS": -19.001,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_HitTaken.wav",
+        "durationSeconds": 0.118,
+        "peakDbFS": -23.003,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_UnitDied.wav",
+        "durationSeconds": 0.41508,
+        "peakDbFS": -18.999,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_CardPlay.wav",
+        "durationSeconds": 0.27671,
+        "peakDbFS": -15.999,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_UIClick.wav",
+        "durationSeconds": 0.01002,
+        "peakDbFS": -20.002,
+        "sourceVerified": true
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_BattleStart.wav",
+        "durationSeconds": 1.37,
+        "peakDbFS": -14.0,
+        "sourceVerified": null
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_Victory.wav",
+        "durationSeconds": 2.05,
+        "peakDbFS": -14.0,
+        "sourceVerified": null
+      },
+      {
+        "file": "ArtSource/StorybookV1/Audio/S_Defeat.wav",
+        "durationSeconds": 1.83,
+        "peakDbFS": -13.999,
+        "sourceVerified": null
+      }
+    ],
+    "reproductionSHA256Matched": true
+  },
+  "playerSaves": {
+    "count": 5,
+    "allHashesUnchanged": true,
+    "noExtraPreviewSaves": true,
+    "sha256": {
+      "LittleKing_Profile_A.sav": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+      "LittleKing_Profile_B.sav": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+      "LittleKing_Save02_Profile_A.sav": "55D4849EFA1F6286015F29BD472590FADE65B5F539B9F4086F2F63EB15538DAE",
+      "LittleKing_Save02_Profile_B.sav": "473D2027DA1842EA51CA6A58B1E0FE0407CB93F9E122A2140F190BF02D92FA32",
+      "LittleKing_Save02_Run.sav": "16C2E66F7ADB6A70861AE5962547ED59E532B17875A2B10D92FB882D1850434B"
+    }
+  },
+  "import": {
+    "reimportSucceeded": true,
+    "assets": 27,
+    "textures": 8,
+    "paperSprites": 7,
+    "soundWaves": 9,
+    "soundConcurrency": 3,
+    "log": "Saved/Logs/StorybookImport03.log",
+    "assetPaths": [
+      "/Game/Art/StorybookV1/Textures/T_Home_Barracks.T_Home_Barracks",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_Barracks.SP_Home_Barracks",
+      "/Game/Art/StorybookV1/Textures/T_Home_Gate.T_Home_Gate",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_Gate.SP_Home_Gate",
+      "/Game/Art/StorybookV1/Textures/T_Home_HeroHouse.T_Home_HeroHouse",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_HeroHouse.SP_Home_HeroHouse",
+      "/Game/Art/StorybookV1/Textures/T_Home_Library.T_Home_Library",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_Library.SP_Home_Library",
+      "/Game/Art/StorybookV1/Textures/T_Home_Statue.T_Home_Statue",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_Statue.SP_Home_Statue",
+      "/Game/Art/StorybookV1/Textures/T_Home_Treasury.T_Home_Treasury",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_Treasury.SP_Home_Treasury",
+      "/Game/Art/StorybookV1/Textures/T_Home_WarRoom.T_Home_WarRoom",
+      "/Game/Art/StorybookV1/Sprites/SP_Home_WarRoom.SP_Home_WarRoom",
+      "/Game/Art/StorybookV1/Textures/T_MenuKingdom.T_MenuKingdom",
+      "/Game/Art/StorybookV1/Audio/SC_Combat.SC_Combat",
+      "/Game/Art/StorybookV1/Audio/SC_UI.SC_UI",
+      "/Game/Art/StorybookV1/Audio/SC_Signals.SC_Signals",
+      "/Game/Art/StorybookV1/Audio/S_BattleStart.S_BattleStart",
+      "/Game/Art/StorybookV1/Audio/S_CardPlay.S_CardPlay",
+      "/Game/Art/StorybookV1/Audio/S_Defeat.S_Defeat",
+      "/Game/Art/StorybookV1/Audio/S_HitTaken.S_HitTaken",
+      "/Game/Art/StorybookV1/Audio/S_MeleeHit.S_MeleeHit",
+      "/Game/Art/StorybookV1/Audio/S_RangedShoot.S_RangedShoot",
+      "/Game/Art/StorybookV1/Audio/S_UIClick.S_UIClick",
+      "/Game/Art/StorybookV1/Audio/S_UnitDied.S_UnitDied",
+      "/Game/Art/StorybookV1/Audio/S_Victory.S_Victory"
+    ]
+  },
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/StorybookBuild05.log"
+  },
+  "automation": [
+    {
+      "scope": "fullRegression",
+      "report": "Saved/Automation/Storybook02/index.json",
+      "succeeded": 32,
+      "succeededWithWarnings": 42,
+      "failed": 0,
+      "notRun": 0,
+      "reportCreatedOn": "2026.09.19-08.14.29"
+    },
+    {
+      "scope": "finalMenuAfterLayoutChange",
+      "report": "Saved/Automation/StorybookMenuFinal/index.json",
+      "succeeded": 0,
+      "succeededWithWarnings": 1,
+      "failed": 0,
+      "notRun": 0,
+      "reportCreatedOn": "2026.09.19-13.01.19"
+    },
+    {
+      "scope": "assetsAfterReimport",
+      "report": "Saved/Automation/StorybookReimport/index.json",
+      "succeeded": 2,
+      "succeededWithWarnings": 0,
+      "failed": 0,
+      "notRun": 0,
+      "reportCreatedOn": "2026.09.19-13.15.39"
+    }
+  ],
+  "automationNote": "Full 74 passed on Build04. Build05 only removed redundant menu text; affected menu test passed 1/1. Warnings include expected error-path and test-world/GameplayCue diagnostics.",
+  "screenshots": [
+    {
+      "file": "docs/images/StorybookHome.png",
+      "size": [
+        1280,
+        720
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "docs/images/StorybookMenu.png",
+      "size": [
+        1280,
+        720
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "docs/images/StorybookHome1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "docs/images/StorybookMenu1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "docs/images/StorybookStatue1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "docs/images/StorybookSaves1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "kind": "Unreal game-mode rendered preview using isolated test saves",
+      "visuallyReviewed": true
+    }
+  ],
+  "remaining": [
+    "20 battle-entity sprites and remaining card illustrations",
+    "Battle HUD art and resource/status icons",
+    "World/ground/camp art and dedicated skill FX/SFX",
+    "Animation and looping BGM",
+    "Subjective in-game listening and mouse feel"
+  ],
+  "documentation": {
+    "localFileLinksChecked": 146,
+    "brokenFileLinks": 0,
+    "gitDiffCheck": "passed"
+  },
+  "activeGameDataAudio": {
+    "defaultSetEnabled": true,
+    "existingSoundEntries": {}
+  }
+}

@@ -1,0 +1,5 @@
+# Preserve source-media, prompt/receipt and license bytes for provenance hashes.
+ArtSource/** -text
+ArtSource/** whitespace=trailing-space,space-before-tab,cr-at-eol
+# Upstream license formatting is kept verbatim, including original whitespace.
+ArtSource/**/Licenses/*.txt -whitespace

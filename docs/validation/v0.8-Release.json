@@ -1,0 +1,156 @@
+{
+  "stage": "v0.8 release: storybook art/audio batches A-D and English README",
+  "date": "2026-09-22",
+  "recordCreatedUtc": "2026-09-22T03:46:46.451169+00:00",
+  "engine": "Unreal Engine 5.8.1",
+  "baselineCommit": "faff76145ebf77e25848cda277cf68a0662e95da",
+  "projectVersion": "0.8.0",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "evidence": {
+      "path": "Saved/Logs/V08ReleaseBuild.log",
+      "sha256": "34f1c437d3ebd7ec9ca18be5030fd8ec8986d040522be47ed0cc6997f3ef4ffa"
+    },
+    "note": "Release build rechecked after updating DefaultGame.ini. UnrealBuildTool reported Target is up to date; zero C++ compile actions were required."
+  },
+  "automation": {
+    "total": 83,
+    "succeeded": 39,
+    "succeededWithWarnings": 44,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "report": {
+      "path": "Saved/Automation/PolishArtFinal05/index.json",
+      "sha256": "5182eac028fd00d9851ec1d6d26156f3f7df10d2e25740eba67ae4adfab74417"
+    },
+    "log": {
+      "path": "Saved/Logs/PolishAutomationFinal05.log",
+      "sha256": "f7ec6d5724ffdfda9cc89456de78d110db2403c8fd3152c58dae3278c9d87448"
+    },
+    "reusedVerifiedRun": true,
+    "reportCreatedUtc": "2026.09.21-15.05.16",
+    "note": "Final D-batch regression, not a newly claimed test run. Release changes affect version metadata, docs, source-byte preservation and authoring scripts; gameplay C++ and runtime assets are unchanged since this run."
+  },
+  "assets": {
+    "allBatches": 775,
+    "A": 27,
+    "B": 57,
+    "C": 52,
+    "D": 639,
+    "DAssetHashesRechecked": 639,
+    "rawSourceFilesMatchGitBlobBytes": 246,
+    "sourceAudits": [
+      {
+        "path": "Saved/WorldArtSourceAudit.json",
+        "sha256": "4fa514bb950484288978dcbdb97cf03170e6ad81cc09373e7bb3345da55b3a24"
+      },
+      {
+        "path": "Saved/PolishArtSourceAudit.json",
+        "sha256": "5aebd312f25ddeee7e2e9d5ffb2edb60c3bd0639b7778d4ed5621d058dabe059"
+      }
+    ],
+    "records": [
+      {
+        "path": "docs/validation/StorybookAssets-Validation.json",
+        "sha256": "04af790afb36e91ad0b21e3cceed4112e0553f83cb9e8ab5d7c6c3dfbff35bf6"
+      },
+      {
+        "path": "docs/validation/BattleArt-Validation.json",
+        "sha256": "de3b7fc34cfcd45e49d72dbd6a55eefe426f6f2b714d47a9df7a0c5b40232b98"
+      },
+      {
+        "path": "docs/validation/WorldArt-Validation.json",
+        "sha256": "5eade9bbb5fcca846a11fe533809673699fba4f3703a5c78fa987cbf14b29570"
+      },
+      {
+        "path": "docs/validation/PolishArt-Validation.json",
+        "sha256": "9b2b7b346ca9e524ddeb03f58cb4b4ab0489adcc9cd70a0fea86681a646fec5d"
+      }
+    ]
+  },
+  "saveProtection": {
+    "files": [
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+        "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+        "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+        "sha256": "562461a0083c4ce8cb8d44d9a5d31df2cf58c90c0cc699732d26cfabf89aafd3",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+        "sha256": "a0dafc14df99c85ad936be3f2fc71bed94f9eb34675fab4c5cff5b298e5ddf69",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+        "sha256": "b311821a2bac29c93182835ff9ee24cfd370861875d0b1e71ae3def4da17b800",
+        "matchesBaseline": true
+      }
+    ],
+    "extraTestSaves": 0,
+    "matchesPreDBaseline": true
+  },
+  "documents": {
+    "checked": [
+      "README.md",
+      "README.en.md",
+      "docs/03-TaskList.md",
+      "docs/07-ArtStyleGuide.md",
+      "docs/12-AssetRequest.md",
+      "docs/13_Asset_Solutions.md",
+      "docs/19-ContentCatalog.md",
+      "docs/29-OptimizationChangeLog.md",
+      "docs/34-CardDevelopmentInterfaces.md",
+      "docs/36-ArtAudioSources.md",
+      "docs/37-ArtAudioIntegration.md",
+      "docs/38-BattleArtIntegration.md",
+      "docs/39-BattleArtPrompts.md",
+      "docs/40-WorldSkillsArtIntegration.md",
+      "docs/41-WorldArtPrompts.md",
+      "docs/42-PolishArtIntegration.md",
+      "docs/43-PolishArtPrompts.md",
+      "docs/44-v0.8ReleaseNotes.md"
+    ],
+    "validLocalLinks": 438,
+    "brokenLocalLinks": 0,
+    "languageSwitchesVerified": true
+  },
+  "indexChecks": {
+    "changedFiles": 1181,
+    "filesAtOrAbove100MiB": 0,
+    "largestFile": {
+      "path": "Content/Art/StorybookV1/Polish/Fonts/FF_Title.uasset",
+      "bytes": 24701968
+    },
+    "ignoredBuildAndSaveDirectoriesAbsent": true,
+    "credentialPatternScan": "passed",
+    "cachedDiffCheck": "passed",
+    "upstreamLicenseWhitespace": "Preserved verbatim; only vendor license whitespace is excluded via .gitattributes.",
+    "authoringPythonSyntax": "passed"
+  },
+  "git": {
+    "branch": "main",
+    "tag": "v0.8",
+    "projectVersion": "0.8.0",
+    "remote": "https://github.com/aaarookie/little_king.git",
+    "releaseCommit": "The commit referenced by annotated tag v0.8; this record is part of that commit.",
+    "proxy": "http://127.0.0.1:18081",
+    "publicationVerification": "Remote main and peeled v0.8 references are checked after push; transport result is reported separately from this pre-commit record."
+  },
+  "limitations": [
+    "Generated animation is a first presentation pass, not hand-cleaned pixel art.",
+    "Audio format/peak/seam and engine lifecycle checks do not constitute subjective listening or final mix approval.",
+    "Packaging and hardware acceptance remain deferred at user request; Sprint 6 stays skipped."
+  ]
+}

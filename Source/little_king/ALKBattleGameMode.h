@@ -111,7 +111,7 @@ public:
 	void BeginCombatBatch() { ++CombatBatchDepth; }
 	void EndCombatBatch();
 	void RecordCombatEvent(const FLKCombatEvent& Event);
-	void NotifyFireballCast(const FVector& Location);
+    void NotifyFireballCast(const FVector& Location, float Radius = 250.f, bool bPresent = true);
 	FRandomStream& GetBattleRandom() const { return BattleRandom; }
 	USoundBase* FindPreloadedSound(FName Id) const;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLKCombatEvent, const FLKCombatEvent&, Event);

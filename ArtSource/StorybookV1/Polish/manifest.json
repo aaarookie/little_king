@@ -1,0 +1,1732 @@
+{
+  "images": [
+    {
+      "id": "Unit_Swordsman",
+      "name": "剑士",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Swordsman.png",
+      "sha256": "9a5a5a95841717351df341773cfe17403bea3def6dae62143e11e384a1ef376a",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Human infantry swordsman, preserve existing armour and sword. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Unit_Swordsman.png",
+      "referenceSha256": "23819cc46944599044fa26adc9d2ea87dd26b9f05e4ea991c9d5e4822a4a75f3",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Swordsman.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_Archer",
+      "name": "弓箭手",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Archer.png",
+      "sha256": "a6319c6c03ea6f1ab6882d420ca580c03763ef068f998f8b2c4eafb67a3ddfb3",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Human archer with simple tunic and bow, preserve existing colours. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Unit_Archer.png",
+      "referenceSha256": "20ca9538e7efbd44d9325641d2f001e38a9972978c32d5161269c76f2dbf6876",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Archer.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_Shieldbearer",
+      "name": "盾卫",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Shieldbearer.png",
+      "sha256": "f878c5454464075052227d48cfa66c70ad991e51fcc5db75d2803a88bd401e53",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Human heavy shield infantry, preserve existing broad shield and armour. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Unit_Shieldbearer.png",
+      "referenceSha256": "1d5c2e94857f2cd59f7687d200d3e0d67442b906af8671790a2ba29bd45f924a",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Shieldbearer.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Hero_Knight",
+      "name": "骑士",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Knight.png",
+      "sha256": "df8e230502d068880f90a632974172d56d23ba25b14659a8a8db0764ab994128",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Asset type: production transparent animation sprite atlas for Little King. Reference image is the EXISTING KNIGHT identity, not a composition to copy. Preserve exactly blond hair, green eyes, ivory armour, gold lion crest, pine-green cape, slender silver sword and the same chestnut outline with gentle gouache shading. Create a SQUARE 2048x2048 RGBA atlas with EXACTLY FOUR COLUMNS and FOUR ROWS, 16 equal cells, ONE full-body knight per cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on both axes. Strictly align identical head size, full-body size, foot baseline and centred anchor in all upright poses; every sword and cape fully within its cell, ample 12% clear inset. All face front three-quarter toward screen right. No grid lines, cell labels, text, shadow ground or backdrop: true transparent pixels between figures and behind them. Read left to right then top to bottom. Row 1: four subtle breathing idle poses, first and fourth connect smoothly. Row 2: four distinct walk-cycle poses, left stride, passing, right stride, passing, feet stay within the cell. Row 3: four sword attack poses, ready, wind-up, forward sword slash, recover. Row 4: first two hit reaction poses (small recoil then recover); last two incapacitation poses (kneeling then lying safely on side), no gore, no blood. Each pose must be an independently drawn animation frame, not sixteen identical copies. Keep costume/weapon count/face consistent. No extra characters, no particles, no effects, no exaggerated camera changes, no perspective changes, no crop. Warm storybook palette pine #193A32, parchment #E7D7AE, antique gold #BE9650. Crisp silhouette at small game size.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Hero_Knight.png",
+      "referenceSha256": "b98f884318ea5b367f8688aa7223ee1aa63bbad8c30cf706e60ba09c31dd352b",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Hero_Knight.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Hero_Mage",
+      "name": "法师",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Mage.png",
+      "sha256": "b57ef9f87d107ac09c12ba67c69cb30d6e0e7f18e3e95d2abf5bae1dd7bfcb58",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Elderly white-haired bearded mage in a purple robe, holding his existing wooden magical staff. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Hero_Mage.png",
+      "referenceSha256": "0aa4166a6d8feb9315cdcb78b8a6652eb79b61b11cd7e76e2276ffd7c95701dc",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Hero_Mage.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Hero_Ranger",
+      "name": "游侠",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Ranger.png",
+      "sha256": "15ec30086ed87af635d41724645d6bfe39a9bbf95ca583cde0f24b6c85884552",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Brown-haired young ranger with green cloak, brown boots and wooden bow. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Hero_Ranger.png",
+      "referenceSha256": "c5882d122e8e3ee94cfaa6a0e4a9e4277723fad98d2044060ba683cf580a7fd2",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Hero_Ranger.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Building_ArrowTower",
+      "name": "箭塔",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Building_ArrowTower.png",
+      "sha256": "63ad7a4db6a17d0b3c8453bf8586528653c54c9a919b911331a39de0516afacb",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Small fantasy wooden arrow tower, preserve existing roof and architectural silhouette. Row 1: four subtle idle flag/canopy-sway frames. Row 2: four subtle moving mechanical/flag frames, the building base NEVER walks or changes position. Row 3: four action frames, mechanism ready, draw back, release arrow or stone, recoil and recover; barracks instead opens door and flags lift, no soldier appears. Row 4: first two hit reaction frames (jolt and recover); last two destruction frames (slight structural slump then small collapsed rubble), no explosions. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Building_ArrowTower.png",
+      "referenceSha256": "e3ef70e4fae3632f99746bfd920378124d651c41ea23d2b73bb328f0a6305d54",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Building_ArrowTower.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Building_Barracks",
+      "name": "兵营",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Building_Barracks.png",
+      "sha256": "6edcb23ebafc9458f20fcd35bbacf35488d84f538ed2af981d43b1ecae493fe4",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. Small fantasy field barracks, preserve existing roof, entrance, flags and architectural silhouette. Row 1: four subtle idle flag/canopy-sway frames. Row 2: four subtle moving mechanical/flag frames, the building base NEVER walks or changes position. Row 3: four action frames, mechanism ready, draw back, release arrow or stone, recoil and recover; barracks instead opens door and flags lift, no soldier appears. Row 4: first two hit reaction frames (jolt and recover); last two destruction frames (slight structural slump then small collapsed rubble), no explosions. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Polish/References/Building_Barracks.png",
+      "referenceSha256": "d04fe01f82516ee67bebfeee0559fde5b5ff1a5d9412641ca784d38935e99463",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Building_Barracks.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_Skeleton",
+      "name": "骷髅兵",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Skeleton.png",
+      "sha256": "5a17d4ca4f31c547239815fedb1a385b2c2aef5ba320c263154def7fff41cb3d",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A small ivory skeleton infantryman, round skull with two dark eye sockets, moss-green torn tabard, small rusty short sword and round wooden buckler. Playful determined expression, clearly readable bones, no gore. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Skeleton.png",
+      "referenceSha256": "8ec29daa5efc0db8102733bf8c194744d33f225728cecac809c563419642e7c7",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Skeleton.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_SkeletonArcher",
+      "name": "骷髅射手",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_SkeletonArcher.png",
+      "sha256": "cbbc536a0e9740148711c34586b8bdb34b6737a3b9949672dbb16338eacff035",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A small ivory skeleton archer, round skull with dark eye sockets, short weathered chestnut hood and moss-green shoulder cloth, curved wooden bow held diagonally and a compact quiver. Distinct slim archer silhouette, no gore. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_SkeletonArcher.png",
+      "referenceSha256": "4a9f055943c9e93647e0ded6f17896f58dea789cfd80f498a9a95efffdbee954",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_SkeletonArcher.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Hero_Necromancer",
+      "name": "死灵法师",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_Necromancer.png",
+      "sha256": "ab624f5356bf988da7551af9aa477fda103d11f479762cf847d65289451ba701",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A gaunt pale adult necromancer in deep muted plum hooded robes with moss-green lining and bone clasps, curled wooden staff with a small ivory skull and dim jade crystal, one closed spellbook at the belt. Clever solemn face, no gore, no floating magic or particles. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Hero_Necromancer.png",
+      "referenceSha256": "a1d4820aff03c0ba06eaaba530b3b347f96d47e9f74dba968b5e344998c043d6",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Hero_Necromancer.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Hero_SkeletonGiant",
+      "name": "骷髅巨人",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Hero_SkeletonGiant.png",
+      "sha256": "4444c783509d8d11d65f654d771f478d40a8b816b197225308ae1be609f66e11",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A huge broad-shouldered ivory skeleton giant, oversized rib cage, thick heavy bones, small round skull, broken rusty shoulder armor and tattered moss cloth, gripping a heavy stone-and-bone club. Massive friendly storybook monster silhouette, no gore. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Hero_SkeletonGiant.png",
+      "referenceSha256": "bd573728291c4c8d6430748398eacd7c80abd47d52556a552a2319db33f48a47",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Hero_SkeletonGiant.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Boss_SkeletonKing",
+      "name": "骷髅王",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Boss_SkeletonKing.png",
+      "sha256": "61c7b0ac53b6089ba2d38d732d842192acda0d0f56c580e3c70448e714a7bf5b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A regal ivory skeleton king with a clearly visible antique-gold crown, heavy old-gold shoulder plates, deep muted plum cape lined moss-green, massive notched longsword held at its side. Towering commanding silhouette, empty dark eye sockets with tiny jade pinlights, no gore. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Boss_SkeletonKing.png",
+      "referenceSha256": "cc900f3badc4a99776494ec9af59070a6fd79d7cebe33bf6b4798cbe3b9bc63e",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Boss_SkeletonKing.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_ElfArcher",
+      "name": "精灵弓箭手",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfArcher.png",
+      "sha256": "a2aa21cfcaf726ff909cc2091f30e58c9b4b5fc4453366aa649f0bab4421a568",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult female elf archer with long pointed ears, honey-blonde braid, moss-green leaf-edged cape, chestnut leather tunic, curved wooden longbow held diagonally, tiny gold leaf clasp and quiver. Slender agile silhouette. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfArcher.png",
+      "referenceSha256": "af279bcd3a569092b3fee4837d00d33a12f66fa792c534cecbf5a4ef75923975",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_ElfArcher.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_ElfWarrior",
+      "name": "精灵战士",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfWarrior.png",
+      "sha256": "97f5fcff0e8bf85ed0491740c8dcb533c9f076f0a5dd4a643d10a3fc7c59e95d",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult male elf warrior with long pointed ears and short copper hair, cream and moss-green leaf-shaped light armor, a single elegant leaf-shaped sword and small almond shield. Athletic compact stance, gold leaf shoulder clasp. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfWarrior.png",
+      "referenceSha256": "12de838a7549bc48ca1421f26c551db634e83cc20d48b8e11a3498edb61a3a21",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_ElfWarrior.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_ElfGuard",
+      "name": "精灵盾卫",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfGuard.png",
+      "sha256": "4aa331d81f2e7c747308413e50c9de1253281be7911bc662483b1bc362dadc65",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult sturdy elf shield guardian with long pointed ears, pale braided hair, moss-green and old-gold plate armor, a tall broad leaf-shaped shield held forward, short spear upright behind shoulder. Heavy defensive silhouette distinct from elf swordsman. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfGuard.png",
+      "referenceSha256": "26c2bf90fc913b8bf4add52fcbd376f9acbb447b143730ecb44ce3a058ae3040",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_ElfGuard.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_ElfPriest",
+      "name": "精灵牧师",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ElfPriest.png",
+      "sha256": "fee624b5b13522661559b2e6c17c575282f5d8c17a5bea3bffcf0094043ca7b1",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult female elf priest with long pointed ears, pale hair in a crown braid, cream robe with moss-green stole and antique-gold leaf embroidery, wooden staff ending in a softly glowing amber leaf crystal. Kind calm face, no free-floating particles. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfPriest.png",
+      "referenceSha256": "3a2666c0a54c2091a3f540f0dcd9fb748c0a56e8ff22fcdccccfb0cba652d2bc",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_ElfPriest.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_GoblinRogue",
+      "name": "哥布林大盗",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinRogue.png",
+      "sha256": "49104092430f5ef446ab87faffa153a10d846e4b1d96cd0573adb8070c8cd458",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A nimble adult small green goblin master thief, long pointed ears, angular sly face, deep muted plum hood and chestnut leather vest, paired curved daggers, one small coin pouch and gold earring. Crouched alert stance, clearly goblin not human. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinRogue.png",
+      "referenceSha256": "f7fd96209fc4e027807267251037a74ba27ee33335a36fa10ac93c79705314ff",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_GoblinRogue.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_Thief",
+      "name": "窃贼",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Thief.png",
+      "sha256": "852d9001de131613ceee1f213831d7fe284c45aba20b993d56d7a8866b99945d",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult human thief with messy dark hair, slim face and a small eye-mask, chestnut leather jacket, short moss-green scarf, a single short dagger and a bulging coin pouch at the belt. Nimble alert stance distinct from green goblin rogue. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Thief.png",
+      "referenceSha256": "0f3c7e6205acad31365af87d4e082afe2ea23005840c59f0cb250e6c3b0cf24e",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Thief.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_ApprenticeMage",
+      "name": "学徒法师",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_ApprenticeMage.png",
+      "sha256": "8afb805cfd5ec0a821dbbb7c12a80f8e0bf2a25fbfdef961b9fccacdbdd74e21",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A young adult human apprentice mage with brown hair and round spectacles, oversized moss-green pointed hat, cream shirt with chestnut short cloak, a small open spellbook and a plain wand. Curious slightly awkward pose, no floating particles. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ApprenticeMage.png",
+      "referenceSha256": "d87d6d6a81a634e3498fed9bac77c64e7a1ff5ac7cf79e6d960c9f2000d4de45",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_ApprenticeMage.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_GoblinBlade",
+      "name": "开道利刃",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinBlade.png",
+      "sha256": "70136f9b948f8e5951999da894e166f729ce1b5ed5beae7fd1a187fc78e05797",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. An adult muscular green goblin pathbreaker with long ears, dark short swept crest hair, chestnut and old-gold armor with a terracotta sash, holding one very large broad curved cleaver across the front. Low charging-ready stance, wider silhouette than goblin thief. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinBlade.png",
+      "referenceSha256": "77dc6207bc1ca5c4610f1afef328a2716a579f1deffa4271663849019347711b",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_GoblinBlade.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_TrollWarrior",
+      "name": "巨魔战士",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollWarrior.png",
+      "sha256": "3bace79b43248f9d08ed51e987dc32fdd06006f3cbe622b8f8a0d6e8e6bc0634",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A massive stocky teal-green troll warrior with small ivory lower tusks, broad flat nose, short rust-orange crest, moss-green leather wraps, chestnut bracers and one heavy rough wooden war club. Big hands and shoulders, simple readable muscular silhouette. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: do not draw flying arrows, detached projectiles, dust or ground shadows. Keep each figure under 80% of cell width and height; all sixteen poses at exactly identical character scale.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollWarrior.png",
+      "referenceSha256": "246b262c3a8f3108b536490bea50c9c6fa2bf505b55954c9cb0ca3a82d634c38",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_TrollWarrior.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_TrollSpearman",
+      "name": "巨魔投矛手",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollSpearman.png",
+      "sha256": "1d86f73ac0abf0d76a49ff286db3a076d76431c5c585a247eaeb7884d2405ffe",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A massive teal-green troll spear thrower with ivory lower tusks, broad nose, rust-orange short crest, chestnut leather shoulder harness and moss-green waistcloth, long throwing spear held diagonally and two spare spears behind back. Big powerful arms, silhouette distinct from club warrior. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollSpearman.png",
+      "referenceSha256": "a08e28b275605ba5c1e0c9d9223a4dd52101804a30d3c78e96453e6478a7929b",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_TrollSpearman.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_TrollMage",
+      "name": "巨魔法师",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollMage.png",
+      "sha256": "e414014a0c765203ad8ea797f173f169c4a3c74c3ed6916257e56def4724eb9c",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A massive teal-green troll mage with ivory lower tusks and broad nose, a comically small cream pointed wizard hat, moss-green robe stretched over broad body, heavy wooden staff with a jade stone and a tiny spellbook tied at his belt. Intelligent earnest face, no floating particles. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollMage.png",
+      "referenceSha256": "c7215f21912672f7b635085525abe3dfa7657ac4e34c2d0700cc39906e2b4625",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_TrollMage.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_TrollKing",
+      "name": "巨魔王",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TrollKing.png",
+      "sha256": "683fe389d49a7c90e7a62e1fad8f251cf613e2e38564aa9720a91cf995838e43",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A towering heavily muscled teal-green troll king with large ivory lower tusks, broad nose, rust-orange braided crest, rugged antique-gold crown, moss-green fur-lined cloak, massive chestnut and gold armor and a huge stone hammer. Proud commanding stance, visibly grander than ordinary trolls. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollKing.png",
+      "referenceSha256": "69657d2b3aad20901346f714efd8ad1425e6c0e2dab45b769d67b30f9c90687f",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_TrollKing.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_TwoHeadedDragon",
+      "name": "双头龙",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_TwoHeadedDragon.png",
+      "sha256": "47436b897bf0da50d3777d800fc94f215666826196ca99e9eca9bf61e8fd43c1",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A single compact four-legged two-headed dragon, exactly TWO distinct necks and heads on ONE body, left head pale ice-blue with ivory horns, right head muted warm terracotta-red with old-gold horns, shared moss-green scaled torso, two small folded wings and one tail. Both faces visible, no breath jets, no particles, storybook creature not a realistic reptile. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TwoHeadedDragon.png",
+      "referenceSha256": "ee3c42844d8045c2dd74675f1f7948f7cd611530ea88207df7f0646612610be2",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_TwoHeadedDragon.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Building_SiegeCatapult",
+      "name": "攻城投石炮",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Building_SiegeCatapult.png",
+      "sha256": "de48df08cbeb3021dd76660814c932a7da559ea698dcf103f9fe747356a4112b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A compact medieval siege catapult building, chestnut wooden chassis on four stout wheels, ONE tall throwing arm with stone cup, stone counterweight, wound rope mechanism, moss-green cloth side panel and antique-gold iron bindings. Complete readable three-quarter front view, no crew. Row 1: four subtle idle flag/canopy-sway frames. Row 2: four subtle moving mechanical/flag frames, the building base NEVER walks or changes position. Row 3: four action frames, mechanism ready, draw back, release arrow or stone, recoil and recover; barracks instead opens door and flags lift, no soldier appears. Row 4: first two hit reaction frames (jolt and recover); last two destruction frames (slight structural slump then small collapsed rubble), no explosions. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Building_SiegeCatapult.png",
+      "referenceSha256": "7f50cfc332ce4f2139fb30afbe5f82130cb152db2d9554b122861359582e9d98",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Building_SiegeCatapult.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Unit_Colossus",
+      "name": "擎天巨像",
+      "file": "ArtSource/StorybookV1/Polish/Animations/T_Anim_Unit_Colossus.png",
+      "sha256": "85d2e463a97d6a1c57b69a1f0b41c6fe6c9ee20beade663e7ccf29f444c53e23",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Production transparent animation sprite atlas for Little King. The input image is the reference for ONE existing character or building identity. Preserve its exact outfit, face, colours, species, weapons and silhouette. Warm hand-painted storybook gouache, clear chestnut outlines, pine green, parchment and antique gold, consistent with the input image. Output a SQUARE 2048x2048 RGBA sprite atlas containing EXACTLY FOUR COLUMNS and FOUR ROWS, sixteen equal cells. Exactly ONE complete subject in each cell. Cell centres at 12.5%,37.5%,62.5%,87.5% on each axis. Identical scale, camera and anchor across ALL cells. Upright figures use the SAME foot baseline and head size. Every weapon and appendage stays strictly INSIDE its own cell, with at least 10% transparent padding. Front three-quarter view toward screen right. Absolutely NO background, floor, shadows, grid lines, borders, numbers, letters or labels. True transparent alpha outside each figure. Frames read left to right and top to bottom. A monumental broad humanoid stone colossus constructed from warm cream limestone blocks, tiny calm amber eyes, square heavy fists, thick pillar legs, moss-green growth in joints and restrained antique-gold crown-like brow and chest plate. Ancient immensely heavy guardian, no weapons, no floating particles. Row 1: four subtle breathing idle frames with a gentle blink. Row 2: four clearly different walk-cycle frames (left stride, passing, right stride, passing). Row 3: four attack frames appropriate to its exact existing weapon: ready, windup or draw bow, strike or release, recover. Row 4: first two hit reaction frames (small recoil then recover); last two defeated/incapacitated poses (kneel then lie on side), no gore or blood. Independently draw genuine successive poses, not sixteen identical copies. No particles or large magic effects. Never crop limbs, weapon tips or the character. No pose crosses cell boundaries. Critical: no flying arrows, detached projectiles, dust or ground shadows. Each subject must fit inside a square cell with a wide 15% transparent margin on every side. Keep the SAME compact scale in all sixteen frames. Make all weapons and wings compact enough to fit fully.",
+      "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Colossus.png",
+      "referenceSha256": "9f49747389286dffd7847881164ae3b25b0821d48c814322fa10ea4fc0dc9c9e",
+      "receipt": "ArtSource/StorybookV1/Polish/Animations/Unit_Colossus.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit.",
+      "frameCount": 16,
+      "states": {
+        "Idle": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "Move": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "Attack": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "Hit": [
+          12,
+          13
+        ],
+        "Death": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "Home_Statue_Lv2",
+      "name": "Home_Statue_Lv2",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Statue_Lv2.png",
+      "sha256": "cd323992b83659005acaec20390dacb598e7c727b5c46f0208fe137d22133e04",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Add two small symmetrical flowering garlands beside the statue niche, fresh moss planter boxes at the steps, and a slightly brighter golden halo. A modest first improvement, keep the roof unchanged.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Statue.png",
+      "referenceSha256": "5dd28d5615a191a7b9fdfa7aaee87524bbf95788c49968a7623e584d53340115",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Statue_Lv2.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Statue_Lv3",
+      "name": "Home_Statue_Lv3",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Statue_Lv3.png",
+      "sha256": "b244408bd469411328eca633efb607b6c690a83db83562395b37c9dbe067e3e4",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Add a prominent carved golden laurel arch framing the original niche, four warm lanterns, planted flower beds against the plinth and refined gold edging on the green roof. Preserve the visible central female statue.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Statue.png",
+      "referenceSha256": "5dd28d5615a191a7b9fdfa7aaee87524bbf95788c49968a7623e584d53340115",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Statue_Lv3.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Statue_Lv4",
+      "name": "Home_Statue_Lv4",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Statue_Lv4.png",
+      "sha256": "700fc320899ef6727ca9252578ce2c5d77ecd8dc1f0367c58668b40c5be76ef7",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Highest upgrade: a luminous gold sunburst halo behind the same female statue, ornate twin miniature pinnacles at the doorway, refined golden roof ribs, cream-and-gold relief panels and abundant white blossom planters. Noble sanctuary, restrained warm light, no magical glow outside its silhouette.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Statue.png",
+      "referenceSha256": "5dd28d5615a191a7b9fdfa7aaee87524bbf95788c49968a7623e584d53340115",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Statue_Lv4.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Treasury_Lv2",
+      "name": "Home_Treasury_Lv2",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv2.png",
+      "sha256": "793ca6fea5ae6a718ae4be1ea0f963e300bddcbe6ca0898dc011faccfddeb77f",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. First upgrade: replace the wood front door with a reinforced dark iron vault door carrying the same gold coin emblem, add thicker gold bands to the columns, retain the original pair of wooden chests.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Treasury.png",
+      "referenceSha256": "d03795031b2a1a22f0dd98307e7e0f0028aac227224181cc67743c8017a0b5fc",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Treasury_Lv2.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Treasury_Lv3",
+      "name": "Home_Treasury_Lv3",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv3.png",
+      "sha256": "6f41b3594c27eb57a7221c2c2ef76e13d7b29513b707f248d1af8dcedbdae83d",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Mid upgrade: reinforced iron vault door with the gold coin emblem, paired sturdy stone buttresses, two larger gold-banded strongboxes, engraved laurel decoration and a broader gold trim along the green roof.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Treasury.png",
+      "referenceSha256": "d03795031b2a1a22f0dd98307e7e0f0028aac227224181cc67743c8017a0b5fc",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Treasury_Lv3.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Treasury_Lv4",
+      "name": "Home_Treasury_Lv4",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv4.png",
+      "sha256": "d5c4cbed8c0f50a8c239b4a94d5947aed81d9a1d5c204344a7cf001c29d173b6",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Advanced upgrade: ornate circular gold-and-iron vault door, stronger paired corner piers, four neatly arranged small strongboxes and a second raised gold ridge below the crown on the green roof. Still one compact treasury building.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Treasury.png",
+      "referenceSha256": "d03795031b2a1a22f0dd98307e7e0f0028aac227224181cc67743c8017a0b5fc",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Treasury_Lv4.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    },
+    {
+      "id": "Home_Treasury_Lv5",
+      "name": "Home_Treasury_Lv5",
+      "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv5.png",
+      "sha256": "c3f159a12d23507cbacb0ff48cfa792394de2c2da6e4917d1e53a1e917c4d84b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "generatedDate": "2026-09-21",
+      "author": "Little King project / built-in image_gen",
+      "license": "Generated art; applicable tool terms, not CC0",
+      "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Highest upgrade: a grand gold-and-iron circular royal vault door with coin crest, two short integrated corner watchtowers with green caps, gold-trimmed green domed roof and a larger refined crown finial, symmetrical ornate strongboxes. Rich but readable compact silhouette. Keep original scale and camera.",
+      "reference": "ArtSource/StorybookV1/Images/T_Home_Treasury.png",
+      "referenceSha256": "d03795031b2a1a22f0dd98307e7e0f0028aac227224181cc67743c8017a0b5fc",
+      "receipt": "ArtSource/StorybookV1/Polish/Buildings/Home_Treasury_Lv5.receipt.json",
+      "originalToolFileAvailable": true,
+      "originalToolFileHashVerified": true,
+      "processing": "Original PNG unchanged. UE SourceUV/SourceDimension/custom pivot only; no pixel edit."
+    }
+  ],
+  "music": [
+    {
+      "id": "Home",
+      "file": "ArtSource/StorybookV1/Polish/Music/M_Home.wav",
+      "source": "ArtSource/StorybookV1/Polish/Music/Originals/Home.wav",
+      "sourceSha256": "3f348dafe59c5615f5850220874595d19b83dfd48825c1cacff65e6c4858427b",
+      "sha256": "b4fefab0ff7f6a972bde306958ad8c679910743d2c1ea026af5a0127e5349a23",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "originalSeconds": 34.795102040816325,
+      "seconds": 32.3,
+      "trimStartSeconds": 0.05,
+      "trimEndSeconds": 0.9451020408163265,
+      "crossfadeSeconds": 1.5,
+      "masteringGainDb": -1.0048774736892216,
+      "rmsDb": -22.862461650412286,
+      "peakDb": -3.0,
+      "seamMaxDelta": 0.002120316993437338,
+      "processing": "DC removal; -48dB edge trim; 1.5s raised-cosine tail/head overlap and head rotation; target -22dB RMS, peak <= -3dBFS; 16-bit PCM stereo"
+    },
+    {
+      "id": "Expedition",
+      "file": "ArtSource/StorybookV1/Polish/Music/M_Expedition.wav",
+      "source": "ArtSource/StorybookV1/Polish/Music/Originals/Expedition.wav",
+      "sourceSha256": "fc86949fcf006f30f68cc3b46e72763ce7085d5ed583c5b3e103fda0b88aedc0",
+      "sha256": "ae5fd630157653ca583c248acbe5e24dc212967ea760ccf1d11f6206112ae5d7",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "originalSeconds": 28.50249433106576,
+      "seconds": 25.35,
+      "trimStartSeconds": 0.0,
+      "trimEndSeconds": 1.6524943310657596,
+      "crossfadeSeconds": 1.5,
+      "masteringGainDb": -2.835980393425257,
+      "rmsDb": -22.0,
+      "peakDb": -3.0856992793123688,
+      "seamMaxDelta": 0.03311302687699159,
+      "processing": "DC removal; -48dB edge trim; 1.5s raised-cosine tail/head overlap and head rotation; target -22dB RMS, peak <= -3dBFS; 16-bit PCM stereo"
+    },
+    {
+      "id": "Battle",
+      "file": "ArtSource/StorybookV1/Polish/Music/M_Battle.wav",
+      "source": "ArtSource/StorybookV1/Polish/Music/Originals/Battle.wav",
+      "sourceSha256": "41974b45da7a94d128a22dd82ea210a375bf4ef6974facb697443ee9f2118524",
+      "sha256": "e5aa0fea0558b2876f446ebe9ebba24fd5729a7128018029e4f7149c5d9e9f20",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "originalSeconds": 22.175056689342405,
+      "seconds": 20.675056689342405,
+      "trimStartSeconds": 0.0,
+      "trimEndSeconds": 0.0,
+      "crossfadeSeconds": 1.5,
+      "masteringGainDb": -4.156876471338661,
+      "rmsDb": -22.0,
+      "peakDb": -4.99796613832855,
+      "seamMaxDelta": 0.003971234531545678,
+      "processing": "DC removal; -48dB edge trim; 1.5s raised-cosine tail/head overlap and head rotation; target -22dB RMS, peak <= -3dBFS; 16-bit PCM stereo"
+    },
+    {
+      "id": "Boss",
+      "file": "ArtSource/StorybookV1/Polish/Music/M_Boss.wav",
+      "source": "ArtSource/StorybookV1/Polish/Music/Originals/Boss.wav",
+      "sourceSha256": "5845bc1885d10d2a0b6d2c8816dfafe9e30c204be8bef14bdd745fbb77c4a8d8",
+      "sha256": "f0d0549242fa56466c149e7f55da9dcf68c9905590dc713de9e1d286031b8472",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "originalSeconds": 48.05369614512472,
+      "seconds": 46.55369614512472,
+      "trimStartSeconds": 0.0,
+      "trimEndSeconds": 0.0,
+      "crossfadeSeconds": 1.5,
+      "masteringGainDb": -2.2773863808985455,
+      "rmsDb": -25.536756901793886,
+      "peakDb": -3.0,
+      "seamMaxDelta": 0.0007982881141576897,
+      "processing": "DC removal; -48dB edge trim; 1.5s raised-cosine tail/head overlap and head rotation; target -22dB RMS, peak <= -3dBFS; 16-bit PCM stereo"
+    }
+  ],
+  "fonts": [
+    {
+      "file": "ArtSource/StorybookV1/Polish/Fonts/NotoSansCJKsc-Regular.otf",
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+      "author": "Noto CJK contributors",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "ArtSource/StorybookV1/Polish/Licenses/NotoSans-OFL.txt",
+      "licenseSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "processing": "Original unmodified OTF; UE inline FontFace and runtime composite Font. No model prompt."
+    },
+    {
+      "file": "ArtSource/StorybookV1/Polish/Fonts/NotoSerifCJKsc-SemiBold.otf",
+      "sha256": "d627b53dbcde61e07de1498d2623a8b287f78585ffbc90cc0618d0caaa2ed6b0",
+      "author": "Noto CJK contributors",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-SemiBold.otf",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "ArtSource/StorybookV1/Polish/Licenses/NotoSerif-OFL.txt",
+      "licenseSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "processing": "Original unmodified OTF; UE inline FontFace and runtime composite Font. No model prompt."
+    }
+  ],
+  "musicLicense": {
+    "source": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/main/LICENSE",
+    "file": "ArtSource/StorybookV1/Polish/Licenses/MiniMax-Music3-LICENSE.txt",
+    "sha256": "b21d12df2adae59dad3fcf80c1d81492654c662342f497d9a9770198c9317e58",
+    "label": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0"
+  },
+  "originalPromptFiles": "Animations/*.receipt.json, Buildings/*.receipt.json, Music/Originals/*.json"
+}

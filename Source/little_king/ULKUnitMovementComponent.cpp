@@ -3,6 +3,7 @@
 #include "ALKUnitHero.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "ULKPresentationSubsystem.h"
 
 ULKUnitMovementComponent::ULKUnitMovementComponent()
 {
@@ -108,6 +109,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     RepathTimer -= DeltaTime;
     if (bMoving && Speed > 0.f)
     {
+        const FVector BeforeMovement = Self->GetActorLocation();
         TArray<LKNavigation::FObstacle> Obstacles;
         LKNavigation::FBounds Bounds;
         CollectNavigation(Obstacles, Bounds);
@@ -133,6 +135,8 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
             if (Distance <= Step + 0.1f) { Path.RemoveAt(0); } else { break; }
         }
         if (FVector::Dist2D(Self->GetActorLocation(), Destination) <= 2.f) { bMoving = false; }
+        if (Self->GetUnitId() == "Unit_Colossus" && FVector::DistSquared2D(BeforeMovement, Self->GetActorLocation()) > .01f)
+        { ULKPresentationSubsystem::Sound(GetWorld(), "Footstep", Self->GetActorLocation()); }
     }
     if (Self->IsCombatEnabled()) { ApplySeparation(DeltaTime); }
     ClampToFieldBounds();

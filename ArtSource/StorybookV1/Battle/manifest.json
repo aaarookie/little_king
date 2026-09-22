@@ -1,0 +1,1093 @@
+[
+  {
+    "id": "Unit_Skeleton",
+    "name": "骷髅兵",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_Skeleton.png",
+    "sha256": "8ec29daa5efc0db8102733bf8c194744d33f225728cecac809c563419642e7c7",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      35,
+      21,
+      1222,
+      1208
+    ],
+    "maskedBounds": [
+      127,
+      64,
+      1108,
+      1206
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A small ivory skeleton infantryman, round skull with two dark eye sockets, moss-green torn tabard, small rusty short sword and round wooden buckler. Playful determined expression, clearly readable bones, no gore. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 230
+  },
+  {
+    "id": "Unit_Skeleton",
+    "name": "骷髅兵",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_Skeleton.png",
+    "sha256": "c1f3cd96b4bdc8e26b176cc8de78f8921c4daa1dab4347d4fb9e407a3cf50a95",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A small ivory skeleton infantryman, round skull with two dark eye sockets, moss-green torn tabard, small rusty short sword and round wooden buckler. Playful determined expression, clearly readable bones, no gore.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Skeleton.png",
+    "referenceSha256": "8ec29daa5efc0db8102733bf8c194744d33f225728cecac809c563419642e7c7"
+  },
+  {
+    "id": "Unit_SkeletonArcher",
+    "name": "骷髅射手",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_SkeletonArcher.png",
+    "sha256": "4a9f055943c9e93647e0ded6f17896f58dea789cfd80f498a9a95efffdbee954",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      33,
+      53,
+      1206,
+      1230
+    ],
+    "maskedBounds": [
+      237,
+      56,
+      1142,
+      1202
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A small ivory skeleton archer, round skull with dark eye sockets, short weathered chestnut hood and moss-green shoulder cloth, curved wooden bow held diagonally and a compact quiver. Distinct slim archer silhouette, no gore. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 230
+  },
+  {
+    "id": "Unit_SkeletonArcher",
+    "name": "骷髅射手",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_SkeletonArcher.png",
+    "sha256": "6263d9dc93b0b76c7c3813cd550bcd049edfad369d6bba4402b5816cfd5e6ffe",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A small ivory skeleton archer, round skull with dark eye sockets, short weathered chestnut hood and moss-green shoulder cloth, curved wooden bow held diagonally and a compact quiver. Distinct slim archer silhouette, no gore.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_SkeletonArcher.png",
+    "referenceSha256": "4a9f055943c9e93647e0ded6f17896f58dea789cfd80f498a9a95efffdbee954"
+  },
+  {
+    "id": "Hero_Necromancer",
+    "name": "死灵法师",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Hero_Necromancer.png",
+    "sha256": "a1d4820aff03c0ba06eaaba530b3b347f96d47e9f74dba968b5e344998c043d6",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      41,
+      15,
+      1200,
+      1239
+    ],
+    "maskedBounds": [
+      310,
+      18,
+      971,
+      1236
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A gaunt pale adult necromancer in deep muted plum hooded robes with moss-green lining and bone clasps, curled wooden staff with a small ivory skull and dim jade crystal, one closed spellbook at the belt. Clever solemn face, no gore, no floating magic or particles. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 290
+  },
+  {
+    "id": "Hero_SkeletonGiant",
+    "name": "骷髅巨人",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Hero_SkeletonGiant.png",
+    "sha256": "bd573728291c4c8d6430748398eacd7c80abd47d52556a552a2319db33f48a47",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      19,
+      1234,
+      1254
+    ],
+    "maskedBounds": [
+      37,
+      49,
+      1210,
+      1205
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A huge broad-shouldered ivory skeleton giant, oversized rib cage, thick heavy bones, small round skull, broken rusty shoulder armor and tattered moss cloth, gripping a heavy stone-and-bone club. Massive friendly storybook monster silhouette, no gore. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 360
+  },
+  {
+    "id": "Boss_SkeletonKing",
+    "name": "骷髅王",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Boss_SkeletonKing.png",
+    "sha256": "cc900f3badc4a99776494ec9af59070a6fd79d7cebe33bf6b4798cbe3b9bc63e",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      7,
+      1218,
+      1254
+    ],
+    "maskedBounds": [
+      165,
+      11,
+      1193,
+      1233
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A regal ivory skeleton king with a clearly visible antique-gold crown, heavy old-gold shoulder plates, deep muted plum cape lined moss-green, massive notched longsword held at its side. Towering commanding silhouette, empty dark eye sockets with tiny jade pinlights, no gore. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 375
+  },
+  {
+    "id": "Unit_ElfArcher",
+    "name": "精灵弓箭手",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfArcher.png",
+    "sha256": "af279bcd3a569092b3fee4837d00d33a12f66fa792c534cecbf5a4ef75923975",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      29,
+      13,
+      1232,
+      1236
+    ],
+    "maskedBounds": [
+      272,
+      22,
+      1008,
+      1224
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult female elf archer with long pointed ears, honey-blonde braid, moss-green leaf-edged cape, chestnut leather tunic, curved wooden longbow held diagonally, tiny gold leaf clasp and quiver. Slender agile silhouette. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 260
+  },
+  {
+    "id": "Unit_ElfArcher",
+    "name": "精灵弓箭手",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_ElfArcher.png",
+    "sha256": "aa0acfe48dbf8a06b9260917afd17280109d9220f530c00d5992d6495027bbe3",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult female elf archer with long pointed ears, honey-blonde braid, moss-green leaf-edged cape, chestnut leather tunic, curved wooden longbow held diagonally, tiny gold leaf clasp and quiver. Slender agile silhouette.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfArcher.png",
+    "referenceSha256": "af279bcd3a569092b3fee4837d00d33a12f66fa792c534cecbf5a4ef75923975"
+  },
+  {
+    "id": "Unit_ElfWarrior",
+    "name": "精灵战士",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfWarrior.png",
+    "sha256": "12de838a7549bc48ca1421f26c551db634e83cc20d48b8e11a3498edb61a3a21",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      29,
+      20,
+      1222,
+      1254
+    ],
+    "maskedBounds": [
+      124,
+      32,
+      1059,
+      1211
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult male elf warrior with long pointed ears and short copper hair, cream and moss-green leaf-shaped light armor, a single elegant leaf-shaped sword and small almond shield. Athletic compact stance, gold leaf shoulder clasp. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 260
+  },
+  {
+    "id": "Unit_ElfWarrior",
+    "name": "精灵战士",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_ElfWarrior.png",
+    "sha256": "32eb5bf30efdb711b5362669e58bc96e1945ee2dd949dfa491fbb5fabbf1efb3",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult male elf warrior with long pointed ears and short copper hair, cream and moss-green leaf-shaped light armor, a single elegant leaf-shaped sword and small almond shield. Athletic compact stance, gold leaf shoulder clasp.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfWarrior.png",
+    "referenceSha256": "12de838a7549bc48ca1421f26c551db634e83cc20d48b8e11a3498edb61a3a21"
+  },
+  {
+    "id": "Unit_ElfGuard",
+    "name": "精灵盾卫",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfGuard.png",
+    "sha256": "26c2bf90fc913b8bf4add52fcbd376f9acbb447b143730ecb44ce3a058ae3040",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      29,
+      13,
+      1236,
+      1237
+    ],
+    "maskedBounds": [
+      318,
+      16,
+      981,
+      1230
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult sturdy elf shield guardian with long pointed ears, pale braided hair, moss-green and old-gold plate armor, a tall broad leaf-shaped shield held forward, short spear upright behind shoulder. Heavy defensive silhouette distinct from elf swordsman. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 280
+  },
+  {
+    "id": "Unit_ElfGuard",
+    "name": "精灵盾卫",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_ElfGuard.png",
+    "sha256": "03fe40bb6d1929a0ab1f7fca1c00be0dcbf97f58594a16dfdd7941a7fbaf27dc",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult sturdy elf shield guardian with long pointed ears, pale braided hair, moss-green and old-gold plate armor, a tall broad leaf-shaped shield held forward, short spear upright behind shoulder. Heavy defensive silhouette distinct from elf swordsman.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfGuard.png",
+    "referenceSha256": "26c2bf90fc913b8bf4add52fcbd376f9acbb447b143730ecb44ce3a058ae3040"
+  },
+  {
+    "id": "Unit_ElfPriest",
+    "name": "精灵牧师",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfPriest.png",
+    "sha256": "3a2666c0a54c2091a3f540f0dcd9fb748c0a56e8ff22fcdccccfb0cba652d2bc",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      33,
+      18,
+      1236,
+      1236
+    ],
+    "maskedBounds": [
+      285,
+      22,
+      987,
+      1229
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult female elf priest with long pointed ears, pale hair in a crown braid, cream robe with moss-green stole and antique-gold leaf embroidery, wooden staff ending in a softly glowing amber leaf crystal. Kind calm face, no free-floating particles. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 260
+  },
+  {
+    "id": "Unit_ElfPriest",
+    "name": "精灵牧师",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_ElfPriest.png",
+    "sha256": "24cd21935c9d1b71c30ece9d54b74ce2ea5b7a94e48e6f727410ec2faba40450",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult female elf priest with long pointed ears, pale hair in a crown braid, cream robe with moss-green stole and antique-gold leaf embroidery, wooden staff ending in a softly glowing amber leaf crystal. Kind calm face, no free-floating particles.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ElfPriest.png",
+    "referenceSha256": "3a2666c0a54c2091a3f540f0dcd9fb748c0a56e8ff22fcdccccfb0cba652d2bc"
+  },
+  {
+    "id": "Unit_GoblinRogue",
+    "name": "哥布林大盗",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinRogue.png",
+    "sha256": "f7fd96209fc4e027807267251037a74ba27ee33335a36fa10ac93c79705314ff",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      41,
+      5,
+      1220,
+      1230
+    ],
+    "maskedBounds": [
+      149,
+      45,
+      1148,
+      1208
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A nimble adult small green goblin master thief, long pointed ears, angular sly face, deep muted plum hood and chestnut leather vest, paired curved daggers, one small coin pouch and gold earring. Crouched alert stance, clearly goblin not human. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 245
+  },
+  {
+    "id": "Unit_GoblinRogue",
+    "name": "哥布林大盗",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_GoblinRogue.png",
+    "sha256": "5a436e4856ff02ad1596c244e249bbd24f85d933e0f9d782671ad2e99423417a",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A nimble adult small green goblin master thief, long pointed ears, angular sly face, deep muted plum hood and chestnut leather vest, paired curved daggers, one small coin pouch and gold earring. Crouched alert stance, clearly goblin not human.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinRogue.png",
+    "referenceSha256": "f7fd96209fc4e027807267251037a74ba27ee33335a36fa10ac93c79705314ff"
+  },
+  {
+    "id": "Unit_Thief",
+    "name": "窃贼",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_Thief.png",
+    "sha256": "0f3c7e6205acad31365af87d4e082afe2ea23005840c59f0cb250e6c3b0cf24e",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      33,
+      19,
+      1234,
+      1230
+    ],
+    "maskedBounds": [
+      216,
+      28,
+      1020,
+      1213
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult human thief with messy dark hair, slim face and a small eye-mask, chestnut leather jacket, short moss-green scarf, a single short dagger and a bulging coin pouch at the belt. Nimble alert stance distinct from green goblin rogue. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 250
+  },
+  {
+    "id": "Unit_Thief",
+    "name": "窃贼",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_Thief.png",
+    "sha256": "88d4292135ef983448ecf71900c230004178256fc8b31242c416a0fe86de39f6",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult human thief with messy dark hair, slim face and a small eye-mask, chestnut leather jacket, short moss-green scarf, a single short dagger and a bulging coin pouch at the belt. Nimble alert stance distinct from green goblin rogue.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Thief.png",
+    "referenceSha256": "0f3c7e6205acad31365af87d4e082afe2ea23005840c59f0cb250e6c3b0cf24e"
+  },
+  {
+    "id": "Unit_ApprenticeMage",
+    "name": "学徒法师",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_ApprenticeMage.png",
+    "sha256": "d87d6d6a81a634e3498fed9bac77c64e7a1ff5ac7cf79e6d960c9f2000d4de45",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      33,
+      21,
+      1236,
+      1254
+    ],
+    "maskedBounds": [
+      199,
+      28,
+      1053,
+      1225
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A young adult human apprentice mage with brown hair and round spectacles, oversized moss-green pointed hat, cream shirt with chestnut short cloak, a small open spellbook and a plain wand. Curious slightly awkward pose, no floating particles. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 255
+  },
+  {
+    "id": "Unit_ApprenticeMage",
+    "name": "学徒法师",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_ApprenticeMage.png",
+    "sha256": "e273431997ac515662853a9df36f4687acc7d33d73744d842d34dcd608aec62a",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A young adult human apprentice mage with brown hair and round spectacles, oversized moss-green pointed hat, cream shirt with chestnut short cloak, a small open spellbook and a plain wand. Curious slightly awkward pose, no floating particles.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_ApprenticeMage.png",
+    "referenceSha256": "d87d6d6a81a634e3498fed9bac77c64e7a1ff5ac7cf79e6d960c9f2000d4de45"
+  },
+  {
+    "id": "Unit_GoblinBlade",
+    "name": "开道利刃",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinBlade.png",
+    "sha256": "77dc6207bc1ca5c4610f1afef328a2716a579f1deffa4271663849019347711b",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      21,
+      1225,
+      1254
+    ],
+    "maskedBounds": [
+      160,
+      83,
+      1222,
+      1185
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. An adult muscular green goblin pathbreaker with long ears, dark short swept crest hair, chestnut and old-gold armor with a terracotta sash, holding one very large broad curved cleaver across the front. Low charging-ready stance, wider silhouette than goblin thief. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 265
+  },
+  {
+    "id": "Unit_GoblinBlade",
+    "name": "开道利刃",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_GoblinBlade.png",
+    "sha256": "65f8086b2237c1597483251a0d7bf062c2af10f6b11e9708670f9475e858fec9",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: An adult muscular green goblin pathbreaker with long ears, dark short swept crest hair, chestnut and old-gold armor with a terracotta sash, holding one very large broad curved cleaver across the front. Low charging-ready stance, wider silhouette than goblin thief.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_GoblinBlade.png",
+    "referenceSha256": "77dc6207bc1ca5c4610f1afef328a2716a579f1deffa4271663849019347711b"
+  },
+  {
+    "id": "Unit_TrollWarrior",
+    "name": "巨魔战士",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollWarrior.png",
+    "sha256": "246b262c3a8f3108b536490bea50c9c6fa2bf505b55954c9cb0ca3a82d634c38",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      20,
+      1236,
+      1254
+    ],
+    "maskedBounds": [
+      45,
+      53,
+      1228,
+      1204
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A massive stocky teal-green troll warrior with small ivory lower tusks, broad flat nose, short rust-orange crest, moss-green leather wraps, chestnut bracers and one heavy rough wooden war club. Big hands and shoulders, simple readable muscular silhouette. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 325
+  },
+  {
+    "id": "Unit_TrollWarrior",
+    "name": "巨魔战士",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_TrollWarrior.png",
+    "sha256": "3c08cbb206fb3f94c154aac31817fe8808bd1e75bcc90b81ed239d0d937e5e70",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A massive stocky teal-green troll warrior with small ivory lower tusks, broad flat nose, short rust-orange crest, moss-green leather wraps, chestnut bracers and one heavy rough wooden war club. Big hands and shoulders, simple readable muscular silhouette.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollWarrior.png",
+    "referenceSha256": "246b262c3a8f3108b536490bea50c9c6fa2bf505b55954c9cb0ca3a82d634c38"
+  },
+  {
+    "id": "Unit_TrollSpearman",
+    "name": "巨魔投矛手",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollSpearman.png",
+    "sha256": "a08e28b275605ba5c1e0c9d9223a4dd52101804a30d3c78e96453e6478a7929b",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      1224,
+      1254
+    ],
+    "maskedBounds": [
+      61,
+      11,
+      1219,
+      1228
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-19",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A massive teal-green troll spear thrower with ivory lower tusks, broad nose, rust-orange short crest, chestnut leather shoulder harness and moss-green waistcloth, long throwing spear held diagonally and two spare spears behind back. Big powerful arms, silhouette distinct from club warrior. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 330
+  },
+  {
+    "id": "Unit_TrollSpearman",
+    "name": "巨魔投矛手",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_TrollSpearman.png",
+    "sha256": "6f9d299834a9055d7c074bd43a168a0766b8bf2c1a45cb829fb12dacfdd01019",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A massive teal-green troll spear thrower with ivory lower tusks, broad nose, rust-orange short crest, chestnut leather shoulder harness and moss-green waistcloth, long throwing spear held diagonally and two spare spears behind back. Big powerful arms, silhouette distinct from club warrior.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollSpearman.png",
+    "referenceSha256": "a08e28b275605ba5c1e0c9d9223a4dd52101804a30d3c78e96453e6478a7929b"
+  },
+  {
+    "id": "Unit_TrollMage",
+    "name": "巨魔法师",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollMage.png",
+    "sha256": "c7215f21912672f7b635085525abe3dfa7657ac4e34c2d0700cc39906e2b4625",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      45,
+      1238,
+      1230
+    ],
+    "maskedBounds": [
+      158,
+      50,
+      1123,
+      1205
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A massive teal-green troll mage with ivory lower tusks and broad nose, a comically small cream pointed wizard hat, moss-green robe stretched over broad body, heavy wooden staff with a jade stone and a tiny spellbook tied at his belt. Intelligent earnest face, no floating particles. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 320
+  },
+  {
+    "id": "Unit_TrollMage",
+    "name": "巨魔法师",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_TrollMage.png",
+    "sha256": "3d243a2bde05257673e2c92827422bd7d9578d3396102294edaa292bfc646d6c",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A massive teal-green troll mage with ivory lower tusks and broad nose, a comically small cream pointed wizard hat, moss-green robe stretched over broad body, heavy wooden staff with a jade stone and a tiny spellbook tied at his belt. Intelligent earnest face, no floating particles.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollMage.png",
+    "referenceSha256": "c7215f21912672f7b635085525abe3dfa7657ac4e34c2d0700cc39906e2b4625"
+  },
+  {
+    "id": "Unit_TrollKing",
+    "name": "巨魔王",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollKing.png",
+    "sha256": "69657d2b3aad20901346f714efd8ad1425e6c0e2dab45b769d67b30f9c90687f",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      9,
+      1233,
+      1254
+    ],
+    "maskedBounds": [
+      59,
+      12,
+      1229,
+      1230
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A towering heavily muscled teal-green troll king with large ivory lower tusks, broad nose, rust-orange braided crest, rugged antique-gold crown, moss-green fur-lined cloak, massive chestnut and gold armor and a huge stone hammer. Proud commanding stance, visibly grander than ordinary trolls. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 370
+  },
+  {
+    "id": "Unit_TrollKing",
+    "name": "巨魔王",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_TrollKing.png",
+    "sha256": "18776476535d3f164574085ce2c857666d29b040e8581ce39a38422169aefa99",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A towering heavily muscled teal-green troll king with large ivory lower tusks, broad nose, rust-orange braided crest, rugged antique-gold crown, moss-green fur-lined cloak, massive chestnut and gold armor and a huge stone hammer. Proud commanding stance, visibly grander than ordinary trolls.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TrollKing.png",
+    "referenceSha256": "69657d2b3aad20901346f714efd8ad1425e6c0e2dab45b769d67b30f9c90687f"
+  },
+  {
+    "id": "Unit_TwoHeadedDragon",
+    "name": "双头龙",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_TwoHeadedDragon.png",
+    "sha256": "ee3c42844d8045c2dd74675f1f7948f7cd611530ea88207df7f0646612610be2",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      16,
+      1238,
+      1254
+    ],
+    "maskedBounds": [
+      120,
+      18,
+      1234,
+      1225
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A single compact four-legged two-headed dragon, exactly TWO distinct necks and heads on ONE body, left head pale ice-blue with ivory horns, right head muted warm terracotta-red with old-gold horns, shared moss-green scaled torso, two small folded wings and one tail. Both faces visible, no breath jets, no particles, storybook creature not a realistic reptile. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 370
+  },
+  {
+    "id": "Unit_TwoHeadedDragon",
+    "name": "双头龙",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_TwoHeadedDragon.png",
+    "sha256": "ee4c5846941f6a3991a123b947a26c97dbcfce4f0ee45ae3464f33d8a4784010",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Frame both heads, their necks and upper body clearly in the same square, exactly TWO heads on ONE dragon; preserve blue ice head and red fire head. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A single compact four-legged two-headed dragon, exactly TWO distinct necks and heads on ONE body, left head pale ice-blue with ivory horns, right head muted warm terracotta-red with old-gold horns, shared moss-green scaled torso, two small folded wings and one tail. Both faces visible, no breath jets, no particles, storybook creature not a realistic reptile.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_TwoHeadedDragon.png",
+    "referenceSha256": "ee3c42844d8045c2dd74675f1f7948f7cd611530ea88207df7f0646612610be2"
+  },
+  {
+    "id": "Building_SiegeCatapult",
+    "name": "攻城投石炮",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Building_SiegeCatapult.png",
+    "sha256": "7f50cfc332ce4f2139fb30afbe5f82130cb152db2d9554b122861359582e9d98",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      41,
+      21,
+      1224,
+      1254
+    ],
+    "maskedBounds": [
+      111,
+      29,
+      1172,
+      1189
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A compact medieval siege catapult building, chestnut wooden chassis on four stout wheels, ONE tall throwing arm with stone cup, stone counterweight, wound rope mechanism, moss-green cloth side panel and antique-gold iron bindings. Complete readable three-quarter front view, no crew. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 330
+  },
+  {
+    "id": "Building_SiegeCatapult",
+    "name": "攻城投石炮",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Building_SiegeCatapult.png",
+    "sha256": "20d01da4e74ff67c7bde78eddb8eadfedd3b0789dc7a3b7650627614c5da4a81",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Show the complete catapult occupying most of the square; keep the throwing arm and wheels visible. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A compact medieval siege catapult building, chestnut wooden chassis on four stout wheels, ONE tall throwing arm with stone cup, stone counterweight, wound rope mechanism, moss-green cloth side panel and antique-gold iron bindings. Complete readable three-quarter front view, no crew.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Building_SiegeCatapult.png",
+    "referenceSha256": "7f50cfc332ce4f2139fb30afbe5f82130cb152db2d9554b122861359582e9d98"
+  },
+  {
+    "id": "Unit_Colossus",
+    "name": "擎天巨像",
+    "kind": "sprite",
+    "file": "ArtSource/StorybookV1/Battle/Images/T_Unit_Colossus.png",
+    "sha256": "9f49747389286dffd7847881164ae3b25b0821d48c814322fa10ea4fc0dc9c9e",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "alphaBounds": [
+      0,
+      39,
+      1196,
+      1254
+    ],
+    "maskedBounds": [
+      80,
+      43,
+      1191,
+      1212
+    ],
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: stylized-concept. Production asset for Little King, a warm hand-painted storybook fantasy strategy game. Soft matte gouache surfaces, restrained watercolor grain, confident chestnut outlines, simplified large readable shapes, gentle warm light from upper left. Unified palette: deep pine #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50; species colours are muted accents. Character proportions about 3.5 heads tall, expressive but not baby-like. A monumental broad humanoid stone colossus constructed from warm cream limestone blocks, tiny calm amber eyes, square heavy fists, thick pillar legs, moss-green growth in joints and restrained antique-gold crown-like brow and chest plate. Ancient immensely heavy guardian, no weapons, no floating particles. Asset type: SINGLE full-body battle sprite. Square 1024 by 1024 canvas. Front three-quarter view with a mild raised viewing angle, face and torso toward viewer, feet at same bottom baseline. Entire figure and every weapon inside frame with 12 percent clear padding; subject fills roughly 76 percent height. One subject only. True transparent RGBA background everywhere outside the object; no ground plane, no cast shadow, no coloured backdrop, no checkerboard painted into the image. No text, letters, logos, border, watermark, named artist or existing franchise. No photorealism, 3D render or pixel art. Crisp clean silhouette readable at 64px.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "canvasWorldHeightCm": 410
+  },
+  {
+    "id": "Unit_Colossus",
+    "name": "擎天巨像",
+    "kind": "card",
+    "file": "ArtSource/StorybookV1/Battle/Cards/T_Card_Unit_Colossus.png",
+    "sha256": "d155d01b086e62124ed1ae8b70c710e1d5984f87a1ac5c1cafb179dafba82c90",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "alpha": null,
+    "alphaBounds": null,
+    "maskedBounds": null,
+    "generator": "Built-in image_gen",
+    "model": null,
+    "seed": null,
+    "date": "2026-09-20",
+    "prompt": "Use case: identity-preserve. Asset type: a new square card illustration for Little King. The supplied image is the character design reference, not a finished card. Preserve this exact character's face, species, colours, costume, weapon and main silhouette. Recompose as a polished warm storybook gouache illustration on pale parchment #E7D7AE, with restrained moss-green leaf washes and a faint softly painted woodland or stone backdrop appropriate to the subject. Chestnut outlines, matte hand-painted textures, gentle amber upper-left light, antique-gold details; consistent with the reference. Chest-up or waist-up portrait, large face and recognizable weapon near the shoulder, friendly or determined expression appropriate to this character. Keep head, distinctive hat/crown and ears fully inside frame with breathing room. Square 1024x1024 composition, one subject, opaque painted background, illustration fills the square. No text, lettering, numbers, card frame, quality stars, logos, watermark, UI, additional characters, photorealism, pixel art or 3D render. Do not paste the full-body sprite small in the middle; make a purposeful close-up illustration. Character: A monumental broad humanoid stone colossus constructed from warm cream limestone blocks, tiny calm amber eyes, square heavy fists, thick pillar legs, moss-green growth in joints and restrained antique-gold crown-like brow and chest plate. Ancient immensely heavy guardian, no weapons, no floating particles.",
+    "postProcessing": "None; original tool output copied without pixel changes",
+    "reference": "ArtSource/StorybookV1/Battle/Images/T_Unit_Colossus.png",
+    "referenceSha256": "9f49747389286dffd7847881164ae3b25b0821d48c814322fa10ea4fc0dc9c9e"
+  }
+]

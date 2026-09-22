@@ -1,0 +1,20 @@
+{
+  "id": "Expedition",
+  "name": "五境之路",
+  "seed": 210902,
+  "bpm": 96,
+  "detail": "96 BPM, D dorian, light walking 4/4. Curious woodland travel, hopeful adventure, quiet sense of discovery. Repeating plucked lute ostinato, answered by short flute phrases, soft pizzicato cello and a small frame drum.",
+  "caption": "Instrumental acoustic fantasy strategy game soundtrack for a warm illustrated small kingdom. No vocals, no choir, no spoken words. Consistent small ensemble: wooden flute, fingerpicked lute, harp, warm chamber strings and soft hand percussion. Natural intimate room, rounded transients, clear midrange, restrained dynamics, no electronic synth, no electric guitar, no cinematic braams. A repeating musical cycle with balanced phrases, steady pulse, no dramatic intro or final cadence; suitable for a seamless game loop. 96 BPM, D dorian, light walking 4/4. Curious woodland travel, hopeful adventure, quiet sense of discovery. Repeating plucked lute ostinato, answered by short flute phrases, soft pizzicato cello and a small frame drum.",
+  "lyrics": "[Instrumental]\n[Instrumental]\n[Instrumental]",
+  "audio_duration": 48.0,
+  "num_inference_steps": 30,
+  "vram_mode": "low",
+  "model": "MiniMaxAI/MiniMax-Music3",
+  "installation": "E:\\minimax_music3\\repo",
+  "sourceLicense": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0",
+  "sampleRate": 44100,
+  "frames": 1256960,
+  "actualSeconds": 28.50249433106576,
+  "elapsedSeconds": 1204.9882786273956,
+  "sha256": "fc86949fcf006f30f68cc3b46e72763ce7085d5ed583c5b3e103fda0b88aedc0"
+}

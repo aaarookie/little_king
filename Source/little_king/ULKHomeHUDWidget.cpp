@@ -1,4 +1,10 @@
 #include "ULKHomeHUDWidget.h"
+#include "ULKJourneyPresentationSubsystem.h"
+#include "LKPresentationStyle.h"
+#include "ULKPresentationSubsystem.h"
+#include "LKWorldArt.h"
+#include "Engine/Texture2D.h"
+#include "Rendering/DrawElementTypes.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
@@ -23,12 +29,12 @@
 
 namespace
 {
-	const FLinearColor HomeBackdropColor(0.004f, 0.010f, 0.024f, 0.72f);
-	const FLinearColor HomeTopBarColor(0.014f, 0.026f, 0.045f, 0.95f);
-	const FLinearColor HomePanelColor(0.020f, 0.038f, 0.064f, 0.99f);
-	const FLinearColor HomeGoldColor(0.96f, 0.69f, 0.22f, 1.f);
-	const FLinearColor HomePaleColor(0.90f, 0.94f, 0.98f, 1.f);
-	const FLinearColor HomeMutedColor(0.60f, 0.69f, 0.79f, 1.f);
+	const FLinearColor HomeBackdropColor = LKPresentationStyle::Ink().CopyWithNewOpacity(.80f);
+	const FLinearColor HomeTopBarColor = LKPresentationStyle::Ink();
+	const FLinearColor HomePanelColor = LKPresentationStyle::Panel();
+	const FLinearColor HomeGoldColor = LKPresentationStyle::Gold();
+	const FLinearColor HomePaleColor = LKPresentationStyle::Paper();
+	const FLinearColor HomeMutedColor = LKPresentationStyle::Muted();
 
 	UTextBlock* MakeHomeText(UWidgetTree* Tree, const TCHAR* Name, int32 Size, const FLinearColor& Color,
 		ETextJustify::Type Justify = ETextJustify::Left)
@@ -36,7 +42,7 @@ namespace
 		UTextBlock* Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
 		FSlateFontInfo Font = Text->GetFont();
 		Font.Size = Size;
-		Text->SetFont(Font);
+		Text->SetFont(LKPresentationStyle::Font(Font.Size));
 		Text->SetColorAndOpacity(FSlateColor(Color));
 		Text->SetJustification(Justify);
 		Text->SetAutoWrapText(true);
@@ -58,7 +64,7 @@ TSharedRef<SWidget> ULKHomeHUDWidget::RebuildWidget()
 
 void ULKHomeHUDWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativeConstruct(); ULKJourneyPresentationSubsystem::Reveal(this);
 	SetVisibility(ESlateVisibility::Visible);
 	if (!bBound && HomeGameMode)
 	{
@@ -188,7 +194,7 @@ void ULKHomeHUDWidget::BuildNativeTree()
 	PanelSize->SetVisibility(ESlateVisibility::Collapsed);
 
 	PanelHost = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("PanelHost"));
-	PanelHost->SetBrushColor(HomePanelColor);
+	LKPresentationStyle::StylePanel(PanelHost, HomePanelColor);
 	PanelHost->SetPadding(FMargin(30.f, 22.f));
 	PanelHost->SetVisibility(ESlateVisibility::Collapsed);
 	PanelSize->SetContent(PanelHost);
@@ -222,7 +228,7 @@ void ULKHomeHUDWidget::BuildNativeTree()
 	RowsScroll->AddChild(RowsBox);
 
 	DetailHost = WidgetTree->ConstructWidget<UBorder>();
-	DetailHost->SetBrushColor(FLinearColor(0.035f, 0.060f, 0.085f));
+	DetailHost->SetBrushColor(LKPresentationStyle::Card());
 	DetailHost->SetPadding(FMargin(24.f));
 	UHorizontalBoxSlot* DetailSlot = Body->AddChildToHorizontalBox(DetailHost);
 	DetailSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
@@ -269,8 +275,8 @@ void ULKHomeHUDWidget::BuildNativeTree()
 	if (UOverlaySlot* LayoutSlot = Root->AddChildToOverlay(HintText))
 	{
 		LayoutSlot->SetHorizontalAlignment(HAlign_Center);
-		LayoutSlot->SetVerticalAlignment(VAlign_Bottom);
-		LayoutSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 86.f));
+		LayoutSlot->SetVerticalAlignment(VAlign_Top);
+		LayoutSlot->SetPadding(FMargin(0.f, 66.f, 0.f, 0.f));
 	}
 	HintText->SetText(FText::FromString(TEXT("点击建筑打开面板（也可按 1~7 快捷打开）· Esc 关闭")));
 	HintText->SetAutoWrapText(false);
@@ -563,6 +569,31 @@ void ULKHomeHUDWidget::HandleActionActivated(int32 Index)
 	ExecuteAction(ActionId);
 }
 
+void ULKHomeHUDWidget::NativeTick(const FGeometry& Geometry, float DeltaTime)
+{
+    Super::NativeTick(Geometry, DeltaTime);
+    UpgradeFeedbackRemaining=FMath::Max(0.f,UpgradeFeedbackRemaining-DeltaTime);
+    if (PanelStatusText) { PanelStatusText->SetColorAndOpacity(UpgradeFeedbackRemaining>0.f ? LKPresentationStyle::Gold() : LKPresentationStyle::Paper()); }
+    if (PanelTitleText) { const float Pulse=UpgradeFeedbackRemaining>0.f ? 1.f+.03f*FMath::Sin(UpgradeFeedbackRemaining*PI*3.f) : 1.f; PanelTitleText->SetRenderScale(FVector2D(Pulse,Pulse)); }
+}
+
+int32 ULKHomeHUDWidget::NativePaint(const FPaintArgs& Args,const FGeometry& Geometry,const FSlateRect& Cull,FSlateWindowElementList& Elements,int32 Layer,const FWidgetStyle& Style,bool Enabled) const
+{
+    Layer=Super::NativePaint(Args,Geometry,Cull,Elements,Layer,Style,Enabled);
+    if (UpgradeFeedbackRemaining<=0.f || !UpgradeLeaf || !PanelTitleText || !IsPanelOpen()) { return Layer; }
+    const FGeometry& Title=PanelTitleText->GetCachedGeometry();
+    const FVector2D Center=Geometry.AbsoluteToLocal(Title.LocalToAbsolute(FVector2D(FMath::Max(50.,Title.GetLocalSize().X-50.),Title.GetLocalSize().Y*.5)));
+    FSlateBrush Leaf; Leaf.SetResourceObject(UpgradeLeaf);
+    const float T=1.f-UpgradeFeedbackRemaining/1.2f;
+    for (int I=0;I<6;++I)
+    {
+        const float A=I*PI/3.f+T;
+        const FVector2D P=Center+FVector2D(FMath::Cos(A),FMath::Sin(A))*(18.f+T*18.f)-FVector2D(14,14);
+        FSlateDrawElement::MakeBox(Elements,Layer+1,Geometry.ToPaintGeometry(FVector2D(28,28),FSlateLayoutTransform(P)),&Leaf,ESlateDrawEffect::None,FLinearColor(1,1,1,1.f-T));
+    }
+    return Layer+1;
+}
+
 FName ULKHomeHUDWidget::GetCurrentUpgradeBuildingId() const
 {
 	if (CurrentPanel == ELKHomePanel::Statue) { return LKHomeContent::BuildingId(ELKHomeBuilding::Statue); }
@@ -644,6 +675,9 @@ void ULKHomeHUDWidget::ExecuteAction(FName ActionId)
 		switch (Result)
 		{
 		case ELKUpgradeResult::Success:
+            if (!UpgradeLeaf) { UpgradeLeaf=LKWorldArt::EffectTexture("FX_Leaf"); }
+            UpgradeFeedbackRemaining = 1.2f;
+            ULKPresentationSubsystem::Sound(GetWorld(), "Upgrade", FVector::ZeroVector, true);
 			ApplyMessage(FText::FromString(FString::Printf(TEXT("升级成功：%s 已到 Lv%d"),
 				*LKHomeContent::BuildingDisplayName(BuildingId).ToString(), HomeGameMode->GetBuildingLevel(BuildingId))));
 			break;

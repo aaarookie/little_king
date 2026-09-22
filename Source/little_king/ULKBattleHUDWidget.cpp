@@ -6,6 +6,16 @@
 #include "Components/Image.h"
 #include "Components/PanelWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
+#include "Components/ScaleBox.h"
+#include "Components/Border.h"
+#include "Components/ProgressBar.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "PaperSprite.h"
+#include "Blueprint/WidgetTree.h"
+#include "LKPresentationStyle.h"
 #include "ULKGameData.h"
 
 #include "ALKBattleGameMode.h"
@@ -66,6 +76,18 @@ void ULKBattleHUDWidget::NativeOnInitialized()
 void ULKBattleHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+    if (WidgetTree)
+    {
+        WidgetTree->ForEachWidget([](UWidget* Widget)
+        {
+            if (UButton* Button=Cast<UButton>(Widget))
+            { LKPresentationStyle::StyleButton(Button); Button->SetBackgroundColor(FLinearColor::White); }
+            if (UBorder* Border=Cast<UBorder>(Widget)) { LKPresentationStyle::StylePanel(Border,LKPresentationStyle::Panel()); }
+            if (UTextBlock* Text=Cast<UTextBlock>(Widget))
+            { Text->SetFont(LKPresentationStyle::Font(Text->GetFont().Size)); Text->SetColorAndOpacity(LKPresentationStyle::Paper()); Text->SetShadowColorAndOpacity(FLinearColor(0,0,0,.8f)); Text->SetShadowOffset(FVector2D(0,1)); }
+            if (UProgressBar* Progress=Cast<UProgressBar>(Widget)) { Progress->SetFillColorAndOpacity(LKPresentationStyle::Gold()); }
+        });
+    }
 	BindEvents();
 	// Widget 从视口移除后再次加入时 NativeOnInitialized 不会重跑，因此在这里幂等重绑。
 	BindResultActionButton();
@@ -207,11 +229,30 @@ void ULKBattleHUDWidget::RefreshDeploymentButtons()
 		UButton* Button = DeploymentButtons[SlotIndex];
 		if (!Button) { continue; }
 		const FName HeroId = GetDeploymentHeroId(SlotIndex);
-		Button->SetIsEnabled(GM && !HeroId.IsNone() && GM->GetPhase() == ELKGamePhase::Deployment && !GM->IsHeroDeployed(HeroId));
+		const FLKUnitRow* Row = GM ? GM->GetUnitRow(HeroId) : nullptr;
+		const bool bDeployed = GM && GM->IsHeroDeployed(HeroId);
+		// Old buttons used their style brush as a portrait. Keep content visible after theming.
+		if (!Button->GetContent() && WidgetTree)
+		{
+			UVerticalBox* Content = WidgetTree->ConstructWidget<UVerticalBox>();
+			UScaleBox* Fit = WidgetTree->ConstructWidget<UScaleBox>();
+			Fit->SetStretch(EStretch::ScaleToFit);
+			UImage* Portrait = WidgetTree->ConstructWidget<UImage>();
+			if (UPaperSprite* Sprite = Row ? Row->Sprite.LoadSynchronous() : nullptr)
+			{ Portrait->SetBrushFromTexture(Sprite->GetSourceTexture(), true); }
+			Fit->SetContent(Portrait);
+			Content->AddChildToVerticalBox(Fit)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			UTextBlock* Label = WidgetTree->ConstructWidget<UTextBlock>();
+			Label->SetFont(LKPresentationStyle::Font(16));
+			Label->SetJustification(ETextJustify::Center);
+			Label->SetColorAndOpacity(LKPresentationStyle::Paper());
+			Content->AddChildToVerticalBox(Label)->SetPadding(FMargin(2.f, 4.f));
+			Button->SetContent(Content);
+		}
+		Button->SetIsEnabled(GM && !HeroId.IsNone() && GM->GetPhase() == ELKGamePhase::Deployment && !bDeployed);
 		if (UTextBlock* Label = FindFirstTextBlock(Button))
 		{
-			const FLKUnitRow* Row = GM ? GM->GetUnitRow(HeroId) : nullptr;
-			Label->SetText(Row ? Row->DisplayName : FText::FromString(TEXT("空位")));
+			Label->SetText(Row ? FText::FromString(Row->DisplayName.ToString() + (bDeployed ? TEXT(" · 已部署") : TEXT(""))) : FText::FromString(TEXT("空位")));
 		}
 	}
 }
@@ -259,19 +300,38 @@ void ULKBattleHUDWidget::HandleHandChanged()
         { CardWidget->SetToolTipText(FText::FromString(CardWidget->GetToolTipText().ToString() + TEXT("\n当前银币上限不足，请在家园升级金库。"))); }
         if (UTextBlock* Label = FindFirstTextBlock(CardWidget))
         {
-            FSlateFontInfo Font = Label->GetFont(); Font.Size = 14; Label->SetFont(Font);
-            Label->SetAutoWrapText(true); Label->SetWrapTextAt(136.f);
+            FSlateFontInfo Font = Label->GetFont(); Font.Size = 14; Label->SetFont(LKPresentationStyle::Font(Font.Size));
+            // Three explicit lines: auto-wrap uses stale pre-DPI widths at 720p and can
+            // grow the label into the artwork area while the hand is being arranged.
+            Label->SetAutoWrapText(false); Label->SetWrapTextAt(0.f);
             Label->SetJustification(ETextJustify::Center);
             Label->SetText(FText::FromString(FString::Printf(TEXT("%s\n%s\n%d费 · %d格"), *Card->CardName.ToString(),
                 *LKCardPresentation::Classification(*Card).ToString(), Card->Cost, LKCardRules::Slots(Card->CardId))));
             Label->SetColorAndOpacity(LKCardPresentation::Color(*Card));
+            Label->SetShadowOffset(FVector2D(0.f, 1.f));
+            Label->SetShadowColorAndOpacity(FLinearColor::Black);
+            if (UOverlaySlot* Layout = Cast<UOverlaySlot>(Label->Slot))
+            { Layout->SetVerticalAlignment(VAlign_Bottom); Layout->SetPadding(FMargin(4.f, 0.f, 4.f, 6.f)); }
         }
         // A null texture still paints the authored Image as a white quad. Give it a
         // readable quality-colored placeholder and reset its tint when the slot cycles.
         if (UImage* Icon = FindFirstImage(CardWidget))
         {
             UTexture2D* Texture = GetCardIcon(Card->CardId);
-            Icon->SetBrushFromTexture(Texture);
+            Icon->SetBrushFromTexture(Texture, true);
+            // The shipped BP stretches an Image across a portrait-shaped hand slot.
+            // Wrap it once at runtime, preserving the button and its existing click binding.
+            if (UOverlay* Overlay = Cast<UOverlay>(Icon->GetParent()))
+            {
+                Icon->RemoveFromParent();
+                UScaleBox* Fit = WidgetTree->ConstructWidget<UScaleBox>();
+                Fit->SetStretch(EStretch::ScaleToFit);
+                Fit->SetVisibility(ESlateVisibility::HitTestInvisible);
+                Fit->SetContent(Icon);
+                UOverlaySlot* Layout = Overlay->AddChildToOverlay(Fit);
+                Layout->SetHorizontalAlignment(HAlign_Fill); Layout->SetVerticalAlignment(VAlign_Fill);
+                Layout->SetPadding(FMargin(4.f, 4.f, 4.f, 78.f));
+            }
             const FLinearColor Accent = LKCardPresentation::Color(*Card);
             Icon->SetColorAndOpacity(Texture ? FLinearColor::White
                 : FLinearColor(Accent.R * .08f, Accent.G * .08f, Accent.B * .08f, 1.f));
@@ -280,10 +340,10 @@ void ULKBattleHUDWidget::HandleHandChanged()
         {
             FButtonStyle Style = Button->GetStyle();
             const FLinearColor Accent = LKCardPresentation::Color(*Card);
-            Style.Normal.TintColor = FSlateColor(FLinearColor(Accent.R * .16f, Accent.G * .16f, Accent.B * .16f, 1.f));
-            Style.Hovered.TintColor = FSlateColor(FLinearColor(Accent.R * .27f, Accent.G * .27f, Accent.B * .27f, 1.f));
-            Style.Pressed.TintColor = FSlateColor(FLinearColor(Accent.R * .2f, Accent.G * .2f, Accent.B * .2f, 1.f));
-            Style.Disabled.TintColor = FSlateColor(FLinearColor(.06f, .07f, .09f));
+            Style.Normal = FSlateRoundedBoxBrush(LKPresentationStyle::Panel(), 6.f, Accent * .65f, 1.f);
+            Style.Hovered = FSlateRoundedBoxBrush(LKPresentationStyle::Hover(), 6.f, Accent, 2.f);
+            Style.Pressed = FSlateRoundedBoxBrush(LKPresentationStyle::Ink(), 6.f, Accent, 2.f);
+            Style.Disabled = LKPresentationStyle::Frame(LKPresentationStyle::Ink());
             Button->SetStyle(Style);
         }
     }

@@ -2,6 +2,7 @@
 
 #include "LKUndeadContent.h"
 #include "LKExpeditionMercenaryContent.h"
+#include "LKBattleArt.h"
 
 namespace LKUnitContent
 {
@@ -73,6 +74,8 @@ const TMap<FName, FLKUnitRow>& Units()
         }
         for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
         { Result.Add(Definition.Unit.UnitId, Definition.Unit); }
+        for (TPair<FName, FLKUnitRow>& Pair : Result)
+        { Pair.Value.Sprite = LKBattleArt::Sprite(Pair.Key); }
         return Result;
     }();
     return Rows;
@@ -87,6 +90,7 @@ FLKUnitRow MergeAuthoredTuning(const FLKUnitRow& Canonical, const FLKUnitRow* Au
 {
     FLKUnitRow Result = Authored ? *Authored : Canonical;
     if (Result.DisplayName.IsEmpty()) { Result.DisplayName = Canonical.DisplayName; }
+    if (Result.Sprite.IsNull()) { Result.Sprite = Canonical.Sprite; }
 
     // 以下字段决定类、攻击管线、被动和建筑逻辑，不能因复制/漏填表行而漂移。
     Result.UnitId = Canonical.UnitId;

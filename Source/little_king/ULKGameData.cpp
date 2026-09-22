@@ -2,6 +2,26 @@
 #include "LKLog.h"
 #include "ULKCardDefinition.h"
 #include "LKExpeditionMercenaryContent.h"
+#include "LKBattleArt.h"
+#include "LKWorldArt.h"
+#include "Engine/Texture2D.h"
+#include "Sound/SoundBase.h"
+
+void ULKGameData::EnsurePresentationDefaults()
+{
+    if (!bUseDefaultSoundSet) { return; }
+    for (FName Key : {FName("MeleeHit"), FName("RangedShoot"), FName("HitTaken"), FName("UnitDied"),
+         FName("CardPlay"), FName("BattleStart"), FName("Victory"), FName("Defeat")})
+    {
+        if (SoundMap.Contains(Key)) { continue; }
+        const FString Name = TEXT("S_") + Key.ToString();
+        SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(TEXT("/Game/Art/StorybookV1/Audio/") + Name + TEXT(".") + Name)));
+    }
+    for (FName Key : LKWorldArt::SoundIds())
+    {
+        if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKWorldArt::SoundPath(Key)))); }
+    }
+}
 
 ULKGameData::ULKGameData()
 {
@@ -66,7 +86,7 @@ void ULKGameData::EnsureCardLibrary()
 		UE_LOG(LogLK, Log, TEXT("[GameData] 已注入 %d 张内置卡（未配置 CardLibrary）"), CardLibrary.Num());
 	}
 
-	// D3 奖励新卡：骷髅兵/骷髅射手（1 费文字卡，暂无美术）。
+	// D3 奖励新卡：骷髅兵/骷髅射手（1 费，缺省美术由 B 批补全）。
 	// 无论 DA_GameData 是否已配置 CardLibrary，都保证运行时目录存在（只改运行时副本，不写资产）。
 	const TPair<FName, const TCHAR*> SkeletonCards[] = {
 		{ TEXT("Unit_Skeleton"), TEXT("骷髅兵") },
@@ -85,7 +105,7 @@ void ULKGameData::EnsureCardLibrary()
 		Card->SpawnUnitId = Entry.Key;
 		Card->BuildingUnitId = Entry.Key;
 		CardLibrary.Add(Card);
-		UE_LOG(LogLK, Log, TEXT("[GameData] 注入奖励卡：%s（%s，1 费，文字卡）"), *Entry.Key.ToString(), Entry.Value);
+		UE_LOG(LogLK, Log, TEXT("[GameData] 注入奖励卡：%s（%s，1 费）"), *Entry.Key.ToString(), Entry.Value);
 	}
     for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
     {
@@ -98,5 +118,14 @@ void ULKGameData::EnsureCardLibrary()
         Card->CardType = Definition.Unit.UnitClass == ELKUnitClass::Building ? ELKCardType::Building : ELKCardType::Unit;
         Card->SpawnUnitId = Id; Card->BuildingUnitId = Id; Card->bExpeditionOnly = true;
         if (Existing) { CardLibrary[CardLibrary.IndexOfByKey(*Existing)] = Card; } else { CardLibrary.Add(Card); }
+    }
+    for (TObjectPtr<ULKCardDefinition>& Entry : CardLibrary)
+    {
+        if (!Entry || !Entry->Icon.IsNull()) { continue; }
+        const TSoftObjectPtr<UTexture2D> DefaultIcon = LKBattleArt::CardIcon(Entry->CardId);
+        if (DefaultIcon.IsNull()) { continue; }
+        // The library may contain a shared authored asset. Never write presentation defaults into it.
+        if (Entry->GetOuter() != this) { Entry = DuplicateObject<ULKCardDefinition>(Entry.Get(), this); }
+        Entry->Icon = DefaultIcon;
     }
 }

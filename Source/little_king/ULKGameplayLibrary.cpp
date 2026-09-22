@@ -5,6 +5,8 @@
 #include "ULKUnitAttributeSet.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "ULKPresentationSubsystem.h"
+#include "ULKGameData.h"
 
 namespace
 {
@@ -25,6 +27,8 @@ namespace
                 && FVector::Dist2D(CenterActor->GetActorLocation(), Unit->GetActorLocation()) <= Radius) { Targets.Add(Unit); }
         }
         if (GM) { GM->BeginCombatBatch(); }
+        if (!bHeal && GM && GM->GetGameData()->FireballSkillHeroIds.Contains(SourceUnit->GetUnitId()))
+        { ULKPresentationSubsystem::Fireball(World, CenterActor->GetActorLocation(), Radius); }
         int32 Count = 0;
         for (ALKUnitBase* Unit : Targets)
         {

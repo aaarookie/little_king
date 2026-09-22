@@ -10,6 +10,7 @@ class USphereComponent;
 class UMaterialInstanceDynamic;
 class UWidgetComponent;
 class ULKHomeBuildingLabelWidget;
+class UPaperSpriteComponent;
 
 /**
  * 家园建筑占位 Actor（H1）。只负责：位置、可点击体积、稳定 BuildingId、名称/等级标签与悬停反馈。
@@ -51,6 +52,7 @@ public:
 	/** 悬停/选中反馈：占位方块描边色与轻微缩放（不只靠颜色区分，标签始终显示名称） */
 	void SetHighlighted(bool bInHighlighted);
 	UFUNCTION(BlueprintPure, Category = "LK|Home") bool IsHighlighted() const { return bHighlighted; }
+	bool HasIllustration() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,6 +62,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Home")
 	TObjectPtr<UStaticMeshComponent> PlaceholderMesh;
+	UPROPERTY(VisibleAnywhere, Category = "LK|Home") TObjectPtr<UPaperSpriteComponent> Illustration;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Home")
 	TObjectPtr<UTextRenderComponent> NameLabel;

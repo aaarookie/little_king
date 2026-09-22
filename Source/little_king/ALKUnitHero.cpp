@@ -1,4 +1,6 @@
 #include "ALKUnitHero.h"
+#include "ULKUnitAnimationComponent.h"
+#include "ULKPresentationSubsystem.h"
 #include "ALKHeroCamp.h"
 #include "ULKUnitMovementComponent.h"
 #include "ALKBattleGameMode.h"
@@ -144,11 +146,13 @@ void ALKUnitHero::TryCastAbilities()
     const bool bActivated = AbilitySystem->TryActivateAbilitiesByTag(AbilityTags);
     if (bActivated && GM && GameDataCached->FireballSkillHeroIds.Contains(UnitId))
     {
-        GM->NotifyFireballCast(GetActorLocation());
+        // GAS area helper presents at the actual effect centre; retain the original cast-only shake here.
+        GM->NotifyFireballCast(GetActorLocation(), 250.f, false);
     }
     if (GM) { GM->EndCombatBatch(); }
 	if (bActivated)
 	{
+        GetAnimationComponent()->Attack();
 		SkillCooldownRemaining = SkillCooldownSeconds;
 		UE_LOG(LogLKUnit, Log, TEXT("[Hero] %s 施放技能，进入冷却 %.1f 秒"),
 			*UnitId.ToString(), SkillCooldownSeconds);
@@ -178,6 +182,8 @@ bool ALKUnitHero::CommandMove(const FVector& Destination)
     ChangeTarget(nullptr);
     AbilitySystem->CancelAllAbilities();
     MovementComponent->MoveToward(RallyPoint, GetMoveSpeed());
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Command, RallyPoint);
+    ULKPresentationSubsystem::Sound(GetWorld(), "CampCommand", RallyPoint);
     return true;
 }
 

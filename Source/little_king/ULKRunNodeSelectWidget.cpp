@@ -1,6 +1,12 @@
 #include "ULKRunNodeSelectWidget.h"
+#include "ULKJourneyPresentationSubsystem.h"
+#include "LKPresentationStyle.h"
+#include "ULKPresentationSubsystem.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
+#include "LKWorldArt.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/VerticalBox.h"
@@ -26,10 +32,10 @@ UTextBlock *MakeText(UWidgetTree *Tree, const FString &Copy, int32 Size, FName N
     UTextBlock *Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
     FSlateFontInfo Font = Text->GetFont();
     Font.Size = Size;
-    Text->SetFont(Font);
+    Text->SetFont(LKPresentationStyle::Font(Font.Size));
     Text->SetText(FText::FromString(Copy));
     Text->SetAutoWrapText(true);
-    Text->SetColorAndOpacity(FLinearColor(.85f, .91f, .95f));
+    Text->SetColorAndOpacity(LKPresentationStyle::Paper());
     return Text;
 }
 } // namespace
@@ -59,8 +65,19 @@ TSharedRef<SWidget> ULKRunNodeSelectWidget::RebuildWidget()
 }
 void ULKRunNodeSelectWidget::NativeConstruct()
 {
-    Super::NativeConstruct();
+    Super::NativeConstruct(); ULKJourneyPresentationSubsystem::Reveal(this);
     RefreshNodeSelect();
+}
+void ULKRunNodeSelectWidget::NativeTick(const FGeometry& Geometry, float DeltaTime)
+{
+    Super::NativeTick(Geometry, DeltaTime);
+    FeedbackRemaining = FMath::Max(0.f, FeedbackRemaining-DeltaTime);
+    if (Status) { Status->SetColorAndOpacity(FeedbackRemaining > 0.f ? LKPresentationStyle::Gold() : LKPresentationStyle::Paper()); }
+    if (NodeIllustration)
+    {
+        const float Pulse = FeedbackRemaining > 0.f ? 1.f+.06f*FMath::Sin(FeedbackRemaining*PI*3.f) : 1.f;
+        NodeIllustration->SetRenderScale(FVector2D(Pulse,Pulse));
+    }
 }
 ULKHomeListButtonWidget *ULKRunNodeSelectWidget::AddAction(UPanelWidget *Parent, const FString &Name,
                                                            const FString &Label, int32 Index, bool bEnabled)
@@ -88,7 +105,7 @@ ULKHomeListButtonWidget *ULKRunNodeSelectWidget::AddAction(UPanelWidget *Parent,
 void ULKRunNodeSelectWidget::BuildNativeTree()
 {
     UBorder *Back = WidgetTree->ConstructWidget<UBorder>();
-    Back->SetBrushColor(FLinearColor(.008f, .015f, .025f, .99f));
+    Back->SetBrushColor(LKPresentationStyle::Ink());
     Back->SetPadding(FMargin(22));
     WidgetTree->RootWidget = Back;
     UScaleBox *Scale = WidgetTree->ConstructWidget<UScaleBox>();
@@ -114,7 +131,7 @@ void ULKRunNodeSelectWidget::BuildNativeTree()
     MapColumn->AddChildToVerticalBox(Map)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
     MapColumn
         ->AddChildToVerticalBox(MakeText(WidgetTree,
-                                         TEXT("普 普通遭遇   精 精英战   王 Boss   商 市场   休 休息\n金边：可前往   "
+                                         TEXT("沿箭头前进 · 区域入口、出口固定\n金边：可前往   "
                                               "绿边：当前位置   白边：已选中 · 点击区域按钮可放大查看"),
                                          15))
         ->SetPadding(FMargin(0, 10));
@@ -134,6 +151,15 @@ void ULKRunNodeSelectWidget::BuildNativeTree()
     ChoicesScroll->AddChild(Choices);
     UScrollBox *DetailScroll = WidgetTree->ConstructWidget<UScrollBox>();
     Sidebar->AddChildToVerticalBox(DetailScroll)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+    USizeBox* BadgeSize = WidgetTree->ConstructWidget<USizeBox>();
+    BadgeSize->SetWidthOverride(96); BadgeSize->SetHeightOverride(96);
+    NodeIllustration = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(),TEXT("NodeIllustration"));
+    NodeIllustration->SetVisibility(ESlateVisibility::HitTestInvisible);
+    UScaleBox* BadgeScale = WidgetTree->ConstructWidget<UScaleBox>();
+    BadgeScale->SetStretch(EStretch::ScaleToFit);
+    BadgeScale->SetContent(NodeIllustration);
+    BadgeSize->SetContent(BadgeScale);
+    DetailScroll->AddChild(BadgeSize);
     Detail = MakeText(WidgetTree, TEXT(""), 17, TEXT("NodeDetail"));
     DetailScroll->AddChild(Detail);
     PrimaryAction = AddAction(Sidebar, TEXT("ConfirmNodeButton"), TEXT("前往此节点"), 1, false);
@@ -195,6 +221,9 @@ void ULKRunNodeSelectWidget::RefreshNodeSelect()
     Map->SetMapState(State, SelectedNodeId);
     RefreshDetail();
     OnNodeDataReadyBP(DisplayedNodeIds.Num());
+    // This page may refresh during the battle HUD tick. New row widgets need a prepass
+    // before scroll/box layout; otherwise their first-frame desired heights are zero.
+    ForceLayoutPrepass();
 }
 void ULKRunNodeSelectWidget::SelectMapNode(FName NodeId)
 {
@@ -221,6 +250,12 @@ void ULKRunNodeSelectWidget::RefreshDetail()
     const FLKRunState State = Run->GetRunState();
     const bool Service = Run->HasServiceNode();
     const FLKDungeonNode Node = Run->GetNode(Service ? State.CurrentNodeId : SelectedNodeId);
+    if (NodeIllustration)
+    {
+        UTexture2D* Texture = LKWorldArt::NodeIcon(Node.Type);
+        NodeIllustration->SetBrushFromTexture(Texture);
+        NodeIllustration->SetVisibility(Texture ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    }
     FString Copy = LKWorldMapContent::NodeTitle(Node.Type).ToString() + TEXT("\n\n") +
                    LKWorldMapContent::NodeDescription(Node.Type).ToString();
     if (const FLKEncounterRow *Encounter = LKEncounterContent::Find(State.Encounters, Node.EncounterId))
@@ -297,6 +332,8 @@ void ULKRunNodeSelectWidget::HandleAction(int32 Index)
         const bool Success = Run->ResolveServiceNode(Rest ? TEXT("RestHeal") : TEXT("LeaveMarket"));
         if (Success)
         {
+            FeedbackRemaining = 1.f;
+            ULKPresentationSubsystem::Sound(GetWorld(), Rest ? FName("Rest") : FName("NodeEnter"), FVector::ZeroVector, true);
             SelectedNodeId = NAME_None;
         }
         Status->SetText(FText::FromString(Success ? (Rest ? TEXT("已休息，英雄恢复 30% 最大生命。请选择下一站。")
@@ -312,6 +349,8 @@ void ULKRunNodeSelectWidget::HandleAction(int32 Index)
         }
         const ELKNodeSelectionResult Result =
             OwnerHUD ? OwnerHUD->SelectNextNode(Choice) : Run->SelectNode(SelectedNodeId);
+        if (Result != ELKNodeSelectionResult::Rejected)
+        { FeedbackRemaining = 1.f; ULKPresentationSubsystem::Sound(GetWorld(), Run->GetNode(SelectedNodeId).Type == ELKDungeonNodeType::Market ? FName("Market") : FName("NodeEnter"), FVector::ZeroVector, true); }
         if (Result == ELKNodeSelectionResult::BattleEntered)
         {
             SetIsEnabled(false);

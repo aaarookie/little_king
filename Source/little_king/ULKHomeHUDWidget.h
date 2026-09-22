@@ -66,6 +66,10 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+    virtual void NativeTick(const FGeometry& Geometry, float DeltaTime) override;
+    virtual int32 NativePaint(const FPaintArgs& Args,const FGeometry& Geometry,const FSlateRect& Cull,FSlateWindowElementList& Elements,int32 Layer,const FWidgetStyle& Style,bool Enabled) const override;
+    float UpgradeFeedbackRemaining = 0.f;
+    UPROPERTY(Transient) TObjectPtr<class UTexture2D> UpgradeLeaf;
 
 	void BuildNativeTree();
 	void RebuildPanel();

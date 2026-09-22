@@ -28,6 +28,7 @@ public:
 protected:
     virtual TSharedRef<SWidget> RebuildWidget() override;
     virtual void NativeConstruct() override;
+    virtual void NativeTick(const FGeometry& Geometry, float DeltaTime) override;
     UFUNCTION(BlueprintImplementableEvent, Category="LK|Run|UI") void OnNodeDataReadyBP(int32 NodeCount);
     UPROPERTY(BlueprintReadOnly, Transient, Category="LK|Run|UI") TObjectPtr<ULKBattleHUDWidget> OwnerHUD;
 private:
@@ -40,6 +41,7 @@ private:
     UPROPERTY(Transient) TObjectPtr<ULKWorldMapWidget> Map;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Summary;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Detail;
+    UPROPERTY(Transient) TObjectPtr<class UImage> NodeIllustration;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Status;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> ChoicesTitle;
     UPROPERTY(Transient) TObjectPtr<USizeBox> ChoicesFrame;
@@ -49,4 +51,5 @@ private:
     TArray<FName> DisplayedNodeIds;
     TArray<FName> RegionIds;
     FName SelectedNodeId, LastCurrentNodeId;
+    float FeedbackRemaining = 0.f;
 };

@@ -36,6 +36,8 @@
 #include "ULKSilverComponent.h"
 #include "ULKRunSubsystem.h"
 #include "ULKSaveSlotSubsystem.h"
+#include "LKBattleArtPreview.h"
+#include "ULKPresentationSubsystem.h"
 
 ALKBattleGameMode::ALKBattleGameMode()
 {
@@ -52,6 +54,10 @@ ALKBattleGameMode::ALKBattleGameMode()
 void ALKBattleGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+#if WITH_EDITOR
+    if (LKBattleArtPreview::Enabled()) { LKBattleArtPreview::Prepare(this, GameData); }
+    else
+#endif
 	if (ULKSaveSlotSubsystem::RouteInitialPlayToMenu(GetWorld())) { SetActorTickEnabled(false); return; }
 
 	const bool bHasAuthoredGameData = IsValid(GameData);
@@ -72,6 +78,7 @@ void ALKBattleGameMode::BeginPlay()
 		}
 	}
 	SetPhase(ELKGamePhase::Deployment);
+    GetWorld()->GetSubsystem<ULKPresentationSubsystem>()->SetupBattlefield(this);
 
 	// 生成敌方 AI
 	FActorSpawnParameters Params;
@@ -252,6 +259,7 @@ void ALKBattleGameMode::EnsureGameData()
     MatchStats.Seed = GameData->BattleSeed;
     BattleContext.AttemptId = FGuid::NewGuid();
     BattleContext.Seed = GameData->BattleSeed;
+    GameData->EnsurePresentationDefaults();
     for (const auto& Pair : GameData->SoundMap)
     {
         if (USoundBase* Sound = Pair.Value.LoadSynchronous()) { PreloadedSounds.Add(Pair.Key, Sound); }
@@ -283,6 +291,10 @@ void ALKBattleGameMode::EnsureGameData()
 void ALKBattleGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+#if WITH_EDITOR
+    if (LKBattleArtPreview::Enabled())
+    { TryInitPlayerState(); LKBattleArtPreview::Tick(this); return; }
+#endif
 
 	switch (Phase)
 	{
@@ -552,6 +564,7 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
     MatchStats.bOvertime = bOvertimeActive;
     MatchStats.Winner = Winner;
     Phase = ELKGamePhase::Result;
+    GetWorld()->GetSubsystem<ULKPresentationSubsystem>()->ClearEffects();
     UE_LOG(LogLKBattle, Log, TEXT("[MatchStats] Seed=%d Winner=%d Duration=%.2f Kills=%d/%d Damage=%.1f/%.1f Healing=%.1f/%.1f Cards=%d/%d Overtime=%d Simultaneous=%d"),
         MatchStats.Seed, int32(Winner), BattleElapsed, MatchStats.Player.Kills, MatchStats.Enemy.Kills,
         MatchStats.Player.Damage, MatchStats.Enemy.Damage, MatchStats.Player.Healing, MatchStats.Enemy.Healing,
@@ -634,6 +647,21 @@ void ALKBattleGameMode::CheckVictoryAfterBatch()
 void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
 {
     if (Phase == ELKGamePhase::Result) { return; }
+    if (Event.ActualAmount > 0.f)
+    {
+        if (Event.bIsHeal)
+        {
+            ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Heal, Event.Location);
+            ULKPresentationSubsystem::Sound(GetWorld(), "Heal", Event.Location);
+        }
+        else if (Event.Source.ActionId == "Attack_Siege")
+        {
+            ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::SiegeImpact, Event.Location, 160.f);
+            ULKPresentationSubsystem::Sound(GetWorld(), "SiegeImpact", Event.Location);
+        }
+        else if (Event.Source.Kind == ELKCombatSourceKind::Projectile)
+        { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Impact, Event.Location, 35.f); }
+    }
     if (Event.Source.bHasTeam)
     {
         FLKTeamMatchStats& Stats = Event.Source.Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy;
@@ -656,9 +684,13 @@ void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
     if (Event.ActualAmount > 0.f) { OnDamageEvent.Broadcast(Event.Location, Event.ActualAmount, Event.bIsHeal); }
 }
 
-void ALKBattleGameMode::NotifyFireballCast(const FVector& Location)
+void ALKBattleGameMode::NotifyFireballCast(const FVector& Location, float Radius, bool bPresent)
 {
-    if (Phase == ELKGamePhase::Battle) { TriggerCameraShake(GameData->FireballShakeIntensity); }
+    if (Phase == ELKGamePhase::Battle)
+    {
+        TriggerCameraShake(GameData->FireballShakeIntensity);
+        if (bPresent) { ULKPresentationSubsystem::Fireball(GetWorld(), Location, Radius); }
+    }
 }
 
 USoundBase* ALKBattleGameMode::FindPreloadedSound(FName Id) const
@@ -1177,7 +1209,7 @@ bool ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const F
         if ((*It)->IsTargetable() && FVector::Dist2D(Location, (*It)->GetActorLocation()) <= Card->SpellRadius) { Targets.Add(*It); }
     }
     BeginCombatBatch();
-    if (Card->CardId == TEXT("Spell_Fireball")) { NotifyFireballCast(Location); }
+    if (Card->CardId == TEXT("Spell_Fireball")) { NotifyFireballCast(Location, Card->SpellRadius); }
     for (ALKUnitBase* Unit : Targets)
     {
         if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, Card->SpellValue, nullptr, false, &Source); }

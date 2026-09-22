@@ -18,6 +18,7 @@ class ULKGameData;
 class ULKUnitPassiveComponent;
 class ULKUnitActiveComponent;
 class ULKUnitStatusComponent;
+class ULKUnitAnimationComponent;
 struct FLKUnitRow;
 struct FLKRunHeroState;
 
@@ -48,6 +49,7 @@ public:
 	FLinearColor GetPlaceholderColor() const { return PlaceholderColor; }
 	FText GetDisplayName() const { return DisplayName; }
 	ULKUnitPassiveComponent* GetPassiveComponent() const { return PassiveComponent; }
+    ULKUnitAnimationComponent* GetAnimationComponent() const { return AnimationComponent; }
     ULKUnitActiveComponent* GetActiveComponent() const { return ActiveComponent; }
     ULKUnitStatusComponent* GetStatusComponent() const { return StatusComponent; }
     UFUNCTION(BlueprintPure, Category = "LK|Unit") bool IsControlled() const;
@@ -58,7 +60,7 @@ public:
     bool IsSkillMoving() const;
 	TArray<FName> GetTraits() const { return HeroTraits; }
 	float GetTraitEffectValue(ELKTraitEffect Effect) const;
-	void SetFocusWarning(float Seconds) { FocusWarningRemaining = FMath::Max(0.f, Seconds); }
+    void SetFocusWarning(float Seconds);
 	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool AddTrait(FName TraitId);
 	UFUNCTION(BlueprintCallable, Category = "LK|Traits") bool RemoveTrait(FName TraitId);
 	UFUNCTION(BlueprintPure, Category = "LK|Traits") bool HasTrait(FName TraitId) const { return HeroTraits.Contains(TraitId); }
@@ -192,6 +194,7 @@ public:
 	ELKAttackType GetAttackType() const { return AttackType; }
 
 protected:
+    UPROPERTY(VisibleAnywhere, Category = "LK|Presentation") TObjectPtr<ULKUnitAnimationComponent> AnimationComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")
 	TObjectPtr<USceneComponent> LogicRoot;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LK|Unit")

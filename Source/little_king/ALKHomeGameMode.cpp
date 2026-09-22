@@ -1,4 +1,5 @@
 #include "ALKHomeGameMode.h"
+#include "ULKJourneyPresentationSubsystem.h"
 #include "LKCardPresentation.h"
 
 #include "Engine/World.h"
@@ -11,6 +12,10 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/Button.h"
+#include "Components/PanelWidget.h"
 
 #include "ALKHomeBuildingActor.h"
 #include "ALKHomePlayerController.h"
@@ -111,6 +116,14 @@ void ALKHomeGameMode::Tick(float DeltaSeconds)
 		const TArray<ELKHomePanel> Panels = {ELKHomePanel::None, ELKHomePanel::Statue, ELKHomePanel::Library,
 			ELKHomePanel::HeroHouse, ELKHomePanel::Treasury, ELKHomePanel::Barracks, ELKHomePanel::WarRoom, ELKHomePanel::Gate};
 		const int32 Index = (PreviewFrame - 120) / 90;
+		if (PreviewFrame == 265 && FParse::Param(FCommandLine::Get(), TEXT("WorldArtHomePreview")))
+		{
+			// Exercise the real upgrade button in the existing isolated preview profile.
+			UPanelWidget* Actions = Cast<UPanelWidget>(HomeHUD->GetWidgetFromName(TEXT("ActionsBox")));
+			UUserWidget* Entry = Actions ? Cast<UUserWidget>(Actions->GetChildAt(0)) : nullptr;
+			UButton* Upgrade = Entry ? Cast<UButton>(Entry->GetWidgetFromName(TEXT("RowButton"))) : nullptr;
+			if (Upgrade && Upgrade->GetIsEnabled()) { Upgrade->OnClicked.Broadcast(); }
+		}
 		if (PreviewFrame >= 120 && Index < Panels.Num())
 		{
 			if ((PreviewFrame - 120) % 90 == 0)
@@ -288,6 +301,21 @@ void ALKHomeGameMode::SpawnPlaceholderScene()
 {
 	UWorld* World = GetWorld();
 	if (!World) { return; }
+
+	// Recolour only the project's known placeholder ground/path materials, at runtime.
+	// Authored level layout, arbitrary meshes and shared material assets remain intact.
+	for (TActorIterator<AStaticMeshActor> It(World); It; ++It)
+	{
+		UStaticMeshComponent* Mesh = It->GetStaticMeshComponent();
+		UMaterialInterface* Existing = Mesh ? Mesh->GetMaterial(0) : nullptr;
+		if (!Existing || !Existing->GetPathName().StartsWith(TEXT("/Game/Materials/Home/"))) { continue; }
+		const bool bGround = Existing->GetName() == TEXT("M_HomePlaceholder");
+		const bool bPath = Existing->GetName().StartsWith(TEXT("MI_Home"));
+		if (!bGround && !bPath) { continue; }
+		UMaterialInstanceDynamic* Material = Mesh->CreateDynamicMaterialInstance(0, Existing);
+		if (Material) { Material->SetVectorParameterValue(TEXT("Color"), FLinearColor::FromSRGBColor(
+			bGround ? FColor(99, 112, 76) : FColor(174, 160, 122))); }
+	}
 
 	// 已有手工摆放的建筑 Actor：尊重它们，只为缺失的 BuildingId 补占位。
 	for (TActorIterator<ALKHomeBuildingActor> It(World); It; ++It)
@@ -948,7 +976,7 @@ bool ALKHomeGameMode::OpenBattleMap(FName MapName)
 		return false;
 	}
 	UE_LOG(LogLK, Log, TEXT("[Home] 前往战斗地图 %s"), *MapName.ToString());
-	UGameplayStatics::OpenLevel(this, MapName);
+	ULKJourneyPresentationSubsystem::Travel(this, MapName);
 	return true;
 }
 

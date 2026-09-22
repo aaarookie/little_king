@@ -1,4 +1,6 @@
 #include "ULKRunRewardWidget.h"
+#include "ULKJourneyPresentationSubsystem.h"
+#include "LKPresentationStyle.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
@@ -33,12 +35,12 @@
 
 namespace
 {
-	const FLinearColor BackdropColor(0.006f, 0.012f, 0.027f, 0.86f);
-	const FLinearColor PanelColor(0.025f, 0.045f, 0.075f, 0.99f);
-	const FLinearColor CardColor(0.055f, 0.085f, 0.13f, 1.f);
-	const FLinearColor GoldColor(0.96f, 0.69f, 0.22f, 1.f);
-	const FLinearColor PaleColor(0.88f, 0.92f, 0.96f, 1.f);
-	const FLinearColor MutedColor(0.58f, 0.67f, 0.76f, 1.f);
+	const FLinearColor BackdropColor = LKPresentationStyle::Ink().CopyWithNewOpacity(.92f);
+	const FLinearColor PanelColor = LKPresentationStyle::Panel();
+	const FLinearColor CardColor = LKPresentationStyle::Card();
+	const FLinearColor GoldColor = LKPresentationStyle::Gold();
+	const FLinearColor PaleColor = LKPresentationStyle::Paper();
+	const FLinearColor MutedColor = LKPresentationStyle::Muted();
 
 	UTextBlock* MakeText(UWidgetTree* Tree, const TCHAR* Name, int32 Size, const FLinearColor& Color,
 		ETextJustify::Type Justification = ETextJustify::Center)
@@ -46,7 +48,7 @@ namespace
 		UTextBlock* Text = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), Name);
 		FSlateFontInfo Font = Text->GetFont();
 		Font.Size = Size;
-		Text->SetFont(Font);
+		Text->SetFont(LKPresentationStyle::Font(Font.Size));
 		Text->SetColorAndOpacity(FSlateColor(Color));
 		Text->SetJustification(Justification);
 		Text->SetAutoWrapText(true);
@@ -55,12 +57,7 @@ namespace
 
 	void StyleButton(UButton* Button, const FLinearColor& Normal, const FLinearColor& Hovered)
 	{
-		FButtonStyle Style = Button->GetStyle();
-		Style.Normal.TintColor = FSlateColor(Normal);
-		Style.Hovered.TintColor = FSlateColor(Hovered);
-		Style.Pressed.TintColor = FSlateColor(Hovered * 0.82f);
-		Style.Disabled.TintColor = FSlateColor(FLinearColor(Normal.R, Normal.G, Normal.B, 0.42f));
-		Button->SetStyle(Style);
+        LKPresentationStyle::StyleButton(Button);
 	}
 
 	void AddVerticalSpace(UWidgetTree* Tree, UVerticalBox* Box, float Height)
@@ -94,7 +91,7 @@ TSharedRef<SWidget> ULKRunRewardWidget::RebuildWidget()
 
 void ULKRunRewardWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativeConstruct(); ULKJourneyPresentationSubsystem::Reveal(this);
 	SetVisibility(ESlateVisibility::Visible);
 	RefreshReward();
 	if (OptionButtons.IsValidIndex(0) && OptionButtons[0]->GetVisibility() == ESlateVisibility::Visible)
@@ -175,8 +172,8 @@ void ULKRunRewardWidget::BuildNativeTree()
 		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(Kind)) { LayoutSlot->SetPadding(FMargin(12.f, 13.f, 12.f, 5.f)); }
 
 		USizeBox* IconSize = WidgetTree->ConstructWidget<USizeBox>();
-		IconSize->SetWidthOverride(54.f);
-		IconSize->SetHeightOverride(54.f);
+		IconSize->SetWidthOverride(128.f);
+		IconSize->SetHeightOverride(128.f);
 		if (UVerticalBoxSlot* LayoutSlot = Card->AddChildToVerticalBox(IconSize))
 		{
 			LayoutSlot->SetHorizontalAlignment(HAlign_Center);
@@ -184,7 +181,7 @@ void ULKRunRewardWidget::BuildNativeTree()
 		}
 		UBorder* IconPlate = WidgetTree->ConstructWidget<UBorder>();
 		IconPlate->SetBrushColor(FLinearColor(0.025f, 0.035f, 0.06f, 1.f));
-		IconPlate->SetPadding(FMargin(8.f));
+		IconPlate->SetPadding(FMargin(4.f));
 		IconSize->SetContent(IconPlate);
 		UOverlay* IconOverlay = WidgetTree->ConstructWidget<UOverlay>();
 		IconPlate->SetContent(IconOverlay);
@@ -511,7 +508,7 @@ bool ULKRunRewardWidget::ChooseReplacement(int32 CardIndex)
         if (!Run->DiscardExcessCard(CardId)) { StatusText->SetText(FText::FromString(TEXT("保存失败，卡组保持原状，请重试"))); return false; }
         bReducingLegacyDeck = Run->NeedsDeckReduction();
         if (bReducingLegacyDeck) { ShowReplacementChoices(); }
-        else { UGameplayStatics::OpenLevel(this, FName(*UGameplayStatics::GetCurrentLevelName(this, true))); }
+        else { ULKJourneyPresentationSubsystem::Travel(this, FName(*UGameplayStatics::GetCurrentLevelName(this, true))); }
         return true;
     }
     if (SelectedReplacementIds.Contains(CardId)) { SelectedReplacementIds.Remove(CardId); }

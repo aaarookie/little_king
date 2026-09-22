@@ -1,0 +1,11 @@
+{
+  "id": "Home_Treasury_Lv2",
+  "kind": "Treasury",
+  "level": 2,
+  "reference": "ArtSource/StorybookV1/Images/T_Home_Treasury.png",
+  "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv2.png",
+  "worldWidth": 500,
+  "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. First upgrade: replace the wood front door with a reinforced dark iron vault door carrying the same gold coin emblem, add thicker gold bands to the columns, retain the original pair of wooden chests.",
+  "path": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-d5e889f8-729f-4efe-a04d-230f6f565160.png",
+  "tool": "image_gen"
+}

@@ -6,6 +6,10 @@
 #include "Components/WidgetComponent.h"
 #include "ULKHomeBuildingLabelWidget.h"
 #include "LKHomeUIStyle.h"
+#include "LKPresentationStyle.h"
+#include "LKPolishArt.h"
+#include "PaperSprite.h"
+#include "PaperSpriteComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -32,6 +36,12 @@ ALKHomeBuildingActor::ALKHomeBuildingActor()
 	PlaceholderMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PlaceholderMesh->SetGenerateOverlapEvents(false);
 	PlaceholderMesh->SetCastShadow(false);
+	Illustration = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Illustration"));
+	Illustration->SetupAttachment(Root);
+	Illustration->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Illustration->SetCastShadow(false);
+	Illustration->SetRelativeRotation(FRotationMatrix::MakeFromXY(FVector(0, 1, 0), FVector(0, 0, 1)).Rotator());
+	Illustration->SetRelativeLocation(FVector(0, 0, 5));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	if (CubeMesh.Succeeded()) { PlaceholderMesh->SetStaticMesh(CubeMesh.Object); }
@@ -88,13 +98,21 @@ void ALKHomeBuildingActor::InitializeBuilding(FName InBuildingId, const FText& I
 
 void ALKHomeBuildingActor::ApplyPlaceholderAppearance()
 {
+	const FString Name = TEXT("SP_") + (BuildingId == TEXT("Home_StatueSaintMaria") ? FString(TEXT("Home_Statue")) : BuildingId.ToString());
+	const FString Path = TEXT("/Game/Art/StorybookV1/Sprites/") + Name + TEXT(".") + Name;
+	UPaperSprite* Sprite = LKPolishArt::HomeLevel(BuildingId, DisplayedLevel);
+    if (!Sprite) { Sprite = LoadObject<UPaperSprite>(nullptr, *Path, nullptr, LOAD_NoWarn); }
+	Illustration->SetSprite(Sprite);
+	Illustration->SetRelativeScale3D(FVector(1.f)); // Importer scales the actual texture width to a 500cm canvas.
+	Illustration->SetSpriteColor(FLinearColor::White);
+	PlaceholderMesh->SetVisibility(!Sprite);
 	if (PlaceholderMesh)
 	{
 		PlaceholderMesh->SetRelativeScale3D(FVector(PlaceholderSize.X / 100.f, PlaceholderSize.Y / 100.f, PlaceholderSize.Z / 100.f));
 		PlaceholderMesh->SetRelativeLocation(FVector(0.f, 0.f, PlaceholderSize.Z * 0.5f));
 		UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/Home/M_HomePlaceholder.M_HomePlaceholder"), nullptr, LOAD_NoWarn);
 		if (!Base) { Base = PlaceholderMesh->GetMaterial(0); }
-		if (Base)
+		if (Base && !PlaceholderMaterial)
 		{
 			PlaceholderMaterial = UMaterialInstanceDynamic::Create(Base, this);
 			PlaceholderMesh->SetMaterial(0, PlaceholderMaterial);
@@ -113,8 +131,10 @@ void ALKHomeBuildingActor::ApplyPlaceholderAppearance()
 
 	if (HitSphere) { HitSphere->SetSphereRadius(FMath::Max(10.f, HitRadius)); }
 	if (NameLabel) { NameLabel->SetRelativeLocation(FVector(0.f, 0.f, PlaceholderSize.Z + 120.f)); }
-	if (ScreenLabel) { ScreenLabel->SetRelativeLocation(FVector(-120.f, 0.f, PlaceholderSize.Z + 20.f)); }
+	if (ScreenLabel) { ScreenLabel->SetRelativeLocation(Sprite ? FVector(-245.f, 0.f, 30.f) : FVector(-120.f, 0.f, PlaceholderSize.Z + 20.f)); }
 }
+
+bool ALKHomeBuildingActor::HasIllustration() const { return Illustration && Illustration->GetSprite(); }
 
 void ALKHomeBuildingActor::RefreshLabel()
 {
@@ -129,15 +149,21 @@ void ALKHomeBuildingActor::RefreshLabel()
 	if (LabelWidget)
 	{
 		const ELKHomeBuilding Kind = LKHomeContent::BuildingFromId(BuildingId);
-		const TCHAR* Hint = bUpgradable ? TEXT("点击查看与升级") : Kind == ELKHomeBuilding::Gate ? TEXT("选择区域 · 开始远征")
+		const TCHAR* Hint = bUpgradable ? TEXT("点击查看与升级") : Kind == ELKHomeBuilding::Gate ? TEXT("确认战备 · 开始远征")
 			: Kind == ELKHomeBuilding::WarRoom ? TEXT("三名英雄 · 配置牌组") : TEXT("点击查看已解锁内容");
-		LabelWidget->SetLabel(FText::FromString(DisplayName.ToString() + LevelText), FText::FromString(Hint), LKHomeUIStyle::Accent(BuildingId));
+		LabelWidget->SetLabel(FText::FromString(DisplayName.ToString() + LevelText), FText::FromString(Hint), LKPresentationStyle::Gold());
 	}
 }
 
 void ALKHomeBuildingActor::SetDisplayedLevel(int32 InLevel)
 {
+	if (DisplayedLevel == FMath::Max(1, InLevel)) { return; }
 	DisplayedLevel = FMath::Max(1, InLevel);
+    ApplyPlaceholderAppearance();
+    // Reapply the hover state after swapping only the illustration.
+    const bool bRestoreHighlight = bHighlighted;
+    bHighlighted = false;
+    SetHighlighted(bRestoreHighlight);
 	RefreshLabel();
 }
 
@@ -145,6 +171,11 @@ void ALKHomeBuildingActor::SetHighlighted(bool bInHighlighted)
 {
 	if (bHighlighted == bInHighlighted) { return; }
 	bHighlighted = bInHighlighted;
+	if (HasIllustration())
+	{
+		Illustration->SetRelativeScale3D(FVector(bHighlighted ? 1.035f : 1.f));
+		Illustration->SetSpriteColor(bHighlighted ? FLinearColor(1.08f, 1.06f, 1.f) : FLinearColor::White);
+	}
 
 	FLinearColor Color = LKHomeUIStyle::Accent(BuildingId);
 	if (bHighlighted) { Color = Color * 1.6f + PlaceholderHighlight * 0.35f; }

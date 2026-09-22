@@ -1,0 +1,11 @@
+{
+  "id": "Home_Statue_Lv3",
+  "kind": "Statue",
+  "level": 3,
+  "reference": "ArtSource/StorybookV1/Images/T_Home_Statue.png",
+  "file": "ArtSource/StorybookV1/Polish/Buildings/T_Home_Statue_Lv3.png",
+  "worldWidth": 500,
+  "prompt": "Use case: identity-preserve. Create ONE upgraded building sprite for Little King, using this existing level-one building as the identity reference. Preserve the main silhouette, cream limestone, pine-green roof, antique-gold detailing, chestnut outlines, soft matte storybook gouache, three-quarter camera and warm upper-left lighting. A single complete building on a square 1024x1024 transparent RGBA canvas. Same centred placement and base footprint as the reference. Keep 8% clear padding on every side. No ground plane, no cast shadow, no landscape, no people, no text, no numerals, no labels, no UI frame. The building must remain instantly recognisable as its reference. Add a prominent carved golden laurel arch framing the original niche, four warm lanterns, planted flower beds against the plinth and refined gold edging on the green roof. Preserve the visible central female statue.",
+  "path": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-f263e262-d4ff-4741-b2a2-1a8cc597cfff.png",
+  "tool": "image_gen"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "Battle",
+  "name": "举盾前行",
+  "seed": 210903,
+  "bpm": 112,
+  "detail": "112 BPM, D minor resolving toward F major, steady 4/4. Determined tactical skirmish, agile and heroic rather than frightening. Lute and pizzicato strings trade compact motifs, low strings pulse, restrained frame drums accent the beat. Keep space for game sound effects.",
+  "caption": "Instrumental acoustic fantasy strategy game soundtrack for a warm illustrated small kingdom. No vocals, no choir, no spoken words. Consistent small ensemble: wooden flute, fingerpicked lute, harp, warm chamber strings and soft hand percussion. Natural intimate room, rounded transients, clear midrange, restrained dynamics, no electronic synth, no electric guitar, no cinematic braams. A repeating musical cycle with balanced phrases, steady pulse, no dramatic intro or final cadence; suitable for a seamless game loop. 112 BPM, D minor resolving toward F major, steady 4/4. Determined tactical skirmish, agile and heroic rather than frightening. Lute and pizzicato strings trade compact motifs, low strings pulse, restrained frame drums accent the beat. Keep space for game sound effects.",
+  "lyrics": "[Instrumental]\n[Instrumental]\n[Instrumental]",
+  "audio_duration": 48.0,
+  "num_inference_steps": 30,
+  "vram_mode": "low",
+  "model": "MiniMaxAI/MiniMax-Music3",
+  "installation": "E:\\minimax_music3\\repo",
+  "sourceLicense": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0",
+  "sampleRate": 44100,
+  "frames": 977920,
+  "actualSeconds": 22.175056689342405,
+  "elapsedSeconds": 888.7533094882965,
+  "sha256": "41974b45da7a94d128a22dd82ea210a375bf4ef6974facb697443ee9f2118524"
+}

@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "ULKUnitActiveComponent.h"
 #include "ULKSilverComponent.h"
+#include "ULKPresentationSubsystem.h"
 
 ULKUnitPassiveComponent::ULKUnitPassiveComponent() { PrimaryComponentTick.bCanEverTick = false; }
 
@@ -35,9 +36,13 @@ bool ULKUnitPassiveComponent::TrySummonFrom(ALKUnitBase* Victim)
     ALKUnitBase* Summon = GM->SpawnUnitForTeam(SummonId, OwnerUnit->GetTeam(), Victim->GetActorLocation());
     if (!Summon) { return false; } // 上限/实体占用阻止转换时不献祭，也不延期补召。
     Summon->SetOwner(OwnerUnit);
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Summon, Summon->GetActorLocation(), 100.f);
+    ULKPresentationSubsystem::Sound(GetWorld(), "Summon", Summon->GetActorLocation());
     const float Cost = OwnerUnit->GetMaxHealth() * OwnerUnit->GetTraitEffectValue(ELKTraitEffect::SummoningHealthCost);
     const FLKCombatSource Source = LKGameplay::MakeSource(OwnerUnit, ELKCombatSourceKind::HealthCost, "Trait_Sacrifice");
     LKGameplay::ApplyDamage(OwnerUnit, Cost, OwnerUnit, true, &Source);
+    if (Cost > 0.f)
+    { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Sacrifice, OwnerUnit->GetActorLocation()); ULKPresentationSubsystem::Sound(GetWorld(), "Sacrifice", OwnerUnit->GetActorLocation()); }
     UE_LOG(LogLKUnit, Log, TEXT("[Passive] 亡灵召唤 %s -> %s；献祭 %.1f"), *Victim->GetUnitId().ToString(), *SummonId.ToString(), Cost);
     return true;
 }
@@ -51,7 +56,9 @@ void ULKUnitPassiveComponent::ObserveDefeat(const ALKUnitBase* Victim, bool bOwn
         if (Ability == ELKPassiveAbility::Loot && OwnerUnit->GetTarget() == Victim && Victim->GetTeam() != OwnerUnit->GetTeam())
         {
             if (ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>())
-            { if (ULKSilverComponent* Silver = GM->GetTeamSilver(OwnerUnit->GetTeam())) { Silver->AddSilver(1.f); } }
+            { if (ULKSilverComponent* Silver = GM->GetTeamSilver(OwnerUnit->GetTeam()))
+                { const float Before = Silver->GetSilver(); Silver->AddSilver(1.f);
+                  if (Silver->GetSilver() > Before) { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Coin, OwnerUnit->GetActorLocation()); ULKPresentationSubsystem::Sound(GetWorld(), "Coin", OwnerUnit->GetActorLocation()); } } }
         }
     }
     if (!OwnerUnit || !Victim || Victim == OwnerUnit || Victim->GetTeam() != OwnerUnit->GetTeam()) { return; }
@@ -98,7 +105,8 @@ void ULKUnitPassiveComponent::ObserveCombatEvent(const FLKCombatEvent& Event)
     if (bElfHealed && Lowest)
     {
         const FLKCombatSource Source = LKGameplay::MakeSource(OwnerUnit, ELKCombatSourceKind::Skill, "Skill_SharedSpring");
-        LKGameplay::ApplyHeal(Lowest, Event.ActualAmount, OwnerUnit, &Source);
+        if (LKGameplay::ApplyHeal(Lowest, Event.ActualAmount, OwnerUnit, &Source) > 0.f)
+        { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::HealLink, Lowest->GetActorLocation(), 60.f, Event.Location); }
     }
 }
 
@@ -110,6 +118,8 @@ bool ULKUnitPassiveComponent::TryRevive()
     BoneCount = 0;
     RevivalThreshold = int32(FMath::Min(int64(MAX_int32), int64(RevivalThreshold) + ThresholdStep));
     ++RevivalCount;
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Revive, OwnerUnit->GetActorLocation(), 180.f);
+    ULKPresentationSubsystem::Sound(GetWorld(), "Revive", OwnerUnit->GetActorLocation());
     UE_LOG(LogLKUnit, Log, TEXT("[Passive] 骷髅王满血复活，第 %d 次，下次门槛 %d"), RevivalCount, RevivalThreshold);
     return true;
 }

@@ -7,6 +7,8 @@
 #include "ULKSilverComponent.h"
 #include "ULKUnitMovementComponent.h"
 #include "ULKUnitStatusComponent.h"
+#include "ULKPresentationSubsystem.h"
+#include "ULKUnitAnimationComponent.h"
 #include "EngineUtils.h"
 
 namespace
@@ -91,6 +93,7 @@ bool ULKUnitActiveComponent::TryActivate()
     default: break;
     }
     if (!bCast) { CooldownRemaining = .25f; }
+    else { Unit->GetAnimationComponent()->Attack(); }
     return bCast;
 }
 
@@ -113,6 +116,7 @@ bool ULKUnitActiveComponent::Backstab()
         if (!ToOpponent.IsNearlyZero()) { Facing = ToOpponent; }
     }
     bool bMoved = false;
+    const FVector BeforeTeleport = Unit->GetActorLocation();
     const float Minimum = Target->GetBodyRadius() + Unit->GetBodyRadius() + 4.f;
     for (float Radius : { Minimum, Minimum + 40.f, Minimum + 80.f })
     {
@@ -124,13 +128,17 @@ bool ULKUnitActiveComponent::Backstab()
         if (bMoved) { break; }
     }
     if (!bMoved) { return false; }
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Backstab, Unit->GetActorLocation(), 60.f, BeforeTeleport);
+    ULKPresentationSubsystem::Sound(GetWorld(), "Backstab", Unit->GetActorLocation());
     Unit->CancelAttackWindup();
     LockedTarget = Target; Unit->SetTarget(Target);
     const FLKCombatSource Source = LKGameplay::MakeSource(Unit, ELKCombatSourceKind::Skill, "Skill_Backstab");
     GM->BeginCombatBatch();
     LKGameplay::ApplyDamage(Target, Unit->GetAttackDamage() * DamageMultiplier, Unit, false, &Source);
     if (GM->GetBattleRandom().FRand() < SilverChance)
-    { if (ULKSilverComponent* Silver = GM->GetTeamSilver(Unit->GetTeam())) { Silver->AddSilver(1.f); } }
+    { if (ULKSilverComponent* Silver = GM->GetTeamSilver(Unit->GetTeam()))
+        { const float Before = Silver->GetSilver(); Silver->AddSilver(1.f);
+          if (Silver->GetSilver() > Before) { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Coin, Unit->GetActorLocation()); ULKPresentationSubsystem::Sound(GetWorld(), "Coin", Unit->GetActorLocation()); } } }
     GM->EndCombatBatch();
     return true;
 }
@@ -199,9 +207,11 @@ bool ULKUnitActiveComponent::MimicSpell()
     if (!bHasTarget) { return false; }
     Unit->CancelAttackWindup();
     LastSpellId = Chosen ? Chosen->CardId : FName("Spell_Fireball");
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Mimic, Unit->GetActorLocation());
+    ULKPresentationSubsystem::Sound(GetWorld(), "Mimic", Unit->GetActorLocation());
     const FLKCombatSource Source = LKGameplay::MakeSource(Unit, ELKCombatSourceKind::Skill, LastSpellId);
     GM->BeginCombatBatch();
-    if (LastSpellId == "Spell_Fireball") { GM->NotifyFireballCast(Center); }
+    if (LastSpellId == "Spell_Fireball") { GM->NotifyFireballCast(Center, Radius); }
     for (ALKUnitBase* Other : Units)
     {
         if (FVector::Dist2D(Center, Other->GetActorLocation()) > Radius) { continue; }
@@ -233,6 +243,7 @@ bool ULKUnitActiveComponent::StartDash()
     if (DashDirection.IsNearlyZero()) { return false; }
     Unit->CancelAttackWindup(); Unit->GetMovementComponent()->Stop();
     DashRemaining = DashDistance; DashHits.Reset();
+    ULKPresentationSubsystem::Sound(GetWorld(), "Dash", Unit->GetActorLocation());
     return true;
 }
 
@@ -243,6 +254,7 @@ void ULKUnitActiveComponent::TickDash(float DeltaSeconds)
     const FVector Start = Unit->GetActorLocation();
     const float Step = FMath::Min(DashRemaining, DashSpeed * DeltaSeconds);
     const FVector End = Unit->GetMovementComponent()->MoveSkillDelta(DashDirection * Step);
+    if (FVector::DistSquared2D(Start, End) > 1.f) { ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Dash, End, 40.f, Start); }
     const FVector Side(-DashDirection.Y, DashDirection.X, 0.f);
     const FLKCombatSource Source = LKGameplay::MakeSource(Unit, ELKCombatSourceKind::Skill, "Skill_MakeWay");
     GM->BeginCombatBatch();

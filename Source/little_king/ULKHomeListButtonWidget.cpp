@@ -9,17 +9,13 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "LKHomeUIStyle.h"
+#include "LKPresentationStyle.h"
 
 namespace
 {
     void StyleEntry(UButton* Button, bool bSelected)
     {
-        FButtonStyle Style = Button->GetStyle();
-        Style.Normal.TintColor = FSlateColor(bSelected ? FLinearColor(0.13f, 0.22f, 0.25f) : FLinearColor(0.055f, 0.085f, 0.13f));
-        Style.Hovered.TintColor = FSlateColor(FLinearColor(0.14f, 0.21f, 0.29f));
-        Style.Pressed.TintColor = FSlateColor(FLinearColor(0.10f, 0.17f, 0.23f));
-        Style.Disabled.TintColor = FSlateColor(FLinearColor(0.06f, 0.075f, 0.10f));
-        Button->SetStyle(Style);
+        LKPresentationStyle::StyleButton(Button, bSelected);
     }
 }
 
@@ -66,10 +62,11 @@ void ULKHomeListButtonWidget::BuildNativeTree()
     {
         FSlateFontInfo Font = Text->GetFont();
         Font.Size = Text == ValueText ? 15 : 18;
-        Text->SetFont(Font);
+        Text->SetFont(LKPresentationStyle::Font(Font.Size));
         Text->SetAutoWrapText(true);
     }
-    ValueText->SetColorAndOpacity(FSlateColor(FLinearColor(0.65f, 0.73f, 0.82f)));
+    LabelText->SetColorAndOpacity(LKPresentationStyle::Paper());
+    ValueText->SetColorAndOpacity(FSlateColor(LKPresentationStyle::Muted()));
     bBuilt = true;
 }
 
@@ -114,7 +111,7 @@ void ULKHomeListButtonWidget::SetCompactRow()
     if (UPanelWidget* Copy = LabelText->GetParent())
     { if (UHorizontalBoxSlot* Layout = Cast<UHorizontalBoxSlot>(Copy->Slot)) { Layout->SetPadding(FMargin(12.f,6.f)); } }
     for (UTextBlock* Text : {LabelText.Get(), ValueText.Get(), BadgeText.Get()})
-    { FSlateFontInfo Font = Text->GetFont(); Font.Size = Text == ValueText ? 13 : 16; Text->SetFont(Font); }
+    { FSlateFontInfo Font = Text->GetFont(); Font.Size = Text == ValueText ? 13 : 16; Text->SetFont(LKPresentationStyle::Font(Font.Size)); }
 }
 
 void ULKHomeListButtonWidget::HandleClicked()

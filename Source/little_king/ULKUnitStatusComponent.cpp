@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "EngineUtils.h"
+#include "ULKPresentationSubsystem.h"
 
 ULKUnitStatusComponent::ULKUnitStatusComponent() { PrimaryComponentTick.bCanEverTick = false; }
 ALKUnitBase* ULKUnitStatusComponent::Unit() const { return Cast<ALKUnitBase>(GetOwner()); }
@@ -27,17 +28,21 @@ bool ULKUnitStatusComponent::Stun(float Seconds)
     if (!Unit() || !Unit()->IsAlive() || !Unit()->IsCombatEnabled() || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return false; }
     StunMeter = 0.f;
     if (IsKing()) { return false; }
-    StunRemaining = FMath::Max(StunRemaining, Seconds); InterruptActions(); return true;
+    StunRemaining = FMath::Max(StunRemaining, Seconds); InterruptActions();
+    ULKPresentationSubsystem::Sound(GetWorld(), "Stun", Unit()->GetActorLocation()); return true;
 }
 bool ULKUnitStatusComponent::Freeze(float Seconds)
 {
     if (!Unit() || !Unit()->IsAlive() || !Unit()->IsCombatEnabled() || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return false; }
-    FreezeRemaining = FMath::Max(FreezeRemaining, Seconds); InterruptActions(); return true;
+    FreezeRemaining = FMath::Max(FreezeRemaining, Seconds); InterruptActions();
+    ULKPresentationSubsystem::Sound(GetWorld(), "Freeze", Unit()->GetActorLocation()); return true;
 }
 void ULKUnitStatusComponent::Empower(float Seconds, float Move, float Interval)
 {
     if (!Unit() || !Unit()->IsAlive() || !Unit()->IsCombatEnabled() || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return; }
     EmpowerRemaining = Seconds;
+    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Empower, Unit()->GetActorLocation());
+    ULKPresentationSubsystem::Sound(GetWorld(), "Empower", Unit()->GetActorLocation());
     EmpowerMove = FMath::IsFinite(Move) ? FMath::Max(1.f, Move) : 1.3f;
     EmpowerInterval = FMath::IsFinite(Interval) ? FMath::Clamp(Interval, .1f, 1.f) : .75f;
 }
@@ -59,6 +64,7 @@ void ULKUnitStatusComponent::Ignite(const FLKCombatSource& Source, AActor* Insti
     if (!Unit() || !Unit()->IsAlive() || !Unit()->IsCombatEnabled()) { return; }
     if (BurnStacks == 0) { BurnTick = 0.f; }
     ++BurnStacks; BurnRemaining = 3.f;
+    ULKPresentationSubsystem::Sound(GetWorld(), "Burn", Unit()->GetActorLocation());
     BurnSource = Source; BurnSource.Kind = ELKCombatSourceKind::Skill; BurnSource.ActionId = "Status_DragonBurn";
     BurnInstigator = Instigator;
 }

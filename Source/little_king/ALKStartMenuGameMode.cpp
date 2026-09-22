@@ -36,7 +36,7 @@ void ALKStartMenuGameMode::BeginPlay()
 #if WITH_EDITOR
 	bPreviewMode = FParse::Param(FCommandLine::Get(), TEXT("StartMenuPreview"));
 	bWorldMapPreview = FParse::Param(FCommandLine::Get(), TEXT("WorldMapPreview"));
-	if (bPreviewMode || bWorldMapPreview) { Saves->SetNamespaceForTest(TEXT("LittleKing_MenuPreview_") + FGuid::NewGuid().ToString(EGuidFormats::Digits)); }
+	if (bPreviewMode || bWorldMapPreview || FParse::Param(FCommandLine::Get(),TEXT("PolishTravelPreview"))) { Saves->SetNamespaceForTest(TEXT("LittleKing_MenuPreview_") + FGuid::NewGuid().ToString(EGuidFormats::Digits)); }
 #endif
 	TryCreateMenu();
 }

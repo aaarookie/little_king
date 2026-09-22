@@ -1,0 +1,20 @@
+{
+  "id": "Home",
+  "name": "晨光小王国",
+  "seed": 210901,
+  "bpm": 80,
+  "detail": "80 BPM, C major, gentle pastoral 4/4. Welcoming and safe. Lute arpeggios and harp cradle a short playful wooden flute motif. Very light brushed tambourine, spacious simple strings, no large crescendo.",
+  "caption": "Instrumental acoustic fantasy strategy game soundtrack for a warm illustrated small kingdom. No vocals, no choir, no spoken words. Consistent small ensemble: wooden flute, fingerpicked lute, harp, warm chamber strings and soft hand percussion. Natural intimate room, rounded transients, clear midrange, restrained dynamics, no electronic synth, no electric guitar, no cinematic braams. A repeating musical cycle with balanced phrases, steady pulse, no dramatic intro or final cadence; suitable for a seamless game loop. 80 BPM, C major, gentle pastoral 4/4. Welcoming and safe. Lute arpeggios and harp cradle a short playful wooden flute motif. Very light brushed tambourine, spacious simple strings, no large crescendo.",
+  "lyrics": "[Instrumental]\n[Instrumental]\n[Instrumental]",
+  "audio_duration": 48.0,
+  "num_inference_steps": 30,
+  "vram_mode": "low",
+  "model": "MiniMaxAI/MiniMax-Music3",
+  "installation": "E:\\minimax_music3\\repo",
+  "sourceLicense": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0",
+  "sampleRate": 44100,
+  "frames": 1534464,
+  "actualSeconds": 34.795102040816325,
+  "elapsedSeconds": 1452.3703813552856,
+  "sha256": "3f348dafe59c5615f5850220874595d19b83dfd48825c1cacff65e6c4858427b"
+}

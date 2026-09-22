@@ -3,6 +3,8 @@
 #include "ULKGameData.h"
 #include "Components/SphereComponent.h"
 #include "ULKUnitMovementComponent.h"
+#include "LKWorldArt.h"
+#include "PaperSprite.h"
 
 ALKHeroCamp::ALKHeroCamp()
 {
@@ -18,6 +20,8 @@ void ALKHeroCamp::InitializeCamp(ALKUnitHero* Hero, ULKGameData* Data)
 	Row.UnitClass = ELKUnitClass::Building;
 	Row.AttackDamage = 0.f;
 	Row.MoveSpeed = 0.f;
+    Row.Sprite = LKWorldArt::CampSprite(Hero->GetUnitId());
+    Row.SpriteScale = FVector2D(1.f, 1.f);
 	SetTeam(Hero->GetTeam());
 	InitUnit(Row, Data);
 	BodyRadius = Data->HeroCampBodyRadius;

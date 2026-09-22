@@ -1,0 +1,316 @@
+{
+  "batch": "B",
+  "date": "2026-09-20",
+  "engine": "5.8.1",
+  "releaseUnchanged": "v0.7",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Logs/BattleArtBuild07.log"
+  },
+  "automation": {
+    "succeeded": 33,
+    "succeededWithWarnings": 43,
+    "failed": 0,
+    "notRun": 0,
+    "total": 76,
+    "report": "Saved/Automation/BattleArtFinal07/index.json",
+    "reportSha256": "46d11cabedcf27ef6a423b2e9b61c91e34c67777bd791ea45697a6da26832ec8"
+  },
+  "imports": {
+    "assetCount": 57,
+    "reimportPassed": true,
+    "log": "Saved/Logs/BattleArtReimport.log",
+    "assets": [
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_Skeleton.T_Unit_Skeleton",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_Skeleton.SP_Unit_Skeleton",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_Skeleton.T_Card_Unit_Skeleton",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_SkeletonArcher.T_Unit_SkeletonArcher",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_SkeletonArcher.SP_Unit_SkeletonArcher",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_SkeletonArcher.T_Card_Unit_SkeletonArcher",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Hero_Necromancer.T_Hero_Necromancer",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Hero_Necromancer.SP_Hero_Necromancer",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Hero_SkeletonGiant.T_Hero_SkeletonGiant",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Hero_SkeletonGiant.SP_Hero_SkeletonGiant",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Boss_SkeletonKing.T_Boss_SkeletonKing",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Boss_SkeletonKing.SP_Boss_SkeletonKing",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_ElfArcher.T_Unit_ElfArcher",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_ElfArcher.SP_Unit_ElfArcher",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_ElfArcher.T_Card_Unit_ElfArcher",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_ElfWarrior.T_Unit_ElfWarrior",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_ElfWarrior.SP_Unit_ElfWarrior",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_ElfWarrior.T_Card_Unit_ElfWarrior",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_ElfGuard.T_Unit_ElfGuard",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_ElfGuard.SP_Unit_ElfGuard",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_ElfGuard.T_Card_Unit_ElfGuard",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_ElfPriest.T_Unit_ElfPriest",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_ElfPriest.SP_Unit_ElfPriest",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_ElfPriest.T_Card_Unit_ElfPriest",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_GoblinRogue.T_Unit_GoblinRogue",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_GoblinRogue.SP_Unit_GoblinRogue",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_GoblinRogue.T_Card_Unit_GoblinRogue",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_Thief.T_Unit_Thief",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_Thief.SP_Unit_Thief",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_Thief.T_Card_Unit_Thief",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_ApprenticeMage.T_Unit_ApprenticeMage",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_ApprenticeMage.SP_Unit_ApprenticeMage",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_ApprenticeMage.T_Card_Unit_ApprenticeMage",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_GoblinBlade.T_Unit_GoblinBlade",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_GoblinBlade.SP_Unit_GoblinBlade",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_GoblinBlade.T_Card_Unit_GoblinBlade",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_TrollWarrior.T_Unit_TrollWarrior",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_TrollWarrior.SP_Unit_TrollWarrior",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_TrollWarrior.T_Card_Unit_TrollWarrior",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_TrollSpearman.T_Unit_TrollSpearman",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_TrollSpearman.SP_Unit_TrollSpearman",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_TrollSpearman.T_Card_Unit_TrollSpearman",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_TrollMage.T_Unit_TrollMage",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_TrollMage.SP_Unit_TrollMage",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_TrollMage.T_Card_Unit_TrollMage",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_TrollKing.T_Unit_TrollKing",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_TrollKing.SP_Unit_TrollKing",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_TrollKing.T_Card_Unit_TrollKing",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_TwoHeadedDragon.T_Unit_TwoHeadedDragon",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_TwoHeadedDragon.SP_Unit_TwoHeadedDragon",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_TwoHeadedDragon.T_Card_Unit_TwoHeadedDragon",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Building_SiegeCatapult.T_Building_SiegeCatapult",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Building_SiegeCatapult.SP_Building_SiegeCatapult",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Building_SiegeCatapult.T_Card_Building_SiegeCatapult",
+      "/Game/Art/StorybookV1/Battle/Textures/T_Unit_Colossus.T_Unit_Colossus",
+      "/Game/Art/StorybookV1/Battle/Sprites/SP_Unit_Colossus.SP_Unit_Colossus",
+      "/Game/Art/StorybookV1/Battle/Cards/T_Card_Unit_Colossus.T_Card_Unit_Colossus"
+    ]
+  },
+  "images": {
+    "sprites": 20,
+    "cards": 17,
+    "allSourceHashesVerified": true,
+    "manifest": "ArtSource/StorybookV1/Battle/manifest.json",
+    "prompts": "docs/39-BattleArtPrompts.md"
+  },
+  "legacyReview": [
+    {
+      "id": "Unit_Swordsman",
+      "source": "/Game/Sprites/Unit_Swordsman_stexture.Unit_Swordsman_stexture",
+      "size": [
+        433.0,
+        577.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        216.5,
+        288.5
+      ]
+    },
+    {
+      "id": "Unit_Archer",
+      "source": "/Game/Sprites/Unit_Archer_stexture.Unit_Archer_stexture",
+      "size": [
+        408.0,
+        612.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        204.0,
+        306.0
+      ]
+    },
+    {
+      "id": "Unit_Shieldbearer",
+      "source": "/Game/Sprites/Unit_Shieldbearer_stexture.Unit_Shieldbearer_stexture",
+      "size": [
+        408.0,
+        612.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        204.0,
+        306.0
+      ]
+    },
+    {
+      "id": "Hero_Knight",
+      "source": "/Game/Sprites/Hero_Knight_stexture.Hero_Knight_stexture",
+      "size": [
+        1086.0,
+        1448.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.2,
+        "Y": 0.2
+      },
+      "worldSize": [
+        217.20000000000002,
+        289.6
+      ]
+    },
+    {
+      "id": "Hero_Mage",
+      "source": "/Game/Sprites/Hero_Mage_stexture.Hero_Mage_stexture",
+      "size": [
+        433.0,
+        577.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        216.5,
+        288.5
+      ]
+    },
+    {
+      "id": "Hero_Ranger",
+      "source": "/Game/Sprites/Hero_Ranger_stexture.Hero_Ranger_stexture",
+      "size": [
+        433.0,
+        577.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        216.5,
+        288.5
+      ]
+    },
+    {
+      "id": "Building_ArrowTower",
+      "source": "/Game/Sprites/Building_ArrowTower_stexture.Building_ArrowTower_stexture",
+      "size": [
+        375.0,
+        666.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "worldSize": [
+        187.5,
+        333.0
+      ]
+    },
+    {
+      "id": "Building_Barracks",
+      "source": "/Game/Sprites/Building_Barracks_stexture.Building_Barracks_stexture",
+      "size": [
+        375.0,
+        666.0
+      ],
+      "ppu": 1.0,
+      "authoredScale": {
+        "X": 0.5,
+        "Y": 1
+      },
+      "worldSize": [
+        187.5,
+        666.0
+      ]
+    }
+  ],
+  "dataTableExportChanges": [
+    {
+      "row": "Building_Barracks",
+      "field": "SpriteScale",
+      "before": {
+        "X": 0.5,
+        "Y": 1
+      },
+      "after": {
+        "X": 0.5,
+        "Y": 0.5
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "docs/images/BattleArtUnits1080.png",
+      "sha256": "aa21cf900d6f7ab18ffe5516ad46b41a038c4197d9106e4dfdf1dc193eb71138"
+    },
+    {
+      "file": "docs/images/BattleArtBattle1080.png",
+      "sha256": "7fc0d5db056b3a543eb818fca059ac4f19c0f4316613a345ea92c05e0198c8ad"
+    },
+    {
+      "file": "docs/images/BattleArtBattle720.png",
+      "sha256": "7e18df4c53557792e233c081bcb1608270b2044b6bcc5d589aafc4b196d1df97"
+    },
+    {
+      "file": "docs/images/BattleArtReward720.png",
+      "sha256": "42d611fd7c3ca2a2bbadce9ef7f13ded79895017c76f6c7598f55d5f21595a6d"
+    },
+    {
+      "file": "docs/images/BattleArtReward1080.png",
+      "sha256": "0a05ea758f9e912c14260567f93a9c207c84187c1e6beaa93feb23c3fd2a53c9"
+    },
+    {
+      "file": "docs/images/BattleArtReplacement720.png",
+      "sha256": "9c54bd53f389825a39a4664a0d500035f97980ab2d97bb081696c0960a485d7f"
+    }
+  ],
+  "viewportVerification": {
+    "mode": "Editor game process with isolated -BattleArtPreview; actual scene and HUD, static units",
+    "resolutions": [
+      "1920x1080",
+      "1280x720"
+    ],
+    "logs": [
+      "Saved/Logs/BattleArtViewport1080Final.log",
+      "Saved/Logs/BattleArtViewport720Final.log"
+    ]
+  },
+  "saveFiles": [
+    {
+      "file": "LittleKing_Profile_A.sav",
+      "sha256": "E3652ECE276CF97744BD0D2F1B413593D3BE6BE460DC52C260D46D045BD14448",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_B.sav",
+      "sha256": "70EC42BCBDA5A80B01EA41450FDD9F878D6E8F2959A14C5BBE8922471C56C379",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_A.sav",
+      "sha256": "562461A0083C4CE8CB8D44D9A5D31DF2CF58C90C0CC699732D26CFABF89AAFD3",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_B.sav",
+      "sha256": "A0DAFC14DF99C85AD936BE3F2FC71BED94F9EB34675FAB4C5CFF5B298E5DDF69",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Run.sav",
+      "sha256": "B311821A2BAC29C93182835FF9EE24CFD370861875D0B1E71AE3DEF4DA17B800",
+      "unchanged": true
+    }
+  ],
+  "saveCount": 5,
+  "localDocumentLinksChecked": 250,
+  "diffCheckPassed": true,
+  "limitations": [
+    "No animation or C/D batch FX/environment/music",
+    "Eight legacy sprites and seven legacy card illustrations retained",
+    "UMG widget test captures differ in gamma from full game viewport; use viewport captures for final colours",
+    "No packaging/hardware/audio listening validation in B"
+  ]
+}

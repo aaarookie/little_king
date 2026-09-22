@@ -4,6 +4,8 @@
 
 ## 1. 从卡牌到战斗单位
 
+2026-09-20 补充：现有角色已完成 B 批单帧/卡面接入，见 [38](38-BattleArtIntegration.md)。新增素材可登记 `LKBattleArt::Sprite/CardIcon` 的默认映射；数据表 Sprite、卡牌 Icon 非空时优先使用自定义图。制作后保存完整提示词、参考图与哈希，运行 `Scripts/ImportBattleArt.py` 导入；新增目录项时同步更新脚本校验数量和测试，不能只放源 PNG。精灵组件抬高 8cm 防地面遮挡，逻辑根与碰撞留在 Z=0。
+
 `原生内容目录 → ULKGameData::EnsureCardLibrary → 奖励/卡组 → GameMode 出牌 → LKUnitContent 合并 DT_Units → ALKUnitBase::InitUnit → 战斗组件 → 伤害事件 → 结算/存档`。
 
 | 需求 | 文件与接口 | 责任与注意事项 |
@@ -74,3 +76,9 @@ Caster->GetStatusComponent()->Empower(8.f, 1.3f, .75f);
 以上是调用示意，调用方需先取得有效的 `Run`、`Target`、`Caster` 和当前奖励索引。`ChooseReward` 的旧单卡签名保留并转入新实现；多卡界面调用新接口。`ULKRunRewardWidget::ConfirmReplacements` 是确认按钮入口，勾选本身不修改远征状态。
 
 `DeckSlots` 与 `bTargetsBuildingsOnly` 属于代码保证的身份字段；表内同名字段不会覆盖内置规则。未注册的新 CardId 默认占 1 格，需要多格时先注册到原生目录。`EmpowerDuration/EmpowerMoveMultiplier/EmpowerIntervalMultiplier` 则是可由数据表调整的技能参数。实际实现已完成，验证与接手说明见 [35](35-TrollAndSiegeCards.md)。
+
+## 6. C 批后的表现接口
+
+新增卡牌的技能表现复用 `ULKPresentationSubsystem::Emit(World, Type, Location, Radius, Origin)` 和 `Sound(World, Id, Location)`；伤害、治疗、眩晕等仍由原战斗接口执行，不能从特效计时反向触发伤害。通用治疗、退场、控制状态已在底层生效处接好，不要在每张新卡里重复播放。新专属声音先加入 `LKWorldArt::SoundIds/SoundInterval` 及导入源目录，再由 GameData 的默认映射补齐；资源覆盖/显式静音继续通过 SoundMap 配置。
+
+表现实例不写入远征存档，不消耗 `GetBattleRandom()`。队列自动限额和过期清理，火球震动仍由 GameMode 的既有释放入口控制。营地/地图/FX 路径、实际绑定表与素材来源见 [40](40-WorldSkillsArtIntegration.md)。

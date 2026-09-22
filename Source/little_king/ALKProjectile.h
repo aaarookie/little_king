@@ -36,6 +36,8 @@ public:
 	bool IsPooledActive() const { return bPooledActive; }
 	FVector GetFlightDirection() const { return Direction; }
     ELKBreathHead GetBreathHead() const { return BreathHead; }
+    bool IsSiegeShot() const { return bSiegeShot; }
+    FName GetSourceUnitId() const { return LaunchSource.UnitId; }
     void SetAttackPayload(ELKBreathHead Head, ALKUnitBase* BuildingTarget = nullptr);
 
 	UFUNCTION()

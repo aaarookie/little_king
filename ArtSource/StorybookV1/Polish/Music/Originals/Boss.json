@@ -1,0 +1,20 @@
+{
+  "id": "Boss",
+  "name": "王庭的挑战",
+  "seed": 210904,
+  "bpm": 108,
+  "detail": "108 BPM, A minor, resolute 4/4. A formidable storybook king approaches. Deeper cello ostinato, low hand drums, bowed chamber strings and firm wooden flute phrases. Noble tension, controlled weight, no horror drones or loud risers. Keep space for game sound effects.",
+  "caption": "Instrumental acoustic fantasy strategy game soundtrack for a warm illustrated small kingdom. No vocals, no choir, no spoken words. Consistent small ensemble: wooden flute, fingerpicked lute, harp, warm chamber strings and soft hand percussion. Natural intimate room, rounded transients, clear midrange, restrained dynamics, no electronic synth, no electric guitar, no cinematic braams. A repeating musical cycle with balanced phrases, steady pulse, no dramatic intro or final cadence; suitable for a seamless game loop. 108 BPM, A minor, resolute 4/4. A formidable storybook king approaches. Deeper cello ostinato, low hand drums, bowed chamber strings and firm wooden flute phrases. Noble tension, controlled weight, no horror drones or loud risers. Keep space for game sound effects.",
+  "lyrics": "[Instrumental]\n[Instrumental]\n[Instrumental]",
+  "audio_duration": 48.0,
+  "num_inference_steps": 30,
+  "vram_mode": "low",
+  "model": "MiniMaxAI/MiniMax-Music3",
+  "installation": "E:\\minimax_music3\\repo",
+  "sourceLicense": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0",
+  "sampleRate": 44100,
+  "frames": 2119168,
+  "actualSeconds": 48.05369614512472,
+  "elapsedSeconds": 1897.5273492336273,
+  "sha256": "5845bc1885d10d2a0b6d2c8816dfafe9e30c204be8bef14bdd745fbb77c4a8d8"
+}

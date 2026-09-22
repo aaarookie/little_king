@@ -27,7 +27,9 @@
 #include "ULKUnitPassiveComponent.h"
 #include "ULKUnitActiveComponent.h"
 #include "ULKUnitStatusComponent.h"
+#include "ULKUnitAnimationComponent.h"
 #include "LKRunTypes.h"
+#include "ULKPresentationSubsystem.h"
 
 ALKUnitBase::ALKUnitBase()
 {
@@ -38,6 +40,9 @@ ALKUnitBase::ALKUnitBase()
     SetRootComponent(LogicRoot);
     SpriteComponent->SetupAttachment(LogicRoot);
 	SpriteComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    // Masked sprites need a small visual lift above the battle floor at Z=0.
+    // Keep the logic root / body collision on the ground plane.
+    SpriteComponent->SetRelativeLocation(FVector(0.f, 0.f, 8.f));
 
 	// Paper2D 精灵默认"立着"（纸片竖在 XZ 平面、正面朝 +Y——为横版游戏设计）。
 	// 本项目是俯视战场（相机 Pitch=-90 从 +Z 俯视），必须把精灵放倒：
@@ -69,6 +74,7 @@ ALKUnitBase::ALKUnitBase()
 	PassiveComponent = CreateDefaultSubobject<ULKUnitPassiveComponent>(TEXT("Passive"));
     ActiveComponent = CreateDefaultSubobject<ULKUnitActiveComponent>(TEXT("NativeActive"));
     StatusComponent = CreateDefaultSubobject<ULKUnitStatusComponent>(TEXT("CombatStatus"));
+    AnimationComponent = CreateDefaultSubobject<ULKUnitAnimationComponent>(TEXT("UnitAnimation"));
 }
 
 void ALKUnitBase::BeginPlay()
@@ -153,6 +159,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	}
 
 	ApplyRowAttributes(Row);
+    AnimationComponent->Initialize();
 
 	// 数据就绪回调（英雄在此授予数据驱动技能等）
 	OnUnitInitialized(Row);
@@ -205,6 +212,7 @@ bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
 
 void ALKUnitBase::ResetTransientRoomState()
 {
+    AnimationComponent->ResetPresentation();
     StatusComponent->Clear();
     if (ActiveComponent) { ActiveComponent->Stop(); }
 	ChangeTarget(nullptr);
@@ -319,7 +327,17 @@ bool ALKUnitBase::IsTaunting() const
     return false;
 }
 
-void ALKUnitBase::AddAuraTauntSource(ALKUnitBase* Source) { if (Source) { ++AuraTauntSources.FindOrAdd(Source); } }
+void ALKUnitBase::AddAuraTauntSource(ALKUnitBase* Source)
+{
+    const bool bHadTaunt=IsTaunting();
+    if (Source) { ++AuraTauntSources.FindOrAdd(Source); }
+    if (!bHadTaunt && IsTaunting() && IsCombatEnabled()) { ULKPresentationSubsystem::Sound(GetWorld(), "Empower", GetActorLocation()); }
+}
+void ALKUnitBase::SetFocusWarning(float Seconds)
+{
+    if (FocusWarningRemaining<=0.f && Seconds>0.f) { ULKPresentationSubsystem::Sound(GetWorld(), "CampCommand", GetActorLocation()); }
+    FocusWarningRemaining=FMath::Max(0.f,Seconds);
+}
 void ALKUnitBase::RemoveAuraTauntSource(ALKUnitBase* Source)
 {
     if (int32* Count = AuraTauntSources.Find(Source)) { if (--*Count <= 0) { AuraTauntSources.Remove(Source); } }
@@ -361,8 +379,14 @@ void ALKUnitBase::Tick(float DeltaSeconds)
 		{
 			DeathAnimRemaining -= DeltaSeconds;
 			const float t = FMath::Clamp(DeathAnimRemaining / DeathAnimDuration, 0.f, 1.f);
-			SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale * FMath::Max(t, 0.05f));
-			SpriteComponent->SetSpriteColor(FLinearColor(1.f, 1.f, 1.f, t));
+			SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale * (AnimationComponent->HasAnimations() ? 1.f : FMath::Max(t, 0.05f)));
+            if (IsHero() && AnimationComponent->HasAnimations())
+            {
+                // Heroes remain incapacitated in the room; keep the authored fallen pose visible.
+                const float Shade = .55f + .45f * t;
+                SpriteComponent->SetSpriteColor(FLinearColor(Shade, Shade, Shade, 1.f));
+            }
+            else { SpriteComponent->SetSpriteColor(FLinearColor(1.f, 1.f, 1.f, t)); }
 		}
 		return;
 	}
@@ -460,6 +484,7 @@ void ALKUnitBase::TriggerHitFlash()
 		return;
 	}
 	HitFlashRemaining = 0.08f;
+    AnimationComponent->Hit();
 	SpriteComponent->SetSpriteColor(FLinearColor(4.f, 4.f, 4.f, 1.f));
 }
 
@@ -631,6 +656,7 @@ void ALKUnitBase::TryAttack(float DeltaSeconds)
         bWindupActive = true;
         WindupTarget = Target;
         WindupRemaining = AttackWindup;
+        AnimationComponent->Attack(AttackWindup);
         // Interval 明确为连续两次起手间隔；前摇包含其中，移动和视觉停顿不暂停它。
         AttackCooldownRemaining = FMath::Max(GetAttackInterval(), AttackWindup);
         if (WindupRemaining > 0.f) { return; }
@@ -647,6 +673,7 @@ void ALKUnitBase::PerformAttack(AActor* Target)
     ALKUnitBase* Victim = Cast<ALKUnitBase>(Target);
     if (!CanPursueTarget(Victim) || IsControlled() || !IsAlive() || !IsCombatEnabled()) { return; }
     AttackPulseRemaining = .15f; HitStopRemaining = .06f;
+    AnimationComponent->Impact();
     const bool bKingStrike = StatusComponent->BeginAttack();
     const float Damage = GetAttackDamage() * (bKingStrike ? 1.5f : 1.f);
     ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
@@ -668,7 +695,10 @@ void ALKUnitBase::PerformAttack(AActor* Target)
             if (!GM) { Projectile->Init(Damage, Team, this, Direction); }
             Projectile->SetAttackPayload(Head, bTargetsBuildingsOnly ? Victim : nullptr);
         }
-        LKGameplay::PlayOneShot(GetWorld(), GameDataCached, TEXT("RangedShoot"), GetActorLocation(), .7f);
+        const FName Shot = Head == ELKBreathHead::Ice ? FName("IceBreath") : Head == ELKBreathHead::Fire ? FName("FireBreath")
+            : bTargetsBuildingsOnly ? FName("SiegeShot") : UnitId == "Unit_TrollSpearman" ? FName("SpearShot")
+            : (bIsMage || UnitId == "Unit_ElfPriest" || UnitId == "Unit_ApprenticeMage" || UnitId == "Hero_Necromancer") ? FName("MagicShot") : FName("BowShot");
+        ULKPresentationSubsystem::Sound(GetWorld(), Shot, GetActorLocation());
     }
     else
     {
@@ -682,7 +712,9 @@ void ALKUnitBase::PerformAttack(AActor* Target)
             Victim->GetMovementComponent()->MoveSkillDelta(Away * 300.f);
             Victim->GetStatusComponent()->Stun(2.f);
         }
-        LKGameplay::PlayOneShot(GetWorld(), GameDataCached, TEXT("MeleeHit"), Target->GetActorLocation(), .8f);
+        ULKPresentationSubsystem::Emit(GetWorld(), bKingStrike || UnitId == "Unit_Colossus" ? ELKVisualCue::HeavyHit : ELKVisualCue::Slash, Target->GetActorLocation(), bKingStrike ? 140.f : 70.f);
+        if (bKingStrike || UnitId == "Unit_Colossus") { ULKPresentationSubsystem::Sound(GetWorld(), "HeavyHit", Target->GetActorLocation()); }
+        else { LKGameplay::PlayOneShot(GetWorld(), GameDataCached, TEXT("MeleeHit"), Target->GetActorLocation(), .8f); }
     }
     StatusComponent->AfterAttack();
     if (GM) { GM->EndCombatBatch(); }
@@ -764,6 +796,7 @@ float ALKUnitBase::GetTraitEffectValue(ELKTraitEffect Effect) const
 
 void ALKUnitBase::RestoreHeroLife(float Health, bool bResumeCombat)
 {
+    AnimationComponent->ResetPresentation();
     bDead = false; State = ELKUnitState::Idle;
     DeathAnimRemaining = 0.f; SetLifeSpan(0.f);
     SpriteComponent->SetRelativeScale3D(BaseSpriteLocalScale);
@@ -828,6 +861,7 @@ void ALKUnitBase::Die()
 	if (UWorld* World = GetWorld())
 	{
 		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("UnitDied"), GetActorLocation(), 1.f);
+        ULKPresentationSubsystem::Emit(World, ELKVisualCue::Death, GetActorLocation());
 	}
 
     StatusComponent->Clear();

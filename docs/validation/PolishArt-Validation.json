@@ -1,0 +1,3930 @@
+{
+  "batch": "D",
+  "date": "2026-09-22",
+  "recordCreatedUtc": "2026-09-22T03:31:23.062273+00:00",
+  "engine": "5.8.1",
+  "releaseUnchanged": "v0.7",
+  "build": {
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "evidence": {
+      "path": "Saved/Logs/PolishBuildFinal.log",
+      "sha256": "710c37b7522bc26a4900c72884648ccfb52c725f128b462cfac45164b375d0b6"
+    }
+  },
+  "automation": {
+    "succeeded": 39,
+    "succeededWithWarnings": 44,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "total": 83,
+    "reportCreatedUtc": "2026.09.21-15.05.16",
+    "report": {
+      "path": "Saved/Automation/PolishArtFinal05/index.json",
+      "sha256": "5182eac028fd00d9851ec1d6d26156f3f7df10d2e25740eba67ae4adfab74417"
+    },
+    "log": {
+      "path": "Saved/Logs/PolishAutomationFinal05.log",
+      "sha256": "f7ec6d5724ffdfda9cc89456de78d110db2403c8fd3152c58dae3278c9d87448"
+    },
+    "warningNote": "44 successful tests include synthetic worlds without cameras/viewports, existing GameplayCue fallback, and deliberate invalid data/save/cap cases. This is not a zero-warning run.",
+    "warningEvents": [
+      {
+        "message": "LogAbilitySystem: No GameplayCueNotifyPaths were specified in DefaultGame.ini under [/Script/GameplayAbilities.AbilitySystemGlobals]. Falling back to using all of /Game/. This may be slow on large projects. Consider specifying which paths are to be searched.",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLK: [Home] 场景中没有相机（CameraActor / CameraComponent 都没有），请在家园地图里放一台俯视相机",
+        "occurrences": 2
+      },
+      {
+        "message": "LogLK: [Home] 拒绝保存战备：英雄必须恰好 3 名（当前 0 名）",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLK: [Home] 永久档不可用：槽 LittleKing_ProfileHomeTest_B 内容非法：ProfileId 无效（原文件保留，未覆盖）",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLK: [Home] 永久档不可读：拒绝覆盖（原文件保留）",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+        "occurrences": 38
+      },
+      {
+        "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_Stage3_?:/Unwritable）；内存状态保留，可继续当前会话",
+        "occurrences": 2
+      },
+      {
+        "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_Troll_?:/Unwritable）；内存状态保留，可继续当前会话",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_WorldMapTest_D2CD1704452675B6424624822B6A693C?:/Unwritable）；内存状态保留，可继续当前会话",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKBattle: [Run] 存档文件版本 99 不受支持，拒绝载入（不静默覆盖）",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKBattle: [Run] 存档校验失败：存档结构版本 99 不受支持（当前支持 1~8）（保留原档，不静默覆盖）",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKUnit: [Trait] 无效特性 Trait_DoesNotExist",
+        "occurrences": 1
+      },
+      {
+        "message": "LogLKUnit: [Unit] 敌方 单位已达上限 8，拒绝生成 Unit_Skeleton",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg called by: LKRunRewardWidget /Engine/Transient.UnrealEdEngine_0:GameInstance_28.LKRunRewardWidget_1",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg called by: LKRunRewardWidget /Engine/Transient.UnrealEdEngine_0:GameInstance_48.LKRunRewardWidget_1",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_15.WBP_BattleHUD_C_0",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_28.WBP_BattleHUD_C_0",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_48.WBP_BattleHUD_C_0",
+        "occurrences": 1
+      },
+      {
+        "message": "LogScript: Script Msg: No game viewport was found.",
+        "occurrences": 18
+      }
+    ],
+    "tests": [
+      {
+        "name": "LittleKing.D0.Content.RegistryAndEncounter",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D0.Heroes.IncapacitationAndRecovery",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D0.Undead.BoneRegenerationAndBatchOrder",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D0.Undead.GiantBones",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D0.Undead.RangedDamageClassification",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D0.Undead.SummoningAndSacrifice",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D1.Configuration.BuiltInUnitRules",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D1.Run.BossCompletion",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D1.Run.ThreeRoomFlow",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D2.Configuration.EncounterCatalog",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D2.Heroes.RoomBoundaryReset",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D2.Integration.AuthoredEncounterSnapshot",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D2.Run.EncounterSnapshotAndPermanentState",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D3.Rewards.ClaimBoundaries",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D3.Rewards.StateMachineAtomicity",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D4.Map.RowStructureAndVisibility",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D4.Roster.RandomizedEncounterRules",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D4.Run.RestHealAndFullClear",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D5.Save.IdentityTraitsRestoredOnLoad",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D5.Save.RecoverySemantics",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D5.Save.RoundTripAndNoDoubleClaim",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.D5.Save.ValidationRules",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H1.Profile.CreateRotateAndRecover",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H2.Loadout.ValidationAndPersistence",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H3.Expedition.SnapshotAndApplication",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H3.Resume.SafePointLeaveAndContinue",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H3.World.BuildingsAndPanels",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H4.Settlement.MathAndHandoff",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H4.Upgrade.TransactionAndCurves",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.H5.Migration.LegacyRunToSchema5",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.HomeUI.AuthoredAssetsAndContent",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.HomeUI.DraftConfirmationAndDetails",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.HomeUI.RosterButtonsAndSafeReturn",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization1.LegacyAndCrossSlotProtection",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization1.MenuButtonsAndAssets",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization1.MoneyConsoleCommand",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization1.SaveIsolationAndRecovery",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.BattleWorldPreservesMapAndService",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.BranchProgressionAndFullGold",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.MapServiceAndGateUI",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.OldMapMigrationAndDepartureFailure",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.WalletSettlementAndCrashRecovery",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization2.WorldGraph200Seeds",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.BackstabAndLoot",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.DashHitsKnockbackAndObstacles",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.ElfHealingAndSharedSpring",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.MimicFullDeckAndFallback",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Content.QualityGradesAndTemporaryCards",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.Deck.CapacityReplacementAndRollback",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Optimization3.UI.HandLabelsRewardReplacementAndRender",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.AssetsAndAudioDefaults",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.BattleArtDefaultsAndOverrides",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.BattleArtSpawnGeometry",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.CampsGroundAndCombatEvents",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.CueBudgetAndThrottling",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.HomeIllustrations",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.PolishAnimationIsolation",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.PolishCatalogue",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.PolishHomeLevelGeometry",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.PolishMusicAndRevealLifetime",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Presentation.WorldArtCatalogue",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.AcquireRangeAndRelease",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.AuthoredSpellTerritory",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.FreeRoamFightRegression",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Movement.CampPathGeometry",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.Sprint5.Placement.BuildingAttackRange",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.UI.MultiSelectAndRender",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.ContentAndWeightedDeck",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.EmpowerControlAndSixthAttack",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.KingSupportHealthRatio",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.MultiReplacementAtomicity",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.SharedBreathBurnAndPool",
+        "state": "Success"
+      },
+      {
+        "name": "LittleKing.TrollCards.SiegeOnlyBuildingsAcrossMap",
+        "state": "Success"
+      }
+    ]
+  },
+  "imports": {
+    "assetCount": 639,
+    "allBatchesAssetCount": 775,
+    "imageAudioAssets": 635,
+    "fontAssets": 4,
+    "reimportPassed": true,
+    "reportsMatchExactAssetInventory": true,
+    "logs": [
+      {
+        "path": "Saved/Logs/PolishAssetsFinalImport.log",
+        "sha256": "22f2484536a8fb633613cc81b05e794ba811b66b6c285af0c7ff82df815d26f5"
+      },
+      {
+        "path": "Saved/Logs/PolishFontsRepeat.log",
+        "sha256": "1e8844be0ecdaee792a76b1a02282a682184e10236a5b046837aef7126fd5615"
+      }
+    ],
+    "assets": [
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Attack.uasset",
+        "sha256": "1d0a8cfe47b070aa37da6647c067f5372788d0ee96ce78ae2dd3e47ab5ed5882"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Death.uasset",
+        "sha256": "c1870799dac18758bb007ff3129e8a364b140e4c3ea59360fb1f6aabce75002a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Hit.uasset",
+        "sha256": "1d27c7876aefba1d9fd19d9e78abdd65ea6827640776b6fe2c7f31b8f7a9be01"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Idle.uasset",
+        "sha256": "b203e13164fbf68267abeac4149379b6cdfd9657e6da7658c30fc7a42098b048"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Boss_SkeletonKing_Move.uasset",
+        "sha256": "a45d5b8f1e04aeba995f21cad4cc1f65c209c15d6748c59b0d74f54c5adfaaf2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_ArrowTower_Attack.uasset",
+        "sha256": "11e1986c069a5752ff2d723456b374334e06558007f10f68e0b33a27e70152e7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_ArrowTower_Death.uasset",
+        "sha256": "0c99de7cf0862d9e4b62999892f82c50146103844ec63f1c8fbafe1fd1dfe7e2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_ArrowTower_Hit.uasset",
+        "sha256": "fcc27fe0530c222abee3e608fc34fd4b111592408d904f3203d13fd9baf1241a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_ArrowTower_Idle.uasset",
+        "sha256": "b0c8bd143832a94e8bad851fd1b314625bc1af436a57706e9ee4924d2cbc4aee"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_ArrowTower_Move.uasset",
+        "sha256": "2bf6c14c87fca6c87a8eaa9376b2dd3862a0397f8563b70e05e08655f167c73a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_Barracks_Attack.uasset",
+        "sha256": "8603c7de9851d8a4c3a84b2ea7b556097a4b5a4b44ac9360b5f60877da4673f1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_Barracks_Death.uasset",
+        "sha256": "8aae1b2dd888fb3a4ab43a5a5cdef6af21625f654a88f6ce27d91b090a0ab5f0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_Barracks_Hit.uasset",
+        "sha256": "abdce577ce3d40e225b67f32e7068e3cb686a11513145861e564fa69a65c31a5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_Barracks_Idle.uasset",
+        "sha256": "8541fb5fe4d63dc1883b270f3bcd47f347a44f5874c3ed521b1f7c3d847b26d9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_Barracks_Move.uasset",
+        "sha256": "7385b153167f15248de858fc05cb3af7f4b4387c1e717e78f9bd3f054ace37fb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_SiegeCatapult_Attack.uasset",
+        "sha256": "1ef1453e42bf04bd94eb71af8da014c5b7937a960e2d3eb039aa2626a8a6d97e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_SiegeCatapult_Death.uasset",
+        "sha256": "0d881f31aa29e6d018915343d16395fd3cb4f4ac8e71308323bee57996029fb4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_SiegeCatapult_Hit.uasset",
+        "sha256": "824942a234a9185951050d374aa50ab0456a22b1b71a164d46348598b6398cc9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_SiegeCatapult_Idle.uasset",
+        "sha256": "daa787202763c275c44edfd95620b259efd7f945e76bb61cdfcf62c94e6929dd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Building_SiegeCatapult_Move.uasset",
+        "sha256": "86ada77121fea3bd33f0915b739cfc5e7cce7bfc914aee6e7de7855b2cbaf523"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Attack.uasset",
+        "sha256": "e22166e77b14a8886bab1d8a61586de70c6676228367a3a781e723cca54f5555"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Death.uasset",
+        "sha256": "ae3bef0b4fdc3c2a2ededaf77f713ac9bf93303d80bc410f7fbb1527d503992a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Hit.uasset",
+        "sha256": "f3286b46bd03702ccd0c4b60a80fe458ebbfa9dc58e21263ff3cc32334d320bf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Idle.uasset",
+        "sha256": "bbef44ec84f819d416c07d7e77534c3e342ae7dbe19b3a01eff58bd21e36e7e3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Knight_Move.uasset",
+        "sha256": "6472f939bebf3c7825dcc909a35b2f4f79b029c2a6c6f488ecbdbd506e8829db"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Attack.uasset",
+        "sha256": "51064602df51e0cc6ae6b6e6e31b74d84d9040a01f729f4ddd624b847bc2c24e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Death.uasset",
+        "sha256": "ba7a42007dca5d86551ffa4efccedee9573c93690777d13660f56205ab92ed44"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Hit.uasset",
+        "sha256": "9ebea9a81a40dffd390447c7f9ea8bde724059c12839076ae39d00f3dbf6a694"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Idle.uasset",
+        "sha256": "dcb047dd2033fbeb186bf17ddd5513362d9ad3b89b0d0fe094782f1b60ddee4e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Mage_Move.uasset",
+        "sha256": "8fcd2bab2af06ce6a963b13a52d633e3d664ac3a605a3e5430c90bb9cee08244"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Attack.uasset",
+        "sha256": "67af6fe28d1c8ce01a52f2b175ab2cf6f2493f368af29484fabfd480d95c8ba6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Death.uasset",
+        "sha256": "f033f184a86fce6d852473a84a32094f938d59bd639c42b3043c0495161d7952"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Hit.uasset",
+        "sha256": "33f4f9f9d006337c781cfe968321e508a2b27e2f97623d011cc311138e03cdc7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Idle.uasset",
+        "sha256": "b67f6b28e67c3b66c161afca8765b31438284d189df2143bade0b16279da7f46"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Necromancer_Move.uasset",
+        "sha256": "57bb92c236910defa53a103415c6cdbc4b71121c2bfcdff88112dc5bf99ba2e9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Attack.uasset",
+        "sha256": "47ed87fa7c10d753857046bf27f4b6942a9ebf424c8f8c25a7ae806b1c1c373f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Death.uasset",
+        "sha256": "04decf2dddd9202896536526976cc56c4390ec18d13a8c57b4b0986779ff5a68"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Hit.uasset",
+        "sha256": "6ef3afa3ed51e1779dee95c41c717dc606a7ad0607fb38eac658ee51278a4899"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Idle.uasset",
+        "sha256": "22734f2a0a4c8e8f480648cf3d27687e3735c0dfe6b623804cacf4de3ff23345"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_Ranger_Move.uasset",
+        "sha256": "952b5187c348bf54a04d7b6cbdbeb0b49fc08f366bffa525fbb850bf72f850ae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Attack.uasset",
+        "sha256": "9967fb291b7711ec289d8081aa28500e56bcc209c97bc99adb6a182287e38da9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Death.uasset",
+        "sha256": "9d2c69a7ab86dbbd925d242e2a081f64c1a63fad78bc813551612cb7614c4d5a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Hit.uasset",
+        "sha256": "ec3d025b29f77ab3326a912655ed2484494fcda00950b8fb8245b18d8fad1f1c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Idle.uasset",
+        "sha256": "765f7d963717f8fd098600c29eaa2ffb86f71f8db48c3de8262789f2fde4e198"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Hero_SkeletonGiant_Move.uasset",
+        "sha256": "8b99db6e860b0de422714053ac4ed019247a2de1563335f4593538c19c6e492f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Attack.uasset",
+        "sha256": "3534d2f48bfb57bc299441e36b3ddc5ef777a7fa982d6b3223e6bc2d2fddac0b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Death.uasset",
+        "sha256": "82d4a2bafc32655bbd3162201ed5fdfaa33ac5b9432fc81f9b5d19c4022135cd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Hit.uasset",
+        "sha256": "07c52e7141abf19f205de0ceec63d3931c2de64cdbc5bcc9cd9760f40d69e8b9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Idle.uasset",
+        "sha256": "385e3210a2a5cf0502185293936d4a1be99e6fedc3de451b3c0b5685ae2638ff"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ApprenticeMage_Move.uasset",
+        "sha256": "6ec46c551a192faeebcf12d0d76ecbbaa31ba14df33060b00d5cadb5c8a44083"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Attack.uasset",
+        "sha256": "db23fbf060466222623e97d8f0ae891b86aa4b927fe0fb3a78265f248c23f765"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Death.uasset",
+        "sha256": "62d225bed3963a6fac77a33b320c03e60e3d3a599e88e16852d127e1ae79e59b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Hit.uasset",
+        "sha256": "bfc58b427419b5b3ab04c9944d32a9637e58dff41b157917e0ec0dc0c1658441"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Idle.uasset",
+        "sha256": "f74ce4bf7c4409b01fa6dfaeacc056eb67d01a97cb6e19eb359ca89b257639f4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Archer_Move.uasset",
+        "sha256": "a61cb341b9ec25c035b4e9a9a25a11a3cce51405147d81f3653bdc1eb6a6475b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Attack.uasset",
+        "sha256": "7cd2ab1597f185213ebb9e6c550f2522e28180dd8ddac9476fddcf10dfae102d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Death.uasset",
+        "sha256": "e0b752fffbc70a5b5b10f044d156b5a2c1cb6987e4edbaa2d5eda3101b034424"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Hit.uasset",
+        "sha256": "61bccc1b58f9e372b72afdf113f6159015059b58bd684874f6f1246df14a621e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Idle.uasset",
+        "sha256": "305bf7094304e34e8da0fcc4f36881e3af28e10a69a6f3007f101cc4b9abbe75"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Colossus_Move.uasset",
+        "sha256": "a99d594ef49156ec922cb11a440304365972c854cdf66a71e0114f55cf34c932"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Attack.uasset",
+        "sha256": "6d8dc18f277374d6dfaae132437bc990b370657c669f82c62b301933890e1cc9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Death.uasset",
+        "sha256": "b8f24020f883cb86cc395cc4744c61645f3d03de1667e0ad554882c838a7ed53"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Hit.uasset",
+        "sha256": "d87551d431a39d2a8b05718719219de52ed0db33eeb9c1d6143265bad2b1bfd2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Idle.uasset",
+        "sha256": "b048333c3eb49289ee3a1626e9978dd47761b3db905ac0ef68cf0d613e4f817d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfArcher_Move.uasset",
+        "sha256": "935a82e2c3b44cf42e9d76b96d3d9ada18a6a9e5e18482179313c247204781c8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Attack.uasset",
+        "sha256": "bfd13bb4c8a7c532d19961185fc5336e5fad1d6e2d7f103a7ebfd06dca2cee33"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Death.uasset",
+        "sha256": "391cf9f2a98cbf7742dd10465506fca885070d76e62f3d4b712bdd0b408b3215"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Hit.uasset",
+        "sha256": "8f06591ab8bd8e5d64382ab0ca8d156d4d44d38c9e4d9e8b037872fdcdef4ecc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Idle.uasset",
+        "sha256": "3795e2ecb3113ae558fa58de878656b6bf80f2335af2985275958c3bc194035e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfGuard_Move.uasset",
+        "sha256": "d4d93c801101f14a3cdf4863cd44205a07b55d72173f8f6c52114aaa5f058c76"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Attack.uasset",
+        "sha256": "9f7a571a0303129037ff6f0289befe0142e282ca8f75f55f18197f6445f27917"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Death.uasset",
+        "sha256": "e18043367d8b70c8bcdad046ecff7e3e64b111c6f9d3ce8f27f1db82d16d8165"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Hit.uasset",
+        "sha256": "9de5d1cb247ec847e2ac79ebaa2916cfb9d3ad01e6e8e701f6f8df1b24fa8d23"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Idle.uasset",
+        "sha256": "2912210967c7660173942eef9d52641fb40ccf763b901a60fcdc13b876dc99d7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfPriest_Move.uasset",
+        "sha256": "6dd4b4a7ce991714b5320bce264b488cb4c2cb10c531faaa0c0132587f4a54c5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Attack.uasset",
+        "sha256": "5fd63997d4073a93c292c5da3481c5cb3067faa93583553c4bc9856c7acec428"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Death.uasset",
+        "sha256": "793ec486ecd4f5602ea70bfb9be5a65e1abc38961535ad02e0849e5b94fe0966"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Hit.uasset",
+        "sha256": "c93d16187dc649be46f874f059389461def8aba8dde2edb5784b7eb57f9632b0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Idle.uasset",
+        "sha256": "e722f38c8bf4a92afbef4631d125008809c6bbdc3353bafaf938386b42472b2c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_ElfWarrior_Move.uasset",
+        "sha256": "680e1f79d1bf9fd5c0f594c6918a9057bae7e84276c93d2f0bf6e0e7acf2ff1b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Attack.uasset",
+        "sha256": "2964aacc59e7427cdedf1fd75f0bc704da5aaa64913b0c22d01679b67d089c87"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Death.uasset",
+        "sha256": "7c7954a859b5d115e8e4779d560092f573c17e79c6558ab112eba67d5a887626"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Hit.uasset",
+        "sha256": "919f0eade74a50e3039c9379ff17332aa7286bf8e415930d8e79baedecabb67d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Idle.uasset",
+        "sha256": "9756edfc163d5e9291a6a7daa004d2737464c9554afc3cec7c02cde86c4eae76"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinBlade_Move.uasset",
+        "sha256": "d945887671bcfd57cb44a10c0ba9fbc3fd86519b8ac1eafba82c9e474b02e7ee"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Attack.uasset",
+        "sha256": "a0431c201992f1e7b019dfffe8c513b887feecbfb43006a7d77bc7b3e9eaa39f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Death.uasset",
+        "sha256": "de7fe44d5497e83755f99db555b0c4d66028a69ac080738411c8c7fb98b122af"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Hit.uasset",
+        "sha256": "2fc41f3219ea4cf2ac76ba46f8302dc9a2968e31db16c1a5cb6393bc14ed38d8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Idle.uasset",
+        "sha256": "e6cc96816347f9901286b4d961a6cc735030fa5e1779d306b98b1a18665a6671"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_GoblinRogue_Move.uasset",
+        "sha256": "8758ce1e9c7059529a6475360740e134fae21c31a89a7524b4064b229a1843c4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Attack.uasset",
+        "sha256": "0df80dbd2b1efbdd736d94252f822643dd3a2775a8dfa762df227454dbf7920b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Death.uasset",
+        "sha256": "7041f4981323763fa2f7975be541464baead12a2b22e8202f92162616ebb9ab8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Hit.uasset",
+        "sha256": "8029d915ac463ec18d7463121de8bf2e40cc446c131700528ac1d77d1fcf97de"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Idle.uasset",
+        "sha256": "d8acfae30be98ccd202237c0e703cc80bfc71166332670b77049f2948a9c2be6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Shieldbearer_Move.uasset",
+        "sha256": "11db8e383bff2d727d1c073065aa086e154f44affcaa4e4f5e4ea47e657780b9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Attack.uasset",
+        "sha256": "e3f302ed9cfa85798515edc7aa7ce02f85ac8352ee8122e6338e591e892cb612"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Death.uasset",
+        "sha256": "1a3e7251db9f46824fef1ca7f2c9d004d5f9e0fb034960f8334f08443b270696"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Hit.uasset",
+        "sha256": "c2564a9c1b6d215e16a12bcfbd1bfe14956c6e15c5211e92a1781831bfac71d0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Idle.uasset",
+        "sha256": "5d4d644812626c3c66c21601d8a0f963c4ec76999d5690bea2a6c3375308dc51"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Skeleton_Move.uasset",
+        "sha256": "2063ac6eb44d6ed4594ce592947981b25d472b87ebf9dd36d55985c297eba555"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Attack.uasset",
+        "sha256": "9a53012201b2cbc7bda0bc9adb9827ce3ca96d945985c3f6fbde4955fc3a7132"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Death.uasset",
+        "sha256": "1c732794a1a8c17e39235cbffe0b42f165b55d97137f6bc5bc0107c71ee2d3c1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Hit.uasset",
+        "sha256": "05ec872c903c4252fea06f9daf9ffdda0baf28784e8b13dca9e6a277390267d9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Idle.uasset",
+        "sha256": "a41bcf24e10044f48c10ea71d885a4157337b32c21d426e47fb5ea5b45b45504"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_SkeletonArcher_Move.uasset",
+        "sha256": "b5fca3a6e5bb077351fce83da09739f02a047c8434a5e5ba15ef5bca27c1be78"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Attack.uasset",
+        "sha256": "f786563ca98e4e6d04511aafe6b05326a936cfdd35e5ba566e8977bcdb805310"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Death.uasset",
+        "sha256": "b22516fb55fcf4f454cdc6b47f3c9be37f400986e43c1cf39e16bdc0622b24ba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Hit.uasset",
+        "sha256": "caf7042ac26cf757fbce4476a69eda0ee4b12cdf8b8020895f5fd6aa7ea269cc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Idle.uasset",
+        "sha256": "f811f65e606f351441de36f9169cd3237bc5678b610cfc1dfc0ba9b74eca3f5f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Swordsman_Move.uasset",
+        "sha256": "6428807d27ef55f45d60999e30263223f6d9ea64528fd8836eb939806ae12b17"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Attack.uasset",
+        "sha256": "a730d846c7c3cf85d7846a7a4b996436a83e3f17544c329e6af2b78b330f9a8e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Death.uasset",
+        "sha256": "3552280cd265edcea4cf2cb9ed07bf3f5de451c7c5c02e295ef7f15a4ce2b58f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Hit.uasset",
+        "sha256": "822a43241fea4e4c0a85b417341f2615e125a7cf0283a1912579832f90056830"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Idle.uasset",
+        "sha256": "cb149ac81f6ff0221758dd225b39373d477b7ed4aa3ad50b66150353c60264ae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_Thief_Move.uasset",
+        "sha256": "74f768ab3f0c1ce1358a48d730802f2276695b379512837e1d115f7eb3b0dd2c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Attack.uasset",
+        "sha256": "f98029f04656ee266e7032ea9f7e45109987b55709fa68caf6f6a2651cfc481d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Death.uasset",
+        "sha256": "c40b54817e97d2ff10b79c345dfc8efa82ba67673e87a5cbefbed314b069c79b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Hit.uasset",
+        "sha256": "097a82239567c41be443643258b4516184663da6210e19de52522133ad2452f8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Idle.uasset",
+        "sha256": "9303897c6c7628f023ea4badaaeae80d881a0d64c693919bf75652f8465661f9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollKing_Move.uasset",
+        "sha256": "7e4c84c33b5a6f79cb72feb97cde233cff3a224091b1ab56c200d49b6264003e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Attack.uasset",
+        "sha256": "3d11e71a0d97e2b32cac21b502533f600c71524e95595fa8ba4e318fe7d0657c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Death.uasset",
+        "sha256": "b016efe75d57d659991a0254b4f311f3413c64505976d2653219b287205e5eaf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Hit.uasset",
+        "sha256": "f10d1a9dc7a772300d6a49fca6fa35b7870a96ff14b072b638ed2b71e796c26c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Idle.uasset",
+        "sha256": "342d160eba8941d68a63889550dd252da72605a1f2f94ab7e839e2fb7a6d3ba8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollMage_Move.uasset",
+        "sha256": "0ac808f4d55cab0693c289a82306d28e9ecf79f3cb67c502cc1d504cae2ef691"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Attack.uasset",
+        "sha256": "30422deb493d46d9d39ebad438825166064033029cd3a25979708b2b2dccb1db"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Death.uasset",
+        "sha256": "ee3e206e4a9d542dbe7473a8a3e9ee787c28f7ee3649d3fb2ea474864116a0c4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Hit.uasset",
+        "sha256": "de7bca3dcf1326315f63c25e157b188749026cd9400da8d0ad513db3114a1d0c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Idle.uasset",
+        "sha256": "95306fbe97df759a6d942eacf0d00e19b7efa6b2ab005bbc0fc99fda1bacd4e2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollSpearman_Move.uasset",
+        "sha256": "afcd90804b4befe611085e00c588a23eb134017d31cd015e1a9811176d442428"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Attack.uasset",
+        "sha256": "048d8566409abed734cd9803870e1178fb2550b851062994e15ecc01f873fb11"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Death.uasset",
+        "sha256": "1fcfced24655922c64d2d01389bca29b30fb72476a4b9adc8c422317da7c1c24"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Hit.uasset",
+        "sha256": "dedb01b1f91421ce5339d1a15a75084e6c3b498cbc1623a4b002ae3fbaa5894f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Idle.uasset",
+        "sha256": "7c1d114330a7990878ccdf7f6284b88b8c876759837a04dd44188d21cb99604c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TrollWarrior_Move.uasset",
+        "sha256": "886ca6b6c280de918610746c3092e4dd43d0b23e71c46124089dffe4d8473e4f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TwoHeadedDragon_Attack.uasset",
+        "sha256": "df7add04d9b250591a328a045ce40c23d4ec877ee4ed7281b960a076dbd5e207"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TwoHeadedDragon_Death.uasset",
+        "sha256": "dbdd2c15f7119c13111a5cdf3156339eb4cea7baa40c99c03395134e37c6a9b9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TwoHeadedDragon_Hit.uasset",
+        "sha256": "7eb1e918c8006bf27ef6e20e642508fe7e75f9f1a248252390735896bab22cab"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TwoHeadedDragon_Idle.uasset",
+        "sha256": "ce8fd29edb067d5a2edf9c3b79515ba729d8fe5b0588a1142bfbde50bda4b221"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/FB_Unit_TwoHeadedDragon_Move.uasset",
+        "sha256": "edebb971a29923b49ee092303c0cef1cc4a340ab5fc100bc9fe993311f663969"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_00.uasset",
+        "sha256": "2e92af52857bceedb395a5c46fdc2c75dc486063742c8f44186e68d097bb5041"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_01.uasset",
+        "sha256": "96f7ecb0c6f7ed470c12586b22380407dfbccebaadd80f5284d87f2ceb121e32"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_02.uasset",
+        "sha256": "1e217bfc663e7afbaba5f6a70cf34ea0cd516465407bf3a8bfc218f85484c820"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_03.uasset",
+        "sha256": "1865cfdac22fdd1fc69d60c27c3812e56b0064dd66b97691466bf301319a54e0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_04.uasset",
+        "sha256": "2bbfe96525f7d31ba491806a3881bb137ce3a3530c1b3c852dbebaae3e060089"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_05.uasset",
+        "sha256": "b719ba94c013c308c6aaa22649932fe91752899c1c7f2f7c5492dbfccbf10972"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_06.uasset",
+        "sha256": "2521f3e276a0f030359c81a8c5bf10f71d83e6f06119612ed9006db1ff59876e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_07.uasset",
+        "sha256": "00d445abdee5f9ab60898173d0938798924d9aa2f3cd29bb9d505079fb3c13fe"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_08.uasset",
+        "sha256": "b4a5eff63f0b4f83e86fad8adf825704ab2089ab9514cbe36c6b54b9b7d475cc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_09.uasset",
+        "sha256": "240cf55cab601615b05d0f2bfb59bb38256f245bf00d8bf1c83af4294cf57afc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_10.uasset",
+        "sha256": "a5b78ceccd6f3528ab2d0074af0f2b34bcb352776622b9ba37e1b7ced33124c0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_11.uasset",
+        "sha256": "014f7b85e0743d0bd717767002a0f402b46e8392b5f08f4b492abb4b469726d6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_12.uasset",
+        "sha256": "ada0a06813f374b50c6c165c2ef522fbcfe00f3f7b95be3cc62ecbc08c901345"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_13.uasset",
+        "sha256": "ebbf5af10fdc1b989bf70cfedae13f8dd421b84c4b576edc650eec0bcc4bf33f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_14.uasset",
+        "sha256": "2cc93cf5b8657c750246884d9781acc0d73197a55f31df0c1521c4b37fe1e3f3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Boss_SkeletonKing_15.uasset",
+        "sha256": "5b076f81db5f4fe14993aff5d6c6fece31d4439326a53d5c98990aaa24e22956"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_00.uasset",
+        "sha256": "80abd1db38b22f313a983e9c1178980910ed32b4478fd0f3f810e7615bc5ddae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_01.uasset",
+        "sha256": "a67e48509458c00206255ce040b857d78b2c0e1af8bbe6f119a56aeb42144568"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_02.uasset",
+        "sha256": "9a42963e5d6bd6ec6f1ea23b4e5bdde44f9e380640e385eab7bc23cf96a87463"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_03.uasset",
+        "sha256": "495e24dbb76e906740d05e113ef228913ed61a691cb97563c1cd0f6944fed52d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_04.uasset",
+        "sha256": "6a313a478cd14e156acb43dfd4d1db8cb0ce6c04c576ac014d09e0ceaf790a59"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_05.uasset",
+        "sha256": "abdf72ec69ead4caa5218cabd1f7885fad68cb3c977890acf8ac6a8792790847"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_06.uasset",
+        "sha256": "c0e15390b56f615aaa3a70c3a508607ebc3af0db780931b01d50adafa61ddfc6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_07.uasset",
+        "sha256": "00b56cf23829cc33ff3d63b68e402dfbac371aca5f6f04427e71ffedcc96347f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_08.uasset",
+        "sha256": "e03bd7d546958f5f9bc9274d80e926d060f726ff95070549df6e53fbc3a3c87b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_09.uasset",
+        "sha256": "99b04b844968c49607eb2baa7c314e042948b8ef9e2c9665ca6572b24a9b5a50"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_10.uasset",
+        "sha256": "9c0f9bcc0698770b9752740ec7320afb0751276815044cdb38be343ee511823f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_11.uasset",
+        "sha256": "0396681710d904822b8755e2d311d4cb1de4501709155618a132ae1ca022ceb5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_12.uasset",
+        "sha256": "99a26be0d9708af13856f26032571af7bc44ca50888a60265f5943e4025dc052"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_13.uasset",
+        "sha256": "ad78d8f6cf789b21bf92bd7c570000e6daa1a19c52cb314f6a07be02fcd08438"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_14.uasset",
+        "sha256": "f587fea2fac14a58d9ad14d3dce5b1b17f5a7a3af6ac17ac75b71e14ef0df206"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_ArrowTower_15.uasset",
+        "sha256": "391684c322facb89b02ad7a229fb01f2f7e25e53b8e01980c0b7875aabc38838"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_00.uasset",
+        "sha256": "fc68ef7ac791793d74968da3962df459e8fdc31ceef3d2db0f358def88e99855"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_01.uasset",
+        "sha256": "812a5ae6d63a8e712e40da47bec2db94856f73d65c8776de2429e9563f921378"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_02.uasset",
+        "sha256": "3b5bfba4a2aa414ac248776aa5144c0064084b6d1dddc6e1c41a540592a8e0fb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_03.uasset",
+        "sha256": "d3bcea01abd51f147857dcd8fb6440a8b1fe7c29d6629029f9c33c2f750c3d1c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_04.uasset",
+        "sha256": "39bc65d0dd1b9470e13827c545a158df4bc00f99b8a01ab98e72e725a67518c4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_05.uasset",
+        "sha256": "6bc89da98c316fd2da2cdeeed1026f5e4df36f73bf8bb559cf606634dabd6441"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_06.uasset",
+        "sha256": "972b2df3f96271664e0e43f29409fc978e04cb7f98d85582397a35befba300e7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_07.uasset",
+        "sha256": "c378d129f631871ce1180bb1e1b2ad7bc092f62293085c2d61fdea365339d2d4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_08.uasset",
+        "sha256": "b4de38d71a18e057d798d75773b9db7a77d32afff267a28fbda3739bd2507c7e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_09.uasset",
+        "sha256": "e6b1c7b5f43a3617f1333ef6f6b0690406afdd375ae25f6eac4ffbb0edfe739f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_10.uasset",
+        "sha256": "b9f00be939446c73b513316c8fe2da4d93662f29bf80a73ddbd4db970229aec2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_11.uasset",
+        "sha256": "801c6736d36314de2a2fc93da76217b137505a6dbd76c0e58c76f49885590efe"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_12.uasset",
+        "sha256": "b88b34f521bfec436851aebbf99cce375ae60a1daaec16fc217e68d6f5f6d9fd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_13.uasset",
+        "sha256": "714019ce7ded976f2f06df17479f3a5941c7c4d41ffe70342dd61b7a076f0ea4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_14.uasset",
+        "sha256": "4f9f3d590b8bda3756ebfb9e6b21fa9c1383a7c0c65c671972f4462aadb8af2e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_Barracks_15.uasset",
+        "sha256": "be19ed78c0fbe1355cbe952961fcb6585219bef0063bbeb5a20db5b07249edb7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_00.uasset",
+        "sha256": "0ff383b2a1433218cbf63fabbffebfc95ccc16bd58b1158b2e38bd19960ef783"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_01.uasset",
+        "sha256": "5359c2cb2bbd1d5f8a868dbea5f0230836b87863ca4ccc14468159fe57891245"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_02.uasset",
+        "sha256": "f7e2b4d397890b313c296e73c26c6c0c1034834446afae70406b3d6173c8a6f7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_03.uasset",
+        "sha256": "8bdf24cfbf9d62735d64603459826c312f5fd8ecedf7dbfcfe8103fac8f8a115"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_04.uasset",
+        "sha256": "1f438fbdb6fb9258672c4eae40df90c4d252ac71c3e3da69d94c6e02322e5239"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_05.uasset",
+        "sha256": "ea2a96e2004f40b8c649481b60e34dfd21169ce3a872bd59b766a623b8756134"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_06.uasset",
+        "sha256": "bad6d09dbfe93a5cb9c15bbcfe998c46a4c445d8f89ab056491824c1a6c37394"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_07.uasset",
+        "sha256": "3939b2ebec281595b4b2025df5cb6e591eff88017b31cf3cfc4e2ae09d860c80"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_08.uasset",
+        "sha256": "e4c86195aace82672fe0842f0c6dbec4e896342bf3a6ba4202405dada7d410b3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_09.uasset",
+        "sha256": "32e26a1746e377e6a978d98b4b98fad8201c99f6f023fbefef06ec312fa2f9cb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_10.uasset",
+        "sha256": "56089942e02c51f540447af6072f328ee1c11cafa5aff8995d3858f7d3853b6c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_11.uasset",
+        "sha256": "00bb5544f732ddc2bae7f19f413ad5000a20797bd9aa46a41598afffd11661f6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_12.uasset",
+        "sha256": "3f42488b02c8b8138ae63022717b87c038a2196a57a53dff9119e3732772ad5f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_13.uasset",
+        "sha256": "19697278f6dd017d229b2699ea53c96841367ffd31bd2e1a0d6a4304e58943f3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_14.uasset",
+        "sha256": "6ee9a92cd75ebd7420ca1e2ef33b25e22a3d8ed0b419ca6fdc2ac12fc4ae4506"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Building_SiegeCatapult_15.uasset",
+        "sha256": "12cf2d93a92bf1e3847189a4904eef9dc01b48f9ada4d6777ab9b970c8e23b1f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_00.uasset",
+        "sha256": "d290a80b3e8caa490a8e1ff71168fdd6bb1e92ad256bd47a8752b53ca17441e9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_01.uasset",
+        "sha256": "44af55a3e9192b549e153d714749a8a621305588053aaf485d91e9fa5036ca39"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_02.uasset",
+        "sha256": "1e1c6a120ee73c88e5baf86f4399b5ad870a946940c24e426752a662bd9fde71"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_03.uasset",
+        "sha256": "8de9f674cf9399b305ac174ab7e2a34c8d7d037d1d50c4311c99f51b72055bbe"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_04.uasset",
+        "sha256": "ae6a612be6034f5e00770a01c773ea482fe5c41042bc857a1ccf14d4db40d915"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_05.uasset",
+        "sha256": "bac7469badb3d8bfabd1dae079f31b885d7e99765a673ec43310a23eb61cae73"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_06.uasset",
+        "sha256": "c7c4ff912274777111d7f8f899e8625936158d1d927cac5d1760a5a9a399368c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_07.uasset",
+        "sha256": "e22493eb3b0c789a2257add6f69444efa433f5749cf89128cbe51d295a175673"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_08.uasset",
+        "sha256": "d1edb56ff6b023fb0736637eb9106a8a7742d16bf40f47500abd333be4c0fbe4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_09.uasset",
+        "sha256": "cdd38e86ee099d0cbd7612a8c9641f03eb603096b0a577df2ad66b4bdcac23b1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_10.uasset",
+        "sha256": "7f5c0a5c9f21ea6498c5e8867074f4f4311e4401e9e03d39b11f3a7859ad17b5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_11.uasset",
+        "sha256": "885a9c1e2c84dc0468074808d4c0b04b21981328833ecc7601ba5f73a01f125b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_12.uasset",
+        "sha256": "57f044b2301f4ae93ffa76626574e40107aa558b243591d0327737826f4492bf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_13.uasset",
+        "sha256": "4123544cb173633b0b81dd080dc6b8224d14e771b95510e6eb6e56d38f6ead01"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_14.uasset",
+        "sha256": "4e8d812e5c3309218d1942ee7d6a7a9809024f7028fd80cd02630b3e3744c18b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Knight_15.uasset",
+        "sha256": "93461ba543a402457a36f4dd8a6b491abaf8621b78decb27fbe02f5c70d54f6f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_00.uasset",
+        "sha256": "f741e5504ddae7fdbf3e79563ef13861a6366a0e27ae374b4d928166492cfb81"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_01.uasset",
+        "sha256": "4be3b33ab250d5c05e2f61e191d63e3bdd9b7317efdb78e9c0f18a0f904ea555"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_02.uasset",
+        "sha256": "20df926902ca34cfe675aa8d8d4759d28bd2867c4bd0d4f5fb50fc894865ce6f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_03.uasset",
+        "sha256": "b7b7c464d13d43746185486f214236280fa6063b1a16b9b218f4a03fba392974"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_04.uasset",
+        "sha256": "0f3d6a483f29e2d3b2b1a9483ffdb6595b07bc79b8d4a0cc6546b39445c91bf6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_05.uasset",
+        "sha256": "13b9b580030fbb682435bfcdfb5f0680ccf7dc8241d12a2560a99c5377b87af4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_06.uasset",
+        "sha256": "691cbe58065250145e61e77dcc50265f9272c1ab7b8d5add3fc3fdec8ed9ea7f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_07.uasset",
+        "sha256": "9e962bfa61ba573875061beb7992903c5e8621c938bfae58a7ae94045dc148e3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_08.uasset",
+        "sha256": "f79518e806d42c64243b124e0c3632028e6717afb6dce9fca48c4752ffa75677"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_09.uasset",
+        "sha256": "279a40aa7a820ae6fc776bda187fe93cc83c17f7200fe8d3f170ca603f17ff8c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_10.uasset",
+        "sha256": "b11184214d710fffbfa63b7bbc76c917eb2f1d0c02119778b209338db24d44dc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_11.uasset",
+        "sha256": "2506497362a97e960a0b5cef390b482cd140e5740975c8066af6e85026b8c608"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_12.uasset",
+        "sha256": "1bddf600dc3993303849df6e35393889d55e0a0d9cc79c2a115d73b37017996b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_13.uasset",
+        "sha256": "bc794e79be229f9743fdd7d0a106554c1a803a49d438b03b566e82801aab2ff5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_14.uasset",
+        "sha256": "4cae107e3348cc9af20a305649a0b82ee478111c8c007ad574c596fbb38d8f9a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Mage_15.uasset",
+        "sha256": "b5489403100ad64d4cf28457075259d51c1cb46cd54bfcd8ce2bd457075abb4c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_00.uasset",
+        "sha256": "abff5d3cb169dcfa0da86382fc32b79d7e7d0729eb5520b4d945c354396ab759"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_01.uasset",
+        "sha256": "cd6e0b8998ef6befcb4eb140810e6cc19c0968868c8d94aca6854d2eeb975530"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_02.uasset",
+        "sha256": "a288a9ec1d4bf83d0ca1cc70729806d0694abaf3d668601438df804f27242f9c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_03.uasset",
+        "sha256": "6b4fc82db20d58982c9a07539b53c0ef93c6438fb4e58f10ba4de608b21b14f5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_04.uasset",
+        "sha256": "5b2fe7088aa3b02c100d02fce714cb8d6d3f6608b78a2522736520fa4701ab8e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_05.uasset",
+        "sha256": "7510c9995dabf4e6494cb97a4383ce7fd105260802fef8a5ec2735bf1f73cf32"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_06.uasset",
+        "sha256": "11b0a8131a3643eb4804103f0e786887d9e01153835d686f9c8fc7e6c86bf43a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_07.uasset",
+        "sha256": "c7dcc51985b0eb16ffe52106a70ab9ee4a57868c47dafb32f64ce69e6649f363"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_08.uasset",
+        "sha256": "f9e599ed4799cbdf885368900be9b03e058fbc11532b4e6934df6de726e86fb6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_09.uasset",
+        "sha256": "0481f1aaf226a2d6f212d7632afb0024eef1c6e36e20206028213964dee5de96"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_10.uasset",
+        "sha256": "c10b6963dcbdc4dac35bf177c38ef1b70eff43781f7ebb17f8bd707b4766cd9e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_11.uasset",
+        "sha256": "2ae10a5ae4f593f6c537fc35090cc88f1de2e70f4f9263fadde89004a1e79aba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_12.uasset",
+        "sha256": "acdfff9d8c591c148b0be76c81059222c7d65db8c90d1eaff6492f4eacaba3d8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_13.uasset",
+        "sha256": "f1b00bbddcbe42885d3ae525300191c8812c32414fb81aeecaf348eda811fb69"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_14.uasset",
+        "sha256": "c6b53fd1566ab865198da654821c27048fd61b3561dd8ea387cbbda1d5a3d3f4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Necromancer_15.uasset",
+        "sha256": "6a0cb6387ef6f70e4b5f8cb7a4ac250d7d92a6c99b98233deb82cd24c679d978"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_00.uasset",
+        "sha256": "cab22759282a951b2d2252555ddfffe7473a88bf35c659247b9c777d42c9ceda"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_01.uasset",
+        "sha256": "d2f46755f1c43063504d97f96a4386e4406828bf9548bf533a7f74748e6e6ae6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_02.uasset",
+        "sha256": "d8d806d94bc76b94e88704f6826d4973d1d1441d0b2973bd7176a0496dcf89f7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_03.uasset",
+        "sha256": "298a2c85354b40eda3160cb9a6c3d3199fd44bae79cdc30ec8006c3c85fce2f2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_04.uasset",
+        "sha256": "a7c1be5d380157e416476a1a4fa2d34395bd855ff93a9a741032e0c0a0a6a088"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_05.uasset",
+        "sha256": "cfc63ee3b5a5b20a5061827fbc90faedb5aeb7f98ff0633c1b163bef57454924"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_06.uasset",
+        "sha256": "5d3085644f2c29b92c63e03e3e2fa85aaecb79716bae3405800d9d6225d2f423"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_07.uasset",
+        "sha256": "fd66cf8f787fa3976c2bdc888667465d7538640674801aa4d2f50d9b6917676e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_08.uasset",
+        "sha256": "6690e08c4bbbc65886a1da12c373c8a1c71fee40de39db2d54243564d96de7fe"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_09.uasset",
+        "sha256": "84168fb2bbf7264a1b6609eefed4d44117148dc9bfa1066c589105d46bab0730"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_10.uasset",
+        "sha256": "51025497f7e7ad6021413180bc6f9d58cb4e8f7c3f83ab1736655c76275110ec"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_11.uasset",
+        "sha256": "f682c4f4cf788b585761c8edb42d454a3724b9e9e6ae4259365aade0b5b757a4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_12.uasset",
+        "sha256": "6942f0fa59c99c2152d24fa394d17a34eea2c64f5284c7ad18ad30cd072e36b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_13.uasset",
+        "sha256": "f25e6d3003f27b5c4e73b38ca375f404a49bdf22b93c09c5041e47da5cd7b049"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_14.uasset",
+        "sha256": "ed198da78f2ea4ff97fb1fe237974c66d8660feaca83850164c49f09a31a4ce6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_Ranger_15.uasset",
+        "sha256": "c75ef7510575073a93284ea3e34c521a01255b7351c50cc607554c023f022026"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_00.uasset",
+        "sha256": "c118d83537cb265b5c9c5a1336b266f113d65dcfda72279025060b8a45e4ad05"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_01.uasset",
+        "sha256": "09116ed8f38b7b325cd46f2b97f34ffc1372cd5fca56372782bcedc9932c8089"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_02.uasset",
+        "sha256": "21628b68d07279acdc58d4648b74ae199b1af95ebf2530ec543a6ccbcd3dd4c0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_03.uasset",
+        "sha256": "9e1225dd20122fd9dba10de44c262c5d3d7cd1393ed24a47dac68ce8eaf20a57"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_04.uasset",
+        "sha256": "04748df8ed76288d30546ecdbaf833a8b8f21880e172e61a3dfa987708d8288b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_05.uasset",
+        "sha256": "6b0fb99e6569f5d515f61bfffd4dac4a599fbf6bd8026b1266805286007fc99b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_06.uasset",
+        "sha256": "0efe5890ceb6eeb2c46e912f9cd4bedcacdd0cd4655976fd8ee4dd4792fdb643"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_07.uasset",
+        "sha256": "f1dad71c6288c7e0c9ed1f9c92b6c559ecea5148476a501a52d8fa90a9bd4c4d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_08.uasset",
+        "sha256": "5ee7095bc18b2e31c71876f3d5da3c81bd1f595e5a65595ff05647be1976a0c0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_09.uasset",
+        "sha256": "d9cc4de3152a497fa800bdffe4610da34e8622201faf5bea83a0d2cebf2b32df"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_10.uasset",
+        "sha256": "7e485b544153e560addf1504d64728cd1cc28ee5223253d6d9a1795cd39879d3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_11.uasset",
+        "sha256": "29ed32f1125b4eb89851abf229466979124b0c0bd6a372aac86e877e0ff99641"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_12.uasset",
+        "sha256": "3101718ea01a92d1839f0c36e9e8f34c351720596375d3c73b977363e5e9d68f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_13.uasset",
+        "sha256": "ebaa8589b051707edda11ae2cd6901c6504898a59092f30537fd9c18f23edf00"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_14.uasset",
+        "sha256": "74ffd84d2c1b748556456ace0fcb59730b76c83a124fa4014dc8392c03aa5ee7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Hero_SkeletonGiant_15.uasset",
+        "sha256": "b55d5a417487e38c3c31e7944949fe71ef6c9f6a3a11bd7cd1169d06a28039f6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_00.uasset",
+        "sha256": "285450ab03f68cae3979272acea5ebb3db92f2f730e6df93a18449c232e2017e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_01.uasset",
+        "sha256": "fdf32cf7c1302421e7cdaf03662d1ab59b8c3a9028831840882ecaeb66a752e6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_02.uasset",
+        "sha256": "b39fb9bb30e3dcf632804b8460087d8f27ed8425b84c3e1263c32b2d49fe50d5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_03.uasset",
+        "sha256": "70d95c1e73947db16250f6292cc578ce9faa42028937120ec744c0f6ef27d6b9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_04.uasset",
+        "sha256": "9577bcf65d689a7870153d5aa6a77b91f077ef9a66ad4b268674c35b01181d69"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_05.uasset",
+        "sha256": "aef3f6d5a74ebe6a0c7abf03b6cff4b9529e5fbe41de91531e01875928423967"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_06.uasset",
+        "sha256": "d6b04fa54e5331724fc557201afeb895eecf04932657885a68d2853be79b0977"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_07.uasset",
+        "sha256": "71c6c823fab5222cd561356379b462c39c7bd4e3ee43d5c6dcd474eaf04e377e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_08.uasset",
+        "sha256": "a6ac82873e777efbc378eb8038e7514e65c887382818a624172853eb2cf98c7f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_09.uasset",
+        "sha256": "40c71bed00f9665c495307ba0766d0909f1fcb36ea7a66a24ecf0f92af7dc8b1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_10.uasset",
+        "sha256": "38ee506ead2890196c7d987e58dc0dbedce52b7a4e20e677b89089b5073c1b7b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_11.uasset",
+        "sha256": "720bdee2d38501b479878b31501ff2ff1456463750af15f18c8c761de5632ffd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_12.uasset",
+        "sha256": "d3691ac73152dae01a547f4ef7286eae8ef284b1f77b65ad1232314941901f4d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_13.uasset",
+        "sha256": "764435138cb0b1f74841e52ec26b3eb2426cf607d7ca38485effdfcadee46ed7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_14.uasset",
+        "sha256": "330560e393f4ad265b4ab77f28dc0786eba9f650e030635eb08f97543e37fe31"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ApprenticeMage_15.uasset",
+        "sha256": "4aca3de7ef371b44ea46d7d3c88297f91ed46bf659bd9b27dcd465e5342e64a6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_00.uasset",
+        "sha256": "4c12eb8cf57f0dd89f4eead302819fa5264c57889b37fbc2382df8fa02efc1ac"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_01.uasset",
+        "sha256": "dc427dc04ccd72dd2f5e4405e61be7627d8481310ffeff701854cf7958fb5bc5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_02.uasset",
+        "sha256": "85a49a90c33bdabc17476017d4a626806da5c684a303211f77f4ff18af01e030"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_03.uasset",
+        "sha256": "26207076a6264791a416f4f4e6524d9e1c66f4bb12ed671b8f11cd1afa18147f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_04.uasset",
+        "sha256": "1ba1dcd6eda6c6a5a5ebf7c826f48e83cb696a5a58fb0101ee70bf5964780a12"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_05.uasset",
+        "sha256": "0189da2f8ba3ec068f853a74c4705e57b17d5f3f87d41bed80a08d58f88ee9dc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_06.uasset",
+        "sha256": "474cac1614c8bb056f72b66498a8faf588b7f0bd3b3428f9440017138f95cb19"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_07.uasset",
+        "sha256": "9fbe7eef43e2601df51ab19e66b149e5f29ff2ba5709c3dca8b968c92143fca6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_08.uasset",
+        "sha256": "549b7dd8a5e78867ff137cf770fccea895811a1d60cda88e759dc66488d898fa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_09.uasset",
+        "sha256": "0d00f2f83f0cd6600a1c492d9c16a65627a670eaafa6e9c7d8f66a7ed17b5047"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_10.uasset",
+        "sha256": "6d5c8e4acb44a5c07814a2cd1f8703a7182cfeaf8f18b37f58e13de635d570ca"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_11.uasset",
+        "sha256": "dbd6344f2bf9eee7e31d899d1bfebbb318e147099219d1d0f4ae643792d760fd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_12.uasset",
+        "sha256": "9fbaf5a81111caf27a812206f72e0a7345d02172b91d3c46fe3cabda2aa25f24"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_13.uasset",
+        "sha256": "d968ffe226b6ef9b7c38adf7d8497d31d5d71c1393a4d9e0fe7eba188a8c4e9d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_14.uasset",
+        "sha256": "67ec9962b16fdbbafbaeaaafb2c8d2d8bb797521dee362d85b1eb70f57d6ba1d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Archer_15.uasset",
+        "sha256": "cc719ff890baef79379f6696e0472b81855ec107bc8524e7341bc02b67136319"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_00.uasset",
+        "sha256": "bb2797d73d7f72c35bc180e450b8863813fc4d783f3f8ed6b578668f8c2a79c9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_01.uasset",
+        "sha256": "c46f7c79f574a78d593887267035d90d53f8d2f378ffafe6b9921f6d1fdfc3f0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_02.uasset",
+        "sha256": "7320d425a6d0901080c8d6309cfcca59f27448ca8d9ba5c8f36278692f3704ff"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_03.uasset",
+        "sha256": "1743171396093ac8610e5872c167962a9a5aea27cbe0143f890ae69e67929d86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_04.uasset",
+        "sha256": "bf71bd217c1d7d8e968c1f13eede8f8b34f067f5c2c006f8b2a0e1a54178f3b3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_05.uasset",
+        "sha256": "c1882d01d0607af5f704ab1985644116343f837a1c1b37ebe24e443288eb5f72"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_06.uasset",
+        "sha256": "df0ab7174f50e94688e4c1dde2c7dea55967cb4673e92fa3629e1560cf3e69d5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_07.uasset",
+        "sha256": "db4b5b0d3cb334c8e39ea26c663387b37b63e21ca30846408626db37597bec0e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_08.uasset",
+        "sha256": "26f5df389af7c13b639fbca0eeee91a6ba752d012ef35f4d2d353d5d4837b946"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_09.uasset",
+        "sha256": "1a831dcefd8c3276d32073207cb9943e84e4101292c3f4e84d077c9b56bbb9c1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_10.uasset",
+        "sha256": "66682c6a21e95ded8d90f5f0e3a130f10cdca246937deae0b9c44ba823c2693f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_11.uasset",
+        "sha256": "afe1e43e9e76f38a2a6d5ba1dd3be17e6e85a02d08cb0ddd2231adf1902e53db"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_12.uasset",
+        "sha256": "1319894f402edbaad287c08c9459222e1c7746e7e61dbd79ead792861428b9d6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_13.uasset",
+        "sha256": "5ca655d9d68c98d848f9a6e78e0032be3bf43c072c0686e2734d7cf7ee2ceae2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_14.uasset",
+        "sha256": "4589281cd47aeb3c9d027323fe34ba9c97b3c32325fbf724c6406241c0e66396"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Colossus_15.uasset",
+        "sha256": "63a9d2b45b0005db1494d325fd09cbc875d39a68c430e5fa7ce524ff1c41811e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_00.uasset",
+        "sha256": "5717b7176132152982a8bc143156e0459d6b998cb63ba02ce54f275b8eb4b45b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_01.uasset",
+        "sha256": "c21da8c1e8e82ea6f826383b002871a41bad116efe89bcca83ff51cb452ccb29"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_02.uasset",
+        "sha256": "7f447c9595c748b2bc5d0814f39cae5d570299b04c13e30ff99b345938568d71"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_03.uasset",
+        "sha256": "135ac9defffcc1be72e817faaf1e92fce79d074b0709aca6c90271dd49bf38bf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_04.uasset",
+        "sha256": "605d9931ef813d352c61de247e66228946401af17d5bfe890a20a860c96caa6b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_05.uasset",
+        "sha256": "1b21ecbff1cdbfcac15586d2ca04a5aca529fc57c80bff87688bab016f9712ae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_06.uasset",
+        "sha256": "bf6df76681d7b2375d7fefff887280ebfa58084dbc7b0f706527030b757df5ef"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_07.uasset",
+        "sha256": "10ba64fa2fd83fd91e5982d89db0345445483eb7e34f7a4ad62d66a8f296316b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_08.uasset",
+        "sha256": "512a5305471872ab0ff8cca9bf584cad7041e831ca6d157d1b667fed1e2b00b6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_09.uasset",
+        "sha256": "9f19d612284e1c927c2cd09ab1b4a1fd79883481b15dfa326dc3a7005c374f92"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_10.uasset",
+        "sha256": "247cf329ea913f602367d09d1c4a1f9bbc2d8850abc14c729a4bfe0345098595"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_11.uasset",
+        "sha256": "7090e90fd0f65fffa49d46165fcf158223a016d440d7bd6d85d5b8cf3d9af207"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_12.uasset",
+        "sha256": "ffeae637c57ba43e2fb2339c062e2157172624c830e6145ef07895b336894696"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_13.uasset",
+        "sha256": "1080f41485f8dd6835d5fa80dbc2a0f37d2899d15f45970ac4efcc0519564286"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_14.uasset",
+        "sha256": "2697c0b2dff9d3d897a083aa9d7d750a7dab34cfa67073c2dae33811ec3725e3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfArcher_15.uasset",
+        "sha256": "4d04e6e072e95f664db4cfed33a5eed51019479f8961a8d072655ba02b688ba3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_00.uasset",
+        "sha256": "af1827bd0ade876a343152eb5c60c094c72abf6037faa164c9c7cf0ef4347691"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_01.uasset",
+        "sha256": "04f2a8fce46e0489072626fc2c97854a1b771cdd53d677c36ecfcb1cec20f422"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_02.uasset",
+        "sha256": "b55e7d6ac4d06213bb30023f2504237b41bdfdc05f6f6ac7fab72f040da0b361"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_03.uasset",
+        "sha256": "92494047dd193504b983687e569ed9963b9a8ed85588c020b350b9f132c055ed"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_04.uasset",
+        "sha256": "8a802ec1169f56562df926c1531f8d0cd511bbbad7f21dd475239a0800ca19a3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_05.uasset",
+        "sha256": "a0ec0f361b035c115bd0b012af8e4c12efe06627fa6f8e76acbaa52daefd8c25"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_06.uasset",
+        "sha256": "9991b168388ee54032217a0a05e757cf9163f5b04244cfc41c3a8fc305283879"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_07.uasset",
+        "sha256": "62345ca3dc20590e79d597299ec47f1d5886d119329769d324c98107396c5aa6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_08.uasset",
+        "sha256": "ec104ddd613f5546ce410a19f88b7f02895f65d794cf6016aa974e2d285f5edb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_09.uasset",
+        "sha256": "57def405bee06f765e81faf3d19e0a846126fbcd5a550d43e7173e3c2b79ce30"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_10.uasset",
+        "sha256": "44bb2037ebfcad55fbb45f8610833dcdd40740d8dc0069898a3590ebce68cb0f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_11.uasset",
+        "sha256": "5b8d79fa48fa310cf68fcf9980c66e17d69b11efcb7eed99a3262970c4bacbf5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_12.uasset",
+        "sha256": "91783c6f0b922708bcba1e196dffb7bb922e55a742e49188d69919a1f4bebb05"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_13.uasset",
+        "sha256": "1999be659f5fac6a78e1d4da004cd20be6a72e7d1404df8ca9948629bfdae9ce"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_14.uasset",
+        "sha256": "22a64bb7b8f3ecdf68fe1c74becf359112c41aaca369f4e0c60fe112fc32b9e2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfGuard_15.uasset",
+        "sha256": "1ab020cd4b436d6073ba53cc4fa8aa60356724464d6c20964cf64092f250c4f9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_00.uasset",
+        "sha256": "00ce4a881ba514378ca0890b2b4357fa1e7ba352c26f085a626d5c2dc4edce49"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_01.uasset",
+        "sha256": "9c292a59963a68534185de3bcc1379dc281b5bcea4d7fc12fefde137e48684d3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_02.uasset",
+        "sha256": "3c5d22ea69dcb17ae7836330785c793bfc803387049cd48ae2e84ab0c4615608"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_03.uasset",
+        "sha256": "d29d08d428b0abe9d562a47170bf63eea6fe3943de7787920556f65c6aec03b1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_04.uasset",
+        "sha256": "bb9f23edac10bed64a4527d1c640cdb47e17b71f4f35753d339a2252211d5978"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_05.uasset",
+        "sha256": "74aa1f668231c9d89c3ba6d953b15ba1cbb92e65c79abe4c280d5e4fbee40ac5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_06.uasset",
+        "sha256": "2757fb5a4e5aea23f07e3f54878429d38bb12f71611a9d622b8ab6285db360b8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_07.uasset",
+        "sha256": "515be1f3ae4b1398103aaefdafa82a7d21cbc019650be7704eae8485a4f2170d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_08.uasset",
+        "sha256": "ac46960374959777ecd011f26692a48a582a24fbf68e4ec5ec849c1ea3e6cb2d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_09.uasset",
+        "sha256": "e0eac184f9e3b3d4dace7970f720602886c89f985788707048ffa002eeac78de"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_10.uasset",
+        "sha256": "2d9d47ec19f2e3420459479ef80f9ca11a933719f5d4344ef745dcb41d3ba48d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_11.uasset",
+        "sha256": "0d931334fce854961c839d79da4ca8a2ce9102e43c844c79a373803c1dc41e95"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_12.uasset",
+        "sha256": "6e439a1c16e5a5e14cdd314b415095ec9038fcae18cd4e542bbbc7b77876ab53"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_13.uasset",
+        "sha256": "ef9f895f003858116dbb7ade3491d358b28b3d424510d54444faa856bb886611"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_14.uasset",
+        "sha256": "86779fa9c56eeefa4e752a6693b65f273c2a3f1f9ccdf762cbe279b6b893b72c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfPriest_15.uasset",
+        "sha256": "718226b663c742caf8e5686087943598a8c5f5463935fa1251dd8bc39f603bda"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_00.uasset",
+        "sha256": "351e1056eb9db376e51490f2d8f3e707ed2570f91bfe8ee5c6999386a10ff05d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_01.uasset",
+        "sha256": "71d9ed25b08fafbee740e994e72d431177943c0ebff053dd6525d1bc47b8438e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_02.uasset",
+        "sha256": "88c69d28202f053e007754b20cbac61a02752ccf9a0e738a9021612cfadf74b9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_03.uasset",
+        "sha256": "aa510becc2aa6da3a9ce45408dac62d822493e4d2769641bfdc57f56e98ca3fa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_04.uasset",
+        "sha256": "4eb2d6dd93e8c9353d0ef48811d35d2200cb81192ca42ca7f0b6846bfe73c7ac"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_05.uasset",
+        "sha256": "8a3def17d3aa951640b6c2c0d868fa531fbc296e2ac07f0d3d7a54e9388cdcd1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_06.uasset",
+        "sha256": "f994f987ca6b1c9d779a47bbc7d9b50232ec5f595c5f1ffb08d266d46a63af03"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_07.uasset",
+        "sha256": "a0339b34900241dd3b7af1e4dabe4ff3ff353dce3a5ce7e6e6f26ab1efdf6dce"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_08.uasset",
+        "sha256": "76b0acb5dda7b81f3479f36611fb1f7a032db6cc65abd73051c3bef51817a002"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_09.uasset",
+        "sha256": "be787e2679e15ad13c93731fa841dea4731801076515785962df6a7369fe8cf8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_10.uasset",
+        "sha256": "e561bba708d2f149b3d4f8820e1cadf6fa3979f3549fa64efdbf34b405324da7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_11.uasset",
+        "sha256": "b3e990e3696b7919b16a9c0589b64f1586d1a4f9c4a510392d9c22ba4668c80e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_12.uasset",
+        "sha256": "bfbf0772646658d42c084365625655df1682d4f8de2c331698772cd26abffb86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_13.uasset",
+        "sha256": "99217f37cff3e76623dcbce10d8cb32545b464eb47465427380f00311c08848d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_14.uasset",
+        "sha256": "eec302f8dfca2aff391b05e20b959c0bd1ae7fd5102405d8f80fd5a5bac122d4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_ElfWarrior_15.uasset",
+        "sha256": "729500d6455f7412404b34488bcd34beb116fb3566c14509c2353ae39e72fede"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_00.uasset",
+        "sha256": "9762bf0c03a70878f73de97b4ef11c85b721512a6fe46072e7841964b06da668"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_01.uasset",
+        "sha256": "274812472b38bc1293d906e42965fe5402c807551b3c8894421ac73959f989b4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_02.uasset",
+        "sha256": "43ad8496883da57cbb91b97d6975434ff8390f671f1d3aef7f699104f838335f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_03.uasset",
+        "sha256": "012bb19d7bbef4fe7e33fd7ecb14af8165cc417ecd0293d82c333e7994d7d120"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_04.uasset",
+        "sha256": "bdb2ce248576570d63302fe79b6c7583a0f77fc2e8563bdb8b629e5f192f84a1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_05.uasset",
+        "sha256": "b81d4ae7206d188af049b3cbd6417405829ed6b35497e469723c1418102cf7d0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_06.uasset",
+        "sha256": "dbe96e7f540f6c98b0abaf4c158c66f5f5270a0e65e70d3e964587a4c2f474f9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_07.uasset",
+        "sha256": "671b7e6661be320a348893f353bd8af11fbf71eabb67ccfad44dfba1cfb2505d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_08.uasset",
+        "sha256": "96df60e66182b19f35405232fa8ca590da783ed297ed7102805073df4b46ddd0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_09.uasset",
+        "sha256": "1b23d529058e817f00dae6517cfd69fe32e179209e94e9c7e8ca98c0ded6a35b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_10.uasset",
+        "sha256": "c074a430041a111d6ebe7c901b268627faa82428f2f0faa77d6eb33895f0b5b7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_11.uasset",
+        "sha256": "ef9428045e6c18f816da72653d996a9722642797675fc9f560be08f5c5a17f62"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_12.uasset",
+        "sha256": "3b22a0e8116ba4bf29e054db30e4d6ee41c9ad49a2c4427ae3920a35cd32f80a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_13.uasset",
+        "sha256": "088134e20cb7b849fee8e592d9bca946562f80b4cec2743f1699e37cdc1d84c7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_14.uasset",
+        "sha256": "4078e2b85a4c5830cd8a42b89722816fb2e03b0677943f0d335c65205c16ea98"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinBlade_15.uasset",
+        "sha256": "419ac98e6e86d69cc45fd055ed163bdc774a3a3afbf9319c9cfd4ae1cf0e560e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_00.uasset",
+        "sha256": "2493ce2f22bf2c3612e0b59fbe431b3a5bcab4fb314317b5b3f78db48c2ab1a2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_01.uasset",
+        "sha256": "dfbf3970962539530ada7c76d425559b305ff60942851e537bc84c31bd70985a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_02.uasset",
+        "sha256": "3e87121c337055a10e5a9b36843787683d33035c2f0fda8bdf5e5f85e680a8bf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_03.uasset",
+        "sha256": "6ae266d7b74d5ed72006ff2dc811ef4ba942540b5b5a601f8fda2e1ad876375f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_04.uasset",
+        "sha256": "9ede161c4f77b47951559e46ab1702853b6491c6f0f752a38be443e704c98efb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_05.uasset",
+        "sha256": "c2d11388313f603ce632070f433d18d4fdab1d860bc0a392f83cc26c473c17a4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_06.uasset",
+        "sha256": "b99452dec89082e2c635c859638bddc1d3819a1d02f72254deff1f5891c585e5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_07.uasset",
+        "sha256": "98ac819761cc16772620fee3f9fc7963c67e3fabde14d1f30f1994e0031db883"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_08.uasset",
+        "sha256": "30ef9c237491f8c62485a63497456c361f99acefd9e3f7cc36a6510f1358364a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_09.uasset",
+        "sha256": "b9f84e9cf1a1cd794455ad994da915f485724beebf6faa46ab932d7dd8b7d66f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_10.uasset",
+        "sha256": "1500b07e80280d5e82d30cfe5078c2d4bb7ba2bbbe0e0e5dab19061c1cbedd43"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_11.uasset",
+        "sha256": "854927825af54e85ee53fb587e3247f9ea1a45ca92c49c0f82a8089403b79cb9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_12.uasset",
+        "sha256": "fa96c64bab6907b748cd5b559c4335e50df075557078d870b558a7f378685c2e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_13.uasset",
+        "sha256": "c4d6009e85d14eaf99aabebe12cc221364b86758893c67a84488ea4f0be7b540"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_14.uasset",
+        "sha256": "19502bca16c13da507a05f439bc939d90982fd30c033c9c3817b19ee420c7066"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_GoblinRogue_15.uasset",
+        "sha256": "e27c634138181226fb620481190ebc1e8ca9c860d807dafe9e641661dd77b6db"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_00.uasset",
+        "sha256": "bbf9da5abef589a28b9b135a7ef9824c8f56dc1f92818e8210f223c407c81b00"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_01.uasset",
+        "sha256": "eb561321eff80e082392aae7b733bd2e70b155948a1368f8b443c33d4242ede3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_02.uasset",
+        "sha256": "40afb09ba030c99e3e7a0aeb62a17b7c1872e0fc2c01a59f4506daad9d0bf44c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_03.uasset",
+        "sha256": "c9392c65b7a10d6faef17c90f0b8c12f209f1e751ccb258c0d5d09bb656aa5d2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_04.uasset",
+        "sha256": "13c79999aeeb7b4e8f17be0081fda72298f0a3e25aec87f97b36c1814919cf67"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_05.uasset",
+        "sha256": "e98abcf0f6de9eb70a19e24b8a7b6448f6be819fffa49375e6bf5f865c900d86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_06.uasset",
+        "sha256": "af5a9e31ec9d2ab565704e678b1e79ab6597bfeb8eaa4938bcba0d678e124bf6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_07.uasset",
+        "sha256": "b65c8407a2ccb03cb59ba6bb4b92f39fda79ea3d061c2960668640a467cb1488"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_08.uasset",
+        "sha256": "da51921326c1f2a2edb7d6b20dbace99b575c80cb990f1573749751120aa9c59"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_09.uasset",
+        "sha256": "922a7b195eaefa90fcaff77b771f05190e23db50fb0a680a4e4d2ed0f110510c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_10.uasset",
+        "sha256": "946d819cbc78a02a0bebb0736c92d17154a53b3572ad5b4a78b3254c68aed04c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_11.uasset",
+        "sha256": "4b33b95502cd98c421e0bac2d7cfa7f5e02bc167b1ebd1187fb8e484c52084e6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_12.uasset",
+        "sha256": "a06fdc680fd050ca9c802fb09b74098b80a7d53812e23bcbaca719831633a7a0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_13.uasset",
+        "sha256": "13df1e9ce8a88afbf46b594e4bdb0b0e6ebfa26f7eae838532737ef1510da520"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_14.uasset",
+        "sha256": "8d7deb9132ffcd06daa414f181a78fe207025b7bc998464e127df5440c2237ef"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Shieldbearer_15.uasset",
+        "sha256": "1187781bceb5a9bcabd2393b6626a5bea911c0eac4c2242be715adf89daad376"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_00.uasset",
+        "sha256": "b973c55d832c5a0314450ca21261d4b1233c9f8c0597b29e6e33b097415ee1e7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_01.uasset",
+        "sha256": "714547e167f71300f9fbfb4f3213b5445bd9c710cf7b0cbef8f7903a3950abc5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_02.uasset",
+        "sha256": "79b1c9a47dafdedcb3fc4a7b68be0809eb000c4646cad6144c9691f524a6d5b4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_03.uasset",
+        "sha256": "39b9a79646d0938c9521a6646cfea667b6261f82f0bc3be9d010c95514c06b17"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_04.uasset",
+        "sha256": "6dcd9f8bc8384932fba4fa5c1631359666d17acf865f5c4ecc98d23fe493b7d1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_05.uasset",
+        "sha256": "ea652e10c4fcb10114875d678f4d43a799457d8eeadbaa83f4b61c6dc9a0fadb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_06.uasset",
+        "sha256": "69c913692cd4dc7e24192e61426fe8ae00d1eebe7ac8b1cacfede745842180f1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_07.uasset",
+        "sha256": "581446fd1d7e1d698c54bf30a6a1258b1f5a5595e6c1c174f562f5cc681ad6d6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_08.uasset",
+        "sha256": "dd6efdfe17416ed3479dfaad876d2c994b06e48490c18f003dbe35bec20f675d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_09.uasset",
+        "sha256": "226001ae20e9a3a4a03f249b3bb425af7a0d30725b7a1cf9a76ac3c0eff612c8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_10.uasset",
+        "sha256": "c09111c182c83845e8616845906dc2fdc7486ea30f3ffc6c4fdf59f71759b730"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_11.uasset",
+        "sha256": "b3f74d565967f0d98a06044e800c9979bb536351ae16bea65aff194efac905e4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_12.uasset",
+        "sha256": "d09365b883b1384403daa3c33a1395846babc7b62dd41477b886a9604a7b88a7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_13.uasset",
+        "sha256": "607fcf8fd1bd9ab85468e1138d691e25877a937070981bef1d5aa8092ff27007"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_14.uasset",
+        "sha256": "df9381ec5a753801d4df9fdfe908dfe0cf803553d044e73bbdac359558f2b12f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Skeleton_15.uasset",
+        "sha256": "f8d6ca7f603e6775f18bfd4b216f926df8b4c5373287189ba92bcd470f4132ca"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_00.uasset",
+        "sha256": "58dc443656494f7e4fb69638818c3813f0b01e9bfd933b1c07bdd25766893506"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_01.uasset",
+        "sha256": "1d91caaa6a935f006c78d2cf0445bbc2028f55f5efb4815f38ce51adfda41cab"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_02.uasset",
+        "sha256": "652c11d5d6e4673157700c11f92fc660fea9ec341d6bc5f9424daae3a931d7bf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_03.uasset",
+        "sha256": "b745815034877c10d3c6777c6360fa2fdb9e965ad3f91dfe45dcc6ec9ab0b8d3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_04.uasset",
+        "sha256": "40e613a720c9c50fd5d3d69534cc23967594a793cb9c2b9992a6f02b653dad8e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_05.uasset",
+        "sha256": "aab897ca091d59690a95c10c0aef1a7593bade5a1dc908992f7b73868f8f78a0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_06.uasset",
+        "sha256": "16633b54dd449ea298ad294c9eb78bace777ad5ed4142c47627a1b0428928398"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_07.uasset",
+        "sha256": "29900692dab32de59877bb2763fa8917b186833c126e66b9b3463d9df7d605c8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_08.uasset",
+        "sha256": "4a3a4e232fae6a76e1f24a1fd3e0eaed311368bbc20b990a17610051e2f0af09"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_09.uasset",
+        "sha256": "7182ca12e257a29a9c6713c92a79b398301a24111d0938b7645ebd14d3e99223"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_10.uasset",
+        "sha256": "2a2ea47214541a2791f183d75c741dfdd760838b0e94d3f5563bc506b2027d0a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_11.uasset",
+        "sha256": "af1eba118fba95e556395a8fd30f2721eef00a9978d7620383372d0b100eb183"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_12.uasset",
+        "sha256": "0a13f1c302728bf3d0d025af341ed1640cf0f23f201ccda1df101cafdc05edc2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_13.uasset",
+        "sha256": "a1346539106ad44f77d283b9c7942b42a96e3dd69c9abe2a3af2c8dc4f29d70e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_14.uasset",
+        "sha256": "1e818a5fc949c2df7effaae544f7885b425aa007a683a62cb9842be8e4c8bd82"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_SkeletonArcher_15.uasset",
+        "sha256": "54ab7e44ce05ae40cc11a72e928d18d7d5014a4ff6c536c4cfc7e39fbb29c1e9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_00.uasset",
+        "sha256": "8c7fba6bf2a1cd7fc973ce73030b3a6daf7e09ad57829e9a1b2cfc4203a2bdad"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_01.uasset",
+        "sha256": "aadafe721492c319dd4bebdc7059de32f298c8f37af65d6d8c4daca8d87e7438"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_02.uasset",
+        "sha256": "64978e8288121c1a109882876b9bf31a04355e4ab0daeaf8d513e04fb820f1c3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_03.uasset",
+        "sha256": "aafd3b6fd82f1d2bdb4f8202f52606107f1301f1412241cb5342c9d69f876518"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_04.uasset",
+        "sha256": "997f9c88b81744a26cc02514f45e5ba3ec5ad851ca7e000180de2882216a5fff"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_05.uasset",
+        "sha256": "e8cdbedf83bcd67ec028ad6277fc33ae8b28434a131ac13474ca474060ab15ac"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_06.uasset",
+        "sha256": "18491c3137b823320198eb3e99888b89de377354f9774ecc42290cd2ab96cc3c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_07.uasset",
+        "sha256": "af30417ad94528c979cab58f3c1c68c3af583b7677725151469cc2b4e712a6ed"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_08.uasset",
+        "sha256": "7d2c35a56b4d6e83f8162ddef04dfd8dd0d8336cef922a2f630bfe56dbc524c5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_09.uasset",
+        "sha256": "ba7c9be37244b344eb7ccc095c3fb788401cda0d23dc2cd9a1d412d972e310cf"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_10.uasset",
+        "sha256": "782df35776fb4ea82829916124d23b252b798a4001f8f08305b62c6e6aee0d73"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_11.uasset",
+        "sha256": "80a1ed9a37e2663280314304aa06fcfc5137254608879ac0f39f2013a1452d9a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_12.uasset",
+        "sha256": "3117a2a50b822b7467620e4e447e467a72723c1f5867fb74b03938837d7f88fd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_13.uasset",
+        "sha256": "387f6a42fcaa6e58f78bfeeaf812d2a010612da422627ebf23c0ef72f8f5dc86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_14.uasset",
+        "sha256": "f8dda1e6fe06f8cb10a3d14ed7ee4ac72d8390c186d32bf142f230cb1e66c826"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Swordsman_15.uasset",
+        "sha256": "823414e3e8da496b2247c42828d93218b68f88811d8f7957e841d788fd16ff79"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_00.uasset",
+        "sha256": "4598902309eadd399bed569a109d2eaf380e07b39ee98f4f05e52817cc88d368"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_01.uasset",
+        "sha256": "6182f2985bace76a988341d6631635b4ad82c8e7ae426adc7a1a90b98faa2a09"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_02.uasset",
+        "sha256": "3ece05f0d909f94ef1e81eb3742079f87ad9e52a918f2999c2267a4c93b9dbd2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_03.uasset",
+        "sha256": "cf79f36860d64be8659fa4dea3e0b972858f3aa832276900fb971aa7b17a30e4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_04.uasset",
+        "sha256": "8b24b9eca93b860d72c74d9a521dc0973ba748cb9c3eef82c56a957c0c5bc190"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_05.uasset",
+        "sha256": "c9dd18b4ab158abbd2c54fee1003b454d7b70b72458368a1cad75d1f4d5058d0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_06.uasset",
+        "sha256": "81cd56c6965a5fc2ff5b56d7860763eced616aa9d1c10124c4c324fdaaf8ed63"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_07.uasset",
+        "sha256": "fc1f4e23fb90f32208a329b0895e5f7893b116db5aaffc7b1a55566d2559589b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_08.uasset",
+        "sha256": "88e01c9865663a8b05cac278793bba6e6a0f182926bf71a94d119f7de83a3540"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_09.uasset",
+        "sha256": "bfdd1185a86132cac662ad5274c818af9acdc4dfb523268720c3e15884e2ab02"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_10.uasset",
+        "sha256": "c37f136a95929144f0e3255ca02be7c30f11f1e70d91e6b25917d32613894c86"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_11.uasset",
+        "sha256": "522982a9b29bc7c4f8830f70968f152548afa51ab3a810be224e3c852cc05658"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_12.uasset",
+        "sha256": "5da4eb35d81d44ba9484beba87866c216de4f5940912038eb0b93f9b60115ead"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_13.uasset",
+        "sha256": "ad1629983ebe78104300cfa4e0b3778f70d0f7bb9f3f0118e19d034313f32775"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_14.uasset",
+        "sha256": "b44476d95e8c7288ea467100a3972149780f4cc8c7f1199b0315921692a919c4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_Thief_15.uasset",
+        "sha256": "f6975b5846852dbf9d4e1270727bb526134aa51bde0d8692c231c783c7aff6c5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_00.uasset",
+        "sha256": "0e9fa0e1645c8e87296ea9e74342c258488631c90670332e00df5b60979cb089"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_01.uasset",
+        "sha256": "674b933604ef33784f12c57f3de5f46496e59b1867399a315b00f4e06dc72dab"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_02.uasset",
+        "sha256": "a422b6f8aef123006ac6ec839cca382432c288897466155e7c33489f1c1c86b4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_03.uasset",
+        "sha256": "099fa94b40df950d470fc26a2dcf06d10cf66c9aeb12f188a073893db9f14f06"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_04.uasset",
+        "sha256": "1aa805d2ad4718ebd05b86f60a33c4db1234b384367656559ed1498ac55bdadd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_05.uasset",
+        "sha256": "0a5275ddae126230e4a2349ea97559daadf90beda6f7880a4a4dded20a4440f6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_06.uasset",
+        "sha256": "7cd071e3f1738b689b1231b86e48c33cc90a68134912f74024ebdab6f4f0a8ea"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_07.uasset",
+        "sha256": "83d9c679729bbebe9408de25da530f5c43ba2404edcaff73f7b1e4132d4e9755"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_08.uasset",
+        "sha256": "c9c9d622bfd46a82ab6fbf8a260b6f33c783b9ad33badd78c68761869b8fa00f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_09.uasset",
+        "sha256": "c19b184fe4184bf4d82db5c27cbd0592316b8390d1fc5aac4cde6c485afcd2eb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_10.uasset",
+        "sha256": "2760fadfe2f3c94eb2861198bb479cb0ee27b79c69b881fca7ab0dd8975563aa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_11.uasset",
+        "sha256": "eea7cf0b558bdb028810e364dbbde08e7ddf843400d38d31f273df9fa9a523bd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_12.uasset",
+        "sha256": "bc20c0006c2cacb8a567521e0f891c502156bb97be4fc3c92b3d8a8361a0c180"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_13.uasset",
+        "sha256": "34bef0f10c0e12bba166ec88b7bd0df28d4db1f8e075a1d957a45393f04c2bd6"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_14.uasset",
+        "sha256": "7c599019b31e825a65c4efbb12d971dd1284ae28cc68ad22a33cd575694f7b2e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollKing_15.uasset",
+        "sha256": "632af35772f60ccca3a4b5cce28e87b4960d3a126c775d73ef8f100c858d076d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_00.uasset",
+        "sha256": "63aef0f3f99be127e8d8536e9ebcba6a06cd0a47c5480db0e9349395fec1aa03"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_01.uasset",
+        "sha256": "6df64be2fff1071643cef8c1d2451970312dbd29842847a15d4a076ad8979dba"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_02.uasset",
+        "sha256": "006631799ae16b18c340eeae292eb02274a581461510091893eda4da2456e059"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_03.uasset",
+        "sha256": "0727d5376c7e6db19db81317f4d80257e00cd36fdc87e0dfb8eb216460c6ac32"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_04.uasset",
+        "sha256": "a05ff5336074c338997b19355db0935ee0e150f18bb64d8d6c477e4f20d680e1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_05.uasset",
+        "sha256": "e808cd6c2d1033d87e8d17c87b73d9d38335e797554c0c0391804dbff053bbfd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_06.uasset",
+        "sha256": "594f7bcd5a7b5176e933e79a963e0c50f45c5c0665bd4e7598e3fafb2f0f9c92"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_07.uasset",
+        "sha256": "0b53ee7e1a6284ecf734d65ab2483c7ad23132a1054823350758edec8b403414"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_08.uasset",
+        "sha256": "2aec7cb59fdaa98010208f4458db03a1f40f8335c5b59013eb1a73b2214882f1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_09.uasset",
+        "sha256": "4877a625e192c221c180aed526b9adb1e780c68fd0b98a2c769da60433fb17f4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_10.uasset",
+        "sha256": "0ab2338b4390735195192ede02c51d6614b7f1d494ad9173e2ccff4b6e0d131e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_11.uasset",
+        "sha256": "037d4cdef247a4a9982e862d05ad04afeaa7671d2bddb5d1ddaaf127af358812"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_12.uasset",
+        "sha256": "ef5586a8198563f1c759c1e6d00b0ac77655f2bf06190742991609f24cbd79db"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_13.uasset",
+        "sha256": "0ee09e5d0c697ff15acf5461e5c4ec0b58027063b684bb63bd88fad81f2a54ea"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_14.uasset",
+        "sha256": "5c6e22eafb390427685a744445a7d571713a939e912d48ce89d1a81dc47d1826"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollMage_15.uasset",
+        "sha256": "b555932b4dfb9f0e486a96c92bf9cd249c8430bb6cb6a5c4cb6f82d709b2fe09"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_00.uasset",
+        "sha256": "b1c8de3a5ff3ef5dee070735cde14fab49926b0a73b6d441bf04adaaf94f36e0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_01.uasset",
+        "sha256": "22f99e6d34e4bc2afacdee4a0db11392b977eab64a203fa1081b41cf40c995ae"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_02.uasset",
+        "sha256": "dd24c3dc718988ba8de2a1681fc35839ae79d7a0929547b3fecb7c7ca6346bcd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_03.uasset",
+        "sha256": "5e84fef07d25fe5a2b3a33219c512ffb456151a681ae9ab84f11cd175f6c45df"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_04.uasset",
+        "sha256": "8177354277317b494b62d95c75b2ad0c72fc5f131419c8a50f8a9f914ce3bd16"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_05.uasset",
+        "sha256": "da6a79b0c269c45b53f4d671653b27af892473d7576c13b3687954cccd0b99ca"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_06.uasset",
+        "sha256": "e49cbd8d47e134e98797c6fa42b30cf366b6edd0fc9ea984d2809722c82a1013"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_07.uasset",
+        "sha256": "1fa1083e7e08b62de0c6e9ae3f7454a6918ada7741ae3ffd28e3c283e3035252"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_08.uasset",
+        "sha256": "4a5379d5136ef7034041f7dad9d5716f6712bc529b57cb45532b1c88c7ed077f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_09.uasset",
+        "sha256": "7b0a134398fb3cfeb7972d35826cfeacaef0ed383242b40d42668052c971c1f5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_10.uasset",
+        "sha256": "d2e421c9b1793544a4426107fa3acb313c337b3fbc0a345ea909f2c9c92486c2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_11.uasset",
+        "sha256": "d04301cd6077d38def166a19d32447064e512e1efc6b256ed2939985717fdf87"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_12.uasset",
+        "sha256": "86c4492427a47d6ea0ea19a075ff0b12c4725d7da7d5728ef058725bf0be6e90"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_13.uasset",
+        "sha256": "385e37f9192896b2998ec123d1bf0122d5193df156065a957c09f71ac232530c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_14.uasset",
+        "sha256": "d0daf9c463845164a666ac436424b375ea84a5b1a4caaf99f373a8597c30d09a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollSpearman_15.uasset",
+        "sha256": "a412608e759c7b383bf5c384ee14f218748f6154a0388a48c8ff9380ba4d9936"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_00.uasset",
+        "sha256": "961d598d89956471b550c3c0607b77e501d3d83effc78fa64283efe1952fd00c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_01.uasset",
+        "sha256": "73168bf7512e2816a200bb014f9689a9bd5aba335b1d80bafb216def3eee6a92"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_02.uasset",
+        "sha256": "0a4109f0a63cfe89e6a8e1b75ee30eca4fe462486793331a1033657e88f97e67"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_03.uasset",
+        "sha256": "958a140794df5a1bf153db99c8250607a213639e457389c3de5aca57a79a90eb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_04.uasset",
+        "sha256": "18a14dba5edf32d31e69d78d70180c2074891f9005f8e3adcbee9d73d3a4e72d"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_05.uasset",
+        "sha256": "38974022c4ee23fa0d606262a9b866403c515a35cd1edf37f943094397fadf58"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_06.uasset",
+        "sha256": "82a5ebbd7c743e3eac8760d0ecbc3d01c9068299dba4e97093f54566f6d6b053"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_07.uasset",
+        "sha256": "e5540cc1584bab46e509971c7b16745b885588a62c251f8f609136122eea3b71"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_08.uasset",
+        "sha256": "c9bd32bae21f6409cf870015ef8077bf04f5e0360bad167f412e2cd8727d33b8"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_09.uasset",
+        "sha256": "d5c06e4158664fcc4736d10c98809e1b88952acbcd2ac5f632bf8d2c612418ca"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_10.uasset",
+        "sha256": "8ca14c3d3b2799a80e20ab61b1e4b94a2a7fc2345f1586c5560df99775146cd1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_11.uasset",
+        "sha256": "039c54567e6ad74e5bca8b57172392daf04bd821ea5962dde70c4b468de26852"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_12.uasset",
+        "sha256": "3438a817149331140fdd51d97e7a44f43433f2ac6944937dc334d1b0e2c9b416"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_13.uasset",
+        "sha256": "9bf04b965bc18b8da1ec9df6fe3de31876bdc66fabb18bdda2960a1ee9360444"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_14.uasset",
+        "sha256": "2ce79ea353aba299a89a3f9a3fdc5e5af664aa71fd035f8695dc9b0806c26ffb"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TrollWarrior_15.uasset",
+        "sha256": "216dd52967046dc47be119c1641068100236ca0abb7c04b5e9646873ad4cb43c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_00.uasset",
+        "sha256": "96ee32ff4dbb00a81748b068fd4cc9c6b9fc59d7fca1f48460bdfd2c44d1e819"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_01.uasset",
+        "sha256": "c4b2b97e2bcd56d335103244f6a57c67ca6637977bccd55470f10acdfb6b2fa1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_02.uasset",
+        "sha256": "8e1f50b9cc47e978fd2b5275e056ed540faffb63550f3d4ea871fd322a2db50b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_03.uasset",
+        "sha256": "d1c10af9e4ad2bb41bf4c772873b914c07f7715b0b141e57c7358fca12887f05"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_04.uasset",
+        "sha256": "fddadaa8ce2d1f4f6256cb0f3d1b2270772d3a2719f6121ee4a07612f0ac352c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_05.uasset",
+        "sha256": "0bf7c2f5a2c52f4c31466d6b84d6d90c19e37744873d4c80d160e6fac6f31516"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_06.uasset",
+        "sha256": "75dd25c2a6e5ac916b702884aa45553b01f3f99df6e0c1c60b447f22e57a245c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_07.uasset",
+        "sha256": "8bba8808687ef7d83ba98a2b892681662d451932549556a679aa12a07eb1f051"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_08.uasset",
+        "sha256": "84c3390ca6bc70c83150c5f1f3718542910802c6177554e7e733a85afa585eb5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_09.uasset",
+        "sha256": "c7f3547ca5b166fbfad9c16ddf99b2491c4cfcab8bf373f0708e45ef3c1ea9d9"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_10.uasset",
+        "sha256": "4f1152d4c2c62c070d19c2447d096737b62632e358ae1628060d7c82b1a2d46f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_11.uasset",
+        "sha256": "87b0af624d0f5062a3a55141d430076323d77211315565cab9567a94dcc2936e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_12.uasset",
+        "sha256": "c20395d013ef70fddd754a4fdb21947247220b73eba1aa051b1e44846bb1fa80"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_13.uasset",
+        "sha256": "ab04fc9f7aab88cde5db860a4854b6316c4ce5b1f778b43c871e736d4a920f90"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_14.uasset",
+        "sha256": "d3bb8883dbb5292f3f5a10d42e040ee29492d00dfb06371dd4047dd8af3bbc69"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/SP_Unit_TwoHeadedDragon_15.uasset",
+        "sha256": "79eed7bda936933945f9daa12630cca2fc9df7e888062ba0649494b7ac4bcb0e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Boss_SkeletonKing.uasset",
+        "sha256": "cd2c207ac54bddf3912ba987b58b6c5d12442de94c1df79ca60c36aa4c6dee5b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Building_ArrowTower.uasset",
+        "sha256": "cf7f4508cea433e308fa4c7c92193dbad97c74e79c45210e6d405538623bfb67"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Building_Barracks.uasset",
+        "sha256": "a71701de5685491abae91255d29ee471c4682e619282860e4dfe6b44bda72b8b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Building_SiegeCatapult.uasset",
+        "sha256": "eb51a79e4b95bccdd1cab22a2fec9e2c1b3d49236bbe44866b91a25a81387104"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Hero_Knight.uasset",
+        "sha256": "83ee193e6b18a531c9f89e3e27ac4f7e824f309d6fa106a6d6ba41da04ec5b51"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Hero_Mage.uasset",
+        "sha256": "33eba496d67e7a28720d04cc427525b12be9192c5d73027a55f1eb8c8f989bb1"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Hero_Necromancer.uasset",
+        "sha256": "400f37e153e3fdffd32aea292b0a0b1ef0a801c949e26d297152e91aad7c39ec"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Hero_Ranger.uasset",
+        "sha256": "37195e2b7a90e51f1bda254bf07637c24e43f535c94d51d05a9331b47c23cbf7"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Hero_SkeletonGiant.uasset",
+        "sha256": "530be0f3bcdf6917047e2669b745ab68aa65577c9cf6522e89e10bda69e106ff"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_ApprenticeMage.uasset",
+        "sha256": "414c3f2b347d0c0c949a5a0844b766a39ec5814b8c847e95b37293f2c49a163b"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Archer.uasset",
+        "sha256": "39ae30b4d796bc51c01ca48bfa402d2cb29c458c8e485d48dabc407fad48c59f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Colossus.uasset",
+        "sha256": "290616699f6cbe2c751f9f1565a32ed4b1dcf548d5be196bfe7b391413f73c54"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_ElfArcher.uasset",
+        "sha256": "7d3a5a036ecb6e07ccfb7c7b8a36b22bad0df7db64db853581fdcf3f889cd7c3"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_ElfGuard.uasset",
+        "sha256": "adf9c82fe17c465936ee12cf7f0817a1357fc569cc520b19df3393fd264cfa43"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_ElfPriest.uasset",
+        "sha256": "583b03cf59960ae9988324cbaba88eb9843d36ba7b3828892ad7d3da8644b032"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_ElfWarrior.uasset",
+        "sha256": "22f98c2d89599f6242aea1cbec3947d3c172295871c628d6cb2042d99b423c8f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinBlade.uasset",
+        "sha256": "27521cd4bc9027f4438bd764ae2a4233e5739e0358820cb8127f15f49d176319"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_GoblinRogue.uasset",
+        "sha256": "84aaf7cdc2adad0a27b34f2e814d73025b65c2cab8bace1a9e3b3e4e6a1846cd"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Shieldbearer.uasset",
+        "sha256": "2fe60158809396a6777adaaf89a3b5fd3889d377bff7f86cef8ea8f45ca0fbfa"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Skeleton.uasset",
+        "sha256": "85d26a594e9e27e9da31489c126940149ddd8b876f99915691e8831abed68d40"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_SkeletonArcher.uasset",
+        "sha256": "f37c11e867a77c698829842f2ada652d2516c783521d0100eecb6382f206be7c"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Swordsman.uasset",
+        "sha256": "d928381e4b017b404130fc3bdf8dd21271956b9ac207061ef4823766dfc53421"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_Thief.uasset",
+        "sha256": "a7c50cafcb985ddca5484958c9971006232f2f5cac4efcc15d3375075e9a3a84"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_TrollKing.uasset",
+        "sha256": "5c01fa9247cf49710df4da4a24a46319541058d6a8f7cdcbf3dfc5bf1dbf2080"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_TrollMage.uasset",
+        "sha256": "499666930fe4451d9f2a74157f308fa82a93706141e3463abf59d537e6e188ec"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_TrollSpearman.uasset",
+        "sha256": "04ee57d4b438f9a1465ff9d9e2644f4a329a16c278039d525d0367c9f666be78"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_TrollWarrior.uasset",
+        "sha256": "573f8db09fa149c054166e98031cb446154f467bb714639ff574776d6a9ea123"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Animations/T_Anim_Unit_TwoHeadedDragon.uasset",
+        "sha256": "73a906e369d7d398ec4a93bb4b20b0558dff3b5e494cb623cb4cb5fcc5deb470"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Statue_Lv2.uasset",
+        "sha256": "bd8779bb949f302fb05e562508077fbc311645410d34c9d2453e2c1da09a0c3f"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Statue_Lv3.uasset",
+        "sha256": "025bcb5fb6ed8c19728792bc75f116c74dd64655d7acd682d19355c94233f917"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Statue_Lv4.uasset",
+        "sha256": "3ea4759606125913f41b1cd3a4d0415966b5b23e12cedddbf8f7c33defa5eb63"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Treasury_Lv2.uasset",
+        "sha256": "920c85367fded8fdd6d7659912a42f01bb12617b72717a6d19c69252b7cc6d3a"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Treasury_Lv3.uasset",
+        "sha256": "cdf6ff481358f1e1d767c4eca8a4682e30b9dae44efdcb150835f253f83de81e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Treasury_Lv4.uasset",
+        "sha256": "d06dd4b0c432379e50dbe98cb984b6cd46dc83a90952e98dcc233bbbef89969e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/SP_Home_Treasury_Lv5.uasset",
+        "sha256": "27703ae115944374320bec8c61368efe0ef8b57e358bde857378e3d470556643"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Statue_Lv2.uasset",
+        "sha256": "c9abfe747f79ddb673aeaac2ec2738a0272f5a2bd535c5e2be8fc7a216f91cfc"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Statue_Lv3.uasset",
+        "sha256": "cbe8dfdb1e646edf73c11e33f7526e12e06b0992580ffd0af0e5fd88d57adf19"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Statue_Lv4.uasset",
+        "sha256": "d91f7b3097c9d1ffb971bc9b9afbe5ae1ba40c4420d0c319cd268d989b1a1c26"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv2.uasset",
+        "sha256": "5fd67973d6567c0e9ae364a091ac9d163f18649f2cac2896fe8047a4a0083426"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv3.uasset",
+        "sha256": "0eae2d9ee1af053125d21f66a06a04eaebfdd5aae53b18e9da60c6cab3554de0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv4.uasset",
+        "sha256": "38febd1c715c3fbad5ab7df35abfafe246b614d87e7bcf74538d40c67be74659"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Buildings/T_Home_Treasury_Lv5.uasset",
+        "sha256": "a806e19cf5869cbc5311c670ff8845abd496553f0f71d4002e13dd1b389ff1d4"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Fonts/F_Body.uasset",
+        "sha256": "f3c0edd28daa5a634729caa9cab3240f6ddc3ea7b9934f3d1759b370bcfba3b2"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Fonts/F_Title.uasset",
+        "sha256": "fcf09999dda693e7e799dbc7e8ee4891cf8f42f0ee87c2b70aaffac19b01e59e"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Fonts/FF_Body.uasset",
+        "sha256": "7e3b4440a18ed0dc66477483322f825e3472cf488346f48fb3863005860e1d18"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Fonts/FF_Title.uasset",
+        "sha256": "61fa7c6886bda335c5fe1e4e7ee3b5d82fb88f94b37e09fd799b7ebef200b887"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Music/M_Battle.uasset",
+        "sha256": "e601dd582c947704a1d182f854de35c4fb9c2c3f484bb0b9becf99c4e6352d07"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Music/M_Boss.uasset",
+        "sha256": "75474abd53644eda586b9a794a0734e0e9d54956df1c294c99690c8996145e64"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Music/M_Expedition.uasset",
+        "sha256": "7e77c0bb4999087d5400ebabdf9a89858f2b2ca6b6f358b4f9521635f55c28f5"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Music/M_Home.uasset",
+        "sha256": "56ab196c11781485cf77752301c7d6f5c5a5c6ac77b21a94bff6a087f683afb0"
+      },
+      {
+        "path": "Content/Art/StorybookV1/Polish/Music/SC_Music.uasset",
+        "sha256": "7223e54f65d3b8e351c5ab09ee631f2a85d4a9da86dff07f525f90d6400cec31"
+      }
+    ]
+  },
+  "sources": {
+    "audit": {
+      "images": 35,
+      "atlases": 28,
+      "frames": 448,
+      "music": [
+        {
+          "id": "Home",
+          "peakDbFS": -3.0003622493859567,
+          "rmsDbFS": -22.862731072512773,
+          "seconds": 32.3,
+          "seamMaxDelta": 0.002105712890625,
+          "hashVerified": true
+        },
+        {
+          "id": "Expedition",
+          "peakDbFS": -3.085778795293837,
+          "rmsDbFS": -22.000270077764345,
+          "seconds": 25.35,
+          "seamMaxDelta": 0.033111572265625,
+          "hashVerified": true
+        },
+        {
+          "id": "Battle",
+          "peakDbFS": -4.998020716787859,
+          "rmsDbFS": -22.000261609905692,
+          "seconds": 20.675056689342405,
+          "seamMaxDelta": 0.00396728515625,
+          "hashVerified": true
+        },
+        {
+          "id": "Boss",
+          "peakDbFS": -3.0003622493859567,
+          "rmsDbFS": -25.537027792758966,
+          "seconds": 46.55369614512472,
+          "seamMaxDelta": 0.00079345703125,
+          "hashVerified": true
+        }
+      ],
+      "fonts": 2,
+      "originalImagesUnmodified": true
+    },
+    "manifest": {
+      "path": "ArtSource/StorybookV1/Polish/manifest.json",
+      "sha256": "d1ed0a579eb7c202533b69b385a395930d5de8aeb201ea13dfce4aaf7bee57b7"
+    },
+    "originalToolFileHashesVerified": 35,
+    "musicLicense": {
+      "source": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/main/LICENSE",
+      "file": "ArtSource/StorybookV1/Polish/Licenses/MiniMax-Music3-LICENSE.txt",
+      "sha256": "b21d12df2adae59dad3fcf80c1d81492654c662342f497d9a9770198c9317e58",
+      "label": "MiniMax-Music3 COMMUNITY LICENSE; generated output, not CC0"
+    },
+    "fonts": [
+      {
+        "file": "ArtSource/StorybookV1/Polish/Fonts/NotoSansCJKsc-Regular.otf",
+        "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+        "author": "Noto CJK contributors",
+        "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+        "license": "SIL Open Font License 1.1",
+        "licenseFile": "ArtSource/StorybookV1/Polish/Licenses/NotoSans-OFL.txt",
+        "licenseSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+        "processing": "Original unmodified OTF; UE inline FontFace and runtime composite Font. No model prompt."
+      },
+      {
+        "file": "ArtSource/StorybookV1/Polish/Fonts/NotoSerifCJKsc-SemiBold.otf",
+        "sha256": "d627b53dbcde61e07de1498d2623a8b287f78585ffbc90cc0618d0caaa2ed6b0",
+        "author": "Noto CJK contributors",
+        "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-SemiBold.otf",
+        "license": "SIL Open Font License 1.1",
+        "licenseFile": "ArtSource/StorybookV1/Polish/Licenses/NotoSerif-OFL.txt",
+        "licenseSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+        "processing": "Original unmodified OTF; UE inline FontFace and runtime composite Font. No model prompt."
+      }
+    ]
+  },
+  "rendering": {
+    "resolutions": [
+      [
+        1280,
+        720
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "captureCount": 76,
+    "archivedCount": 28,
+    "reviewScope": "Representative five-state grids, building levels, menus and home/map/service layouts visually inspected. All PNG dimensions/integrity and hashes checked. Do not equate capture count with individual aesthetic approval.",
+    "captures": [
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_00_Idle_1080.png",
+        "sha256": "396927b4d8d686764d9ea376a27a7ff89a77fb1cd20ec793ffaabe6efbabded6",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_00_Idle_720.png",
+        "sha256": "c0ce3055978a0e06ef7a8736a35293f7042deddaa88a8eafc1bbf03b36145dce",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_01_Idle_1080.png",
+        "sha256": "1ea493e8b6663336854ed7a3ca1bc75a5f69424bd2851b86a5ef6fa6cd8c53fd",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_01_Idle_720.png",
+        "sha256": "93e39be5660f76771710f40beb29321e76f302a5605ef0c12bbe528c5260d50c",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_02_Idle_1080.png",
+        "sha256": "a957653dec0a63f27b87fda1aff5911f3c316c3ebd2296d581d8e712eb550404",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_02_Idle_720.png",
+        "sha256": "77ce0a2796da7c282e52b5a64a328ba6b125c829c5fea1f3e37a80ff52a77a60",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_03_Idle_1080.png",
+        "sha256": "ad3353aa117625115daf1a3a4bfb0afe42914f1320f62ae819bde67680d87ed3",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_03_Idle_720.png",
+        "sha256": "557511fde27c60a5b75d9c2c6ec93b1861ef1f5f667517005dfa36b0dc14cf70",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_04_Move_1080.png",
+        "sha256": "91679b4f97ef6e2c245711e1bdd94093f9f65730896517304c29d3f59a71fdcf",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_04_Move_720.png",
+        "sha256": "59a16756c1d0ebe25d4c3927fd8f506fcb23188f501d96d393252d7019d1f429",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_05_Move_1080.png",
+        "sha256": "63bf69db32b21a3490a46066c58bf6ef0ce58dd3ab3caec7a374df3ab9e73212",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_05_Move_720.png",
+        "sha256": "fbe9da30024432e2468055af3be8a3731bca52db303d1a7ede56024161e8edc6",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_06_Move_1080.png",
+        "sha256": "87ede681f67cc1ac2363e9722ba355ed36e10aad19ce782e1164120c3543e3a1",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_06_Move_720.png",
+        "sha256": "a5d83410eb373c2bde9dcde503a07b9b69fddcc0264f916ff1ae756121d5052b",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_07_Move_1080.png",
+        "sha256": "9c09785097ca4732ad651c97978ada8e44af74198016a3a0dc164cdab392e060",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_07_Move_720.png",
+        "sha256": "f1ee8a3c03f0b5f783ae60624a4cbfe360cacb48cdfb45a1a9d9fabcdd0e4eb1",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_08_Attack_1080.png",
+        "sha256": "37570315020ecbced863e1e48442d064f479f08a7a65a826c978d933f203d575",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_08_Attack_720.png",
+        "sha256": "12d748f077d9125c4aec749a6c6ea409dd5d74547336914460609d95babf71ab",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_09_Attack_1080.png",
+        "sha256": "2e55dfb665df4fbed587361f4f27caa841fe779cbc8d1397a8c8316e77cbd627",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_09_Attack_720.png",
+        "sha256": "0fd9555989e1aadf7ec6a469feda3c402a27179d87df36db97ec24db3ee287d2",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_10_Attack_1080.png",
+        "sha256": "bcd7de019962f9b6928b645290d0e3db0ed3af13fd9880fba6c9199caed521ba",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_10_Attack_720.png",
+        "sha256": "4a73161811e7861b3395c24d8bc329aa43eeb628965ca480e26f111d7c03d930",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_11_Attack_1080.png",
+        "sha256": "d6ed031df48b6a1f8cd2fc1debfe63d2c51354e33b7e63e7a03f3083bb81c4d6",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_11_Attack_720.png",
+        "sha256": "21b06aa65a678fc354cebf176b13aff5b22335ddf8e9bf5ef1e76a5b25e1dcb8",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_12_Hit_1080.png",
+        "sha256": "8bdfee396b7e59cdf9a265658a75c176f5e3c3fb20e1ef8d561bb46bbecb293a",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_12_Hit_720.png",
+        "sha256": "5fcdaa03b62c5e7e2e76a8e2d46454ac2fab96888ea45e6aaf5dea3781f90dc6",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_13_Hit_1080.png",
+        "sha256": "bd8a4df97ab17c41efb0f7b7196b23515986c1ba1fba9c34f85092e704135a8e",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_13_Hit_720.png",
+        "sha256": "b86ba0ac21d3d381d9373a58c07bee96a1f7dfd42663df858241f7e6aa559aa5",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_14_Death_1080.png",
+        "sha256": "a02f4cc47482dbe7dcf56b69e99c411c34f8cf474d632766dbbdb93b997fa25a",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_14_Death_720.png",
+        "sha256": "8136511eac09563cf24e2830e1d7ca61adc077727f72eb2c33e2c1bc7930818f",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_15_Death_1080.png",
+        "sha256": "07afedf68bba24ad4fcdcbc1fac154068ad7eda3a7216c151b3f851a2dc61202",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Frames_15_Death_720.png",
+        "sha256": "d74ce25b12f1f70ea2a9f4472ec271a3ec405b020830f3b54d7e4941a7d4b9d2",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/HomeLevels_1080.png",
+        "sha256": "5ba85c0fe3ad2a3da7f3854bafdb17dea78325b8cf74b54d661bece9436885ed",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/HomeLevels_720.png",
+        "sha256": "d84dd1ecdc232b776f148c558baf8c08fe5d4b7a69a9b6808037d08250872b44",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Battle_1080.png",
+        "sha256": "ad92afa368140c7db80e4b956c1ea9079bd59fda3fcc28128fba1f1dbc5ff3e5",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Battle_720.png",
+        "sha256": "8a27a22b92e284aa5086f9090e9d8df64512749a3237cbdbd4bd07b858be868e",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Curtain_1080.png",
+        "sha256": "afdc5622352585ea564699cff5e4eef01c67b33ac4e8da8e95a02dc6c9f91594",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Curtain_720.png",
+        "sha256": "49a77ae75ff4555cd90f3ee33bcd4d0149d04858f4142397a9b16404c7650ae0",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Home_1080.png",
+        "sha256": "30c4b651c65b19f74c39b5b6853d9ad96b75dbd344a36993df819340007489c1",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Home_720.png",
+        "sha256": "f9aa71b82759bad26b624ee225496785f31d439c2928d9cc23cbeb5068e52f96",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Menu_1080.png",
+        "sha256": "c13f8d228c2f19f417d797c822b5ed8a99a6a52f0958ea8fb9d82ba172af6b21",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_Menu_720.png",
+        "sha256": "488295393eb6d4fb16fbeee33307dc6c967fc28969b775abbffd34241f2df80a",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_ReturnedHome_1080.png",
+        "sha256": "c4b151c38c413c9777222bbbbfde2a0182a2d0e1958a635478c617a31879d572",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/PolishArt/Travel_ReturnedHome_720.png",
+        "sha256": "754c47d11132b9d0b9720e4a4d44106d4ab2a18915b4dbacc843e10a5525b512",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-00.png",
+        "sha256": "48af3985158c459e1936122eef78f9de62d0f555db01b7004b914402873f0495",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-01.png",
+        "sha256": "5a444a313c7a9976f4e418bf63309af2afbf489cce2a4aecfaff4e9748a1a90c",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-02.png",
+        "sha256": "35a9abe84a27a49e012e3a35181fffb0f78ff98a249f05f1337db0a5087ed003",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-03.png",
+        "sha256": "c7fa1e7905ddc4cb6fe197baf88a24cbaea8ded701ea67bd2aedc462b7a47221",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-04.png",
+        "sha256": "6ee815073a7a68abe3f0d51bf2475a1847034b3de480156aebd3d09baabafa30",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-05.png",
+        "sha256": "01365f7304507b8aefafc6f2c452c1be70d9cb4d6cca9cc08e54ad06ba2dbd82",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-06.png",
+        "sha256": "9b1c4684500fa028c0be502a0b9c705ab6daa462a82ff20fa8f305926f2ed1fc",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1280x720-07.png",
+        "sha256": "dbae9a0e49afd6b61892e96b403d4bd11612753b39578657aa909de6666d2561",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-00.png",
+        "sha256": "78010f6d84b5733256e10006743f97f0691d7789a79c4bd821fa1aca148608c7",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-01.png",
+        "sha256": "47164cec3abbb282d54188fb7626d4f396c021502f012878dc670f8561fa7ad9",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-02.png",
+        "sha256": "d471548a9e2486bdad803065505df9b1ee7e3aa06a93f40cefec930123b20e94",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-03.png",
+        "sha256": "8b05369dcba6907880396b459f44f49740883f9d116922e70e7e30b0f14a543d",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-04.png",
+        "sha256": "cc7044569a862e5175e25abce668a08d430e29f46796fb3a722b2b40d4fa348e",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-05.png",
+        "sha256": "2883bc321d5f85382d406cf9b89a61a833fab1d61a40ba92053c39858e864d37",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-06.png",
+        "sha256": "352d883f4cb8af8769752d0b1a949f38e4e259425a736674e1e84bbb7bbd32ab",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/HomeUI/1920x1080-07.png",
+        "sha256": "6a16e52a9a1d83be7a1f1b5529b0f66746d55583b2414dcb8acf9411a3c271b6",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1280x720-00.png",
+        "sha256": "146969536efd8dac8a72f581abac36892c6261feb8a8254f7e26cdcfb8e24203",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1280x720-01.png",
+        "sha256": "5d86534a436dd7a87f56b752332b4f50bb2650b8a87ddf2fc7aad0527f238d34",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1280x720-02.png",
+        "sha256": "953980fd6b89fb04c63a0f890348f77b1e8a6437cbf9a6b97da4ea04019f6d49",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1280x720-03.png",
+        "sha256": "dc32d39f3e98befd08f706d9d8ce9c59fd6e8ffb8b95b65b06a89fe38c596e12",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1920x1080-00.png",
+        "sha256": "d5a59c3ff745fe2f322df7ba5c47a6a8b7f388f6f7392b347c1b457ba045833a",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1920x1080-01.png",
+        "sha256": "4ea93b59805424e15df35d1cfc3d7de7f17651b0bfbceed69f15fbd2179698c8",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1920x1080-02.png",
+        "sha256": "f46e65401c46004a0c188750d395007a3cca253054f4ad7f545a7c7b750b8e32",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/WorldMap/1920x1080-03.png",
+        "sha256": "ec2a80c57b3dd58ba537c8668a7a8ddb205b6a17da70a176b40f2b64a6e38485",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1280x720-00.png",
+        "sha256": "21bf8b18e060562a3adedc9f48b1dc7601b33e6f038274148dd80d8c90662d84",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1280x720-01.png",
+        "sha256": "82dcb6c629ba9e56b761b076b14f617d6d4e21f0beb1aa376100204be455f3c5",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1280x720-02.png",
+        "sha256": "21b8499c014f01da11deb13c5a797eb5a92e46ed9f79d4f9a69ec4606c164146",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1280x720-03.png",
+        "sha256": "34d4bda2914bd118e25cbad84d1c117b4be2c0aa5f54ee2431783fea10beb2f8",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1920x1080-00.png",
+        "sha256": "f62e7596b872d01d059ce7ff8b3e7aa2f4d59d28f68ab50e29bb4c27c3bfcafa",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1920x1080-01.png",
+        "sha256": "6e04481363387aafc59553afaf5b439319d874df9fb41c0bd8bbbcc7018eb583",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1920x1080-02.png",
+        "sha256": "da698434d75a3dcda85b532f0b5ac6ce40caea767cea89fd7c611281b0c2d7c1",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "path": "Saved/Screenshots/StartMenu/1920x1080-03.png",
+        "sha256": "1848410dfc6f5c075e10df04fa0da8a632763bec005c357c97ec9941b4fa9a60",
+        "width": 1920,
+        "height": 1080
+      }
+    ],
+    "archives": [
+      {
+        "path": "docs/images/PolishIdle_720.png",
+        "sha256": "c0ce3055978a0e06ef7a8736a35293f7042deddaa88a8eafc1bbf03b36145dce",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Frames_00_Idle_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMove_720.png",
+        "sha256": "a5d83410eb373c2bde9dcde503a07b9b69fddcc0264f916ff1ae756121d5052b",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Frames_06_Move_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishAttack_720.png",
+        "sha256": "4a73161811e7861b3395c24d8bc329aa43eeb628965ca480e26f111d7c03d930",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Frames_10_Attack_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishHit_720.png",
+        "sha256": "b86ba0ac21d3d381d9373a58c07bee96a1f7dfd42663df858241f7e6aa559aa5",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Frames_13_Hit_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishDeath_720.png",
+        "sha256": "d74ce25b12f1f70ea2a9f4472ec271a3ec405b020830f3b54d7e4941a7d4b9d2",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Frames_15_Death_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishHomeLevels_720.png",
+        "sha256": "d84dd1ecdc232b776f148c558baf8c08fe5d4b7a69a9b6808037d08250872b44",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/HomeLevels_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMenu_720.png",
+        "sha256": "488295393eb6d4fb16fbeee33307dc6c967fc28969b775abbffd34241f2df80a",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Travel_Menu_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishCurtain_720.png",
+        "sha256": "49a77ae75ff4555cd90f3ee33bcd4d0149d04858f4142397a9b16404c7650ae0",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Travel_Curtain_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMap_720.png",
+        "sha256": "8a27a22b92e284aa5086f9090e9d8df64512749a3237cbdbd4bd07b858be868e",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/PolishArt/Travel_Battle_720.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishStatue_720.png",
+        "sha256": "5a444a313c7a9976f4e418bf63309af2afbf489cce2a4aecfaff4e9748a1a90c",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/HomeUI/1280x720-01.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishTreasury_720.png",
+        "sha256": "6ee815073a7a68abe3f0d51bf2475a1847034b3de480156aebd3d09baabafa30",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/HomeUI/1280x720-04.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishRest_720.png",
+        "sha256": "dc32d39f3e98befd08f706d9d8ce9c59fd6e8ffb8b95b65b06a89fe38c596e12",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/WorldMap/1280x720-03.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishRegion_720.png",
+        "sha256": "5d86534a436dd7a87f56b752332b4f50bb2650b8a87ddf2fc7aad0527f238d34",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/WorldMap/1280x720-01.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishSaves_720.png",
+        "sha256": "21b8499c014f01da11deb13c5a797eb5a92e46ed9f79d4f9a69ec4606c164146",
+        "width": 1280,
+        "height": 720,
+        "source": "Saved/Screenshots/StartMenu/1280x720-02.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishIdle_1080.png",
+        "sha256": "396927b4d8d686764d9ea376a27a7ff89a77fb1cd20ec793ffaabe6efbabded6",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Frames_00_Idle_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMove_1080.png",
+        "sha256": "87ede681f67cc1ac2363e9722ba355ed36e10aad19ce782e1164120c3543e3a1",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Frames_06_Move_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishAttack_1080.png",
+        "sha256": "bcd7de019962f9b6928b645290d0e3db0ed3af13fd9880fba6c9199caed521ba",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Frames_10_Attack_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishHit_1080.png",
+        "sha256": "bd8a4df97ab17c41efb0f7b7196b23515986c1ba1fba9c34f85092e704135a8e",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Frames_13_Hit_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishDeath_1080.png",
+        "sha256": "07afedf68bba24ad4fcdcbc1fac154068ad7eda3a7216c151b3f851a2dc61202",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Frames_15_Death_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishHomeLevels_1080.png",
+        "sha256": "5ba85c0fe3ad2a3da7f3854bafdb17dea78325b8cf74b54d661bece9436885ed",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/HomeLevels_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMenu_1080.png",
+        "sha256": "c13f8d228c2f19f417d797c822b5ed8a99a6a52f0958ea8fb9d82ba172af6b21",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Travel_Menu_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishCurtain_1080.png",
+        "sha256": "afdc5622352585ea564699cff5e4eef01c67b33ac4e8da8e95a02dc6c9f91594",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Travel_Curtain_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishMap_1080.png",
+        "sha256": "ad92afa368140c7db80e4b956c1ea9079bd59fda3fcc28128fba1f1dbc5ff3e5",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/PolishArt/Travel_Battle_1080.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishStatue_1080.png",
+        "sha256": "47164cec3abbb282d54188fb7626d4f396c021502f012878dc670f8561fa7ad9",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/HomeUI/1920x1080-01.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishTreasury_1080.png",
+        "sha256": "cc7044569a862e5175e25abce668a08d430e29f46796fb3a722b2b40d4fa348e",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/HomeUI/1920x1080-04.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishRest_1080.png",
+        "sha256": "ec2a80c57b3dd58ba537c8668a7a8ddb205b6a17da70a176b40f2b64a6e38485",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/WorldMap/1920x1080-03.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishRegion_1080.png",
+        "sha256": "4ea93b59805424e15df35d1cfc3d7de7f17651b0bfbceed69f15fbd2179698c8",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/WorldMap/1920x1080-01.png",
+        "copiedUnmodified": true
+      },
+      {
+        "path": "docs/images/PolishSaves_1080.png",
+        "sha256": "da698434d75a3dcda85b532f0b5ac6ce40caea767cea89fd7c611281b0c2d7c1",
+        "width": 1920,
+        "height": 1080,
+        "source": "Saved/Screenshots/StartMenu/1920x1080-02.png",
+        "copiedUnmodified": true
+      }
+    ],
+    "logs": [
+      {
+        "path": "Saved/Logs/PolishFinal_PolishArtPreview_720.log",
+        "sha256": "335d97185676a8ebf345374fe02662dbb2c03ab4891d7a487e4b5be6e0d66595"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_PolishTravelPreview_720.log",
+        "sha256": "a149aa43fc47cd1ca3d06f4bece474c930ef3b1519761b7350f988b03095daaf"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_HomeUIPreview_720.log",
+        "sha256": "3f1b50b85d64f7772165a42d015da573599c654b3247289bb8110f92de26b65a"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_WorldMapPreview_720.log",
+        "sha256": "cd8098eff0ac7568f427ae06c2045e8873225e9c621f5d627e7a2a11b4e8ac13"
+      },
+      {
+        "path": "Saved/Logs/PolishMenuFinal_720.log",
+        "sha256": "aca06293789a7c73f01c5a7bb20afa2cfc355775dfacdbe35acb32e35d342fe0"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_PolishArtPreview_1080.log",
+        "sha256": "4b71e6139992117a59d36b8439b371787f263d7c8cd3a560b2bdd1a34d4d6aff"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_PolishTravelPreview_1080.log",
+        "sha256": "dfd235c9c0181eee851b4bba810da3d5bf3084af8b3f6994dd16ab2b4448ee0a"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_HomeUIPreview_1080.log",
+        "sha256": "2edadeb2250f58eadf2d6f6fb5455d06f386b75d38f380506e137d91945e139e"
+      },
+      {
+        "path": "Saved/Logs/PolishFinal_WorldMapPreview_1080.log",
+        "sha256": "c26d54b448e123f21615d5eb5061f112eb45483aa3acf6016933b76fd2b936ee"
+      },
+      {
+        "path": "Saved/Logs/PolishMenuFinal_1080.log",
+        "sha256": "ebcf14405bf19a5985e266366a214486d85bb1a17a6978c6dd61a729e0758158"
+      }
+    ],
+    "realTravel": [
+      {
+        "resolution": 720,
+        "result": "POLISH_TRAVEL_OK menu-home-battle-home music=Home voices=1 curtain=0",
+        "log": "Saved/Logs/PolishFinal_PolishTravelPreview_720.log"
+      },
+      {
+        "resolution": 1080,
+        "result": "POLISH_TRAVEL_OK menu-home-battle-home music=Home voices=1 curtain=0",
+        "log": "Saved/Logs/PolishFinal_PolishTravelPreview_1080.log"
+      }
+    ]
+  },
+  "preservation": {
+    "originalSaveCount": 5,
+    "originalSaves": [
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+        "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+        "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+        "sha256": "562461a0083c4ce8cb8d44d9a5d31df2cf58c90c0cc699732d26cfabf89aafd3",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+        "sha256": "a0dafc14df99c85ad936be3f2fc71bed94f9eb34675fab4c5cff5b298e5ddf69",
+        "matchesBaseline": true
+      },
+      {
+        "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+        "sha256": "b311821a2bac29c93182835ff9ee24cfd370861875d0b1e71ae3def4da17b800",
+        "matchesBaseline": true
+      }
+    ],
+    "extraPreviewSavesRemaining": 0,
+    "unitTable": {
+      "path": "Content/Data/DT_Units.uasset",
+      "sha256": "5bd2282930b84cf9430bd2a2d86e5a6ccc500b0ab1be4487784181a5e576b782",
+      "matchesBeforeD": true,
+      "priorChange": "B-batch Barracks SpriteScale.Y 1 to 0.5 retained."
+    },
+    "baselines": [
+      {
+        "path": "Saved/ArtBatchDBaseline/saves.json",
+        "sha256": "0a995177436e878004582a88005f72a21cfd742e0efcf6d9f53ccd6c51f1ea97"
+      },
+      {
+        "path": "Saved/ArtBatchDBaseline/data-table.json",
+        "sha256": "9441b763463bf0fc250c53adb298f3ef29cfa2c7de9c383aac8b70eca69813af"
+      }
+    ]
+  },
+  "limitations": [
+    "Generated animation is a first presentation pass, not hand-cleaned pixel art.",
+    "Audio format/peak/seam and engine lifecycle checks do not constitute subjective listening or final mix approval.",
+    "Packaging and hardware acceptance remain deferred at user request; Sprint 6 stays skipped."
+  ],
+  "documentation": {
+    "filesChecked": [
+      "README.md",
+      "docs/03-TaskList.md",
+      "docs/07-ArtStyleGuide.md",
+      "docs/12-AssetRequest.md",
+      "docs/13_Asset_Solutions.md",
+      "docs/29-OptimizationChangeLog.md",
+      "docs/36-ArtAudioSources.md",
+      "docs/40-WorldSkillsArtIntegration.md",
+      "docs/42-PolishArtIntegration.md",
+      "docs/43-PolishArtPrompts.md"
+    ],
+    "localLinksVerified": 260,
+    "missingLocalLinks": 0
+  },
+  "staticChecks": {
+    "gitDiffCheck": "passed (repository line-ending policy, core.safecrlf=false for this invocation only)",
+    "untrackedTextFilesWhitespaceChecked": 49,
+    "pythonSyntaxFiles": [
+      "Scripts/AuditPolishArt.py",
+      "Scripts/GeneratePolishMusic.py",
+      "Scripts/ImportPolishAssets.py",
+      "Scripts/ImportPolishFonts.py",
+      "Scripts/PreparePolishAudio.py",
+      "Scripts/PreparePolishFrames.py"
+    ]
+  }
+}

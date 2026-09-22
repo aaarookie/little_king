@@ -1,4 +1,5 @@
 #include "ULKHomeBuildingLabelWidget.h"
+#include "LKPresentationStyle.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
 #include "Components/SizeBox.h"
@@ -16,7 +17,7 @@ TSharedRef<SWidget> ULKHomeBuildingLabelWidget::RebuildWidget()
         AccentBorder->SetPadding(FMargin(0.f, 3.f, 0.f, 0.f));
         Size->SetContent(AccentBorder);
         UBorder* Plate = WidgetTree->ConstructWidget<UBorder>();
-        Plate->SetBrushColor(FLinearColor(0.016f, 0.025f, 0.04f, 0.97f));
+        LKPresentationStyle::StylePanel(Plate, LKPresentationStyle::Ink());
         Plate->SetPadding(FMargin(10.f, 8.f));
         AccentBorder->SetContent(Plate);
         UVerticalBox* Content = WidgetTree->ConstructWidget<UVerticalBox>();
@@ -27,11 +28,12 @@ TSharedRef<SWidget> ULKHomeBuildingLabelWidget::RebuildWidget()
         {
             FSlateFontInfo Font = Text->GetFont();
             Font.Size = Text == TitleText ? 17 : 12;
-            Text->SetFont(Font);
+            Text->SetFont(LKPresentationStyle::Font(Font.Size));
             Text->SetJustification(ETextJustify::Center);
             Content->AddChildToVerticalBox(Text);
         }
-        HintText->SetColorAndOpacity(FSlateColor(FLinearColor(0.65f, 0.73f, 0.80f)));
+        TitleText->SetColorAndOpacity(LKPresentationStyle::Paper());
+        HintText->SetColorAndOpacity(FSlateColor(LKPresentationStyle::Muted()));
         SetVisibility(ESlateVisibility::HitTestInvisible);
         UpdateLabel();
     }

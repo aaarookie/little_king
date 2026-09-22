@@ -1,4 +1,5 @@
 #include "ALKBattleGameMode.h"
+#include "ULKJourneyPresentationSubsystem.h"
 
 #include "Engine/GameInstance.h"
 #include "Engine/DataTable.h"
@@ -404,7 +405,7 @@ bool ALKBattleGameMode::ReturnToHome()
     }
     bResultActionInProgress = true;
     UE_LOG(LogLKBattle, Log, TEXT("[Home] 返回家园 %s"), *MapName.ToString());
-    UGameplayStatics::OpenLevel(this, MapName);
+    ULKJourneyPresentationSubsystem::Travel(this, MapName);
     return true;
 }
 
@@ -491,7 +492,7 @@ bool ALKBattleGameMode::ReloadBattleLevel()
     const FString LevelName = UGameplayStatics::GetCurrentLevelName(this, true);
     if (LevelName.IsEmpty()) { bResultActionInProgress = false; return false; }
     UE_LOG(LogLKBattle, Log, TEXT("[Run] 重载战场 %s"), *LevelName);
-    UGameplayStatics::OpenLevel(this, FName(*LevelName));
+    ULKJourneyPresentationSubsystem::Travel(this, FName(*LevelName));
     return true;
 }
 
