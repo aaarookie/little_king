@@ -1,6 +1,7 @@
 #include "ULKUnitActiveComponent.h"
 #include "ALKUnitBase.h"
 #include "ALKBattleGameMode.h"
+#include "LKCardRules.h"
 #include "LKGameplayHelpers.h"
 #include "ULKCardDefinition.h"
 #include "ULKDeckState.h"
@@ -174,8 +175,11 @@ bool ULKUnitActiveComponent::MimicSpell()
         for (FName Id : Ids)
         {
             const ULKCardDefinition* Card = GM->FindCard(Id);
-            if (Card && Card->CardType == ELKCardType::Spell && Card->SpellGrade <= ELKSpellGrade::Novice3
-                && Card->SpellEffect != ELKSpellEffect::None && Card->SpellValue > 0.f && FMath::IsFinite(Card->SpellValue)
+            // 学徒模仿只复制玩家可获得的法术：敌方专属（骷髅法阵）不在候选里。
+            if (Card && Card->CardType == ELKCardType::Spell && LKCardRules::IsPlayerObtainable(Id)
+                && Card->SpellGrade <= ELKSpellGrade::Novice3
+                && Card->SpellEffect != ELKSpellEffect::None && Card->SpellEffect != ELKSpellEffect::SummonZone
+                && Card->SpellValue > 0.f && FMath::IsFinite(Card->SpellValue)
                 && Card->SpellRadius > 0.f && FMath::IsFinite(Card->SpellRadius)) { Spells.Add(Card); }
         }
     }
@@ -187,7 +191,9 @@ bool ULKUnitActiveComponent::MimicSpell()
             && FMath::IsFinite(Fireball->SpellValue) && Fireball->SpellValue > 0.f && FMath::IsFinite(Fireball->SpellRadius) && Fireball->SpellRadius > 0.f) { Chosen = Fireball; }
     }
     const ELKSpellEffect Effect = Chosen ? Chosen->SpellEffect : ELKSpellEffect::Damage;
-    const float Value = Chosen ? Chosen->SpellValue : 60.f, Radius = Chosen ? Chosen->SpellRadius : 250.f;
+    const float Scale=Chosen?GM->GetCardUpgradeScale(Chosen->CardId,Unit->GetTeam()):1.f;
+    const float Value = (Chosen ? Chosen->SpellValue : 60.f)*Scale, Radius = Chosen ? Chosen->SpellRadius : 250.f;
+    const float HeroPercent=Chosen?Chosen->HeroHealPercent*Scale:0.f;
     const bool bHeal = Effect == ELKSpellEffect::Heal;
     const TArray<ALKUnitBase*> Units = LivingUnits(GetWorld());
     FVector Center = Unit->GetActorLocation();
@@ -200,7 +206,7 @@ bool ULKUnitActiveComponent::MimicSpell()
         for (ALKUnitBase* Other : Units)
         {
             if ((Other->GetTeam() == Unit->GetTeam()) == bHeal && FVector::Dist2D(Candidate->GetActorLocation(), Other->GetActorLocation()) <= Radius)
-            { Score += bHeal ? FMath::Min(Value, Other->GetMaxHealth() - Other->GetHealth()) : (Other->IsHero() ? 2.f : 1.f); }
+            { Score += bHeal ? FMath::Min(Value+(Other->IsHero()?Other->GetMaxHealth()*HeroPercent:0.f), Other->GetMaxHealth() - Other->GetHealth()) : (Other->IsHero() ? 2.f : 1.f); }
         }
         if (Score > BestScore) { BestScore = Score; Center = Candidate->GetActorLocation(); bHasTarget = true; }
     }
@@ -215,7 +221,7 @@ bool ULKUnitActiveComponent::MimicSpell()
     for (ALKUnitBase* Other : Units)
     {
         if (FVector::Dist2D(Center, Other->GetActorLocation()) > Radius) { continue; }
-        if (bHeal && Other->GetTeam() == Unit->GetTeam()) { LKGameplay::ApplyHeal(Other, Value, Unit, &Source); }
+        if (bHeal && Other->GetTeam() == Unit->GetTeam()) { LKGameplay::ApplyHeal(Other, Value+(Other->IsHero()?Other->GetMaxHealth()*HeroPercent:0.f), Unit, &Source); }
         else if (!bHeal && Other->GetTeam() != Unit->GetTeam()) { LKGameplay::ApplyDamage(Other, Value, Unit, false, &Source); }
     }
     GM->EndCombatBatch();

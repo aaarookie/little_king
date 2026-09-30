@@ -41,6 +41,11 @@ private:
     UPROPERTY(Transient) TObjectPtr<ULKWorldMapWidget> Map;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Summary;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Detail;
+    UPROPERTY(Transient) TObjectPtr<UVerticalBox> ServiceActions;
+    UPROPERTY(Transient) TObjectPtr<ULKHomeListButtonWidget> AbandonAction;
+    int32 SelectedMarketIndex=INDEX_NONE;
+    TArray<FName> MarketRemoved;
+    bool bConfirmAbandon=false;
     UPROPERTY(Transient) TObjectPtr<class UImage> NodeIllustration;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> Status;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> ChoicesTitle;

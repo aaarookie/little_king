@@ -21,6 +21,8 @@ public:
 
 	/** 费用解析器（GameMode 注入：CardId -> Cost） */
 	TFunction<int32(FName)> CostProvider;
+	/** Optional faction/content gate. Player GameMode supplies the canonical permission rule. */
+	TFunction<bool(FName)> CardAllowed;
 
 	/** 去重后仅开局洗牌一次；不足槽数 + 1 时返回 false，保留原状态。 */
 	bool InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimit, int32 Seed = 1);

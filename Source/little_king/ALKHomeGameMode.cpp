@@ -1,6 +1,8 @@
 #include "ALKHomeGameMode.h"
+#include "LKBalanceRules.h"
 #include "ULKJourneyPresentationSubsystem.h"
 #include "LKCardPresentation.h"
+#include "LKResearchContent.h"
 
 #include "Engine/World.h"
 #include "Engine/StaticMeshActor.h"
@@ -19,6 +21,7 @@
 
 #include "ALKHomeBuildingActor.h"
 #include "ALKHomePlayerController.h"
+#include "LKCardRules.h"
 #include "LKEncounterContent.h"
 #include "LKHomeContent.h"
 #include "LKLog.h"
@@ -47,7 +50,7 @@ namespace
 		if (TraitId == "Trait_MageSpellReach") { return FText::FromString(TEXT("全场施法：本方所有法术可在战场任意位置落点")); }
 		if (TraitId == "Trait_KnightTauntAura") { return FText::FromString(TEXT("嘲讽光环：半径内己方近战佣兵获得嘲讽")); }
 		if (TraitId == "Taunt") { return FText::FromString(TEXT("嘲讽：敌方索敌优先攻击本单位")); }
-		if (TraitId == "Trait_Sacrifice") { return FText::FromString(TEXT("献祭：每次亡灵召唤消耗自身 8% 最大生命")); }
+		if (TraitId == "Trait_Sacrifice") { return FText::FromString(FString::Printf(TEXT("献祭：每次亡灵召唤消耗自身 %.0f%% 最大生命"), LKBalanceRules::SacrificeHealthPercent*100.f)); }
 		if (TraitId == "Trait_FaceFear") { return FText::FromString(TEXT("直面恐惧：受到远程伤害减少 30%")); }
 		return FText::FromString(FString::Printf(TEXT("%s（暂无说明）"), *TraitId.ToString()));
 	}
@@ -96,6 +99,11 @@ void ALKHomeGameMode::BeginPlay()
 	}
 
 	// H4：远征终态金币入账（幂等；已入账的同一 SettlementId 不会重复加钱）。
+	if (HasActiveExpedition() && !bPreviewMode)
+	{
+		RequestContinueExpedition();
+		return; // Active expeditions never open a temporary home session.
+	}
 	ApplyPendingSettlement();
 	if (ULKRunSubsystem* Run = GetRunSubsystem(); Run && (Run->HasRun() || !Run->HasSavedExpedition())) { Run->ReconcileDepartureFunding(); }
 	RefreshBuildingLevels();
@@ -446,6 +454,14 @@ FText ALKHomeGameMode::BuildHeroDetail(FName HeroId) const
 	return FText::FromString(Text);
 }
 
+bool ALKHomeGameMode::RequestResearch(FName Id,FString& Error)
+{
+    if (HasActiveExpedition()) { Error=TEXT("远征进行中不能使用家园研究"); return false; }
+    ULKProfileSubsystem* P=GetProfileSubsystem();
+    if (!P || !P->ResearchCard(Id,Error)) { return false; }
+    OnHomeRefreshRequested.Broadcast(); return true;
+}
+
 FText ALKHomeGameMode::BuildCardDetail(FName CardId) const
 {
 	const ULKCardDefinition* Card = FindCard(CardId);
@@ -459,8 +475,7 @@ FText ALKHomeGameMode::BuildCardDetail(FName CardId) const
 	if (Card->CardType == ELKCardType::Spell)
 	{
 		const TCHAR* Effect = Card->SpellEffect == ELKSpellEffect::Heal ? TEXT("范围治疗") : TEXT("范围伤害");
-		Text += FString::Printf(TEXT("\n%s %.0f · 半径 %.0f\n落点规则：己方半场；有全场施法特性时可全场落点"),
-			Effect, Card->SpellValue, Card->SpellRadius);
+		Text += TEXT("\n")+LKCardPresentation::Detail(*Card).ToString()+TEXT("\n落点规则：己方半场；有全场施法特性时可全场落点");
 	}
 	else
 	{
@@ -598,8 +613,10 @@ FLKHomePanelModel ALKHomeGameMode::BuildCollectionPanel(ELKHomePanel Panel, FNam
 		else
 		{
 			const ULKCardDefinition* Card = FindCard(Id);
+			// 敌方专属卡不在收藏/图书馆出现（UI 过滤 + ValidateLoadout 校验双层）。
+			if (!LKCardRules::IsPlayerObtainable(Id)) { continue; }
 			// 图书馆只列法术：从永久解锁集里按卡牌类型筛选，不从手牌/临时牌组反推。
-			if (Panel == ELKHomePanel::Library && (!Card || Card->CardType != ELKCardType::Spell)) { continue; }
+			if (Panel == ELKHomePanel::Library && (!Card || (Card->CardType != ELKCardType::Spell && Card->CardType!=ELKCardType::Building))) { continue; }
 			Row.Label = Card ? LKCardPresentation::Label(*Card) : FText::FromName(Id);
 			Row.Value = Card ? FText::FromString(FString::Printf(TEXT("费用 %d · %s"), Card->Cost,
 				Card->CardType == ELKCardType::Spell ? TEXT("法术") : (Card->CardType == ELKCardType::Building ? TEXT("战斗建筑") : TEXT("佣兵"))))
@@ -611,8 +628,27 @@ FLKHomePanelModel ALKHomeGameMode::BuildCollectionPanel(ELKHomePanel Panel, FNam
 
 	if (Panel == ELKHomePanel::Library)
 	{
-		Model.Subtitle = FText::FromString(TEXT("永久解锁的法术；配牌请到战备处"));
-		Model.Status = FText::FromString(TEXT("点击法术查看效果；前往战备处调整出征牌组"));
+		Model.Subtitle = FText::FromString(TEXT("法术与建筑研究 · 解锁后到战备处配牌"));
+		Model.Status = FText::FromString(TEXT("市场购买的书籍／图纸在远征结束后带回；每次研究消耗一份材料。"));
+		if (Profile && Profile->HasProfile())
+		{
+			for (const auto& R:LKResearchContent::All())
+			{
+				const int32 Count=Profile->GetProfile().ResearchMaterials.FindRef(R.CardId);
+				if (Count<1 || Profile->IsCardUnlocked(R.CardId)) { continue; }
+				FLKHomePanelRow Row; Row.RowId=R.CardId; Row.bSelectable=true;
+				Row.Label=FText::FromString(R.Name.ToString()+TEXT(" · 待研究"));
+				Row.Value=FText::FromString(FString::Printf(TEXT("%s ×%d"),R.Kind==ELKMarketOfferKind::SpellBook?TEXT("法术书"):TEXT("建筑图纸"),Count));
+				Row.Detail=BuildCardDetail(R.CardId); Model.Rows.Add(Row);
+			}
+			if (const auto* R=LKResearchContent::Find(SelectedRowId))
+			{
+				FLKHomePanelAction Research; Research.ActionId=FName(*(TEXT("Research:")+SelectedRowId.ToString()));
+				Research.Label=FText::FromString(Profile->IsCardUnlocked(SelectedRowId)?TEXT("已永久解锁"):TEXT("研究 · 消耗一份材料"));
+				Research.bEnabled=IsProfileUsable() && !HasActiveExpedition() && !Profile->IsCardUnlocked(SelectedRowId) && Profile->GetProfile().ResearchMaterials.FindRef(SelectedRowId)>0;
+				Model.Actions.Add(Research);
+			}
+		}
 	}
 	else
 	{
@@ -645,6 +681,8 @@ FLKHomePanelModel ALKHomeGameMode::BuildBarracksPanel(FName SelectedRowId, int32
 	{
 		const ULKCardDefinition* Card = FindCard(CardId);
 		if (!Card) { continue; }
+		// 兵营页同样过滤敌方专属卡。
+		if (!LKCardRules::IsPlayerObtainable(CardId)) { continue; }
 		const bool bBuilding = Card->CardType == ELKCardType::Building;
 		if (Card->CardType == ELKCardType::Spell) { continue; }
 		if ((TabIndex == 1) != bBuilding) { continue; }
@@ -715,7 +753,7 @@ FLKHomePanelModel ALKHomeGameMode::BuildGatePanel(FName SelectedRowId) const
         FLKHomePanelRow Row; Row.RowId = CardId; Row.bSelectable = true;
         const ULKCardDefinition* Card = FindCard(CardId);
         Row.Label = Card ? LKCardPresentation::Label(*Card) : FText::FromName(CardId);
-        Row.Value = FText::FromString(TEXT("部队容量上限 8 格")); Row.Detail = BuildCardDetail(CardId); Model.Rows.Add(Row);
+        Row.Value = FText::FromString(FString::Printf(TEXT("部队容量上限 %d 格"), bActive ? Run->GetRunState().DeckCapacityMaximum : (GameData ? GameData->DeckCapacityMaximum : LKHomeContent::MaxStartingDeck()))); Row.Detail = BuildCardDetail(CardId); Model.Rows.Add(Row);
     }
     FLKHomePanelRow Money;
     Money.Label = FText::FromString(bActive ? TEXT("远征钱包") : TEXT("金币携带上限"));
@@ -728,7 +766,9 @@ FLKHomePanelModel ALKHomeGameMode::BuildGatePanel(FName SelectedRowId) const
     {
         AddAction(TEXT("Continue"), TEXT("继续远征"));
         if (bActive) { AddAction(TEXT("Abandon"), TEXT("结束本轮并带回金币")); }
-        Model.Status = FText::FromString(TEXT("原队伍与路线保持不变；结束本轮将全额带回剩余钱包。"));
+        FString Status = TEXT("继续保存的队伍与路线；结束本轮将全额带回剩余钱包。");
+        if (Run && !Run->GetMigrationNotice().IsEmpty()) { Status += TEXT("\n") + Run->GetMigrationNotice().ToString(); }
+        Model.Status = FText::FromString(Status);
     }
     else
     {
@@ -787,6 +827,8 @@ FLKHomePanelModel ALKHomeGameMode::BuildWarRoomPanel(const FLKExpeditionLoadout&
 	for (FName CardId : CardPool)
 	{
 		const ULKCardDefinition* Card = FindCard(CardId);
+		// 敌方专属卡不进入玩家战备卡池（规范身份见 LKCardRules）。
+		if (!Card || !LKCardRules::IsPlayerObtainable(CardId)) { continue; }
 		FLKHomePanelRow Row;
 		Row.RowId = CardId;
 		Row.bToggleable = true;
@@ -809,8 +851,8 @@ FLKHomePanelModel ALKHomeGameMode::BuildWarRoomPanel(const FLKExpeditionLoadout&
 
 	FString Error;
 	const ELKLoadoutResult Validation = LKHomeContent::ValidateLoadout(DraftLoadout, GameData, Error);
-	Model.Subtitle = FText::FromString(FString::Printf(TEXT("英雄 %d/3 · 牌组 %d 张（%d～%d）· 平均费用 %.2f"),
-		DraftLoadout.HeroIds.Num(), DraftLoadout.CardIds.Num(), LKHomeContent::MinStartingDeck(), LKHomeContent::MaxStartingDeck(), AverageCost));
+	Model.Subtitle = FText::FromString(FString::Printf(TEXT("英雄 %d/3 · 牌组 %d 张（至少 %d）· 容量 %d/%d 格 · 平均费用 %.2f"),
+		DraftLoadout.HeroIds.Num(), DraftLoadout.CardIds.Num(), LKHomeContent::MinStartingDeck(), LKCardRules::Used(DraftLoadout.CardIds), GameData ? GameData->DeckCapacityMaximum : LKHomeContent::MaxStartingDeck(), AverageCost));
 	Model.Status = Validation == ELKLoadoutResult::Success
 		? FText::FromString(TEXT("配置合法：保存后下次新远征生效（不影响进行中的远征）"))
 		: FText::FromString(Error);

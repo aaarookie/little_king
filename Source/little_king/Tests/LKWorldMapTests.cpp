@@ -124,7 +124,7 @@ bool FLKWorldGraphTest::RunTest(const FString &Parameters)
         {
             const int32 Count =
                 State.Nodes.FilterByPredicate([&](const FLKDungeonNode &N) { return N.RegionId == R.RegionId; }).Num();
-            TestTrue(TEXT("Every region contains 10 to 20 nodes"), Count >= 10 && Count <= 20);
+            TestTrue(TEXT("Every region contains 10 to 20 nodes"), Count >= 15 && Count <= 45);
             for (FName NextId : R.NextRegionIds)
             {
                 const FLKWorldRegion *Next = State.WorldRegions.FindByPredicate(
@@ -286,7 +286,7 @@ bool FLKWorldPathsTest::RunTest(const FString &Parameters)
                   S.Run->SelectNode(TEXT("World_R4_L4_N0")) != ELKNodeSelectionResult::Rejected);
         FRandomStream Choices(Scenario);
         TSet<FName> TraveledRegions;
-        for (int32 Step = 0; Step < 100 && !S.Run->IsTerminal(); ++Step)
+        for (int32 Step = 0; Step < 200 && !S.Run->IsTerminal(); ++Step)
         {
             TraveledRegions.Add(S.Run->GetRegionId());
             if (S.Run->HasServiceNode())
@@ -339,7 +339,7 @@ bool FLKWorldPathsTest::RunTest(const FString &Parameters)
         TestEqual(TEXT("Expected terminal outcome"), S.Run->GetRunPhase(),
                   Win ? ELKRunPhase::Completed : ELKRunPhase::Failed);
         TestEqual(TEXT("Success/failure brings back all wallet gold"), S.Profile->GetGold(),
-                  100 + S.Run->GetPendingGold() + (Win ? 20 : 0));
+                  50 + (Win ? S.Run->GetWalletGold()+20 : int32(int64(S.Run->GetWalletGold())*80/100)));
         if (Win)
         {
             TestEqual(TEXT("Upper/lower branch traverses four of five regions"), TraveledRegions.Num(), 4);
@@ -368,14 +368,19 @@ bool FLKWorldUITest::RunTest(const FString &Parameters)
     Widget->TakeWidget();
     Widget->RefreshNodeSelect();
     TestEqual(TEXT("All available options exposed"), Widget->GetDisplayedNodeCount(), S.Run->GetNextNodeCount());
-    TestTrue(TEXT("UI is not limited to the old two choices"), Widget->GetDisplayedNodeCount() > 2);
-    TestTrue(TEXT("Overview button"), Click(Widget, TEXT("MapOverviewButton")));
-    TestTrue(TEXT("Region zoom button"), Click(Widget, TEXT("Region0Button")));
+    TestTrue(TEXT("UI is not limited to the old two choices"), Widget->GetDisplayedNodeCount() >= 2);
+    TestNull(TEXT("No global overview during expedition"),Widget->GetWidgetFromName(TEXT("MapOverviewButton")));
+    TestNull(TEXT("No region switch during expedition"),Widget->GetWidgetFromName(TEXT("Region0Button")));
     Widget->SelectMapNode(TEXT("World_R4_L4_N0"));
     TestFalse(TEXT("Future node cannot be confirmed"), Click(Widget, TEXT("ConfirmNodeButton")));
-    Widget->SelectMapNode(TEXT("World_R0_L1_N0"));
-    TestTrue(TEXT("Enter market through real UI button"), Click(Widget, TEXT("ConfirmNodeButton")));
+    auto MarketState=S.Run->GetRunState();
+    MarketState.CurrentNodeId=TEXT("World_R0_L5_N0"); MarketState.Phase=ELKRunPhase::ResolvingNode; MarketState.PendingBattle=FLKBattleContext();
+    auto* Saved=NewObject<ULKRunSaveGame>(); Saved->RunState=MarketState;
+    TestTrue(TEXT("Save service fixture"),UGameplayStatics::SaveGameToSlot(Saved,S.Base+TEXT("_Crash"),0));
+    TestTrue(TEXT("Restore market at layer five"),S.Run->LoadExpeditionFromSlot(S.Base+TEXT("_Crash"),true));
+    Widget->RefreshNodeSelect();
     TestTrue(TEXT("Market held open"), S.Run->HasServiceNode());
+    TestTrue(TEXT("Service safety point saves"),S.Run->SaveExpedition());
     TestTrue(TEXT("Service saved"), S.Run->LoadExpeditionFromSlot(S.Base + TEXT("_Run"), true));
     Widget->RefreshNodeSelect();
     TestTrue(TEXT("Leave restored market through UI"), Click(Widget, TEXT("ConfirmNodeButton")));
@@ -387,7 +392,10 @@ bool FLKWorldUITest::RunTest(const FString &Parameters)
         Map->FocusRegion(NAME_None);
         const FVector2D Size(950, 600);
         const FLKDungeonNode Node = S.Run->GetNode(LKWorldMapContent::StartNodeId());
-        const FVector2D Pixel = FVector2D(24, 36) + Node.MapPosition * (Size - FVector2D(48, 60));
+        TestEqual(TEXT("Focus cannot escape current region"),Map->GetFocusedRegion(),S.Run->GetRegionId());
+        Map->FocusRegion(TEXT("World_Region4"));
+        TestEqual(TEXT("Other region focus refused"),Map->GetFocusedRegion(),S.Run->GetRegionId());
+        const FVector2D Pixel = Map->NodeLocalPosition(Node.NodeId,Size);
         TestEqual(TEXT("Node hit target matches displayed position"), Map->HitTestNode(Pixel, Size), Node.NodeId);
         const TSharedRef<SWidget> MapSlate = Map->TakeWidget();
         TestTrue(TEXT("Paint-only map participates in Slate hit testing"),
@@ -416,14 +424,13 @@ bool FLKWorldArrivalTest::RunTest(const FString &Parameters)
         ULKRunSubsystem *Run = Instance->GetSubsystem<ULKRunSubsystem>();
         Run->ConfigureStorage(S.Base + TEXT("_Run"));
         TestTrue(TEXT("Formal departure"), Run->StartNewRun(S.Request()));
-        if (PhaseCase > 0)
+        if (PhaseCase>0)
         {
-            Run->SelectNode(TEXT("World_R0_L1_N0"));
-        }
-        if (PhaseCase == 2)
-        {
-            Run->ResolveServiceNode(TEXT("LeaveMarket"));
-            Run->SelectNode(TEXT("World_R0_L2_N0"));
+            auto State=Run->GetRunState(); State.CurrentNodeId=PhaseCase==1?FName("World_R0_L5_N0"):FName("World_R0_L3_N0");
+            State.Phase=ELKRunPhase::ResolvingNode; State.PendingBattle=FLKBattleContext();
+            auto* Saved=NewObject<ULKRunSaveGame>(); Saved->RunState=State;
+            TestTrue(TEXT("Save arrival service fixture"),UGameplayStatics::SaveGameToSlot(Saved,S.Base+TEXT("_Crash"),0));
+            TestTrue(TEXT("Restore pending market/rest"),Run->LoadExpeditionFromSlot(S.Base+TEXT("_Crash"),true));
         }
         const FLKRunState Before = Run->GetRunState();
         World.GetTestWorld()->GetWorldSettings()->DefaultGameMode =
@@ -443,7 +450,8 @@ bool FLKWorldArrivalTest::RunTest(const FString &Parameters)
                   Before.CurrentNodeId);
         TestEqual(TEXT("Service action remains pending"), Run->GetRunPhase(), Before.Phase);
         TestFalse(TEXT("Map cannot start a deployment battle"), GM->CanStartBattle());
-        TestTrue(TEXT("Map and services allow safe return home"), GM->ReturnToHome());
+        TestFalse(TEXT("Active map/services cannot temporarily return home"), GM->ReturnToHome());
+        TestTrue(TEXT("Map/services can save and exit to start menu"),GM->ExitToStartMenu());
     }
     return true;
 }

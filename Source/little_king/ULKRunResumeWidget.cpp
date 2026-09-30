@@ -143,8 +143,9 @@ void ULKRunResumeWidget::RefreshResume()
 			const ULKRunSubsystem* Run = OwnerHUD->GetWorld()
 				? OwnerHUD->GetWorld()->GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
 			const int32 Room = Run ? Run->GetRunState().BattleHistory.Num() : 0;
-			SummaryText->SetText(FText::FromString(FString::Printf(
-				TEXT("已完成 %d 场战斗。继续后回到保存的奖励、地图或服务节点。"), Room)));
+			FString Summary = FString::Printf(TEXT("已完成 %d 场战斗。继续后回到保存的奖励、地图或服务节点。"), Room);
+			if (Run && !Run->GetMigrationNotice().IsEmpty()) { Summary += TEXT("\n") + Run->GetMigrationNotice().ToString(); }
+			SummaryText->SetText(FText::FromString(Summary));
 		}
 		if (PrimaryLabel) { PrimaryLabel->SetText(FText::FromString(TEXT("继续远征"))); }
 	}

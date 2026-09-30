@@ -2,130 +2,73 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**.
+A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**. Current release: **v0.8.2** (`ProjectVersion=0.8.2`). The game UI and detailed design documents are in Simplified Chinese.
 
-Prepare your heroes and deck at home, set out through the gate, and explore a fixed world map with randomized routes. Deploy three heroes before each battle, command them through their camps, and cycle cards to support your army. Bring expedition gold home to upgrade your settlement.
+Prepare three heroes and a deck at home, depart through the gate, and follow randomized routes across fixed regions. Deploy every hero before combat, command camps, and cycle cards. Bring gold and research materials home to develop the settlement.
 
-The current version is **v0.8.1** (`ProjectVersion=0.8.1`). The game UI and most detailed design documents are currently in Simplified Chinese.
+## v0.8.2: balance, research, and expedition recovery
 
-v0.8.1 fixes flickering and dark intersections between overlapping units and camps, makes facing follow movement, and replaces walking clips for 24 biped characters. Gait follows voluntary travel distance, and battle motion blur is disabled. The update adds 144 Unreal assets, bringing the total to 919. See the [v0.8.1 release notes](docs/47-v0.8.1ReleaseNotes.md), [fix record and UE 5.8 guide](docs/45-BattlePresentationFixes.md), and [exact art prompts](docs/46-MovementFixPrompts.md).
+- Hero and skeleton durability increased; enemy health and attack scale with route depth. Finite reinforcements are more frequent. Skeleton Circle is an enemy-only slowing and summoning spell; skeleton cards are also unavailable to the player. Necromancer sacrifice now costs 3% maximum health.
+- Heal Wave restores 120 health to friendly targets plus 6% maximum health to heroes, with cost 2 and radius 300. Combat healing cannot revive incapacitated heroes.
+- Depart with at least seven distinct cards. Default weighted capacity is eight: trolls cost two slots and the Colossus three. Four hand slots remain full and unique; a drawn card occupies one hand slot. Fixed limits require the minimum necessary discard; flexible intervals allow any replacement ending within the legal range. Keep at least five distinct cards during a run.
+- Combat rewards and ordinary market stock grant temporary mercenaries only. Spell/building numerical upgrades are available exclusively at rest nodes: choose healing or one upgrade, multiplying values by 1.1 per level.
+- Markets very rarely sell expensive spellbooks or building blueprints; advanced books require later regions. Consume purchased materials at the home library for permanent unlocks. Seven research spells and the siege catapult blueprint are available.
+- Failure returns 80% of remaining wallet gold, rounded down; abandonment returns 100%. Purchased research materials return in full for every outcome. Abandonment is unavailable during deployment or combat.
+- Pause with Esc or the combat button. Resume, or exit to the start/save menu. Loading retries the selected battle with its original pre-battle heroes, cards, enemies, and seed; it cannot change the chosen branch or reroll market stock.
+- Each region has roughly fifteen route layers, with fifteen visited stops and nine to ten battles. Only the current region is visible. Returning home during an expedition requires explicitly abandoning it.
 
-![Main menu](docs/images/PolishMenu_1080.png)
-
-## Previous release: v0.8 art and audio
-
-This release integrates all four art and audio batches, adding **775 Unreal assets** together with source files, import scripts, provenance records, and generation prompts.
-
-| Batch | Delivered content | Unreal assets |
-| --- | --- | ---: |
-| A | Main-menu illustration, seven home buildings, shared storybook UI styling, nine audio clips | 27 |
-| B | Twenty additional battle sprites and seventeen card illustrations; card layout and sprite-scale fixes | 57 |
-| C | Five regional grounds, three hero camps, five node emblems, effect components, twenty-eight dedicated sound effects, combat/UI event integration | 52 |
-| D | Animation for all 28 entities: 448 frames and 140 clips; seven building upgrades; four music loops; Chinese fonts; scene transitions and UI entrance motion | 639 |
-
-All **28 built-in units/buildings and 24 cards** now have artwork. Characters use idle, movement, attack, hit, and incapacitation/defeat poses. Existing custom sprite overrides remain supported. Camps, health bars, spell feedback, node screens, and upgrade effects retain their gameplay behavior.
-
-Four background tracks were generated using the existing local **MiniMax-Music3** installation for home/menu, expedition, battle, and boss scenes. Music transitions use crossfades with at most two active voices. Noto Sans/Serif CJK fonts provide consistent body and heading text. Source images, original audio, exact prompts, and license files are included; normal play does not require a generation model or manual asset downloads.
-
-See the [v0.8 release notes](docs/44-v0.8ReleaseNotes.md), [asset inventory](docs/12-AssetRequest.md), [sources and licenses](docs/36-ArtAudioSources.md), and [animation/music integration guide](docs/42-PolishArtIntegration.md).
+See the [change record](docs/50-v0.8.2ExpeditionChanges.md), [UE 5.8 play/configuration guide](docs/51-v0.8.2Guide.md), and [release notes](docs/52-v0.8.2ReleaseNotes.md). These and the [current design](docs/01-GDD.md) supersede conflicting older tutorials.
 
 ## Current gameplay
 
-### Home and expeditions
+Seven home buildings provide the Saint Maria Statue, Library, Gate, Hero House, Treasury, Barracks, and War Room. The statue grants post-battle recovery of 40/60/80/100% maximum health. Treasury silver capacities are 5/7/9/11/13, generation increases by 10% of base per level, and departure gold limits are 100/150/200/250/300. Expedition income is not limited by departure capacity; home bonuses are frozen at departure.
 
-- Seven home buildings: Saint Maria Statue, Library, Gate, Hero House, Treasury, Barracks, and War Room. The library, hero house, and barracks currently provide collection views; further progression features are planned.
-- The statue raises post-battle hero recovery from 40% to 60%, 80%, and 100% of maximum health across its four levels. The treasury improves silver generation and capacity, and limits the gold carried into a new expedition.
-- The War Room configures three heroes and a deck. The Gate shows the departure summary and lets you choose carried gold before leaving from the fixed starting point.
-- The world contains five fixed regions. Each expedition generates approximately 10–20 nodes per region, connected as directed acyclic routes with multiple entrances/exits and connections between adjacent regions.
-- Nodes include ordinary encounters, elite encounters, boss battles, markets, and rests. Market merchandise remains a future extension; rests currently recover 30% health.
-- Victory rewards offer three choices, including card upgrades and temporary recruits, with an option to skip. Gold remaining in the expedition wallet returns home on success, defeat, or voluntarily ending the expedition.
-- Reward, route, and service screens allow a safe return home while retaining the expedition. The Gate can resume it or confirm abandoning it.
+Five regions have fixed boundaries, entrances, and exits. Nodes and forward-only connections are generated and saved for each run. A route normally visits four regions, choosing one node per layer. Normal encounters feature one enemy hero, elite encounters several heroes, and boss encounters a boss with supporting heroes. Enemy units rebuild at full health each battle.
 
-### Battle and cards
+All three heroes must be deployed before combat; deployment has no timer. Camps have volume but cannot be attacked. Click a camp and a reachable location to issue a movement order; the hero stops attacking until arrival or a stuck timeout. The Mage enables full-field spell placement; without that trait, spells remain usable in the friendly half. Knight taunt takes priority over focus fire. Combat units have overhead health bars, attack-building placement previews show ranges, and a yellow line divides battlefield halves.
 
-- Deploy all three heroes—Knight, Mage, and Ranger—before starting. Deployment has no time limit.
-- Each hero has a solid, untargetable camp. Select a friendly camp, then a reachable location to issue a movement order. The hero interrupts combat while moving, then resumes automatic combat on arrival or after the stuck timeout. Right-click cancels camp selection.
-- The battle hand always contains **four distinct cards**. A successful play draws the next card into the same slot and returns the played card to the queue's end. The deck starts shuffled; cycling thereafter follows the queue.
-- Deck capacity is **eight weighted slots**, with at least five distinct cards. Troll cards cost two capacity slots, the Colossus costs three, and other cards cost one. Each drawn card still occupies only one hand slot. Heroes are selected separately.
-- When a reward would exceed capacity, select one or more existing cards to replace, then confirm the change. Temporary expedition cards are not permanently unlocked at home.
-- Character quality progresses through Common, Uncommon, Rare, Epic, and Legendary. Spells have fourteen tiers across four ranks. Quality, cost, capacity, race, and abilities appear in card details.
-- The Mage's trait permits spells anywhere on the battlefield. Without it, spells remain available in the friendly half. The Knight grants taunt to nearby friendly melee mercenaries; taunt takes priority over focus-fire orders. The Ranger has no additional trait yet.
-- Combat entities have overhead health bars; camps do not. Attack-building placement previews show their ranges. A yellow center line separates battlefield halves. Only fireball casts currently produce a small camera shake.
-- Player heroes become incapacitated at zero health. At battle settlement, they recover the configured fraction of maximum health, capped at full; incapacitated heroes recover to that fraction. Ordinary healing cannot revive them during combat.
-- The roster includes undead summoners and bosses, self-healing elves, thieves, apprentice casters, goblins, four trolls, a two-headed dragon, a building-only siege catapult, and the Colossus. Empowerment, stun, freeze, and stacking burn are implemented.
-- Treasury silver capacities are currently 5/7/9/11/13. Initial balance remains subject to playtesting.
-
-Rules and current values are documented in the [game design](docs/01-GDD.md), [content catalog](docs/19-ContentCatalog.md), [quality and balance guide](docs/32-CharacterQualityAndBalance.md), and [troll/siege card guide](docs/35-TrollAndSiegeCards.md).
-
-![Battle animation preview: a controlled display of the 28 entities](docs/images/PolishAttack_1080.png)
+Characters/buildings have five qualities and spells fourteen tiers. The current catalog contains 28 units and 32 registered cards: three enemy-only, fourteen temporary expedition mercenaries, and fifteen starter/research cards. Detailed values and abilities are in the [catalog](docs/19-ContentCatalog.md), [balance guide](docs/32-CharacterQualityAndBalance.md), [card interfaces](docs/34-CardDevelopmentInterfaces.md), and [troll/siege guide](docs/35-TrollAndSiegeCards.md).
 
 ## Build and play
 
-The verified development target is **Unreal Engine 5.8.1 / Windows / Development Editor**. Install UE 5.8 and its supported Visual Studio C++ toolchain. Paper2D and GameplayAbilities are enabled in the project.
+Verified target: **UE 5.8.1 / Windows / Development Editor**. Install UE 5.8 and its supported Visual Studio C++ toolchain; Paper2D and GameplayAbilities are enabled.
 
-1. Clone the repository and close any running editor instance for this project.
-2. In PowerShell, from the repository root, build the editor target. Adjust the engine path for your installation:
+1. Close any editor instance for this project and build from the repository root, adjusting the engine path:
 
    ```powershell
-   $ueRoot = 'E:\epic\UE_5.8'
+   $engineRoot = 'E:\epic\UE_5.8'
    $projectPath = (Resolve-Path '.\little_king.uproject').Path
-   & "$ueRoot\Engine\Build\BatchFiles\Build.bat" little_kingEditor Win64 Development $projectPath -WaitMutex -NoHotReloadFromIDE -MaxParallelActions=4
+   & "$engineRoot\Engine\Build\BatchFiles\Build.bat" little_kingEditor Win64 Development "-Project=$projectPath" -WaitMutex -NoHotReloadFromIDE
    ```
 
-3. After `Result: Succeeded`, open `little_king.uproject` and click Play. The default map is `Content/Maps/L_StartMenu`. Starting Play directly from the home or battle map also routes through save selection when needed.
-4. Choose New Game, Continue, or Load Game. The start menu supports up to eight independent saves and deleting saves; Settings is currently a placeholder.
-5. Save your team and deck at the War Room, then use the Gate to depart. Choose a reachable node, deploy all three heroes, and start combat. Select a card and click a valid battlefield location to play it.
-6. Claim or skip rewards, follow the route, and return home after finishing or losing the expedition.
+2. Open `little_king.uproject` and click Play. `L_StartMenu` offers Continue, New Game, Load/Delete Game, and a Settings placeholder. Up to eight independent saves are supported.
+3. Save three heroes and at least seven cards at the War Room. Set departure gold at the Gate and depart. Loading an active expedition resumes it directly.
+4. Deploy heroes, begin combat, and play cards by selecting them and a valid location. Claim/skip rewards, follow the route, buy mercenaries/materials, and rest or upgrade.
+5. Return home after victory/failure. To leave mid-expedition, exit to the start menu; to return home, confirm abandonment at a non-combat node.
 
-Use the console command `show me the money` to add 100 home gold, or `show me the money 500` to specify an amount. This debug command is described in the [start-menu guide](docs/30-StartMenuTutorial.md).
-
-All runtime artwork, audio, fonts, maps, and UI integration are already included. Python, image generation, and Music3 are optional authoring tools. Follow the [asset guide](docs/13_Asset_Solutions.md) and [D-batch guide](docs/42-PolishArtIntegration.md) only when changing or reimporting source assets; font import requires a normal editor session with Slate.
+The console command `show me the money` adds 100 home gold; `show me the money 500` specifies the amount. Runtime UI, maps, art, sound, and Chinese fonts are included. No manual Blueprint creation or asset download is required. Python, image generation, and Music3 are optional authoring tools.
 
 ## Validation and saves
 
-The v0.8.1 fixes were built with UE 5.8.1. The full `LittleKing` automation suite passed **87/87 tests**: 43 without warnings and 44 with warnings from synthetic test worlds, existing engine fallbacks, or deliberately rejected input/save cases. There were no failed or unexecuted tests. The four new regression tests cover overlap ordering, facing, distance-driven gait, and walking-asset completeness. See the [v0.8.1 release validation](docs/validation/v0.8.1-Release.json).
+The UE 5.8.1 editor build succeeded and all **109/109** `LittleKing` automation tests passed. Native UMG captures at 720p and 1080p cover library research, local maps, rest, market replacements, and pause. Tests use isolated temporary saves; the five real player-save files remain byte-identical. See the [release validation](docs/validation/v0.8.2-Release.json).
 
-The movement-fix review produced 48 actual-renderer screenshots across 720p and 1080p, covering movement in both directions, stopping, and front/back overlap with camps. Existing saves and the unit balance table were unchanged. The following D-batch records remain historical evidence for v0.8.
+Run schema 10 and profile schema 2 migrate compatible old saves. Existing maps remain frozen, settled receipts retain their amounts, and invalid files are preserved with an error. Old five/six-card loadouts can be read but must reach seven cards for the next departure. Earlier Balance V1 combat measurements are a historical baseline; current Heal Wave sampling is recorded separately. Full expedition growth and recovery balance remain subject to playtesting.
 
-Real-engine captures cover 720p and 1080p: 76 screenshots were produced, representative layouts and animation states were inspected, and 28 images were archived for D. Travel checks completed menu → home → battle map → home without leaving a transition curtain or extra music voices. See the [D validation record](docs/validation/PolishArt-Validation.json) and [v0.8 release validation](docs/validation/v0.8-Release.json).
+Packaging and hardware acceptance remain deferred; Sprint 6 stays skipped. Historical releases: [v0.8.1 presentation fixes](docs/47-v0.8.1ReleaseNotes.md), 87/87 tests; [v0.8 art/audio integration](docs/44-v0.8ReleaseNotes.md), 83/83 tests. The storybook assets and walking fixes for 24 biped characters are retained.
 
-The five existing player-save files remained byte-identical during D validation. Save slot 01 retains the legacy `LittleKing_Profile_A/B` and `LittleKing_Run` names; slots 02–08 use numbered prefixes. Expedition Schema 8 preserves compatible older routes and wallets. Older oversized decks require an explicit player-selected reduction rather than silently deleting cards. Automation uses isolated test slots.
-
-Packaging and hardware acceptance testing remain deferred, and Sprint 6 remains skipped. Generated animation is an initial visual pass. Audio format, peaks, loop seams, and playback lifetimes have been checked; final subjective listening and mix approval remain separate work.
-
-## Project layout and collaboration
+## Collaboration and documentation
 
 | Path | Purpose |
-| --- | --- |
-| `Source/little_king` | Gameplay, content registration, run/profile subsystems, native UI, and presentation |
-| `Source/little_king/Tests` | Unreal automation tests |
-| `Content` | Maps, Blueprints, data assets, and imported runtime resources |
-| `Content/Art/StorybookV1` | The 775 assets added by art/audio batches A–D |
-| `ArtSource/StorybookV1` | Original images/audio/fonts, manifests, generation receipts, prompts, and licenses |
-| `Scripts` | Import, audio preparation, frame metadata, and asset-audit tools |
-| `docs` | Design, implementation records, tutorials, shared screenshots, and validation summaries |
-| `Saved` | Local logs, caches, screenshots, and player saves; excluded from Git |
+|---|---|
+| `Source/little_king` | Gameplay, native content, UI, run/profile systems, and tests |
+| `Content` | Maps, Blueprints, data assets, and runtime artwork/audio |
+| `Scripts` | Asset synchronization, import, and audit tools |
+| `docs` | Design, collaboration records, tutorials, and validation |
+| `ArtSource/StorybookV1` | Original assets, receipts, prompts, and licenses |
+| `Saved` | Local logs, screenshots, and player saves; excluded from Git |
 
-Built-in unit identities and behaviors have native C++ defaults. Data tables tune values and presentation without replacing required unit rules; custom unit IDs remain supported. See [card development interfaces](docs/34-CardDevelopmentInterfaces.md) before adding content.
+Built-in identities, skills, and behaviors have C++ defaults; tables tune values and presentation. Custom unit IDs remain supported. This release updates authored unit/encounter tables, GameData, and Heal Wave; coordinate shared asset edits. Private runtime copies do not modify shared assets.
 
-Coordinate changes to shared Unreal assets. A/C/D did not resave existing battle assets; B only corrected the old Barracks sprite's vertical scale in `DT_Units`. Existing `DT_Traits`, hero ability assets, `DA_GameData`, `L_BattleTest`, and `WBP_BattleHUD` were retained. Unity compilation is disabled because some translation units contain helpers with the same file-local names.
+Useful references: [design](docs/01-GDD.md), [architecture](docs/02-BattlePrototypeDesign.md), [dungeon D0–D5](docs/18-DungeonChangeLog.md), [home H0–H5](docs/27-HomeChangeLog.md), [optimization log](docs/29-OptimizationChangeLog.md), [asset inventory](docs/12-AssetRequest.md), and [asset provenance](docs/36-ArtAudioSources.md).
 
-## Documentation
-
-Detailed linked documents are currently in Chinese. Older tutorials are historical; the current design and latest change records take precedence.
-
-| Topic | Entry points |
-| --- | --- |
-| Design and architecture | [Game design](docs/01-GDD.md), [technical design](docs/02-BattlePrototypeDesign.md), [task list](docs/03-TaskList.md), [bug log](docs/05-BugLog.md) |
-| Dungeon D0–D5 | [Plan](docs/17-DungeonDevelopmentPlan.md), [change log](docs/18-DungeonChangeLog.md), [content catalog](docs/19-ContentCatalog.md), [save/recovery tutorial](docs/25-D5SaveTutorial.md) |
-| Home H0–H5 | [Plan](docs/26-HomeDevelopmentPlan.md), [change log](docs/27-HomeChangeLog.md), [tutorial](docs/28-HomeTutorial.md) |
-| Menus and world map | [Optimization change log](docs/29-OptimizationChangeLog.md), [start-menu tutorial](docs/30-StartMenuTutorial.md), [five-region expedition tutorial](docs/31-WorldMapExpeditionTutorial.md) |
-| Cards and balance | [Quality and balance](docs/32-CharacterQualityAndBalance.md), [character tutorial](docs/33-Stage3CharactersTutorial.md), [development interfaces](docs/34-CardDevelopmentInterfaces.md), [troll/siege cards](docs/35-TrollAndSiegeCards.md) |
-| Art direction and authoring | [Style guide](docs/07-ArtStyleGuide.md), [inventory](docs/12-AssetRequest.md), [integration tutorial](docs/13_Asset_Solutions.md), [sources and licenses](docs/36-ArtAudioSources.md) |
-| Art/audio implementation | [A: home and UI](docs/37-ArtAudioIntegration.md), [B: battle art](docs/38-BattleArtIntegration.md), [C: world and effects](docs/40-WorldSkillsArtIntegration.md), [D: animation and music](docs/42-PolishArtIntegration.md) |
-| Exact generation prompts | [Battle](docs/39-BattleArtPrompts.md), [world/effects](docs/41-WorldArtPrompts.md), [animation/buildings/music](docs/43-PolishArtPrompts.md) |
-| Releases | [v0.8.1 notes](docs/47-v0.8.1ReleaseNotes.md), [v0.8.1 validation](docs/validation/v0.8.1-Release.json), [v0.8 notes](docs/44-v0.8ReleaseNotes.md), [v0.8 validation](docs/validation/v0.8-Release.json), [historical v0.7 validation](docs/validation/v0.7-Release.json) |
-
-## Asset credits
-
-Third-party assets retain their respective licenses. Noto fonts include their SIL Open Font License files; adopted audio sources and generated artwork/music have separate provenance records. MiniMax-Music3 is covered by its archived Community License, and the menu includes the music attribution. Do not assume that all project assets share a CC0 license. Exact sources, authors, processing steps, applicable license files, and AI generation prompts are recorded in the [asset source document](docs/36-ArtAudioSources.md) and manifests under `ArtSource/StorybookV1`.
+Assets retain their respective terms: Noto fonts include OFL licenses; MiniMax-Music3 music follows the archived Community License and keeps its menu credit; generated artwork is not labeled CC0. Exact sources, processing, and prompts are recorded in [36](docs/36-ArtAudioSources.md), [39](docs/39-BattleArtPrompts.md), [41](docs/41-WorldArtPrompts.md), [43](docs/43-PolishArtPrompts.md), and [46](docs/46-MovementFixPrompts.md). This release reuses existing spell icons and styling; no new external assets are required.

@@ -15,6 +15,7 @@
 #include "PaperSpriteComponent.h"
 #include "ULKPresentationSubsystem.h"
 #include "LKPresentationStyle.h"
+#include "LKSkeletonCircle.h"
 
 bool ALKPresentationHUD::ProjectPoint(const FVector& Location, FVector2D& Point) const
 {
@@ -67,6 +68,28 @@ void ALKPresentationHUD::DrawHUD()
 	if (ProjectPoint(FVector(-HalfWidth, 0.f, 0.f), LineStart) && ProjectPoint(FVector(HalfWidth, 0.f, 0.f), LineEnd))
 	{
 		DrawLine(LineStart.X, LineStart.Y, LineEnd.X, LineEnd.Y, FLinearColor::Yellow, 2.f * Scale);
+	}
+	// Canvas 投影确保法阵提示不被地面遮挡，且不依赖调试绘制。
+	for (TActorIterator<ALKSkeletonCircle> It(GetWorld()); It; ++It)
+	{
+		if (It->IsFinished() || GM->GetPhase() != ELKGamePhase::Battle) { continue; }
+		const bool Warning = It->IsWarned();
+		const FLinearColor Color = Warning ? FLinearColor(.64f,.9f,.28f) : FLinearColor(.72f,.35f,.82f);
+		DrawWorldCircle(It->GetCenter(), It->GetRadius(), Color, (Warning ? 4.f : 2.f) * Scale);
+		DrawWorldCircle(It->GetCenter(), It->GetRadius() * .84f, Color.CopyWithNewOpacity(.45f), Scale);
+		FVector2D Point;
+		if (ProjectPoint(It->GetCenter()+FVector(It->GetRadius()+70.f,0,0), Point))
+		{
+			const FString Label = FString::Printf(TEXT("骷髅法阵 · %s %.1fs"), Warning ? TEXT("预警") : TEXT("减速"),
+				Warning ? It->GetWarningRemaining() : It->GetActiveRemaining());
+			const float FontScale=2.f*Scale;
+			float Width=0.f, Height=0.f;
+			GetTextSize(Label,Width,Height,LKPolishArt::Font(false),FontScale);
+			const float X=FMath::Clamp(Point.X-Width*.5f,8.f,Canvas->ClipX-Width-8.f);
+			const float Y=FMath::Clamp(Point.Y-Height,8.f,Canvas->ClipY-Height-8.f);
+			DrawRect(LKPresentationStyle::Ink().CopyWithNewOpacity(.9f),X-5.f*Scale,Y-3.f*Scale,Width+10.f*Scale,Height+6.f*Scale);
+			DrawText(Label,Color,X,Y,LKPolishArt::Font(false),FontScale);
+		}
 	}
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
 	{

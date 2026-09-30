@@ -25,7 +25,7 @@ bool FLKBattleArtDefaultsTest::RunTest(const FString& Parameters)
     if (!TestNotNull(TEXT("Shipped data loads"), Authored)) { return false; }
     ULKGameData* Data = DuplicateObject<ULKGameData>(Authored, GetTransientPackage());
     Data->EnsureCardLibrary();
-    TestEqual(TEXT("All 24 cards retained"), Data->CardLibrary.Num(), 24);
+    TestEqual(TEXT("All 25 cards retained (incl. enemy-only skeleton circle)"), Data->CardLibrary.Num(), 32);
     int32 Defaults = 0;
     for (const auto& Card : Data->CardLibrary)
     {

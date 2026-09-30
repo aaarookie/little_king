@@ -1,4 +1,5 @@
 #include "ALKUnitBase.h"
+#include "LKBalanceRules.h"
 
 #include "AbilitySystemComponent.h"
 #include "CollisionQueryParams.h"
@@ -266,7 +267,7 @@ void ALKUnitBase::ApplyTraits()
 bool ALKUnitBase::ResolveTrait(FName Id, FLKTraitRow& Row) const
 {
     Row.TraitId = Id;
-    if (Id == "Trait_Sacrifice") { Row.TraitName = FText::FromString(TEXT("献祭")); Row.Effect = ELKTraitEffect::SummoningHealthCost; Row.EffectValue = 0.08f; return true; }
+    if (Id == "Trait_Sacrifice") { Row.TraitName = FText::FromString(TEXT("献祭")); Row.Effect = ELKTraitEffect::SummoningHealthCost; Row.EffectValue = LKBalanceRules::SacrificeHealthPercent; return true; }
     if (Id == "Trait_FaceFear") { Row.TraitName = FText::FromString(TEXT("直面恐惧")); Row.Effect = ELKTraitEffect::RangedDamageReduction; Row.EffectValue = 0.3f; return true; }
     if (Id == TEXT("Trait_MageSpellReach")) { Row.Effect = ELKTraitEffect::GlobalSpellPlacement; return true; }
     if (Id == TEXT("Trait_KnightTauntAura"))

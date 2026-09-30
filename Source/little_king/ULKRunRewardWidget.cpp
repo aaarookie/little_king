@@ -281,9 +281,14 @@ void ULKRunRewardWidget::BuildNativeTree()
 	Home->OnClicked.AddDynamic(this, &ULKRunRewardWidget::HandleReturnHomeClicked);
 	Footer->AddChildToHorizontalBox(Home)->SetPadding(FMargin(12.f, 0.f, 0.f, 0.f));
 	UTextBlock* HomeText = MakeText(WidgetTree, TEXT("ReturnHomeText"), 17, PaleColor);
-	HomeText->SetText(FText::FromString(TEXT("暂回家园")));
+	HomeText->SetText(FText::FromString(TEXT("退出游戏")));
 	Home->SetContent(HomeText);
-	Home->SetToolTipText(FText::FromString(TEXT("保留当前奖励，继续远征时再选择")));
+	Home->SetToolTipText(FText::FromString(TEXT("保存并回到开始界面，下次继续处理当前奖励")));
+	UButton* Abandon=WidgetTree->ConstructWidget<UButton>();
+	StyleButton(Abandon,FLinearColor(.18f,.10f,.09f),FLinearColor(.28f,.16f,.11f));
+	Abandon->OnClicked.AddDynamic(this,&ULKRunRewardWidget::HandleAbandonClicked);
+	Footer->AddChildToHorizontalBox(Abandon)->SetPadding(FMargin(12,0,0,0));
+	AbandonLabel=MakeText(WidgetTree,TEXT("AbandonLabel"),17,PaleColor); AbandonLabel->SetText(FText::FromString(TEXT("放弃远征"))); Abandon->SetContent(AbandonLabel);
 }
 
 void ULKRunRewardWidget::RefreshReward()
@@ -385,7 +390,7 @@ FText ULKRunRewardWidget::BuildDeckSummary() const
 		if (State.UpgradeLevel > 0) { Label += FString::Printf(TEXT(" Lv%d"), State.UpgradeLevel); }
 		Cards.Add(MoveTemp(Label));
 	}
-	return FText::FromString(FString::Printf(TEXT("容量 %d / 8 · %d 张：%s"), Run->GetDeckCapacityUsed(), Cards.Num(), *FString::Join(Cards, TEXT("  ·  "))));
+	return FText::FromString(FString::Printf(TEXT("容量 %d / %d · %d 张：%s"), Run->GetDeckCapacityUsed(), Run->GetRunState().DeckCapacityMaximum, Cards.Num(), *FString::Join(Cards, TEXT("  ·  "))));
 }
 
 void ULKRunRewardWidget::SetInteractionEnabled(bool bEnabled)
@@ -439,7 +444,7 @@ bool ULKRunRewardWidget::ChooseOption(int32 Index)
     const ULKRunSubsystem* Run = GetGameInstance() ? GetGameInstance()->GetSubsystem<ULKRunSubsystem>() : nullptr;
     if (Run && Index >= 0 && Index < Run->GetPendingRewardCount()
         && Run->GetPendingRewardOffer(Index).Kind == ELKRunRewardKind::AddCard
-        && Run->GetDeckCapacityUsed() + LKCardRules::Slots(Run->GetPendingRewardOffer(Index).CardId) > LKCardRules::Capacity)
+        && (Run->GetRunState().DeckCapacityMinimum<Run->GetRunState().DeckCapacityMaximum || Run->GetDeckCapacityUsed() + LKCardRules::Slots(Run->GetPendingRewardOffer(Index).CardId) > Run->GetRunState().DeckCapacityMaximum))
     {
         PendingOptionIndex = Index;
         SelectedReplacementIds.Reset();
@@ -469,11 +474,14 @@ void ULKRunRewardWidget::ShowReplacementChoices()
     const int32 Released = LKCardRules::Used(SelectedReplacementIds);
     const int32 AfterSlots = Run->GetDeckCapacityUsed() - Released + (Incoming ? LKCardRules::Slots(Incoming->CardId) : 0);
     const int32 AfterCount = State.Cards.Num() - SelectedReplacementIds.Num() + 1;
-    ReplacementBudget->SetText(FText::FromString(FString::Printf(TEXT("已选 %d 张 / 释放 %d 格 · 替换后 %d/8 格、%d 张（至少 5 张）"),
-        SelectedReplacementIds.Num(), Released, AfterSlots, AfterCount)));
+    ReplacementBudget->SetText(FText::FromString(FString::Printf(TEXT("已选 %d 张 / 释放 %d 格 · 替换后 %d/%d 格、%d 张（至少 5 张）"),
+        SelectedReplacementIds.Num(), Released, AfterSlots, State.DeckCapacityMaximum, AfterCount)));
     ReplacementBudget->SetVisibility(bReducingLegacyDeck ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
     ConfirmReplacementButton->SetVisibility(bReducingLegacyDeck ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
-    ConfirmReplacementButton->SetIsEnabled(!SelectedReplacementIds.IsEmpty() && AfterSlots <= LKCardRules::Capacity && AfterCount >= LKCardRules::MinimumCards);
+    FString ReplacementError;
+    const bool Valid=Run->ValidateRewardReplacement(PendingOptionIndex,SelectedReplacementIds,ReplacementError);
+    ConfirmReplacementButton->SetIsEnabled(Valid);
+    if (!bReducingLegacyDeck) { StatusText->SetText(FText::FromString(Valid?TEXT("容量符合规则，可以确认；强化不转移"):ReplacementError)); }
     for (int32 Index = 0; Index < State.Cards.Num(); ++Index)
     {
         const FLKRunCardState& CardState = State.Cards[Index];
@@ -521,7 +529,7 @@ void ULKRunRewardWidget::HandleConfirmReplacements() { ConfirmReplacements(); }
 
 bool ULKRunRewardWidget::ConfirmReplacements()
 {
-    if (bInteractionLocked || !OwnerHUD || bReducingLegacyDeck || PendingOptionIndex == INDEX_NONE || SelectedReplacementIds.IsEmpty()) { return false; }
+    if (bInteractionLocked || !OwnerHUD || bReducingLegacyDeck || PendingOptionIndex == INDEX_NONE) { return false; }
     SetInteractionEnabled(false);
     ConfirmReplacementButton->SetIsEnabled(false);
     if (OwnerHUD->ChooseRunRewardReplacingCards(PendingOptionIndex, SelectedReplacementIds))
@@ -540,8 +548,16 @@ bool ULKRunRewardWidget::SkipReward()
 void ULKRunRewardWidget::HandleReturnHomeClicked()
 {
 	ALKBattleGameMode* GM = OwnerHUD ? OwnerHUD->GetBattleGameMode() : nullptr;
-	if (!GM || !GM->ReturnToHome())
+	if (!GM || !GM->ExitToStartMenu())
 	{
 		if (StatusText) { StatusText->SetText(FText::FromString(TEXT("暂时无法返回，请检查存档并重试"))); }
 	}
+}
+
+void ULKRunRewardWidget::HandleAbandonClicked()
+{
+    if (!bConfirmAbandon)
+    { bConfirmAbandon=true; AbandonLabel->SetText(FText::FromString(TEXT("确认放弃"))); StatusText->SetText(FText::FromString(TEXT("再次点击将结束本轮，金币与已购材料全额带回家园；也可以继续选择奖励。"))); return; }
+    ALKBattleGameMode* GM=OwnerHUD?OwnerHUD->GetBattleGameMode():nullptr;
+    if (!GM || !GM->AbandonToHome()) { StatusText->SetText(FText::FromString(TEXT("放弃或保存未完成，请重试"))); }
 }

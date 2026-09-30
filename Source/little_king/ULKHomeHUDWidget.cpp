@@ -23,6 +23,8 @@
 
 #include "ALKHomeGameMode.h"
 #include "LKHomeContent.h"
+#include "LKCardRules.h"
+#include "ULKGameData.h"
 #include "LKLog.h"
 #include "ULKHomeListButtonWidget.h"
 #include "ULKProfileSubsystem.h"
@@ -609,13 +611,13 @@ void ULKHomeHUDWidget::ToggleDraftCard(FName CardId)
 	{
 		DraftLoadout.CardIds.Remove(CardId);
 	}
-	else if (DraftLoadout.CardIds.Num() < LKHomeContent::MaxStartingDeck())
+	else if (LKCardRules::Used(DraftLoadout.CardIds)+LKCardRules::Slots(CardId) <= (HomeGameMode && HomeGameMode->GetGameData() ? HomeGameMode->GetGameData()->DeckCapacityMaximum : LKHomeContent::MaxStartingDeck()))
 	{
 		DraftLoadout.CardIds.Add(CardId);
 	}
 	else
 	{
-		ApplyMessage(FText::FromString(FString::Printf(TEXT("初始牌组最多 %d 张，请先取消一张"), LKHomeContent::MaxStartingDeck())));
+		ApplyMessage(FText::FromString(TEXT("超过部队容量，请先取消其他卡牌")));
 		return;
 	}
 	bDraftDirty = true;
@@ -632,6 +634,12 @@ void ULKHomeHUDWidget::ResetDraftFromSaved()
 void ULKHomeHUDWidget::ExecuteAction(FName ActionId)
 {
 	if (!HomeGameMode) { return; }
+	if (ActionId.ToString().StartsWith(TEXT("Research:")))
+	{
+		FString Error; const bool Success=HomeGameMode->RequestResearch(FName(*ActionId.ToString().Mid(9)),Error);
+		ApplyMessage(FText::FromString(Success?TEXT("研究完成，已永久解锁；可到战备处编入出征牌组。"):Error));
+		RebuildPanel(); return;
+	}
 
 	if (ActionId == TEXT("Abandon") || ActionId == TEXT("CancelAbandon"))
 	{

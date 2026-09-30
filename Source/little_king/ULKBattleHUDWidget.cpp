@@ -295,7 +295,7 @@ void ULKBattleHUDWidget::HandleHandChanged()
         if (!Card || !CardWidget) { continue; }
         const ALKBattleGameMode* GM = GetBattleGameMode();
         CardWidget->SetToolTipText(LKCardPresentation::Detail(*Card, GM ? GM->GetUnitRow(
-            Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId) : nullptr));
+            Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId) : nullptr, GM?GM->GetCardUpgradeLevel(Card->CardId):0));
         if (GetSilverComp() && Card->Cost > GetSilverComp()->GetCap())
         { CardWidget->SetToolTipText(FText::FromString(CardWidget->GetToolTipText().ToString() + TEXT("\n当前银币上限不足，请在家园升级金库。"))); }
         if (UTextBlock* Label = FindFirstTextBlock(CardWidget))

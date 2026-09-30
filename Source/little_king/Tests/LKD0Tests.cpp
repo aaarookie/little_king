@@ -122,7 +122,7 @@ bool FLKD0NecroTest::RunTest(const FString& Parameters)
             TestTrue(TEXT("Summon belongs to nearest necromancer"), Summon->GetOwner() == Necro);
         }
     }
-    TestTrue(TEXT("Two summons cost sixteen percent of max HP"), FMath::IsNearlyEqual(Necro->GetHealth(), Full * 0.84f, 0.01f));
+    TestTrue(TEXT("Two summons cost six percent of max HP"), FMath::IsNearlyEqual(Necro->GetHealth(), Full * 0.94f, 0.01f));
     TestEqual(TEXT("Other necromancer does not pay"), Distant->GetHealth(), Distant->GetMaxHealth());
     const float BeforeHero = Necro->GetHealth();
     Env.Hero("Hero_Mage", ELKTeam::Player)->Die();
@@ -137,7 +137,7 @@ bool FLKD0NecroTest::RunTest(const FString& Parameters)
 
     FD0World Last; if (!Last.Open(*this, "Patrol") || !Last.Start(*this)) { return false; }
     ALKUnitBase* LastNecro = Last.Hero("Hero_Necromancer");
-    Last.Health(LastNecro, LastNecro->GetMaxHealth() * 0.04f);
+    Last.Health(LastNecro, LastNecro->GetMaxHealth() * LastNecro->GetTraitEffectValue(ELKTraitEffect::SummoningHealthCost) * 0.5f);
     LastNecro->SetInvulnerable(-1.f);
     Last.Spawn("Unit_Swordsman", ELKTeam::Player, FVector(0.f, -300.f, 0.f))->Die();
     TestEqual(TEXT("Sacrifice can incapacitate last enemy hero despite invulnerability"), Last.GM->GetPhase(), ELKGamePhase::Result);
@@ -180,9 +180,9 @@ bool FLKD0KingTest::RunTest(const FString& Parameters)
         TestEqual(TEXT("Skeleton hero counts five; soldier counts one"), Passive->GetBoneCount(), 9);
         ALKUnitBase* Skeleton = Env.Spawn("Unit_Skeleton");
         Env.GM->BeginCombatBatch();
-        if (bKingFirst) { LKGameplay::ApplyDamage(King, 10000.f, Env.Hero("Hero_Knight", ELKTeam::Player)); }
+        if (bKingFirst) { LKGameplay::ApplyDamage(King, King->GetMaxHealth()*2.f, Env.Hero("Hero_Knight", ELKTeam::Player)); }
         Skeleton->Die();
-        if (!bKingFirst) { LKGameplay::ApplyDamage(King, 10000.f, Env.Hero("Hero_Knight", ELKTeam::Player)); }
+        if (!bKingFirst) { LKGameplay::ApplyDamage(King, King->GetMaxHealth()*2.f, Env.Hero("Hero_Knight", ELKTeam::Player)); }
         Env.GM->EndCombatBatch();
         TestEqual(TEXT("Same-batch revival precedes victory for both orders"), Env.GM->GetPhase(), ELKGamePhase::Battle);
         TestTrue(TEXT("King revived full and combat ready"), King->IsAlive() && King->IsCombatEnabled() && King->GetHealth() == King->GetMaxHealth());

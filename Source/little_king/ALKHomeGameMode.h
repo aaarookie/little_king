@@ -85,6 +85,7 @@ public:
 
 	/** 升级（单次提交，失败不扣金币） */
 	ELKUpgradeResult RequestUpgrade(FName BuildingId, int32 ExpectedLevel);
+	bool RequestResearch(FName CardId,FString& Error);
 	/** 保存战备（草稿由 UI 维护，这里做严格校验与落盘） */
 	ELKLoadoutResult RequestSaveLoadout(const FLKExpeditionLoadout& DraftLoadout);
 	/** 出征：校验战备/区域/无进行中远征 → 冻结快照 → 创建新 RunId → 切图 */
@@ -137,8 +138,8 @@ private:
 	UPROPERTY(Transient) TMap<FName, FLKUnitRow> ResolvedHomeUnits;
 	bool bHUDCreateAttempted = false;
 	bool bSettlementAttempted = false;
+bool bPreviewMode = false;
 #if WITH_EDITOR
 	int32 PreviewFrame = 0;
-	bool bPreviewMode = false;
 #endif
 };

@@ -38,6 +38,7 @@ void ULKWorldMapWidget::SetMapState(const FLKRunState &InState, FName InSelected
         Region.Color = FLinearColor(.08f, .14f, .19f);
         Region.Polygon = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
         Snapshot.WorldRegions.Add(Region);
+        Snapshot.RegionId=Region.RegionId;
         for (FLKDungeonNode &Node : Snapshot.Nodes)
         {
             const FString Name = Node.NodeId.ToString();
@@ -52,7 +53,7 @@ void ULKWorldMapWidget::SetMapState(const FLKRunState &InState, FName InSelected
                                                                                           : .5);
         }
     }
-    FocusRegion(Focus);
+    FocusRegion(Snapshot.RegionId);
     for (const FLKWorldRegion& Region : Snapshot.WorldRegions)
     { RegionTextures.FindOrAdd(Region.RegionId) = LKWorldArt::GroundTexture(Region.RegionId); }
     for (ELKDungeonNodeType Type : {ELKDungeonNodeType::Battle, ELKDungeonNodeType::Elite, ELKDungeonNodeType::Boss, ELKDungeonNodeType::Market, ELKDungeonNodeType::Rest})
@@ -60,6 +61,7 @@ void ULKWorldMapWidget::SetMapState(const FLKRunState &InState, FName InSelected
 }
 void ULKWorldMapWidget::FocusRegion(FName RegionId)
 {
+    if (!Snapshot.RegionId.IsNone() && RegionId!=Snapshot.RegionId) { RegionId=Snapshot.RegionId; }
     Focus = RegionId;
     ViewMin = FVector2D::ZeroVector;
     ViewMax = FVector2D(1, 1);
@@ -93,7 +95,7 @@ FName ULKWorldMapWidget::HitTestNode(FVector2D LocalPoint, FVector2D Size) const
         {
             continue;
         }
-        const double D = (LocalPoint - Project(Node.MapPosition, Size)).SizeSquared();
+        const double D = (LocalPoint - ProjectNode(Node, Size)).SizeSquared();
         if (D < Distance)
         {
             Distance = D;
@@ -101,6 +103,32 @@ FName ULKWorldMapWidget::HitTestNode(FVector2D LocalPoint, FVector2D Size) const
         }
     }
     return Best;
+}
+FVector2D ULKWorldMapWidget::NodeLocalPosition(FName Id,FVector2D Size) const
+{
+    const auto* N=Snapshot.Nodes.FindByPredicate([Id](const auto& N){return N.NodeId==Id;});
+    return N && N->RegionId==Focus?ProjectNode(*N,Size):FVector2D(-10000,-10000);
+}
+FVector2D ULKWorldMapWidget::ProjectNode(const FLKDungeonNode& Node,FVector2D Size) const
+{
+    FVector2D P=Project(Node.MapPosition,Size);
+    if(Snapshot.WorldMapVersion<2) { return P; }
+    // Separate narrow-end lanes in screen space without changing frozen geographic data.
+    TArray<const FLKDungeonNode*> Lane;
+    for(const auto& Other:Snapshot.Nodes)
+    { if(Other.RegionId==Node.RegionId && Other.Layer==Node.Layer) { Lane.Add(&Other); } }
+    Lane.Sort([](const auto& A,const auto& B){return A.MapPosition.Y<B.MapPosition.Y;});
+    const int32 Index=Lane.IndexOfByPredicate([&](const auto* N){return N->NodeId==Node.NodeId;});
+    if(Index==INDEX_NONE || Lane.Num()<2) { return P; }
+    double Gap=100000,Center=0;
+    for(int32 I=0;I<Lane.Num();++I)
+    { const auto Y=Project(Lane[I]->MapPosition,Size).Y; Center+=Y;
+      if(I>0) { Gap=FMath::Min(Gap,Y-Project(Lane[I-1]->MapPosition,Size).Y); } }
+    Gap=FMath::Max(36.,Gap); Center/=Lane.Num();
+    const double Half=Gap*(Lane.Num()-1)*.5;
+    Center=FMath::Clamp(Center,36.+Half,FMath::Max(36.+Half,Size.Y-30.-Half));
+    P.Y=Center+(Index-(Lane.Num()-1)*.5)*Gap;
+    return P;
 }
 FReply ULKWorldMapWidget::NativeOnMouseButtonDown(const FGeometry &Geometry, const FPointerEvent &Event)
 {
@@ -175,7 +203,7 @@ int32 ULKWorldMapWidget::NativePaint(const FPaintArgs &Args, const FGeometry &Ge
             {
                 continue;
             }
-            const FVector2D A = Project(Node.MapPosition, Size), B = Project(Next->MapPosition, Size),
+            const FVector2D A = ProjectNode(Node, Size), B = ProjectNode(*Next, Size),
                             Dir = (B - A).GetSafeNormal();
             const bool Available = Node.NodeId == Snapshot.CurrentNodeId && Snapshot.Phase == ELKRunPhase::ChoosingNode;
             const FLinearColor Color =
@@ -198,8 +226,8 @@ int32 ULKWorldMapWidget::NativePaint(const FPaintArgs &Args, const FGeometry &Ge
         const bool Available = Current && Snapshot.Phase == ELKRunPhase::ChoosingNode &&
                                Current->NextNodeIds.Contains(Node.NodeId) && !Node.bResolved;
         const bool IsCurrent = Node.NodeId == Snapshot.CurrentNodeId;
-        const FVector2D P = Project(Node.MapPosition, Size);
-        const double Width = Focus.IsNone() ? 18 : 32;
+        const FVector2D P = ProjectNode(Node, Size);
+        const double Width = Snapshot.WorldMapVersion>=2 ? 24 : 32;
         const FLinearColor Border = Node.NodeId == Selected ? FLinearColor::White
                                     : Available             ? FLinearColor(1, .7f, .15f)
                                     : IsCurrent             ? FLinearColor(.3f, 1, .7f)
@@ -240,7 +268,8 @@ int32 ULKWorldMapWidget::NativePaint(const FPaintArgs &Args, const FGeometry &Ge
             Geometry.ToPaintGeometry(FVector2D(Width, Width),
                                      FSlateLayoutTransform(P - (Focus.IsNone() ? FVector2D(5, 6) : FVector2D(8, 10)))),
             Glyph, Font, ESlateDrawEffect::None, FLinearColor::White); }
-        if (!Focus.IsNone() && (Node.Layer == 0 || Node.Layer == 4))
+        const bool IsExit=Snapshot.WorldRegions.ContainsByPredicate([&](const auto& R){return R.RegionId==Node.RegionId && R.ExitNodeIds.Contains(Node.NodeId);}) || (Snapshot.WorldMapVersion==0 && Node.Layer==4);
+        if (!Focus.IsNone() && (Node.Layer == 0 || IsExit))
         {
             const FString Label = Node.Type == ELKDungeonNodeType::Event ? TEXT("起点") : Node.Layer == 0 ? TEXT("入口") : TEXT("出口");
             FSlateDrawElement::MakeText(Elements, Layer + 7, Geometry.ToPaintGeometry(FVector2D(40,16),FSlateLayoutTransform(P+FVector2D(22,-6))),

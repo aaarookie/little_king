@@ -1,4 +1,5 @@
 #include "LKHomeContent.h"
+#include "LKResearchContent.h"
 #include "LKCardRules.h"
 
 #include "LKEncounterContent.h"
@@ -224,7 +225,7 @@ namespace LKHomeContent
 		return DefaultUnlockedHeroes().Contains(HeroId);
 	}
 
-	int32 MinStartingDeck() { return 5; }
+	int32 MinStartingDeck() { return LKCardRules::MinimumDepartureCards; }
 	int32 MaxStartingDeck() { return 8; }
 
 	FLKExpeditionLoadout DefaultLoadout()
@@ -268,9 +269,10 @@ namespace LKHomeContent
 			OutError = FString::Printf(TEXT("初始牌组至少 %d 张（当前 %d 张）"), MinStartingDeck(), CardCount);
 			return ELKLoadoutResult::DeckTooSmall;
 		}
-		if (LKCardRules::Used(Loadout.CardIds) > MaxStartingDeck())
+		const int32 MaxSlots=Data?Data->DeckCapacityMaximum:MaxStartingDeck();
+		if (LKCardRules::Used(Loadout.CardIds) > MaxSlots)
 		{
-			OutError = FString::Printf(TEXT("部队容量最多 %d 格（当前 %d 格）"), MaxStartingDeck(), LKCardRules::Used(Loadout.CardIds));
+			OutError = FString::Printf(TEXT("部队容量最多 %d 格（当前 %d 格）"), MaxSlots, LKCardRules::Used(Loadout.CardIds));
 			return ELKLoadoutResult::DeckTooLarge;
 		}
 		TSet<FName> Cards;
@@ -279,9 +281,15 @@ namespace LKHomeContent
 			if (CardId.IsNone()) { OutError = TEXT("卡牌 ID 为空"); return ELKLoadoutResult::UnknownCard; }
 			if (Cards.Contains(CardId)) { OutError = FString::Printf(TEXT("卡牌重复：%s"), *CardId.ToString()); return ELKLoadoutResult::DuplicateCard; }
 			Cards.Add(CardId);
-			if (!IsDefaultUnlockedCard(CardId))
+			if (!IsDefaultUnlockedCard(CardId) && !LKResearchContent::Find(CardId))
 			{
 				OutError = FString::Printf(TEXT("卡牌未永久解锁：%s"), *CardId.ToString());
+				return ELKLoadoutResult::LockedCard;
+			}
+			// 阵营权限：敌方专属卡（骷髅兵/骷髅射手/骷髅法阵）永不能进入玩家战备。
+			if (!LKCardRules::IsPlayerObtainable(CardId))
+			{
+				OutError = FString::Printf(TEXT("敌方专属卡不可编入玩家牌组：%s"), *CardId.ToString());
 				return ELKLoadoutResult::LockedCard;
 			}
 			if (Data && !Data->CardLibrary.ContainsByPredicate(
@@ -304,7 +312,7 @@ namespace LKHomeContent
 		case ELKLoadoutResult::DuplicateHero: return FText::FromString(TEXT("英雄重复"));
 		case ELKLoadoutResult::LockedHero: return FText::FromString(TEXT("英雄尚未永久解锁"));
 		case ELKLoadoutResult::UnknownHero: return FText::FromString(TEXT("英雄定义缺失"));
-		case ELKLoadoutResult::DeckTooSmall: return FText::FromString(TEXT("初始牌组至少 5 张"));
+		case ELKLoadoutResult::DeckTooSmall: return FText::FromString(TEXT("出征至少携带 7 种卡"));
 		case ELKLoadoutResult::DeckTooLarge: return FText::FromString(TEXT("部队容量最多 8 格"));
 		case ELKLoadoutResult::DuplicateCard: return FText::FromString(TEXT("卡牌重复"));
 		case ELKLoadoutResult::LockedCard: return FText::FromString(TEXT("卡牌尚未永久解锁"));
@@ -321,9 +329,9 @@ namespace LKHomeContent
 		Rules.EliteWin = 20;
 		Rules.BossWin = 40;
 		Rules.RunCompletedBonus = 20;
-		Rules.FailureKeepPercent = 1.f;
+		Rules.FailureKeepPercent = .8f;
 		Rules.AbandonKeepPercent = 1.f;
-		Rules.RuleVersion = 2;
+		Rules.RuleVersion = 3;
 		return Rules;
 	}
 
@@ -362,6 +370,7 @@ namespace LKHomeContent
 
 		const FLKExpeditionLoadout Loadout = Profile.GetSavedLoadout();
 		if (ValidateLoadout(Loadout, Data, OutError) != ELKLoadoutResult::Success) { return false; }
+		for (FName Id : Loadout.CardIds) { if (!Profile.IsCardUnlocked(Id)) { OutError=TEXT("战备包含未研究解锁的卡牌"); return false; } }
 
 		OutRequest.ProfileId = Profile.GetProfile().ProfileId;
 		OutRequest.RegionId = RegionId;
@@ -371,6 +380,8 @@ namespace LKHomeContent
 		OutRequest.Seed = int32(GetTypeHash(FGuid::NewGuid()) & MAX_int32);
 		OutRequest.BonusSnapshot = Profile.BuildBonusSnapshot(Data, RegionId);
 		OutRequest.RewardRules = DefaultRewardRules();
+		OutRequest.DeckCapacityMinimum=Data?Data->DeckCapacityMinimum:8;
+		OutRequest.DeckCapacityMaximum=Data?Data->DeckCapacityMaximum:8;
 		OutRequest.bEligibleForHomeReward = true;
 
 		for (FName HeroId : Loadout.HeroIds)

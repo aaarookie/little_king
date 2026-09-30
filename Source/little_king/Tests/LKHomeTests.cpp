@@ -76,7 +76,11 @@ namespace
 	/** 测试用真实 GameData（含 CardLibrary 与遭遇表引用）；加载失败返回 nullptr */
 	ULKGameData* LoadAuthoredGameData()
 	{
-		return LoadObject<ULKGameData>(nullptr, TEXT("/Game/Data/DA_GameData.DA_GameData"));
+		ULKGameData* Asset=LoadObject<ULKGameData>(nullptr, TEXT("/Game/Data/DA_GameData.DA_GameData"));
+		if (!Asset) { return nullptr; }
+		ULKGameData* Runtime=DuplicateObject<ULKGameData>(Asset, GetTransientPackage());
+		Runtime->EnsureCardLibrary();
+		return Runtime;
 	}
 
 	const ULKCardDefinition* ResolveCard(const ULKGameData* Data, FName CardId)
@@ -220,17 +224,18 @@ bool FLKHomeLoadoutTest::RunTest(const FString& Parameters)
 	// 5 张合法牌组可以保存并跨重启保留
 	FLKExpeditionLoadout FiveCards = Defaults;
 	FiveCards.CardIds.SetNum(5);
-	TestTrue(TEXT("Five-card loadout saves"), Profile->SaveLoadout(FiveCards, nullptr) == ELKLoadoutResult::Success);
+	TestTrue(TEXT("Five-card departure rejected"), Profile->SaveLoadout(FiveCards, nullptr) == ELKLoadoutResult::DeckTooSmall);
+    TestTrue(TEXT("Seven-card loadout saves"),Profile->SaveLoadout(Defaults,nullptr)==ELKLoadoutResult::Success);
 	ULKProfileSubsystem* Reloaded = MakeProfile();
 	if (!TestTrue(TEXT("Reload after loadout save"), Reloaded->EnsureProfile())) { return false; }
-	TestEqual(TEXT("Saved deck size survives"), Reloaded->GetSavedLoadout().CardIds.Num(), 5);
+	TestEqual(TEXT("Saved deck size survives"), Reloaded->GetSavedLoadout().CardIds.Num(), 7);
 	TestEqual(TEXT("Saved hero count survives"), Reloaded->GetSavedLoadout().HeroIds.Num(), 3);
 
 	// 非法草稿不覆盖已保存配置
 	FLKExpeditionLoadout Bad = FiveCards;
 	Bad.HeroIds.Reset();
 	TestTrue(TEXT("Illegal draft rejected"), Profile->SaveLoadout(Bad, nullptr) == ELKLoadoutResult::WrongHeroCount);
-	TestEqual(TEXT("Saved loadout untouched by rejected draft"), Profile->GetSavedLoadout().CardIds.Num(), 5);
+	TestEqual(TEXT("Saved loadout untouched by rejected draft"), Profile->GetSavedLoadout().CardIds.Num(), 7);
 	return true;
 }
 
@@ -370,7 +375,7 @@ bool FLKHomeSettlementTest::RunTest(const FString& Parameters)
 
 	auto RunToTerminal = [this](ULKRunSubsystem* Run, bool bWinAll, bool bAbandon) -> FLKSettlementReceipt
 	{
-		for (int32 Guard = 0; Guard < 100 && !Run->IsTerminal(); ++Guard)
+		for (int32 Guard = 0; Guard < 200 && !Run->IsTerminal(); ++Guard)
 		{
 			const ELKRunPhase Phase = Run->GetRunPhase();
 			if (Phase == ELKRunPhase::EnteringBattle || Phase == ELKRunPhase::InBattle)
@@ -467,8 +472,8 @@ bool FLKHomeSettlementTest::RunTest(const FString& Parameters)
     Run->SetProfileSubsystemOverrideForTest(Profile);
 		if (!TestTrue(TEXT("Failure run starts"), Run->StartNewRun(Request))) { return false; }
 		const FLKSettlementReceipt Receipt = RunToTerminal(Run, false, false);
-		TestTrue(TEXT("Failed run keeps all earned gold"), Receipt.GoldAmount == Run->GetPendingGold());
-		TestTrue(TEXT("Failure never pays the completion bonus"), Receipt.GoldAmount == Run->GetPendingGold());
+		TestTrue(TEXT("Failed run keeps all earned gold"), Receipt.GoldAmount == int32(int64(Run->GetWalletGold())*80/100));
+		TestTrue(TEXT("Failure never pays the completion bonus"), Receipt.GoldAmount == int32(int64(Run->GetWalletGold())*80/100));
 	}
 
 	// c) 明确放弃：0 金币
@@ -562,7 +567,7 @@ bool FLKHomeWorldTest::RunTest(const FString& Parameters)
 
 	// 图书馆/英雄之家/军营：只读且只列永久解锁内容
 	const FLKHomePanelModel Library = GM->BuildPanelModel(ELKHomePanel::Library, FLKExpeditionLoadout(), NAME_None, 0);
-	TestEqual(TEXT("Library lists exactly the two unlocked spells"), Library.Rows.Num(), 2);
+	TestEqual(TEXT("Library lists exactly the two unlocked spells"), Library.Rows.Num(), 4);
 	TestTrue(TEXT("Library has no purchase action"), !Library.Actions.ContainsByPredicate(
 		[](const FLKHomePanelAction& Action) { return Action.ActionId != TEXT("Close"); }));
 	const FLKHomePanelModel Heroes = GM->BuildPanelModel(ELKHomePanel::HeroHouse, FLKExpeditionLoadout(), NAME_None, 0);

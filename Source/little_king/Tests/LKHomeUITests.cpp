@@ -105,9 +105,11 @@ bool FLKHomeUIInteractionTest::RunTest(const FString& Parameters)
     HUD->OpenPanel(ELKHomePanel::WarRoom);
     ToggleFirstCard();
     HUD->RequestClosePanel();
-    TestTrue(TEXT("Save confirmation button works"), ClickEntry(HUD, TEXT("ActionsBox"), 0));
-    TestFalse(TEXT("Save and close closes panel"), HUD->IsPanelOpen());
-    TestEqual(TEXT("Saved deck has six cards"), GM->GetProfileSubsystem()->GetSavedLoadout().CardIds.Num(), 6);
+    TestFalse(TEXT("Six-card save disabled"),ClickEntry(HUD,TEXT("ActionsBox"),0));
+    TestTrue(TEXT("Illegal draft remains open for correction"),HUD->IsPanelOpen());
+    TestTrue(TEXT("Discard invalid draft and close"),ClickEntry(HUD,TEXT("ActionsBox"),1));
+    TestFalse(TEXT("Discard closes confirmation"),HUD->IsPanelOpen());
+    TestEqual(TEXT("Saved deck keeps seven cards"),GM->GetProfileSubsystem()->GetSavedLoadout().CardIds.Num(),7);
     HUD->OpenPanel(ELKHomePanel::WarRoom);
     TestTrue(TEXT("Hero tab button switches the visible list"), ClickEntry(HUD, TEXT("TabsBox"), 1));
     bHeroesTab = true;

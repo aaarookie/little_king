@@ -14,6 +14,8 @@ public:
 	FOnNodePicked OnNodePicked;
 	void SetMapState(const FLKRunState& InState, FName InSelected);
 	void FocusRegion(FName RegionId);
+	FName GetFocusedRegion() const { return Focus; }
+	FVector2D NodeLocalPosition(FName NodeId,FVector2D Size) const;
 	FName HitTestNode(FVector2D LocalPoint, FVector2D Size) const;
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
@@ -21,6 +23,7 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& Event) override;
 private:
 	FVector2D Project(FVector2D Point, FVector2D Size) const;
+	FVector2D ProjectNode(const FLKDungeonNode& Node, FVector2D Size) const;
 	UPROPERTY(Transient) FLKRunState Snapshot;
     UPROPERTY(Transient) TMap<FName, TObjectPtr<class UTexture2D>> RegionTextures;
     UPROPERTY(Transient) TMap<uint8, TObjectPtr<class UTexture2D>> NodeTextures;

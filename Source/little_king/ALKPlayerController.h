@@ -30,6 +30,8 @@ public:
 	void RequestCameraShake(float Intensity);
 	bool GetGroundUnderMouse(FVector& Location) const { return DeprojectMouseToGround(Location); }
 	ALKHeroCamp* GetSelectedCamp() const;
+	UFUNCTION(BlueprintCallable, Category="LK|Battle") void ToggleBattlePause();
+	UPROPERTY(Transient) TObjectPtr<class ULKBattlePauseWidget> PauseWidget;
 	int32 GetPlacingHandIndex() const { return PlacingHandIndex; }
 	bool GetPlacementPreview(FVector& Location, float& Radius, bool& bValid, float* OutAttackRadius = nullptr) const;
 

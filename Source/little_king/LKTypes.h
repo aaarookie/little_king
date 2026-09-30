@@ -92,7 +92,21 @@ enum class ELKSpellEffect : uint8
 {
 	None	UMETA(DisplayName = "无"),
 	Damage	UMETA(DisplayName = "范围伤害"),
-	Heal	UMETA(DisplayName = "范围治疗")
+	Heal	UMETA(DisplayName = "范围治疗"),
+	/** 区域召唤区（敌方专属骷髅法阵）：无直接伤害，按节奏召唤并减速区域内敌对单位 */
+	SummonZone UMETA(DisplayName = "区域召唤")
+};
+
+/** 卡牌阵营权限：规范身份由代码注册，数据资产不能意外开放。 */
+UENUM(BlueprintType)
+enum class ELKCardFaction : uint8
+{
+	/** 双方都可用（玩家可获取，敌方也可由遭遇配置使用） */
+	Both		UMETA(DisplayName = "双方"),
+	/** 仅玩家可获取 */
+	PlayerOnly	UMETA(DisplayName = "玩家专属"),
+	/** 仅敌方可用：玩家不能在收藏、奖励、牌组、施放或学徒模仿中取得 */
+	EnemyOnly	UMETA(DisplayName = "敌方专属")
 };
 
 /** 放置模式（UI 交互状态机：点卡/英雄 -> 放置模式 -> 点战场 -> 结算） */

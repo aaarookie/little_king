@@ -1,0 +1,1320 @@
+{
+  "auditedAt": "2026-09-28T23:28:57.305333+08:00",
+  "baseline": "v0.8.1 / 3f66a536c7ab50b27a4768f5ffb381e2a559e52b",
+  "release": "Uncommitted development changes; published version remains 0.8.1",
+  "engine": "UE 5.8.1",
+  "build": {
+    "path": "Saved/Logs/BalanceV1FinalBuild09.log",
+    "sha256": "0e82fe06ff08057457365b11fa898071ad77d9904d68e9662f6443ed3226d5fa",
+    "result": "Succeeded",
+    "note": "Build08 passed full 101 tests. Build09 changes only the sampling test: adds optional independent seeds, treasury/entry-HP cohorts and healing columns. Production code/assets are unchanged."
+  },
+  "fullAutomation": {
+    "path": "Saved/Automation/BalanceV1Final/index.json",
+    "sha256": "147b5fc8469ff45a359b0e77b54dc6835c675eb9e348803d66e2e517c67b1a92",
+    "reportCreatedOn": "2026.09.28-09.54.33",
+    "succeeded": 49,
+    "succeededWithWarnings": 52,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "totalDuration": 139.3637237548828,
+    "tests": [
+      {
+        "name": "LittleKing.BalanceV1.Circle.AreaSlowTeamsLeaveOverlapAndCleanup",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.BalanceV1.Circle.GameModeGuardAndParamValidation",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.BalanceV1.Circle.HugeDeltaAndFailureCap",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.BalanceV1.Circle.LowFrameRateSlowRefresh",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.BalanceV1.Circle.WarningBoundaryAndSixSummons",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.CompletedEncountersStayHistorical",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.DisabledCardAndRewardReplacement",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.HealthRatioAndPermanentUpgrades",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.InvalidSnapshotKeepsMemoryState",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.TempSlotRoundTripIsIdempotent",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.Migration.TerminalHistoryPreserved",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.BattleSampling",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 206
+      },
+      {
+        "name": "LittleKing.BalanceV1.RulesAndAuthoredAssets",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.BalanceV1.TacticalTransaction",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D0.Content.RegistryAndEncounter",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D0.Heroes.IncapacitationAndRecovery",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D0.Undead.BoneRegenerationAndBatchOrder",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.D0.Undead.GiantBones",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D0.Undead.RangedDamageClassification",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D0.Undead.SummoningAndSacrifice",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 3
+      },
+      {
+        "name": "LittleKing.D1.Configuration.BuiltInUnitRules",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "name": "LittleKing.D1.Run.BossCompletion",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D1.Run.ThreeRoomFlow",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D2.Configuration.EncounterCatalog",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D2.Heroes.RoomBoundaryReset",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.D2.Integration.AuthoredEncounterSnapshot",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.D2.Run.EncounterSnapshotAndPermanentState",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D3.Rewards.ClaimBoundaries",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D3.Rewards.StateMachineAtomicity",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D4.Map.RowStructureAndVisibility",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D4.Roster.RandomizedEncounterRules",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D4.Run.RestHealAndFullClear",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D5.Save.IdentityTraitsRestoredOnLoad",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D5.Save.RecoverySemantics",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.D5.Save.RoundTripAndNoDoubleClaim",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.D5.Save.ValidationRules",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.H1.Profile.CreateRotateAndRecover",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.H2.Loadout.ValidationAndPersistence",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.H3.Expedition.SnapshotAndApplication",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.H3.Resume.SafePointLeaveAndContinue",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "name": "LittleKing.H3.World.BuildingsAndPanels",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.H4.Settlement.MathAndHandoff",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.H4.Upgrade.TransactionAndCurves",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.H5.Migration.LegacyRunToSchema5",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.HomeUI.AuthoredAssetsAndContent",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.HomeUI.DraftConfirmationAndDetails",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.HomeUI.RosterButtonsAndSafeReturn",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "name": "LittleKing.Optimization1.LegacyAndCrossSlotProtection",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization1.MenuButtonsAndAssets",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization1.MoneyConsoleCommand",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization1.SaveIsolationAndRecovery",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization2.BattleWorldPreservesMapAndService",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization2.BranchProgressionAndFullGold",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization2.MapServiceAndGateUI",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization2.OldMapMigrationAndDepartureFailure",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization2.WalletSettlementAndCrashRecovery",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization2.WorldGraph200Seeds",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.BackstabAndLoot",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.DashHitsKnockbackAndObstacles",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.ElfHealingAndSharedSpring",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization3.Combat.MimicFullDeckAndFallback",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Optimization3.Content.QualityGradesAndTemporaryCards",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Optimization3.Deck.CapacityReplacementAndRollback",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.Optimization3.UI.HandLabelsRewardReplacementAndRender",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "name": "LittleKing.Presentation.AssetsAndAudioDefaults",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.BattleArtDefaultsAndOverrides",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.BattleArtSpawnGeometry",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.CampsGroundAndCombatEvents",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Presentation.CorrectedWalkAtlases",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.CueBudgetAndThrottling",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.FacingFollowsVoluntaryTravel",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.HomeIllustrations",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.OverlapDepthAndCamps",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.PolishAnimationIsolation",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Presentation.PolishCatalogue",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.PolishHomeLevelGeometry",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.PolishMusicAndRevealLifetime",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.WalkDistanceAndInterruption",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Presentation.WorldArtCatalogue",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.AcquireRangeAndRelease",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.AuthoredSpellTerritory",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.FreeRoamFightRegression",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.Sprint5.Movement.CampPathGeometry",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.Sprint5.Placement.BuildingAttackRange",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.TrollCards.UI.MultiSelectAndRender",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "name": "LittleKing.TrollCards.ContentAndWeightedDeck",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "LittleKing.TrollCards.EmpowerControlAndSixthAttack",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.TrollCards.KingSupportHealthRatio",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.TrollCards.MultiReplacementAtomicity",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.TrollCards.SharedBreathBurnAndPool",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "LittleKing.TrollCards.SiegeOnlyBuildingsAcrossMap",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 1
+      }
+    ]
+  },
+  "holdoutAutomation": {
+    "path": "Saved/Automation/BalanceV1Holdout/index.json",
+    "sha256": "f00b383f3666e44b6ccc0485a297645670ab15bb53c32d1bf2a1f8dd89a68915",
+    "reportCreatedOn": "2026.09.28-15.28.13",
+    "succeeded": 0,
+    "succeededWithWarnings": 1,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "totalDuration": 239.00245666503906,
+    "tests": [
+      {
+        "name": "LittleKing.BalanceV1.BattleSampling",
+        "state": "Success",
+        "errors": 0,
+        "warnings": 432
+      }
+    ]
+  },
+  "warnings": "Reviewed: isolated worlds without cameras/viewports, expected rejection cases, capped enemy spawns and missing mage range permission, existing GameplayCue search-path warning and editor connectivity timeout. No test failures.",
+  "sampling": {
+    "stepSeconds": 0.05,
+    "policyIntervalSeconds": 0.5,
+    "observationLimitSeconds": 450,
+    "deck0": "Sword/Archer/Shield/Fireball/Heal/ArrowTower/Barracks, all level 0",
+    "deck1": "ElfWarrior/ElfArcher/ElfPriest/GoblinRogue/ApprenticeMage/Fireball/Heal/ArrowTower, all level 0",
+    "calibration": {
+      "all": {
+        "count": 18,
+        "playerWins": 11,
+        "p50Seconds": 232.61,
+        "p90SecondsLinear": 326.19,
+        "minSeconds": 139.95,
+        "maxSeconds": 344.99,
+        "below180": 4,
+        "within180To300": 11,
+        "above300": 3,
+        "overtime": 3,
+        "maxEnemyUnits": 20
+      },
+      "wins": {
+        "count": 11,
+        "playerWins": 11,
+        "p50Seconds": 259.01,
+        "p90SecondsLinear": 335.99,
+        "minSeconds": 169.46,
+        "maxSeconds": 344.99,
+        "below180": 1,
+        "within180To300": 7,
+        "above300": 3,
+        "overtime": 3,
+        "maxEnemyUnits": 20
+      },
+      "groups": [
+        {
+          "depth": 0,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 225.33,
+          "p90SecondsLinear": 252.27,
+          "minSeconds": 191.66,
+          "maxSeconds": 259.01,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 18
+        },
+        {
+          "depth": 0,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 235.03,
+          "p90SecondsLinear": 235.46,
+          "minSeconds": 234.51,
+          "maxSeconds": 235.56,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 0,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 294.8,
+          "p90SecondsLinear": 316.55,
+          "minSeconds": 267.61,
+          "maxSeconds": 321.99,
+          "below180": 0,
+          "within180To300": 1,
+          "above300": 1,
+          "overtime": 1,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 257.23,
+          "p90SecondsLinear": 327.44,
+          "minSeconds": 169.46,
+          "maxSeconds": 344.99,
+          "below180": 1,
+          "within180To300": 0,
+          "above300": 1,
+          "overtime": 1,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 1,
+          "p50Seconds": 279.96,
+          "p90SecondsLinear": 283.07,
+          "minSeconds": 276.06,
+          "maxSeconds": 283.85,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 1,
+          "p50Seconds": 274.6,
+          "p90SecondsLinear": 323.71,
+          "minSeconds": 213.21,
+          "maxSeconds": 335.99,
+          "below180": 0,
+          "within180To300": 1,
+          "above300": 1,
+          "overtime": 1,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 1,
+          "p50Seconds": 199.69,
+          "p90SecondsLinear": 224.5,
+          "minSeconds": 168.66,
+          "maxSeconds": 230.71,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 185.25,
+          "p90SecondsLinear": 221.5,
+          "minSeconds": 139.95,
+          "maxSeconds": 230.56,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 185.36,
+          "p90SecondsLinear": 218.24,
+          "minSeconds": 144.25,
+          "maxSeconds": 226.46,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        }
+      ]
+    },
+    "holdoutFullHealth": {
+      "all": {
+        "count": 18,
+        "playerWins": 10,
+        "p50Seconds": 224.26,
+        "p90SecondsLinear": 288.58,
+        "minSeconds": 159.16,
+        "maxSeconds": 354.49,
+        "below180": 2,
+        "within180To300": 15,
+        "above300": 1,
+        "overtime": 1,
+        "maxEnemyUnits": 20
+      },
+      "wins": {
+        "count": 10,
+        "playerWins": 10,
+        "p50Seconds": 252.63,
+        "p90SecondsLinear": 302.7,
+        "minSeconds": 202.11,
+        "maxSeconds": 354.49,
+        "below180": 0,
+        "within180To300": 9,
+        "above300": 1,
+        "overtime": 1,
+        "maxEnemyUnits": 20
+      },
+      "groups": [
+        {
+          "depth": 0,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 232.06,
+          "p90SecondsLinear": 237.46,
+          "minSeconds": 225.31,
+          "maxSeconds": 238.81,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 14
+        },
+        {
+          "depth": 0,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 238.26,
+          "p90SecondsLinear": 259.7,
+          "minSeconds": 211.46,
+          "maxSeconds": 265.06,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 0,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 272.5,
+          "p90SecondsLinear": 292.06,
+          "minSeconds": 248.06,
+          "maxSeconds": 296.95,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 2,
+          "p50Seconds": 278.3,
+          "p90SecondsLinear": 339.25,
+          "minSeconds": 202.11,
+          "maxSeconds": 354.49,
+          "below180": 0,
+          "within180To300": 1,
+          "above300": 1,
+          "overtime": 1,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 1,
+          "p50Seconds": 248.41,
+          "p90SecondsLinear": 255.45,
+          "minSeconds": 239.61,
+          "maxSeconds": 257.21,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 211.96,
+          "p90SecondsLinear": 220.96,
+          "minSeconds": 200.71,
+          "maxSeconds": 223.21,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 1,
+          "p50Seconds": 237.13,
+          "p90SecondsLinear": 275.43,
+          "minSeconds": 189.26,
+          "maxSeconds": 285.0,
+          "below180": 0,
+          "within180To300": 2,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 195.56,
+          "p90SecondsLinear": 209.92,
+          "minSeconds": 177.61,
+          "maxSeconds": 213.51,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 187.56,
+          "p90SecondsLinear": 210.28,
+          "minSeconds": 159.16,
+          "maxSeconds": 215.96,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        }
+      ]
+    },
+    "holdoutWoundedTreasury3": {
+      "all": {
+        "count": 12,
+        "playerWins": 0,
+        "p50Seconds": 116.95,
+        "p90SecondsLinear": 140.35,
+        "minSeconds": 91.35,
+        "maxSeconds": 185.91,
+        "below180": 11,
+        "within180To300": 1,
+        "above300": 0,
+        "overtime": 0,
+        "maxEnemyUnits": 20
+      },
+      "wins": {
+        "count": 0
+      },
+      "groups": [
+        {
+          "depth": 9,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 163.2,
+          "p90SecondsLinear": 181.37,
+          "minSeconds": 140.5,
+          "maxSeconds": 185.91,
+          "below180": 1,
+          "within180To300": 1,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 132.35,
+          "p90SecondsLinear": 137.71,
+          "minSeconds": 125.65,
+          "maxSeconds": 139.05,
+          "below180": 2,
+          "within180To300": 0,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 9,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 130.25,
+          "p90SecondsLinear": 133.33,
+          "minSeconds": 126.4,
+          "maxSeconds": 134.1,
+          "below180": 2,
+          "within180To300": 0,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Patrol",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 95.38,
+          "p90SecondsLinear": 96.0,
+          "minSeconds": 94.6,
+          "maxSeconds": 96.15,
+          "below180": 2,
+          "within180To300": 0,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Elite",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 102.08,
+          "p90SecondsLinear": 107.02,
+          "minSeconds": 95.9,
+          "maxSeconds": 108.25,
+          "below180": 2,
+          "within180To300": 0,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        },
+        {
+          "depth": 19,
+          "rank": "Boss",
+          "count": 2,
+          "playerWins": 0,
+          "p50Seconds": 97.57,
+          "p90SecondsLinear": 102.55,
+          "minSeconds": 91.35,
+          "maxSeconds": 103.8,
+          "below180": 2,
+          "within180To300": 0,
+          "above300": 0,
+          "overtime": 0,
+          "maxEnemyUnits": 20
+        }
+      ]
+    },
+    "files": [
+      {
+        "path": "docs/validation/BalanceV1/battle-samples.csv",
+        "sha256": "e50f84274fbfcf032c47b1dcae523bc93f337714af224c50423276e268be63d1"
+      },
+      {
+        "path": "docs/validation/BalanceV1/battle-holdout.csv",
+        "sha256": "5f577e9a688fc06dee7f9237c4d338ba2dd2f494e9f65f5794543906febd2f90"
+      },
+      {
+        "path": "docs/validation/BalanceV1/battle-events.csv",
+        "sha256": "79f0821451d99b2471f331e5719c0e53122c6b3042f37d336e9ba284b68b8ded"
+      }
+    ],
+    "eventNotes": "Events parsed from each isolated world before its MatchStats line. Sacrifice totals are nominal pre-clamp costs. Circle totals count logged final summaries, not a claim every spell found six legal positions.",
+    "limitations": [
+      "Automatic legal affordable card policy; no camp micro or deck upgrades.",
+      "Separate room scenarios, not an end-to-end upgraded expedition.",
+      "Wounded cohort starts at 40% HP with treasury level 3 at depths 9 and 19.",
+      "No parameter tuning used holdout outcomes. No claim that every battle lasts 180-300 seconds."
+    ]
+  },
+  "assetAudit": {
+    "units": [
+      {
+        "unit": "Hero_Knight",
+        "changes": {
+          "BaseHealth": {
+            "before": 450,
+            "after": 6000
+          }
+        }
+      },
+      {
+        "unit": "Hero_Mage",
+        "changes": {
+          "BaseHealth": {
+            "before": 300,
+            "after": 4200
+          }
+        }
+      },
+      {
+        "unit": "Hero_Ranger",
+        "changes": {
+          "BaseHealth": {
+            "before": 350,
+            "after": 4800
+          }
+        }
+      },
+      {
+        "unit": "Unit_Skeleton",
+        "changes": {
+          "AttackDamage": {
+            "before": 6,
+            "after": 10
+          },
+          "BaseHealth": {
+            "before": 65,
+            "after": 240
+          }
+        }
+      },
+      {
+        "unit": "Unit_SkeletonArcher",
+        "changes": {
+          "AttackDamage": {
+            "before": 7,
+            "after": 12
+          },
+          "BaseHealth": {
+            "before": 45,
+            "after": 160
+          }
+        }
+      },
+      {
+        "unit": "Hero_Necromancer",
+        "changes": {
+          "AttackDamage": {
+            "before": 9,
+            "after": 26
+          },
+          "BaseHealth": {
+            "before": 180,
+            "after": 18000
+          },
+          "Name": {
+            "before": "NewHero_NecromancerRow",
+            "after": "Hero_Necromancer"
+          }
+        }
+      },
+      {
+        "unit": "Hero_SkeletonGiant",
+        "changes": {
+          "AttackDamage": {
+            "before": 13,
+            "after": 34
+          },
+          "BaseHealth": {
+            "before": 280,
+            "after": 10000
+          }
+        }
+      },
+      {
+        "unit": "Boss_SkeletonKing",
+        "changes": {
+          "AttackDamage": {
+            "before": 18,
+            "after": 44
+          },
+          "BaseHealth": {
+            "before": 420,
+            "after": 8000
+          }
+        }
+      }
+    ],
+    "gameData": {
+      "BattleTimeLimit": {
+        "before": 60.0,
+        "after": 300.0
+      }
+    },
+    "presentationFieldsPreserved": true,
+    "unitRowsPreserved": 13,
+    "audit": {
+      "path": "Saved/BalanceV1Delegation/inventory.json",
+      "sha256": "093825107cff30bec1f18cec70d824fc73b1cc055705a1bcdfb5859a7f80b9a6"
+    },
+    "assets": [
+      {
+        "path": "Content/Data/DT_Units.uasset",
+        "sha256": "c5f99dd3d65e4bae145743bd12ba7727b5b543b5b6886a5a19e440209a3c4f13"
+      },
+      {
+        "path": "Content/Data/DT_Encounters.uasset",
+        "sha256": "95cd8f510ee16202bcfc4d5994234776f65389460f329001142a2f677af15d66"
+      },
+      {
+        "path": "Content/Data/DA_GameData.uasset",
+        "sha256": "e8ddebf12851cfca4f8b3e980870946afcfd43adfb1acd8b6bbf57297f702557"
+      }
+    ]
+  },
+  "render": {
+    "images": [
+      {
+        "path": "docs/validation/BalanceV1/warning-720.png",
+        "sha256": "d85f152e459365059d13c3e58e9731492996fd420a2f2d75937542d2d4891077",
+        "pixels": [
+          1280,
+          720
+        ]
+      },
+      {
+        "path": "docs/validation/BalanceV1/warning-888.png",
+        "sha256": "252fbfd86c2d7ea82a14b6757b6c1326d9b185bf0202e3f1d538146dcb91d25a",
+        "pixels": [
+          888,
+          500
+        ]
+      },
+      {
+        "path": "docs/validation/BalanceV1/active-720.png",
+        "sha256": "c5bff8dfd031ad731579a869eca718d920bb0fae8b04fa6e68f29ccca697d56e",
+        "pixels": [
+          1280,
+          720
+        ]
+      },
+      {
+        "path": "docs/validation/BalanceV1/active-888.png",
+        "sha256": "0997f3279678b89f04f17597fbce6a7995a178db34853666607cd88aeb36400f",
+        "pixels": [
+          888,
+          500
+        ]
+      }
+    ],
+    "method": "Real D3D12 offscreen BattleTest preview, isolated and paused for warning/active capture; debug drawing off.",
+    "note": "Second launch requested 1920x1080 but actual viewport was 888x500. Recorded actual PNG sizes, not the requested resolution. Not a hardware performance or package test."
+  },
+  "playerSaves": [
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+      "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+      "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+      "sha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+      "sha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+      "sha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "unchanged": true
+    }
+  ],
+  "delegation": [
+    {
+      "path": "Saved/BalanceV1Delegation/circle-result.md",
+      "sha256": "774cb10a6666701b1a44b803d56c20ac01197ce7647f7af8d8cd849610452275"
+    },
+    {
+      "path": "Saved/BalanceV1Delegation/migration-result.md",
+      "sha256": "e7ead377deab173915096d7faa8d01b952fdc56866354db157fb6ff891c390e7"
+    }
+  ]
+}

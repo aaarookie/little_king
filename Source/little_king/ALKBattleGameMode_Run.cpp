@@ -5,6 +5,8 @@
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "LKBalanceRules.h"
+#include "LKCardRules.h"
 #include "LKDataTypes.h"
 #include "LKEncounterContent.h"
 #include "LKHomeContent.h"
@@ -66,7 +68,8 @@ TArray<FLKRunCardState> ALKBattleGameMode::BuildInitialRunCards() const
     TSet<FName> Seen;
     for (FName CardId : GameData->DefaultPlayerDeck)
     {
-        if (CardId.IsNone() || Seen.Contains(CardId) || !FindCard(CardId)) { continue; }
+        // 玩家初始牌组同样过滤敌方专属卡（配置误填也不会把骷髅卡发给玩家）。
+        if (CardId.IsNone() || Seen.Contains(CardId) || !FindCard(CardId) || !LKCardRules::IsPlayerObtainable(CardId)) { continue; }
         FLKRunCardState State;
         State.CardId = CardId;
         Result.Add(State);
@@ -101,6 +104,12 @@ bool ALKBattleGameMode::ApplyExpeditionContext(const FLKBattleContext& Context)
     for (const FLKRunCardState& Card : Context.PlayerCards)
     {
         if (Card.CardId.IsNone() || CardIds.Contains(Card.CardId) || !FindCard(Card.CardId)) { return false; }
+        // 敌方专属卡绝不能进入玩家牌组/玩家出牌入口（旧档由 RunSubsystem 迁移替代）。
+        if (!LKCardRules::IsPlayerObtainable(Card.CardId))
+        {
+            UE_LOG(LogLKBattle, Error, TEXT("[Run] 玩家牌组含敌方专属卡 %s，拒绝该战斗上下文"), *Card.CardId.ToString());
+            return false;
+        }
         CardIds.Add(Card.CardId);
         GameData->DefaultPlayerDeck.Add(Card.CardId);
     }
@@ -384,8 +393,7 @@ bool ALKBattleGameMode::ReturnToHome()
 	if (bResultActionInProgress) { return false; }
 	ULKRunSubsystem* CurrentRun = GetRunSubsystem();
 	if (!CurrentRun || !CurrentRun->HasRun() || (Phase != ELKGamePhase::Result && !bRecoveredJunction && !bRecoveredTerminal)
-		|| (!CurrentRun->IsTerminal() && CurrentRun->GetRunPhase() != ELKRunPhase::ChoosingReward
-			&& CurrentRun->GetRunPhase() != ELKRunPhase::ChoosingNode && !CurrentRun->HasServiceNode())) { return false; }
+		|| !CurrentRun->IsTerminal()) { return false; }
 	if (!CurrentRun->SaveExpedition())
 	{
 		UE_LOG(LogLKBattle, Warning, TEXT("[Home] 当前安全点未保存，留在此处重试"));
@@ -406,6 +414,26 @@ bool ALKBattleGameMode::ReturnToHome()
     bResultActionInProgress = true;
     UE_LOG(LogLKBattle, Log, TEXT("[Home] 返回家园 %s"), *MapName.ToString());
     ULKJourneyPresentationSubsystem::Travel(this, MapName);
+    return true;
+}
+
+bool ALKBattleGameMode::AbandonToHome()
+{
+    ULKRunSubsystem* Run=GetRunSubsystem();
+    if (bResultActionInProgress || !Run || !Run->HasRunInProgress() || !LKHomeContent::DoesMapExist(GetHomeMapName())) { return false; }
+    // Deployment and active combat share an InBattle run phase and both forbid abandonment.
+    if (!Run->AbandonCurrentRun()) { return false; }
+    return ReturnToHome();
+}
+bool ALKBattleGameMode::ExitToStartMenu()
+{
+    if (bResultActionInProgress || !LKHomeContent::DoesMapExist(TEXT("L_StartMenu"))) { return false; }
+    ULKRunSubsystem* Run=GetRunSubsystem();
+    if (Run && Run->HasRunInProgress() && !Run->SaveForMenuExit()) { return false; }
+    if (Run && Run->IsTerminal() && !Run->SaveExpedition()) { return false; }
+    UGameplayStatics::SetGamePaused(this,false);
+    bResultActionInProgress=true;
+    ULKJourneyPresentationSubsystem::Travel(this,TEXT("L_StartMenu"));
     return true;
 }
 
@@ -552,7 +580,8 @@ FText ALKBattleGameMode::GetNextNodeSubtitle(int32 Index) const
 		const FString Name = (Row && !Row->DisplayName.IsEmpty()) ? Row->DisplayName.ToString() : HeroId.ToString();
 		Names.Add(Name);
 	}
-	return FText::FromString(TEXT("敌人：") + FString::Join(Names, TEXT("、")));
+	return FText::FromString(TEXT("敌人：") + FString::Join(Names, TEXT("、")) + FString::Printf(
+		TEXT("\n深度 %d · 敌方基础生命 ×%.2f / 攻击 ×%.2f"), Encounter->Depth, Encounter->EnemyHealthScale, Encounter->EnemyDamageScale));
 }
 
 ELKNodeSelectionResult ALKBattleGameMode::SelectNextNode(int32 Index)
@@ -591,12 +620,13 @@ bool ALKBattleGameMode::BuildRunRewardOffers(TArray<FLKRunRewardOffer>& OutOffer
 	};
 
 	// Stable native pool order; never TMap iteration order. Owned cards cannot appear twice.
+	// 骷髅兵/骷髅射手/骷髅法阵是敌方专属（LKCardRules::IsPlayerObtainable）——奖励池永不含它们。
 	TArray<FLKRunRewardOffer> NewCards;
-    TArray<FName> RewardCardIds = { "Unit_Skeleton", "Unit_SkeletonArcher" };
+    TArray<FName> RewardCardIds;
     for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All()) { RewardCardIds.Add(Definition.Unit.UnitId); }
 	for (const FName Id : RewardCardIds)
 	{
-		if (!FindCard(Id)) { continue; }
+		if (!FindCard(Id) || !LKCardRules::IsPlayerObtainable(Id) || !LKCardRules::IsTemporaryMercenary(Id)) { continue; }
 		if (State.Cards.ContainsByPredicate([Id](const FLKRunCardState& Card) { return Card.CardId == Id; })) { continue; }
 		FLKRunRewardOffer Offer;
 		Offer.Kind = ELKRunRewardKind::AddCard;
@@ -609,7 +639,7 @@ bool ALKBattleGameMode::BuildRunRewardOffers(TArray<FLKRunRewardOffer>& OutOffer
 	for (const FLKRunCardState& Card : State.Cards)
 	{
 		const ULKCardDefinition* Def = FindCard(Card.CardId);
-		if (!Def || (Def->CardType != ELKCardType::Unit && Def->CardType != ELKCardType::Building)) { continue; }
+		if (!Def || Def->CardType != ELKCardType::Unit) { continue; }
 		const FName UnitId = Def->CardType == ELKCardType::Building ? Def->BuildingUnitId : Def->SpawnUnitId;
 		if (UnitId.IsNone() || !GetUnitRow(UnitId)) { continue; }
 		FLKRunRewardOffer Offer;

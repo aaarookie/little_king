@@ -39,6 +39,12 @@ public:
 	bool UsesCards() const { return bCanPlayCards; }
 	bool IsFocusEnabled() const;
 	const TArray<struct FLKWaveEntry>& GetWaves() const { return Waves; }
+	/** 结束战斗/换房：清空波次队列、重试队列与战术法术计时。 */
+	void ResetBattleState();
+	/** 统计：因满员/落点失败超过延后窗口而丢弃的增援数；已成功施放的战术法术数。 */
+	int32 GetDroppedReinforcements() const { return DroppedReinforcements; }
+	int32 GetTacticalSpellCasts() const { return TacticalSpellCasts; }
+	const FLKEnemySpellSettings& GetSpellSettings() const { return SpellSettings; }
 
 	ULKSilverComponent* GetSilver() const { return Silver; }
 	ULKDeckState* GetDeck() const { return Deck; }
@@ -60,6 +66,24 @@ private:
 	bool bCanPlayCards = true;
 	FLKEncounterAISettings AISettings;
 
+	/** 延迟重试的增援（满员/落点失败）：最多延后 3 秒，过期丢弃并计数，不累计到腾空后爆发。 */
+	static constexpr float MaxReinforcementDelay = 3.f;
+	struct FPendingReinforcement
+	{
+		FName UnitId;
+		int32 Remaining = 0;
+		float Deadline = 0.f;
+	};
+	TArray<FPendingReinforcement> PendingReinforcements;
+	int32 DroppedReinforcements = 0;
+
+	// ---------- 敌方战术法术（独立通道，不用五张假手牌） ----------
+	FLKEnemySpellSettings SpellSettings;
+	float SpellCheckTimer = 0.f;
+	float SpellCooldownRemaining = 0.f;
+	float SpellFirstCastAt = 12.f;
+	int32 TacticalSpellCasts = 0;
+
 	float ThinkTimer = 0.f;
 	float ThinkInterval = 1.f;
 
@@ -77,7 +101,14 @@ private:
 
 	void LoadWaves();
 	void ProcessWaves(float BattleElapsed);
+	/** 把一条到期波次排入重试队列（首次尝试失败时）。 */
+	void QueueReinforcement(FName UnitId, int32 Count, float BattleElapsed);
 	void ThinkAndPlay();
+	/** 独立敌方战术施法通道：与有限波次并行，共用敌方银币组件（波次不扣费）。 */
+	void TickTacticalSpell(float DeltaTime, float BattleElapsed);
+	bool TryCastTacticalSpell(float BattleElapsed);
+	/** 找一个能覆盖优先数量玩家战斗单位的落点；必要时允许只覆盖单英雄。 */
+	bool FindTacticalSpellLocation(float Radius, int32 PreferredTargets, FVector& OutLocation) const;
 
 	// S4：集火 / 反制 / 爆发 / 单张出牌
 	void DoFocus();

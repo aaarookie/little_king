@@ -85,6 +85,7 @@ public:
 	/** 幂等入账：同一 SettlementId 只加一次；成功后记录到 ProcessedSettlementIds */
 	ELKSettlementResult ApplySettlement(const FLKSettlementReceipt& Receipt);
 	bool HasProcessedSettlement(const FGuid& SettlementId) const;
+	bool ResearchCard(FName CardId, FString& Error);
 
 	/** 记录最近选择的区域（不参与任何数值计算） */
 	bool SetLastSelectedRegionId(FName RegionId);

@@ -44,21 +44,30 @@ FText Label(const ULKCardDefinition& Card)
     return FText::FromString(FString::Printf(TEXT("%s · %s%s"), *Card.CardName.ToString(), *Classification(Card).ToString(),
         LKCardRules::Slots(Card.CardId) > 1 ? *FString::Printf(TEXT(" · %d格"), LKCardRules::Slots(Card.CardId)) : TEXT("")));
 }
-FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow)
+FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow, int32 UpgradeLevel)
 {
+    const float Scale=LKCardRules::UpgradeMultiplier(UpgradeLevel);
     FString SkillText;
     FString Text = FString::Printf(TEXT("%s · %d 银币\n部队占格 %d%s"), *Classification(Card).ToString(), Card.Cost,
         LKCardRules::Slots(Card.CardId), Card.bExpeditionOnly ? TEXT(" · 远征临时") : TEXT(""));
+    if (UpgradeLevel>0) { Text+=FString::Printf(TEXT(" · Lv%d（数值 ×%.2f）"),UpgradeLevel,Scale); }
     if (Card.CardType == ELKCardType::Spell)
     {
-        Text += FString::Printf(TEXT("\n%s %.0f · 半径 %.0f"), Card.SpellEffect == ELKSpellEffect::Heal ? TEXT("治疗") : TEXT("伤害"), Card.SpellValue, Card.SpellRadius);
+        if (Card.SpellEffect == ELKSpellEffect::SummonZone)
+        {
+            Text += FString::Printf(TEXT("\n敌方专属 · 半径 %.0f · 持续 %.1f 秒\n移速降低 %.0f%% · 攻速降低 %.0f%%\n每 %.1f 秒召唤骷髅兵（最多 %d 名）"),
+                Card.Circle.Radius, Card.Circle.Duration, (1.f-Card.Circle.MoveMultiplier)*100.f,
+                (1.f-Card.Circle.AttackSpeedMultiplier)*100.f, Card.Circle.SummonInterval, Card.Circle.MaxSummons);
+        }
+        else { Text += FString::Printf(TEXT("\n%s %.0f · 半径 %.0f"), Card.SpellEffect == ELKSpellEffect::Heal ? TEXT("治疗") : TEXT("伤害"), Card.SpellValue*Scale, Card.SpellRadius);
+            if (Card.SpellEffect==ELKSpellEffect::Heal && Card.HeroHealPercent>0) { Text+=FString::Printf(TEXT("\n英雄额外恢复 %.1f%% 最大生命"),Card.HeroHealPercent*Scale*100.f); } }
     }
     else if (const FLKUnitRow* Row = TunedRow ? TunedRow : LKUnitContent::Find(Card.CardType == ELKCardType::Building ? Card.BuildingUnitId : Card.SpawnUnitId))
     {
         const FString RangeText = Row->bTargetsBuildingsOnly ? TEXT("全图") : FString::Printf(TEXT("%.0f"), Row->AttackRange);
         Text += FString::Printf(TEXT("\n%s · %s\n基础生命 %.0f · 攻击 %.0f\n间隔 %.1f 秒 · 射程 %s"),
             *RaceName(Row->Race).ToString(), Row->AttackType == ELKAttackType::Melee ? TEXT("近战") : TEXT("远程"),
-            Row->BaseHealth, Row->AttackDamage, Row->AttackInterval, *RangeText);
+            Row->BaseHealth*Scale, Row->AttackDamage*Scale, Row->AttackInterval, *RangeText);
         switch (Row->PassiveAbility)
         {
         case ELKPassiveAbility::AttackRenewal:

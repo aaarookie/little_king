@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "LKTypes.h"
+#include "LKDataTypes.h"
 #include "ULKCardDefinition.generated.h"
 
 /**
@@ -30,6 +31,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ELKCardType CardType = ELKCardType::Unit;
 
+	/**
+	 * 阵营权限。规范身份由 LKCardRules 按 CardId 注册并在运行时校正，
+	 * 数据资产即使被误改也不会把敌方专属卡开放给玩家。
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
+	ELKCardFaction Faction = ELKCardFaction::Both;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Content")
     ELKSpellGrade SpellGrade = ELKSpellGrade::Novice1;
 
@@ -51,8 +59,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "CardType==ELKCardType::Spell", EditConditionHides, ClampMin = "0.0"))
 	float SpellValue = 0.f;
 
+	/** Additional max-health healing for heroes only; affected by expedition spell upgrades. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell", meta=(ClampMin="0",ClampMax="1"))
+	float HeroHealPercent = 0.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "CardType==ELKCardType::Spell", EditConditionHides, ClampMin = "10.0"))
 	float SpellRadius = 300.f;
+
+	/** 区域召唤法术（SpellEffect=SummonZone）的专用参数；与 Damage/Heal 的 SpellValue 通道独立。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "SpellEffect==ELKSpellEffect::SummonZone", EditConditionHides))
+	FLKSkeletonCircleParams Circle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<class UTexture2D> Icon;

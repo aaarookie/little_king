@@ -28,17 +28,18 @@ const TMap<FName, FLKUnitRow>& Units()
             return Row;
         };
 
+        // 第一版平衡（docs/48 第 3 节）：英雄承担持续战斗核心，基础生命大幅提高；普攻不做等比例膨胀。
         FLKUnitRow& Knight = Add("Hero_Knight", TEXT("骑士"), ELKUnitClass::Hero, ELKAttackType::Melee,
-            450.f, 25.f, 130.f, 1.f, 300.f);
+            6000.f, 25.f, 130.f, 1.f, 300.f);
         Knight.SkillCooldown = 8.f;
 
         FLKUnitRow& Mage = Add("Hero_Mage", TEXT("法师"), ELKUnitClass::Hero, ELKAttackType::Ranged,
-            300.f, 20.f, 500.f, 1.3f, 280.f);
+            4200.f, 20.f, 500.f, 1.3f, 280.f);
         Mage.SkillCooldown = 6.f;
         Mage.bIsMage = true; // 旧查询兼容；施法范围仍由 Trait_MageSpellReach 决定。
 
         FLKUnitRow& Ranger = Add("Hero_Ranger", TEXT("游侠"), ELKUnitClass::Hero, ELKAttackType::Ranged,
-            350.f, 22.f, 400.f, 1.1f, 340.f);
+            4800.f, 22.f, 400.f, 1.1f, 340.f);
         Ranger.SkillCooldown = 5.f;
 
         Add("Unit_Swordsman", TEXT("剑士"), ELKUnitClass::Soldier, ELKAttackType::Melee,

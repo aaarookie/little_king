@@ -95,7 +95,7 @@ void ULKHomeListButtonWidget::SetupAction(int32 InIndex, const FLKHomePanelActio
     if (!bBuilt && WidgetTree && !WidgetTree->RootWidget) { BuildNativeTree(); }
     if (!Button) { return; }
     LabelText->SetText(Action.Label);
-    LabelText->SetAutoWrapText(false);
+    LabelText->SetAutoWrapText(true);
     LabelText->SetJustification(ETextJustify::Center);
     BadgeSize->SetVisibility(ESlateVisibility::Collapsed);
     ValueText->SetVisibility(ESlateVisibility::Collapsed);

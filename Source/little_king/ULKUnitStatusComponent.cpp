@@ -46,6 +46,55 @@ void ULKUnitStatusComponent::Empower(float Seconds, float Move, float Interval)
     EmpowerMove = FMath::IsFinite(Move) ? FMath::Max(1.f, Move) : 1.3f;
     EmpowerInterval = FMath::IsFinite(Interval) ? FMath::Clamp(Interval, .1f, 1.f) : .75f;
 }
+
+void ULKUnitStatusComponent::ApplyAreaSlow(FName SourceId, float MoveMultiplier, float AttackSpeedMultiplier, float Seconds)
+{
+    if (SourceId.IsNone() || !Unit() || !Unit()->IsAlive() || !Unit()->IsCombatEnabled()) { return; }
+    if (!FMath::IsFinite(MoveMultiplier) || MoveMultiplier <= 0.f) { return; }
+    if (!FMath::IsFinite(AttackSpeedMultiplier) || AttackSpeedMultiplier <= 0.f) { return; }
+    if (!FMath::IsFinite(Seconds) || Seconds <= 0.f) { return; }
+    FAreaSlowEntry& Entry = AreaSlowRemaining.FindOrAdd(SourceId);
+    // 多次刷新同一来源取"更慢"的一侧，避免帧率影响结果。
+    Entry.MoveMultiplier = Entry.Remaining > 0.f ? FMath::Min(Entry.MoveMultiplier, MoveMultiplier) : MoveMultiplier;
+    const float Interval = 1.f / AttackSpeedMultiplier;
+    Entry.IntervalMultiplier = Entry.Remaining > 0.f ? FMath::Max(Entry.IntervalMultiplier, Interval) : Interval;
+    Entry.Remaining = FMath::Max(Entry.Remaining, Seconds);
+}
+
+void ULKUnitStatusComponent::RemoveAreaSlow(FName SourceId)
+{
+    AreaSlowRemaining.Remove(SourceId);
+}
+
+void ULKUnitStatusComponent::TickAreaSlowRemaining(float DeltaSeconds)
+{
+    if (AreaSlowRemaining.IsEmpty()) { return; }
+    for (auto It = AreaSlowRemaining.CreateIterator(); It; ++It)
+    {
+        It.Value().Remaining -= DeltaSeconds;
+        if (It.Value().Remaining <= 0.f) { It.RemoveCurrent(); }
+    }
+}
+
+float ULKUnitStatusComponent::AreaSlowMoveMultiplier() const
+{
+    float Result = 1.f;
+    for (const TPair<FName, FAreaSlowEntry>& Pair : AreaSlowRemaining)
+    {
+        if (Pair.Value.Remaining > 0.f) { Result = FMath::Min(Result, Pair.Value.MoveMultiplier); }
+    }
+    return Result;
+}
+
+float ULKUnitStatusComponent::AreaSlowIntervalMultiplier() const
+{
+    float Result = 1.f;
+    for (const TPair<FName, FAreaSlowEntry>& Pair : AreaSlowRemaining)
+    {
+        if (Pair.Value.Remaining > 0.f) { Result = FMath::Max(Result, Pair.Value.IntervalMultiplier); }
+    }
+    return Result;
+}
 bool ULKUnitStatusComponent::BeginAttack()
 {
     if (!IsKing()) { return false; }
@@ -90,6 +139,7 @@ void ULKUnitStatusComponent::TickStatus(float DeltaSeconds)
     StunRemaining = FMath::Max(0.f, StunRemaining - DeltaSeconds);
     FreezeRemaining = FMath::Max(0.f, FreezeRemaining - DeltaSeconds);
     EmpowerRemaining = FMath::Max(0.f, EmpowerRemaining - DeltaSeconds);
+    TickAreaSlowRemaining(DeltaSeconds);
     if (!IsEmpowered()) { StunMeter = 0.f; }
     if (BurnStacks > 0)
     {
@@ -151,5 +201,7 @@ void ULKUnitStatusComponent::Clear()
 {
     StunRemaining = FreezeRemaining = StunMeter = EmpowerRemaining = BurnRemaining = BurnTick = 0.f;
     BurnStacks = AttackCount = 0; LastBreath = ELKBreathHead::None; BurnSource = FLKCombatSource(); BurnInstigator.Reset();
+    // 临时区域状态不写入远征存档：换房/死亡/控制清理时一并移除。
+    AreaSlowRemaining.Reset();
     SetWarriorSupport(false); bSpearSupport = false;
 }

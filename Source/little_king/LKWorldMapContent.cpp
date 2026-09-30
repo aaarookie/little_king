@@ -1,4 +1,6 @@
 #include "LKWorldMapContent.h"
+#include "LKResearchContent.h"
+#include "LKBalanceRules.h"
 #include "LKEncounterContent.h"
 
 namespace
@@ -41,7 +43,7 @@ FVector2D Position(const FLKWorldRegion &Region, int32 Layer, int32 Index, int32
         MaxX = FMath::Max(MaxX, P.X);
     }
     // 避开多边形尖角；窄端挤满节点会使放大视图也互相遮挡。
-    const double X = FMath::Lerp(MinX, MaxX, 0.14 + Layer * 0.145);
+    const double X = FMath::Lerp(MinX, MaxX, 0.14 + Layer * (0.72 / (LKWorldMapContent::LayersPerRegion-1)));
     double MinY = 1, MaxY = 0;
     for (int32 Edge = 0; Edge < Region.Polygon.Num(); ++Edge)
     {
@@ -106,7 +108,7 @@ const TArray<FLKWorldRegion> &LKWorldMapContent::Regions()
             }
             for (int32 N = 0; N < (Index == 4 ? 1 : 2); ++N)
             {
-                Region.ExitNodeIds.Add(NodeId(Index, 4, N));
+                Region.ExitNodeIds.Add(NodeId(Index, LayersPerRegion-1, N));
             }
             Result.Add(Region);
         }
@@ -151,9 +153,9 @@ FText LKWorldMapContent::NodeDescription(ELKDungeonNodeType Type)
     case ELKDungeonNodeType::Boss:
         return FText::FromString(TEXT("1 名 Boss、2 名英雄及佣兵，胜利获得 40 金币。"));
     case ELKDungeonNodeType::Market:
-        return FText::FromString(TEXT("使用远征金币交易的场所。商品后续加入，目前可查看钱包并离开。"));
+        return FText::FromString(TEXT("购买本轮临时佣兵；极少出现昂贵法术书或建筑图纸，终态带回家园研究。"));
     case ELKDungeonNodeType::Rest:
-        return FText::FromString(TEXT("全体英雄恢复 30% 最大生命。其他营地功能后续加入。"));
+        return FText::FromString(TEXT("选择全体英雄恢复 30% 最大生命，或升级一张法术／建筑的本轮数值 10%。"));
     default:
         return FText::FromString(TEXT("远征固定起点，选择沿箭头相连的下一站。"));
     }
@@ -175,24 +177,17 @@ bool LKWorldMapContent::Generate(FLKRunState &State, FString &OutError)
     State.WorldMapVersion = LayoutVersion;
     State.WorldRegions = Regions();
     State.Nodes.Reset();
+    // 难度按地理拓扑深度：d = 5 × 区域深度 + 层号；平行分支同深度同难度。
+    TMap<FName, int32> RegionDepths;
+    LKBalanceRules::ComputeRegionDepths(State.WorldRegions, RegionDepths);
     FRandomStream Stream(State.Seed);
     for (int32 R = 0; R < State.WorldRegions.Num(); ++R)
     {
         const FLKWorldRegion &Region = State.WorldRegions[R];
-        const int32 Target = Stream.RandRange(10, 20);
-        TArray<int32> Counts = {Region.EntryNodeIds.Num(), 2, 2, 2, Region.ExitNodeIds.Num()};
-        int32 Count = Counts[0] + 6 + Counts[4];
-        while (Count < Target)
-        {
-            const int32 Layer = Stream.RandRange(1, 3);
-            if (Counts[Layer] < (Layer == 3 ? 4 : 7))
-            {
-                ++Counts[Layer];
-                ++Count;
-            }
-        }
+        TArray<int32> Counts;
+        for (int32 L=0;L<LayersPerRegion;++L) { Counts.Add(L==0?Region.EntryNodeIds.Num():L==LayersPerRegion-1?Region.ExitNodeIds.Num():Stream.RandRange(2,3)); }
         TArray<TArray<int32>> Layers;
-        for (int32 Layer = 0; Layer < 5; ++Layer)
+        for (int32 Layer = 0; Layer < LayersPerRegion; ++Layer)
         {
             TArray<int32> Indices;
             for (int32 N = 0; N < Counts[Layer]; ++N)
@@ -202,22 +197,15 @@ bool LKWorldMapContent::Generate(FLKRunState &State, FString &OutError)
                 Node.RegionId = Region.RegionId;
                 Node.Layer = Layer;
                 Node.MapPosition =
-                    Position(Region, Layer, N, Counts[Layer], Layer == 0 || Layer == 4 ? nullptr : &Stream);
+                    Position(Region, Layer, N, Counts[Layer], Layer == 0 || Layer == LayersPerRegion-1 ? nullptr : &Stream);
                 const int32 Roll = Stream.RandRange(0, 99);
-                Node.Type = Roll < 48   ? ELKDungeonNodeType::Battle
-                            : Roll < 67 ? ELKDungeonNodeType::Elite
-                            : Roll < 83 ? ELKDungeonNodeType::Rest
-                                        : ELKDungeonNodeType::Market;
+                Node.Type = Roll<75?ELKDungeonNodeType::Battle:ELKDungeonNodeType::Elite;
                 // 每区域都具备市场和休息；入口/出口固定，内部类型与连线仍由远征种子决定。
-                if (Layer == 1 && N == 0)
+                if (Layer == 5 || Layer==10)
                 {
                     Node.Type = ELKDungeonNodeType::Market;
                 }
-                if (Layer == 1 && N == 1)
-                {
-                    Node.Type = ELKDungeonNodeType::Battle;
-                }
-                if (Layer == 2 && N == 0)
+                if (Layer == 3 || Layer==8 || Layer==12)
                 {
                     Node.Type = ELKDungeonNodeType::Rest;
                 }
@@ -225,7 +213,7 @@ bool LKWorldMapContent::Generate(FLKRunState &State, FString &OutError)
                 {
                     Node.Type = ELKDungeonNodeType::Battle;
                 }
-                if (Layer == 4)
+                if (Layer == LayersPerRegion-1)
                 {
                     Node.Type = R == 4 ? ELKDungeonNodeType::Boss : ELKDungeonNodeType::Elite;
                 }
@@ -247,13 +235,17 @@ bool LKWorldMapContent::Generate(FLKRunState &State, FString &OutError)
                     {
                         return false;
                     }
+                    // 遭遇快照写入本节点的地理深度与倍率；战斗只消费快照，不重算。
+                    const int32 Depth = LKBalanceRules::NodeDepth(RegionDepths.FindRef(Region.RegionId),FMath::RoundToInt(float(Layer)*4.f/float(LayersPerRegion-1)));
+                    LKBalanceRules::ApplySnapshot(Dynamic, Depth);
                     State.Encounters.Add(Dynamic);
                 }
+                LKResearchContent::GenerateMarket(Node,State.Seed,RegionDepths.FindRef(Region.RegionId));
                 Indices.Add(State.Nodes.Add(Node));
             }
             Layers.Add(Indices);
         }
-        for (int32 Layer = 0; Layer < 4; ++Layer)
+        for (int32 Layer = 0; Layer < LayersPerRegion-1; ++Layer)
         {
             const TArray<int32> &From = Layers[Layer];
             const TArray<int32> &To = Layers[Layer + 1];
@@ -318,7 +310,7 @@ bool LKWorldMapContent::Contains(const FLKWorldRegion &Region, FVector2D Point)
 }
 bool LKWorldMapContent::Validate(const FLKRunState &State, FString &OutError)
 {
-    if (State.WorldMapVersion != LayoutVersion || State.WorldRegions.Num() != 5)
+    if ((State.WorldMapVersion != 1 && State.WorldMapVersion != LayoutVersion) || State.WorldRegions.Num() != 5)
     {
         OutError = TEXT("世界版图版本或区域数量无效");
         return false;
@@ -339,7 +331,7 @@ bool LKWorldMapContent::Validate(const FLKRunState &State, FString &OutError)
     for (int32 I = 0; I < State.Nodes.Num(); ++I)
     {
         const FLKDungeonNode &Node = State.Nodes[I];
-        if (Node.Layer < 0 || Node.Layer > 4 ||
+        if (Node.Layer < 0 || Node.Layer > (State.WorldMapVersion==1?4:LayersPerRegion-1) ||
             (!IsCombat(Node.Type) && Node.Type != ELKDungeonNodeType::Market && Node.Type != ELKDungeonNodeType::Rest &&
              !(Node.Type == ELKDungeonNodeType::Event && Node.NodeId == StartNodeId())))
         {
@@ -372,9 +364,9 @@ bool LKWorldMapContent::Validate(const FLKRunState &State, FString &OutError)
         {
             Count += Node.RegionId == Region.RegionId ? 1 : 0;
         }
-        if (Count < 10 || Count > 20)
+        if (Count < (State.WorldMapVersion==1?10:15) || Count > (State.WorldMapVersion==1?20:45))
         {
-            OutError = TEXT("区域节点数量超出 10～20");
+            OutError = TEXT("区域节点数量超出当前版图限制");
             return false;
         }
         for (FName Id : Region.EntryNodeIds)
@@ -389,7 +381,7 @@ bool LKWorldMapContent::Validate(const FLKRunState &State, FString &OutError)
         for (FName Id : Region.ExitNodeIds)
         {
             if (!Index.Contains(Id) || State.Nodes[Index[Id]].RegionId != Region.RegionId ||
-                State.Nodes[Index[Id]].Layer != 4)
+                State.Nodes[Index[Id]].Layer != (State.WorldMapVersion==1?4:LayersPerRegion-1))
             {
                 OutError = TEXT("区域出口无效");
                 return false;

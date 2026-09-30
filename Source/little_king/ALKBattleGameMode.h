@@ -21,6 +21,7 @@ class ALKUnitHero;
 class USoundBase;
 class UDataTable;
 class ULKRunSubsystem;
+class ALKSkeletonCircle;
 struct FLKUnitRow;
 
 /**
@@ -35,6 +36,7 @@ class ALKBattleGameMode : public AGameModeBase
 	friend struct FLKD0TestAccess;
 	friend struct FLKD1TestAccess;
 	friend struct FLKD2TestAccess;
+	friend struct FLKBalanceTestAccess;
 
 public:
 	ALKBattleGameMode();
@@ -70,6 +72,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LK|Home") FName GetHomeMapName() const;
 	/** 保存奖励/路线安全点或终态，然后返回家园；失败留在当前界面。 */
 	UFUNCTION(BlueprintCallable, Category = "LK|Home") bool ReturnToHome();
+	UFUNCTION(BlueprintCallable, Category = "LK|Run") bool AbandonToHome();
+	UFUNCTION(BlueprintCallable, Category = "LK|Run") bool ExitToStartMenu();
 
 	// ---------- D3 房间胜利奖励（三选一/跳过；经 RunSubsystem 原子落地） ----------
 	/** 是否存在待领取的奖励批次（有奖励时"下一关"不可点，必须先选或跳过） */
@@ -111,7 +115,9 @@ public:
 	void BeginCombatBatch() { ++CombatBatchDepth; }
 	void EndCombatBatch();
 	void RecordCombatEvent(const FLKCombatEvent& Event);
-    void NotifyFireballCast(const FVector& Location, float Radius = 250.f, bool bPresent = true);
+    float GetCardUpgradeScale(FName CardId, ELKTeam Team=ELKTeam::Player) const;
+	int32 GetCardUpgradeLevel(FName CardId) const;
+	void NotifyFireballCast(const FVector& Location, float Radius = 250.f, bool bPresent = true);
 	FRandomStream& GetBattleRandom() const { return BattleRandom; }
 	USoundBase* FindPreloadedSound(FName Id) const;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLKCombatEvent, const FLKCombatEvent&, Event);
@@ -161,6 +167,23 @@ public:
 	// ---------- 单位 ----------
 	/** SourceCardId：玩家出牌生成单位时的来源卡（D3 卡升级放大依据）；波次/兵营/部署/召唤不传 */
 	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier, FName SourceCardId = NAME_None);
+	/**
+	 * 在 Preferred 周围 SearchRadius 内均匀采样圆盘，返回一个不越界、不与任何存活实体/营地/建筑重叠的空位。
+	 * 法阵召唤与波次落点共用；采样用调用方提供的确定性随机流，不使用全局随机。
+	 */
+	bool FindFreeSpawnLocation(const FVector& Preferred, float SearchRadius, FVector& OutLocation,
+		FRandomStream& Stream, int32 MaxAttempts = 12) const;
+	/** 某点是否可落单位（场地内 + 不与存活实体/营地重叠）。 */
+	bool IsSpawnPointFree(const FVector& Location, float BodyRadius) const;
+
+	// ---------- 敌方战术法术（独立通道，不影响玩家半场施法规则） ----------
+	/** 按 CardId 驱动统一校验（阵营=敌方专属、区域召唤、余额、场地、活动上限）并扣费生成法阵。 */
+	ALKSkeletonCircle* CastEnemyTacticalSpell(FName CardId, const FVector& Location);
+	UFUNCTION(BlueprintPure, Category = "LK|Battle") int32 GetActiveTacticalCircleCount() const;
+	/** 结束战斗/换房时清空全部法阵（同时解除区域减速）。 */
+	void ClearTacticalSpells();
+	/** 区域内敌对单位数量（法阵落点评估用，只统计玩家侧可战斗目标）。 */
+	int32 CountTargetsInRadius(ELKTeam CasterTeam, const FVector& Location, float Radius) const;
 	const FLKUnitRow* GetUnitRow(FName UnitId) const;
 	UFUNCTION(BlueprintPure, Category = "LK|Battle")
 	ULKCardDefinition* FindCard(FName CardId) const;
@@ -232,6 +255,8 @@ protected:
 	bool bProcessingDefeats = false;
 	bool bEnemyUsesCards = true;
 	UPROPERTY(Transient) TArray<TObjectPtr<ALKUnitBase>> PendingDefeats;
+	UPROPERTY(Transient) TArray<TObjectPtr<ALKSkeletonCircle>> ActiveSkeletonCircles;
+	uint32 TacticalSpellSerial = 0;
 	UPROPERTY(Transient) TArray<FName> EnemyHeroIds;
 	UPROPERTY(Transient) FLKEncounterRow CurrentEncounter;
 	UPROPERTY(Transient) FLKBattleContext BattleContext;

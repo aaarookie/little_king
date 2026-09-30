@@ -5,6 +5,7 @@
 
 #include "LKHomeContent.h"
 #include "LKCardRules.h"
+#include "LKResearchContent.h"
 #include "LKLog.h"
 #include "ULKGameData.h"
 #include "ULKProfileSaveGame.h"
@@ -35,8 +36,8 @@ namespace
 	{
 		if (Loadout.HeroIds.Num() != 3) { OutError = TEXT("英雄数量不是 3"); return false; }
 		if (Loadout.HeroIds.Contains(NAME_None)) { OutError = TEXT("英雄含空 ID"); return false; }
-		if (Loadout.CardIds.Num() < LKHomeContent::MinStartingDeck()
-			|| LKCardRules::Used(Loadout.CardIds) > LKCardRules::Capacity)
+		if (Loadout.CardIds.Num() < LKCardRules::MinimumCards
+			|| LKCardRules::Used(Loadout.CardIds) > 64)
 		{ OutError = TEXT("初始牌组至少 5 种卡，部队容量不超过 8 格"); return false; }
 		if (Loadout.CardIds.Contains(NAME_None)) { OutError = TEXT("卡牌含空 ID"); return false; }
 		TSet<FName> Heroes;
@@ -97,7 +98,7 @@ bool ULKProfileSubsystem::TouchSelectedProfile()
 FLKProfileState ULKProfileSubsystem::MakeDefaultProfile()
 {
 	FLKProfileState Profile;
-	Profile.SchemaVersion = 1;
+	Profile.SchemaVersion = 2;
 	Profile.ProfileId = FGuid::NewGuid();
 	Profile.Revision = 0;
 	Profile.Gold = 0;
@@ -116,7 +117,7 @@ FLKProfileState ULKProfileSubsystem::MakeDefaultProfile()
 bool ULKProfileSubsystem::ValidateProfile(const FLKProfileState& Profile, FString& OutError)
 {
 	OutError.Reset();
-	if (Profile.SchemaVersion < 1 || Profile.SchemaVersion > 1)
+	if (Profile.SchemaVersion < 1 || Profile.SchemaVersion > 2)
 	{
 		OutError = FString::Printf(TEXT("永久档结构版本 %d 不受支持"), Profile.SchemaVersion);
 		return false;
@@ -124,6 +125,7 @@ bool ULKProfileSubsystem::ValidateProfile(const FLKProfileState& Profile, FStrin
 	if (!Profile.ProfileId.IsValid()) { OutError = TEXT("ProfileId 无效"); return false; }
 	if (Profile.Revision < 0) { OutError = TEXT("Revision 非法"); return false; }
 	if (Profile.Gold < 0) { OutError = TEXT("金币为负"); return false; }
+	if (!LKResearchContent::ValidateMaterials(Profile.ResearchMaterials)) { OutError=TEXT("研究材料无效"); return false; }
 	if (Profile.FundedRunGold < 0 || (!Profile.FundedRunId.IsValid() && Profile.FundedRunGold != 0)) { OutError = TEXT("出发资金凭据无效"); return false; }
 	if (Profile.UnlockedHeroIds.IsEmpty() || Profile.UnlockedCardIds.IsEmpty() || Profile.UnlockedRegionIds.IsEmpty())
 	{
@@ -197,6 +199,7 @@ bool ULKProfileSubsystem::CommitProfile(FLKProfileState Candidate)
 		UE_LOG(LogLK, Warning, TEXT("[Home] %s"), *LastError);
 		return false;
 	}
+	Candidate.SchemaVersion=2;
 	++Candidate.Revision;
 	if (!IsProfilePersistenceAllowed())
 	{
@@ -231,7 +234,10 @@ bool ULKProfileSubsystem::CommitProfile(FLKProfileState Candidate)
 	if (!ReadBack || !ValidateProfile(ReadBack->Profile, ReadError)
 		|| ReadBack->Profile.Revision != Candidate.Revision
 		|| ReadBack->Profile.ProfileId != Candidate.ProfileId
-		|| ReadBack->Profile.Gold != Candidate.Gold)
+		|| ReadBack->Profile.Gold != Candidate.Gold
+        || ReadBack->Profile.UnlockedCardIds!=Candidate.UnlockedCardIds
+        || !ReadBack->Profile.ResearchMaterials.OrderIndependentCompareEqual(Candidate.ResearchMaterials)
+        || ReadBack->Profile.ProcessedSettlementIds!=Candidate.ProcessedSettlementIds)
 	{
 		LastError = FString::Printf(TEXT("永久档读回校验失败（槽 %s）：本次操作未生效"), *Slot);
 		UE_LOG(LogLK, Warning, TEXT("[Home] %s"), *LastError);
@@ -363,7 +369,10 @@ ELKUpgradeResult ULKProfileSubsystem::UpgradeBuilding(FName BuildingId, int32 Ex
 ELKLoadoutResult ULKProfileSubsystem::ValidateLoadout(const FLKExpeditionLoadout& Loadout, const ULKGameData* Data) const
 {
 	FString Error;
-	return LKHomeContent::ValidateLoadout(Loadout, Data, Error);
+	const auto Result=LKHomeContent::ValidateLoadout(Loadout, Data, Error);
+	if (Result!=ELKLoadoutResult::Success) { return Result; }
+	for (FName Id:Loadout.CardIds) { if (!IsCardUnlocked(Id)) { return ELKLoadoutResult::LockedCard; } }
+	return ELKLoadoutResult::Success;
 }
 
 ELKLoadoutResult ULKProfileSubsystem::SaveLoadout(const FLKExpeditionLoadout& Loadout, const ULKGameData* Data)
@@ -380,6 +389,7 @@ ELKLoadoutResult ULKProfileSubsystem::SaveLoadout(const FLKExpeditionLoadout& Lo
 
 	FLKProfileState Candidate = State;
 	Candidate.SavedLoadout = Loadout;
+    for (FName Id:Loadout.CardIds) { if (!IsCardUnlocked(Id)) { return ELKLoadoutResult::LockedCard; } }
 	if (!CommitProfile(MoveTemp(Candidate))) { return ELKLoadoutResult::SaveFailed; }
 	UE_LOG(LogLK, Log, TEXT("[Home] 战备已保存：英雄 %d 名、初始牌组 %d 张"), State.SavedLoadout.HeroIds.Num(), State.SavedLoadout.CardIds.Num());
 	OnProfileChanged.Broadcast();
@@ -403,11 +413,28 @@ ELKSettlementResult ULKProfileSubsystem::ApplySettlement(const FLKSettlementRece
 	Candidate.Gold = int32(FMath::Min<int64>(MAX_int32, int64(Candidate.Gold) + Receipt.GoldAmount));
 	if (Candidate.FundedRunId == Receipt.RunId) { Candidate.FundedRunId.Invalidate(); Candidate.FundedRunGold = 0; }
 	Candidate.ProcessedSettlementIds.Add(Receipt.SettlementId);
+    if (!LKResearchContent::ValidateMaterials(Receipt.ResearchMaterials)) { return ELKSettlementResult::IdentityMismatch; }
+    for (const auto& P:Receipt.ResearchMaterials)
+    { const int64 Count=int64(Candidate.ResearchMaterials.FindRef(P.Key))+P.Value; if (Count>10000) { return ELKSettlementResult::IdentityMismatch; } Candidate.ResearchMaterials.Add(P.Key,int32(Count)); }
 	if (!CommitProfile(MoveTemp(Candidate))) { return ELKSettlementResult::SaveFailed; }
 	UE_LOG(LogLK, Log, TEXT("[Home] 远征结算入账：+%d 金币（结算 %s，终态 %d，余额 %d）"),
 		Receipt.GoldAmount, *Receipt.SettlementId.ToString(), int32(Receipt.TerminalPhase), State.Gold);
 	OnProfileChanged.Broadcast();
 	return ELKSettlementResult::Success;
+}
+
+bool ULKProfileSubsystem::ResearchCard(FName Id,FString& Error)
+{
+    Error.Reset();
+    if (!EnsureProfile() || !bProfileUsable || !LKResearchContent::Find(Id)) { Error=TEXT("研究不可用"); return false; }
+    if (IsCardUnlocked(Id)) { Error=TEXT("已经解锁，无需重复研究"); return false; }
+    if (State.ResearchMaterials.FindRef(Id)<1) { Error=TEXT("缺少对应法术书或建筑图纸"); return false; }
+    FLKProfileState Candidate=State;
+    const int32 Left=Candidate.ResearchMaterials.FindRef(Id)-1;
+    if (Left>0) { Candidate.ResearchMaterials.Add(Id,Left); } else { Candidate.ResearchMaterials.Remove(Id); }
+    Candidate.UnlockedCardIds.AddUnique(Id); Candidate.SchemaVersion=2;
+    if (!CommitProfile(MoveTemp(Candidate))) { Error=TEXT("研究保存失败，材料未消耗"); return false; }
+    OnProfileChanged.Broadcast(); return true;
 }
 
 int32 ULKProfileSubsystem::GetDepartureGoldCap() const

@@ -99,7 +99,7 @@ bool StartRun(ULKRunSubsystem* Run, int32 CardCount = 7)
         FLKRunHeroState Hero; Hero.HeroId = Id; Hero.Health = Hero.MaxHealth = Hero.BaseMaxHealth = LKUnitContent::Find(Id)->BaseHealth; Heroes.Add(Hero);
     }
     TArray<FLKRunCardState> Cards;
-    TArray<FName> Ids = LKHomeContent::DefaultUnlockedCards(); Ids.Add("Unit_Skeleton"); Ids.Add("Unit_SkeletonArcher");
+    TArray<FName> Ids = LKHomeContent::DefaultUnlockedCards(); Ids.Add("Unit_GoblinBlade"); Ids.Add("Unit_ElfGuard");
     for (int32 I = 0; I < CardCount; ++I) { FLKRunCardState Card; Card.CardId = Ids[I]; Cards.Add(Card); }
     return Run->StartNewRun(Heroes, Cards, 815);
 }
@@ -118,7 +118,7 @@ bool FLKTrollCatalogTest::RunTest(const FString& Parameters)
 {
     ULKGameData* Data = NewObject<ULKGameData>(); Data->EnsureDefaultDecks(); Data->EnsureCardLibrary();
     TestEqual(TEXT("Native unit count"), LKUnitContent::Units().Num(), 28);
-    TestEqual(TEXT("Full card count"), Data->CardLibrary.Num(), 24);
+    TestEqual(TEXT("Full card count (adds the enemy-only skeleton circle)"), Data->CardLibrary.Num(), 32);
     TestEqual(TEXT("Four troll cards cost two slots"), LKCardRules::Slots("Unit_TrollKing"), 2);
     TestEqual(TEXT("Colossus costs three slots"), LKCardRules::Slots("Unit_Colossus"), 3);
     TestEqual(TEXT("Spell costs one slot"), LKCardRules::Slots("Spell_Fireball"), 1);
@@ -127,7 +127,7 @@ bool FLKTrollCatalogTest::RunTest(const FString& Parameters)
     {
         const auto* Found = Data->CardLibrary.FindByPredicate([Id](const TObjectPtr<ULKCardDefinition>& C){ return C && C->CardId == Id; });
         if (!TestNotNull(TEXT("New card injected without asset"), Found)) { return false; }
-        TestTrue(TEXT("New card remains expedition-only"), (*Found)->bExpeditionOnly);
+        TestEqual(TEXT("Mercenaries temporary; catapult research permanent"), (*Found)->bExpeditionOnly, Id!=FName("Building_SiegeCatapult"));
         TestTrue(TEXT("UI explicitly displays deck slots"), LKCardPresentation::Detail(**Found).ToString().Contains(TEXT("部队占格")));
     }
     const auto* Catapult = Data->CardLibrary.FindByPredicate([](const TObjectPtr<ULKCardDefinition>& C){return C && C->CardId == "Building_SiegeCatapult";});
@@ -379,7 +379,7 @@ bool FLKTrollWeightedUITest::RunTest(const FString& Parameters)
     Render(TEXT("WeightedHand"),1280,720,HUDSlate);
     GM->ForceEndMatch(ELKTeam::Player);
     ULKRunSaveGame* Save=NewObject<ULKRunSaveGame>();Save->SaveVersion=1;Save->RunState=Run->GetRunState();
-    Save->RunState.PendingRewardOffers={NewCard("Unit_Colossus"),NewCard("Unit_TrollMage"),NewCard("Building_SiegeCatapult")};
+    Save->RunState.PendingRewardOffers={NewCard("Unit_Colossus"),NewCard("Unit_TrollMage"),NewCard("Unit_TrollWarrior")};
     TestTrue(TEXT("Save controlled candidate batch"),UGameplayStatics::SaveGameToSlot(Save,SlotName,0));
     if(!Run->LoadExpeditionFromSlot(SlotName,true)){return false;}
     ULKRunRewardWidget* Reward=CreateWidget<ULKRunRewardWidget>(World.GetTestWorld());
@@ -416,7 +416,7 @@ bool FLKTrollWeightedUITest::RunTest(const FString& Parameters)
     const auto Cards=Run->GetRunState().Cards;
     TestTrue(TEXT("Weighted deck reloads"),Run->LoadExpeditionFromSlot(SlotName,true));
     TestEqual(TEXT("Weighted capacity restored"),Run->GetDeckCapacityUsed(),8);
-    TestEqual(TEXT("Schema eight stored"),Run->GetRunState().SchemaVersion,8);
+    TestEqual(TEXT("Current schema stored"),Run->GetRunState().SchemaVersion,ULKRunSubsystem::CurrentSchemaVersion);
     UGameplayStatics::DeleteGameInSlot(SlotName,0);
     return true;
 }

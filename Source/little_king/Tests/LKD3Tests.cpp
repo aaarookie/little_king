@@ -4,6 +4,7 @@
 
 #include "Engine/GameInstance.h"
 
+#include "../LKCardRules.h"
 #include "../LKEncounterContent.h"
 #include "../LKRunTypes.h"
 #include "../ULKRunSubsystem.h"
@@ -93,18 +94,19 @@ bool FLKD3RewardStateMachineTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Room one victory accepted"), Run->SubmitBattleOutcome(MakeWinOutcome(Room1)));
 
 	// 房1 胜利后进入 ChoosingNode：提交奖励批次（升级×2 + 新卡）。
+	// 新卡用合法奖励卡（精灵弓箭手）；骷髅卡是敌方专属，只能被拒绝（见下方断言）。
 	TArray<FLKRunRewardOffer> Offers;
 	Offers.Add(Upgrade(TEXT("Unit_Swordsman"), 0));
-	Offers.Add(AddCard(TEXT("Unit_Skeleton")));
+	Offers.Add(AddCard(TEXT("Unit_ElfArcher")));
 	Offers.Add(Upgrade(TEXT("Unit_Archer"), 0));
 	TestFalse(TEXT("Offer requires non-empty and ≤3 candidates"), Run->OfferRewardBatch({}));
 	TestFalse(TEXT("Offer rejects overlong batch"), Run->OfferRewardBatch({
 		Upgrade(TEXT("Unit_Swordsman"), 0), Upgrade(TEXT("Unit_Archer"), 0),
-		Upgrade(TEXT("Unit_Shieldbearer"), 0), AddCard(TEXT("Unit_Skeleton")) }));
+		Upgrade(TEXT("Unit_Shieldbearer"), 0), AddCard(TEXT("Unit_ElfArcher")) }));
 	TestTrue(TEXT("Valid batch is offered"), Run->OfferRewardBatch(Offers));
 	TestTrue(TEXT("Pending reward choice is visible"), Run->HasPendingRewardChoice());
 	TestEqual(TEXT("Three candidates are readable"), Run->GetPendingRewardCount(), 3);
-	TestEqual(TEXT("Second candidate is the skeleton card"), Run->GetPendingRewardOffer(1).Kind, ELKRunRewardKind::AddCard);
+	TestEqual(TEXT("Second candidate is the add-card offer"), Run->GetPendingRewardOffer(1).Kind, ELKRunRewardKind::AddCard);
 	TestFalse(TEXT("Cannot advance while reward is pending"), Run->CanAdvance());
 	TestFalse(TEXT("Cannot claim out-of-range option"), Run->ChooseReward(3));
 	TestTrue(TEXT("First skip succeeds"), Run->SkipReward());
@@ -135,6 +137,18 @@ bool FLKD3RewardStateMachineTest::RunTest(const FString& Parameters)
 		[](const FLKRunCardState& Card) { return Card.CardId == "Unit_Skeleton"; });
 	TestTrue(TEXT("Upgraded card level crosses rooms"), Swordsman && Swordsman->UpgradeLevel == 1);
 	TestFalse(TEXT("Skipped card was not added"), Skeleton != nullptr);
+
+	// Enemy-only cards are rejected before publishing a batch, leaving the route usable.
+	TestTrue(TEXT("Room three victory accepted"), Run->SubmitBattleOutcome(MakeWinOutcome(Room3)));
+	TArray<FLKRunRewardOffer> EnemyOnlyOffer;
+	EnemyOnlyOffer.Add(AddCard(TEXT("Unit_Skeleton")));
+	TestFalse(TEXT("State layer rejects an enemy-only batch"), Run->OfferRewardBatch(EnemyOnlyOffer));
+	TestFalse(TEXT("Enemy-only skeleton cannot be claimed as a reward"), Run->ChooseReward(0));
+	TestFalse(TEXT("Rejected batch does not block navigation"), Run->HasPendingRewardChoice());
+	TestTrue(TEXT("Deck never contains the enemy-only skeleton"), !Run->GetRunState().Cards.ContainsByPredicate(
+		[](const FLKRunCardState& Card) { return Card.CardId == "Unit_Skeleton"; }));
+	TestFalse(TEXT("Enemy-only skeleton archer is rejected too"), LKCardRules::IsPlayerObtainable("Unit_SkeletonArcher"));
+	TestFalse(TEXT("Enemy-only skeleton circle is rejected too"), LKCardRules::IsPlayerObtainable("Spell_SkeletonCircle"));
 	return true;
 }
 
@@ -154,12 +168,12 @@ bool FLKD3RewardDefenseTest::RunTest(const FString& Parameters)
 	FLKBattleContext Battle;
 	TestTrue(TEXT("Battle context begins"), Run->BeginCurrentBattle(Battle));
 	TArray<FLKRunRewardOffer> InBattleOffers;
-	InBattleOffers.Add(AddCard(TEXT("Unit_Skeleton")));
+	InBattleOffers.Add(AddCard(TEXT("Unit_ElfArcher")));
 	TestFalse(TEXT("Offer rejected while in battle"), Run->OfferRewardBatch(InBattleOffers));
 
 	TestTrue(TEXT("Victory accepted"), Run->SubmitBattleOutcome(MakeWinOutcome(Battle)));
 	TestTrue(TEXT("Add-card batch offered"), Run->OfferRewardBatch(InBattleOffers));
-	TestTrue(TEXT("Skeleton card claimed once"), Run->ChooseReward(0));
+	TestTrue(TEXT("Legal add-card claimed once"), Run->ChooseReward(0));
 
 	// 已持有卡的 AddCard 候选：生成层不会产出，防御层仍拒绝（不产生重复副本）。
 	TestTrue(TEXT("Room two starts"), Run->AdvanceToNextBattle());
@@ -167,7 +181,7 @@ bool FLKD3RewardDefenseTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Room two begins"), Run->BeginCurrentBattle(Room2));
 	TestTrue(TEXT("Room two victory accepted"), Run->SubmitBattleOutcome(MakeWinOutcome(Room2)));
 	TArray<FLKRunRewardOffer> DuplicateOffer;
-	DuplicateOffer.Add(AddCard(TEXT("Unit_Skeleton"))); // 已持有 → 领取必须失败
+	DuplicateOffer.Add(AddCard(TEXT("Unit_ElfArcher"))); // 已持有 → 领取必须失败
 	TestTrue(TEXT("Duplicate-card batch still offered by state layer"), Run->OfferRewardBatch(DuplicateOffer));
 	TestFalse(TEXT("Duplicate add-card claim is rejected"), Run->ChooseReward(0));
 	TestTrue(TEXT("Player can still skip after rejection"), Run->SkipReward() && Run->CanAdvance());

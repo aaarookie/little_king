@@ -1,4 +1,5 @@
 #include "ALKOpponentBrain.h"
+#include "EngineUtils.h"
 
 #include "Engine/DataTable.h"
 
@@ -10,7 +11,6 @@
 #include "ULKDeckState.h"
 #include "ULKGameData.h"
 #include "ULKSilverComponent.h"
-
 ALKOpponentBrain::ALKOpponentBrain()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -67,6 +67,8 @@ void ALKOpponentBrain::LoadWaves()
 {
 	Waves.Reset();
 	WaveIndex = 0;
+	PendingReinforcements.Reset();
+	DroppedReinforcements = 0;
 
 	if (GameData && !GameData->WaveTable.IsNull())
 	{
@@ -103,11 +105,30 @@ void ALKOpponentBrain::LoadWaves()
 	};
 }
 
+void ALKOpponentBrain::ResetBattleState()
+{
+	Waves.Reset();
+	WaveIndex = 0;
+	PendingReinforcements.Reset();
+	PendingFocusTarget.Reset();
+	FocusWarningTimer = 0.f;
+	bReserving = false;
+	ReserveRemaining = 0.f;
+	PushRemainingCards = 0;
+	SpellCheckTimer = 0.f;
+	SpellCooldownRemaining = 0.f;
+}
+
 void ALKOpponentBrain::SetScriptedWaves(const TArray<FLKWaveEntry>& InWaves)
 {
     Waves = InWaves;
     Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
 	WaveIndex = 0; bCanPlayCards = false;
+	PendingReinforcements.Reset();
+	// 脚本波次夹具不启用战术法术：避免给旧的固定节奏测试引入额外敌人。
+	SpellSettings.bEnabled = false;
+	SpellCheckTimer = 0.f;
+	SpellCooldownRemaining = 0.f;
     PendingFocusTarget.Reset(); FocusWarningTimer = 0.f;
 }
 
@@ -117,6 +138,8 @@ bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
 	Waves = Encounter.Waves;
 	Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
 	WaveIndex = 0;
+	PendingReinforcements.Reset();
+	DroppedReinforcements = 0;
 	bCanPlayCards = Encounter.bEnemyUsesCards;
 	AISettings = Encounter.AI;
 	PendingFocusTarget.Reset();
@@ -125,6 +148,12 @@ bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
 	ReserveRemaining = 0.f;
 	PushRemainingCards = 0;
 	ThinkTimer = 0.f;
+	// 战术法术通道：独立于波次与牌组，共用敌方银币组件。
+	SpellSettings = Encounter.EnemySpell;
+	SpellFirstCastAt = SpellSettings.FirstCastTime;
+	SpellCheckTimer = 0.f;
+	SpellCooldownRemaining = 0.f;
+	TacticalSpellCasts = 0;
 	Silver->Init(Encounter.EnemySilverPerSecond, Encounter.EnemySilverCap);
 	Silver->AddSilver(Encounter.EnemyStartingSilver);
 	if (bCanPlayCards && !Deck->InitDeck(Encounter.EnemyCards, GameData->HandSize, GameData->BattleSeed + 2))
@@ -136,9 +165,11 @@ bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
 	FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
 	CounterTimer = AISettings.CounterCheckInterval;
 	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
-	UE_LOG(LogLKBattle, Log, TEXT("[Encounter] AI %s：波次%d 出牌=%d 集火=%d 反制=%d 爆发=%d 奖励档=%d"),
+	UE_LOG(LogLKBattle, Log, TEXT("[Encounter] AI %s：波次%d 出牌=%d 集火=%d 反制=%d 爆发=%d 奖励档=%d 战术法术=%d(%s 冷却%.0f 首放%.0f 停%.0f)"),
 		*Encounter.EncounterId.ToString(), Waves.Num(), int32(bCanPlayCards), int32(AISettings.bEnableFocus),
-		int32(AISettings.bEnableCounter), int32(AISettings.bEnablePush), Encounter.RewardTier);
+		int32(AISettings.bEnableCounter), int32(AISettings.bEnablePush), Encounter.RewardTier,
+		int32(SpellSettings.bEnabled), *SpellSettings.SpellId.ToString(), SpellSettings.Cooldown,
+		SpellSettings.FirstCastTime, SpellSettings.StopTime);
 	return true;
 }
 
@@ -155,8 +186,11 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 	}
 
 	if (bCanPlayCards) { Silver->TickSilver(DeltaTime); }
+	// 战术法术经济独立于出牌：即使 bEnemyUsesCards=false 也照常产银币并施放。
+	else if (SpellSettings.bEnabled) { Silver->TickSilver(DeltaTime); }
 
 	ProcessWaves(BattleElapsed);
+	TickTacticalSpell(DeltaTime, BattleElapsed);
 	// 波次、集火和出牌是独立开关；无牌遭遇仍可拥有精英/首领集火节奏。
     if (bReserving) { ReserveRemaining -= DeltaTime; }
     if (FocusWarningTimer > 0.f)
@@ -208,20 +242,120 @@ void ALKOpponentBrain::ProcessWaves(float BattleElapsed)
 	while (WaveIndex < Waves.Num() && Waves[WaveIndex].Time <= BattleElapsed)
 	{
 		const FLKWaveEntry& Entry = Waves[WaveIndex];
-		for (int32 i = 0; i < Entry.Count; ++i)
-		{
-			const float HalfW = GameData->FieldHalfWidth;
-			const float HalfH = GameData->FieldHalfHeight;
-			// 敌方右半侧（Y>0），前中场位置
-			const FVector Loc(
-				GameMode->GetBattleRandom().FRandRange(-0.8f, 0.8f) * HalfW,
-				GameMode->GetBattleRandom().FRandRange(0.15f, 0.45f) * HalfH,
-				0.f);
-			GameMode->SpawnUnitForTeam(Entry.UnitId, ELKTeam::Enemy, Loc);
-		}
+		QueueReinforcement(Entry.UnitId, Entry.Count, Entry.Time);
 		UE_LOG(LogLKBattle, Log, TEXT("[Brain] 波次触发 t=%.0f: %s x%d"), Entry.Time, *Entry.UnitId.ToString(), Entry.Count);
 		++WaveIndex;
 	}
+
+	// 有限重试：满员/落点失败最多延后 3 秒；过期丢弃并计数，不累计到腾空后瞬间爆发。
+	for (int32 Index = PendingReinforcements.Num() - 1; Index >= 0; --Index)
+	{
+		FPendingReinforcement& Pending = PendingReinforcements[Index];
+		if (BattleElapsed > Pending.Deadline)
+		{
+			DroppedReinforcements += Pending.Remaining;
+			UE_LOG(LogLKBattle, Log, TEXT("[Brain] 增援 %s x%d 超过延后窗口丢弃（累计丢弃 %d）"),
+				*Pending.UnitId.ToString(), Pending.Remaining, DroppedReinforcements);
+			PendingReinforcements.RemoveAt(Index);
+			continue;
+		}
+		while (Pending.Remaining > 0)
+		{
+			if (GameData->MaxUnitsPerTeam > 0 && GameMode->CountAliveUnits(ELKTeam::Enemy) >= GameData->MaxUnitsPerTeam) { break; }
+			const float HalfW = GameData->FieldHalfWidth;
+			const float HalfH = GameData->FieldHalfHeight;
+			const FVector Preferred(
+				GameMode->GetBattleRandom().FRandRange(-0.8f, 0.8f) * HalfW,
+				GameMode->GetBattleRandom().FRandRange(0.15f, 0.45f) * HalfH,
+				0.f);
+			FVector Location = Preferred;
+			if (!GameMode->FindFreeSpawnLocation(Preferred, GameData->UnitBodyRadius * 4.f, Location,
+				GameMode->GetBattleRandom(), 12))
+			{
+				break; // 场上没有合法落点，保留剩余数量等下一帧或过期丢弃。
+			}
+			if (!GameMode->SpawnUnitForTeam(Pending.UnitId, ELKTeam::Enemy, Location)) { break; }
+			--Pending.Remaining;
+		}
+		if (Pending.Remaining <= 0) { PendingReinforcements.RemoveAt(Index); }
+	}
+}
+
+void ALKOpponentBrain::QueueReinforcement(FName UnitId, int32 Count, float BattleElapsed)
+{
+	if (UnitId.IsNone() || Count <= 0) { return; }
+	FPendingReinforcement Pending;
+	Pending.UnitId = UnitId;
+	Pending.Remaining = Count;
+	Pending.Deadline = BattleElapsed + MaxReinforcementDelay;
+	PendingReinforcements.Add(Pending);
+}
+
+void ALKOpponentBrain::TickTacticalSpell(float DeltaTime, float BattleElapsed)
+{
+	if (!SpellSettings.bEnabled || !GameMode.IsValid()) { return; }
+	SpellCooldownRemaining = FMath::Max(0.f, SpellCooldownRemaining - DeltaTime);
+	SpellCheckTimer -= DeltaTime;
+	if (SpellCheckTimer > 0.f) { return; }
+	SpellCheckTimer = FMath::Max(0.1f, SpellSettings.CheckInterval);
+	TryCastTacticalSpell(BattleElapsed);
+}
+
+bool ALKOpponentBrain::TryCastTacticalSpell(float BattleElapsed)
+{
+	ALKBattleGameMode* GM = GameMode.Get();
+	if (!GM || GM->GetPhase() != ELKGamePhase::Battle) { return false; }
+	// 第一次最早在开战 FirstCastTime 之后，且余额够 5；180 秒后停止新增法阵以保留残局收束期。
+	if (BattleElapsed < SpellFirstCastAt || BattleElapsed > SpellSettings.StopTime) { return false; }
+	if (SpellCooldownRemaining > 0.f) { return false; }
+	if (SpellSettings.MaxActive <= 0 || GM->GetActiveTacticalCircleCount() >= SpellSettings.MaxActive) { return false; }
+	const ULKCardDefinition* Card = GM->FindCard(SpellSettings.SpellId);
+	if (!Card || Card->CardType != ELKCardType::Spell || Card->SpellEffect != ELKSpellEffect::SummonZone) { return false; }
+	if (!Silver || Silver->GetSilver() < Card->Cost) { return false; } // 余额不足：不扣费、不空放。
+
+	FVector Location = FVector::ZeroVector;
+	if (!FindTacticalSpellLocation(Card->Circle.Radius, SpellSettings.PreferredTargets, Location)) { return false; }
+	// 扣费与落点在 GameMode 事务里再次校验；失败不扣费、不进冷却。
+	if (!GM->CastEnemyTacticalSpell(SpellSettings.SpellId, Location)) { return false; }
+	SpellCooldownRemaining = FMath::Max(0.f, SpellSettings.Cooldown);
+	++TacticalSpellCasts;
+	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 战术法术 %s 于 t=%.1f 释放（第 %d 次，银币 %.1f，冷却 %.0f）"),
+		*SpellSettings.SpellId.ToString(), BattleElapsed, TacticalSpellCasts, Silver->GetSilver(), SpellSettings.Cooldown);
+	return true;
+}
+
+bool ALKOpponentBrain::FindTacticalSpellLocation(float Radius, int32 PreferredTargets, FVector& OutLocation) const
+{
+	ALKBattleGameMode* GM = GameMode.Get();
+	if (!GM || !FMath::IsFinite(Radius) || Radius <= 0.f) { return false; }
+
+	// 优先覆盖至少两名玩家战斗单位；没有这种点时才允许只覆盖单英雄。
+	int32 BestCount = 0;
+	FVector BestLocation = FVector::ZeroVector;
+	auto Consider = [&](const FVector& Candidate)
+	{
+		const int32 Count = GM->CountTargetsInRadius(ELKTeam::Enemy, Candidate, Radius);
+		if (Count > BestCount) { BestCount = Count; BestLocation = Candidate; }
+	};
+	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+	{
+		ALKUnitBase* Unit = *It;
+		if (!Unit || Unit->IsCamp() || !Unit->IsTargetable() || !Unit->IsCombatEnabled()) { continue; }
+		if (Unit->GetTeam() == ELKTeam::Enemy) { continue; }
+		Consider(Unit->GetActorLocation());
+	}
+	if (BestCount < FMath::Max(1, PreferredTargets))
+	{
+		// A lone surviving hero is still a useful target; lone ordinary troops are not.
+		for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+		{
+			if (It->IsHero() && It->IsTargetable() && It->IsCombatEnabled() && It->GetTeam() == ELKTeam::Player)
+			{ OutLocation = It->GetActorLocation(); return true; }
+		}
+		return false;
+	}
+	OutLocation = BestLocation;
+	return true;
 }
 
 void ALKOpponentBrain::DoFocus()

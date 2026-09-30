@@ -9,6 +9,26 @@ class ULKProfileSubsystem;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnServiceNodeEntered, FName, NodeId, ELKDungeonNodeType, NodeType);
 
 /**
+ * Balance V1 一次性迁移的纯数据结果（不参与存档；只用于生成 UI 提示与日志）。
+ * 迁移函数本身不写成员状态，提示 flag 只有在载入成功提交后才由调用方写入，失败路径不会泄漏。
+ */
+struct FLKBalanceMigrationReport
+{
+	/** 迁移前的 BalanceVersion。 */
+	int32 PreviousBalanceVersion = 0;
+	/** 按"新原生生命/旧原生生命"同比缩放的英雄数。 */
+	int32 ScaledHeroes = 0;
+	/** 刷新增援/难度快照的未完成节点数。 */
+	int32 UnfinishedEncounters = 0;
+	/** 替换的敌方专属卡数（含补齐到五张与待领奖励候选）。 */
+	int32 ReplacedCards = 0;
+	/** 终态旧远征：只补版本标记，英雄/牌组/遭遇/历史/回执原样保留。 */
+	bool bTerminalHistoryPreserved = false;
+	/** 是否真正改写了内容（终态保留时为 false）。 */
+	bool bChanged = false;
+};
+
+/**
  * D2 远征状态机。它保存英雄永久状态和开局遭遇快照；
  * 战场 Actor、临时光环、强制目标、银币、手牌位置、弹道与技能冷却均由每个世界重建。
  * 路线仍固定为普通战 -> 精英战 -> 首领战，不包含奖励 UI、随机路线或存档。
@@ -21,6 +41,12 @@ class ULKRunSubsystem : public UGameInstanceSubsystem
 public:
 	UFUNCTION(BlueprintPure, Category="LK|Run") bool HasServiceNode() const { return State.Phase == ELKRunPhase::ResolvingNode; }
 	UFUNCTION(BlueprintCallable, Category="LK|Run") bool ResolveServiceNode(FName ActionId);
+	TArray<FLKMarketOffer> GetMarketOffers() const;
+	bool PurchaseMarketOffer(int32 Index,const TArray<FName>& Removed,FString& Error);
+	bool UpgradeAtRest(FName CardId,int32 ExpectedLevel,FString& Error);
+	bool SetDeckCapacityRule(int32 MinimumSlots,int32 MaximumSlots);
+	bool ValidateRewardReplacement(int32 Index,const TArray<FName>& Removed,FString& Error) const;
+	bool SaveForMenuExit();
 	UPROPERTY(BlueprintAssignable, Category="LK|Run") FOnServiceNodeEntered OnServiceNodeEntered;
 	UFUNCTION(BlueprintPure, Category="LK|Run") int32 GetWalletGold() const { return State.WalletGold; }
 	/** 节点奖励/未来商品共用幂等钱包接口；只有安全节点阶段允许交易。 */
@@ -78,7 +104,7 @@ public:
     bool ChooseRewardReplacingCards(int32 Index, const TArray<FName>& ReplacedCardIds);
     UFUNCTION(BlueprintPure, Category = "LK|Run") int32 GetDeckCapacityUsed() const;
     /** 旧版本超额卡组先由玩家裁减，不在读档时丢弃卡牌。 */
-    UFUNCTION(BlueprintPure, Category = "LK|Run") bool NeedsDeckReduction() const { return !IsTerminal() && GetDeckCapacityUsed() > 8; }
+    UFUNCTION(BlueprintPure, Category = "LK|Run") bool NeedsDeckReduction() const { return !IsTerminal() && GetDeckCapacityUsed() > State.DeckCapacityMaximum; }
     bool DiscardExcessCard(FName CardId);
     /** 原子跳过本批奖励：消费批次并回到 ChoosingNode；不可回头补领 */
     bool SkipReward();
@@ -150,13 +176,21 @@ public:
     UFUNCTION(BlueprintPure, Category = "LK|Run") FLKHomeRewardRules GetRewardRules() const { return State.RewardRules; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool IsHomeRewardEligible() const { return State.bHomeRewardEligible; }
 
-    /** Stage 3 content/capacity contract; version 6 routes and wallets are preserved. */
-    static constexpr int32 CurrentSchemaVersion = 8;
+    /** Stage 3 content/capacity contract; version 9 adds the Balance V1 snapshot + one-shot migration. */
+    static constexpr int32 CurrentSchemaVersion = 10;
+
+    /** 读档时发生过平衡迁移/禁用卡替换的提示（主菜单与恢复中枢显示；空 = 无）。 */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") FText GetMigrationNotice() const { return MigrationNotice; }
+    /** 本轮是否被平衡迁移改写（供 UI 明确告知玩家）。 */
+    UFUNCTION(BlueprintPure, Category = "LK|Run") bool WasMigratedForBalance() const { return bMigratedForBalance; }
 
 private:
     UPROPERTY(Transient) FLKRunState State;
     FString StorageSlot;
     bool bAutoSaveEnabled = true;
+    /** 平衡迁移提示（写入后由 UI 读取；不参与存档结构） */
+    FText MigrationNotice;
+    bool bMigratedForBalance = false;
     /** 仅自动化测试：迁移旧档时的 ProfileId 关联值 */
     FGuid ProfileIdOverrideForTest;
     /** 仅自动化测试：入账交接使用的永久档 */
@@ -173,6 +207,19 @@ private:
     void FreezeTerminalSettlement();
     /** v0.6 档迁移到 Schema 5：补默认加成/区域/战备并标记旧轮不参与金币结算 */
     void MigrateStoredRun(FLKRunState& InOutState) const;
+    /**
+     * Balance V1 一次性迁移（BalanceVersion 0→1）：
+     * 玩家英雄按"新原生生命/旧原生生命"同比缩放 BaseMaxHealth/MaxHealth/Health
+     * （保留旧 MaxHealth 生命百分比、永久基础升级与特性，0 血仍失能；无旧基准的自定义英雄不动），
+     * 只刷新未完成节点及其 PendingBattle 的增援与难度快照，禁用卡按稳定顺序替代，
+     * 待领奖励与待开战副本同步；终态旧远征只补版本标记，历史内容原样保留。
+     * 幂等：BalanceVersion 已是当前值时不做任何事；返回值供调用方生成提示。
+     */
+    FLKBalanceMigrationReport MigrateRunToBalanceV1(FLKRunState& InOutState) const;
+    /** 旧档里的敌方专属卡替换（返回替换条数）。 */
+    int32 ReplaceDisabledCards(FLKRunState& InOutState) const;
+    /** 该节点在平衡曲线上的地理深度（旧小图只有起点区域，深度 = 层号）。 */
+    int32 NodeBalanceDepth(const FLKRunState& InOutState, const FLKDungeonNode& Node) const;
 
     bool ValidateStartingParty(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards) const;
 	bool ValidateEncounterCatalog(const TArray<FLKEncounterRow>& Encounters) const;

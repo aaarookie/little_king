@@ -1,6 +1,8 @@
 #include "LKEncounterContent.h"
 
 #include "Engine/DataTable.h"
+#include "LKBalanceRules.h"
+#include "LKCardRules.h"
 #include "LKUnitContent.h"
 #include "ULKCardDefinition.h"
 #include "ULKGameData.h"
@@ -20,7 +22,7 @@ namespace
 	}
 
 	FLKEncounterRow Encounter(FName Id, const TCHAR* Name, ELKEncounterRank Rank, int32 RewardTier,
-		TArray<FName> Heroes, TArray<FLKWaveEntry> Waves, bool bFocus, float FocusMin, float FocusMax, float FocusDuration)
+		TArray<FName> Heroes, bool bFocus, float FocusMin, float FocusMax, float FocusDuration)
 	{
 		FLKEncounterRow Row;
 		Row.EncounterId = Id;
@@ -28,7 +30,8 @@ namespace
 		Row.Rank = Rank;
 		Row.RewardTier = RewardTier;
 		Row.EnemyHeroIds = MoveTemp(Heroes);
-		Row.Waves = MoveTemp(Waves);
+		// 有限密集增援：初始 4 近战 + 2 远程，之后按遭遇强度每 8/7/6 秒一波，直到 176/175/180 秒。
+		LKBalanceRules::BuildReinforcementWaves(Rank, Row.Waves);
 		Row.bEnemyUsesCards = false;
 		Row.AI.bEnableFocus = bFocus;
 		Row.AI.bEnableCounter = false;
@@ -36,6 +39,12 @@ namespace
 		Row.AI.FocusIntervalMin = FocusMin;
 		Row.AI.FocusIntervalMax = FocusMax;
 		Row.AI.FocusDuration = FocusDuration;
+		// 战术法术经济与波次预算分开：波次不扣银币，法术独立扣费。
+		Row.EnemySilverPerSecond = LKBalanceRules::EnemySilverRate(Rank);
+		Row.EnemySilverCap = 10.f;
+		Row.EnemyStartingSilver = 0.f;
+		Row.EnemySpell.Cooldown = LKBalanceRules::CircleCooldown(Rank);
+		Row.EnemySpell.bEnabled = true;
 		return Row;
 	}
 
@@ -52,23 +61,17 @@ const TMap<FName, FLKEncounterRow>& BuiltInEncounters()
 		TMap<FName, FLKEncounterRow> Result;
 		FLKEncounterRow Patrol = Encounter("Encounter_UndeadPatrol", TEXT("亡灵巡逻"), ELKEncounterRank::Normal, 1,
 			{ "Hero_Necromancer" },
-			{ Wave(0.f, "Unit_Skeleton", 3), Wave(0.f, "Unit_SkeletonArcher", 1),
-			  Wave(28.f, "Unit_Skeleton", 2), Wave(55.f, "Unit_SkeletonArcher", 1) },
 			false, 35.f, 42.f, 5.f);
 		Result.Add(Patrol.EncounterId, MoveTemp(Patrol));
 
 		FLKEncounterRow Elite = Encounter("Encounter_UndeadElite", TEXT("巨骨卫队"), ELKEncounterRank::Elite, 2,
 			{ "Hero_Necromancer", "Hero_SkeletonGiant" },
-			{ Wave(0.f, "Unit_Skeleton", 3), Wave(0.f, "Unit_SkeletonArcher", 2),
-			  Wave(32.f, "Unit_Skeleton", 2), Wave(60.f, "Unit_SkeletonArcher", 2) },
 			true, 28.f, 36.f, 6.f);
 		Elite.AI.FocusWarningSeconds = 2.5f;
 		Result.Add(Elite.EncounterId, MoveTemp(Elite));
 
 		FLKEncounterRow Boss = Encounter("Encounter_SkeletonKing", TEXT("骷髅王座"), ELKEncounterRank::Boss, 3,
 			{ "Boss_SkeletonKing", "Hero_Necromancer" },
-			{ Wave(0.f, "Unit_Skeleton", 4), Wave(0.f, "Unit_SkeletonArcher", 2),
-			  Wave(30.f, "Unit_Skeleton", 2), Wave(60.f, "Unit_SkeletonArcher", 2) },
 			true, 22.f, 30.f, 7.f);
 		Boss.AI.FocusWarningSeconds = 2.f;
 		Result.Add(Boss.EncounterId, MoveTemp(Boss));
@@ -120,7 +123,6 @@ bool NormalizeAndValidate(FName RowName, const FLKEncounterRow& Source, FLKEncou
 		{ OutError = TEXT("Waves 含非法时间、单位 ID 或数量（单波 1～50）"); return false; }
 	}
 	OutRow.Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
-
 	TSet<FName> Cards;
 	for (FName CardId : OutRow.EnemyCards)
 	{
@@ -140,6 +142,20 @@ bool NormalizeAndValidate(FName RowName, const FLKEncounterRow& Source, FLKEncou
 		|| !IsFinitePositive(AI.PushCooldownMin) || !IsFinitePositive(AI.PushCooldownMax)
 		|| AI.PushCooldownMin > AI.PushCooldownMax || !IsFiniteNonNegative(AI.PushReserveMaxSeconds))
 	{ OutError = TEXT("AI 参数含非有限值、非正值或 Min > Max"); return false; }
+
+	// 敌方战术法术（独立通道）：参数必须有限且在合理范围；卡牌解析由 BuildValidatedCatalog 负责。
+	const FLKEnemySpellSettings& Spell = OutRow.EnemySpell;
+	if (!IsFiniteNonNegative(Spell.FirstCastTime) || !IsFinitePositive(Spell.CheckInterval)
+		|| !IsFiniteNonNegative(Spell.Cooldown) || Spell.MaxActive < 0 || Spell.MaxActive > 4
+		|| Spell.PreferredTargets < 1 || Spell.PreferredTargets > 10 || !IsFinitePositive(Spell.StopTime))
+	{ OutError = TEXT("敌方战术法术参数非法"); return false; }
+	if (Spell.bEnabled && Spell.SpellId.IsNone()) { OutError = TEXT("启用敌方战术法术时 SpellId 不能为空"); return false; }
+
+	// 平衡快照：缺失（BalanceVersion=0）时按中性深度补齐；已写入的快照必须自洽。
+	if (OutRow.BalanceVersion < 0 || OutRow.BalanceVersion > LKBalanceRules::CurrentBalanceVersion)
+	{ OutError = TEXT("不支持的平衡快照版本"); return false; }
+	if (OutRow.BalanceVersion == 0) { LKBalanceRules::EnsureSnapshot(OutRow); }
+	if (!LKBalanceRules::ValidateSnapshot(OutRow, OutError)) { return false; }
 	return true;
 }
 
@@ -238,6 +254,25 @@ bool BuildValidatedCatalog(const ULKGameData* Data,
 				return false;
 			}
 		}
+		// 敌方战术法术必须解析到"敌方专属 + 区域召唤"的卡牌定义。
+		if (Encounter.EnemySpell.bEnabled)
+		{
+			const ULKCardDefinition* Spell = ResolveCard(Encounter.EnemySpell.SpellId);
+			if (!Spell || Spell->CardType != ELKCardType::Spell || Spell->SpellEffect != ELKSpellEffect::SummonZone)
+			{
+				OutError = FString::Printf(TEXT("遭遇 %s 的战术法术 %s 缺失或不是区域召唤法术"),
+					*Encounter.EncounterId.ToString(), *Encounter.EnemySpell.SpellId.ToString());
+				OutRows.Reset();
+				return false;
+			}
+			if (LKCardRules::IsPlayerObtainable(Encounter.EnemySpell.SpellId))
+			{
+				OutError = FString::Printf(TEXT("遭遇 %s 的战术法术 %s 不是敌方专属（阵营权限不一致）"),
+					*Encounter.EncounterId.ToString(), *Encounter.EnemySpell.SpellId.ToString());
+				OutRows.Reset();
+				return false;
+			}
+		}
 	}
 	return true;
 }
@@ -318,6 +353,8 @@ bool MakeDynamicEncounter(FName NewEncounterId, const FLKEncounterRow& Template,
 		OutError = TEXT("敌阵容池为空，无法生成动态遭遇");
 		return false;
 	}
+	// A generated roster needs a fresh budget; persisted snapshots are validated without repair.
+	LKBalanceRules::ApplySnapshot(OutRow, OutRow.Depth);
 	return NormalizeAndValidate(NewEncounterId, OutRow, OutRow, OutError);
 }
 }

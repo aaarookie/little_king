@@ -17,6 +17,7 @@
 #include "ULKCheatManager.h"
 #include "ULKDeckState.h"
 #include "ULKSilverComponent.h"
+#include "ULKBattlePauseWidget.h"
 
 ALKPlayerController::ALKPlayerController()
 {
@@ -38,6 +39,11 @@ void ALKPlayerController::BeginPlay()
 	FInputModeGameAndUI InputMode;
 	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
+	if (GetLocalPlayer())
+	{
+		PauseWidget=CreateWidget<ULKBattlePauseWidget>(this,ULKBattlePauseWidget::StaticClass());
+		if (PauseWidget) { PauseWidget->AddToViewport(150); }
+	}
 }
 
 void ALKPlayerController::Tick(float DeltaSeconds)
@@ -78,6 +84,7 @@ void ALKPlayerController::RequestCameraShake(float Intensity)
 void ALKPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+	InputComponent->BindKey(EKeys::Escape,IE_Pressed,this,&ALKPlayerController::ToggleBattlePause).bExecuteWhenPaused=true;
 
 	InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &ALKPlayerController::HandleLeftClick);
 	InputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &ALKPlayerController::HandleRightClick);
@@ -88,6 +95,7 @@ void ALKPlayerController::SetupInputComponent()
 
 void ALKPlayerController::HandleLeftClick()
 {
+    if (UGameplayStatics::IsGamePaused(this)) { return; }
     if (GetPhase() == ELKGamePhase::Result) { return; }
     if (PlacementMode == ELKPlacementMode::None || PlacementMode == ELKPlacementMode::HeroMove)
     {
@@ -99,6 +107,9 @@ void ALKPlayerController::HandleLeftClick()
     }
     if (PlacementMode != ELKPlacementMode::None) { TryPlaceActive(); }
 }
+
+void ALKPlayerController::ToggleBattlePause()
+{ if (PauseWidget) { PauseWidget->TogglePause(); } }
 
 void ALKPlayerController::HandleRightClick()
 {

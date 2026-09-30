@@ -25,9 +25,12 @@
 #include "ULKUnitStatusComponent.h"
 #include "ALKUnitBuilding.h"
 #include "ALKUnitHero.h"
+#include "LKBalanceRules.h"
+#include "LKCardRules.h"
 #include "LKDataTypes.h"
 #include "LKGameplayHelpers.h"
 #include "LKLog.h"
+#include "LKSkeletonCircle.h"
 #include "LKUnitContent.h"
 #include "ULKCardDefinition.h"
 #include "ULKBattleHUDWidget.h"
@@ -349,6 +352,7 @@ void ALKBattleGameMode::TryInitPlayerState()
 		? Bonus.PlayerSilverCap : GameData->SilverCap;
 
 	PS->Silver->Init(PlayerSilverPerSecond, PlayerSilverCap);
+	PS->Deck->CardAllowed = [](FName CardId) { return LKCardRules::IsPlayerObtainable(CardId); };
 	if (!PS->Deck->InitDeck(GameData->DefaultPlayerDeck, GameData->HandSize, GameData->BattleSeed + 1))
 	{
 		UE_LOG(LogLKBattle, Warning, TEXT("[Deck] 玩家牌库无效：去重后至少需要 HandSize + 1 种卡，禁止开战"));
@@ -545,7 +549,12 @@ bool ALKBattleGameMode::CanStartBattle() const
 
 void ALKBattleGameMode::ForceStartBattle()
 {
-    if (CanStartBattle()) { SetPhase(ELKGamePhase::Battle); }
+    if (CanStartBattle())
+    {
+        // 法阵序号在开战时复位：同种子 + 同施法顺序 => 同随机流与同来源 ID。
+        TacticalSpellSerial = 0;
+        SetPhase(ELKGamePhase::Battle);
+    }
 }
 
 void ALKBattleGameMode::ForceEndMatch(ELKTeam Winner)
@@ -572,6 +581,10 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 
 	// 对局结束，单位停止战斗
 	ApplyCombatEnabledToAllUnits(false);
+
+	// 结束战斗：清空波次队列/重试队列/法阵与区域减速（不残留到下一房）。
+	ClearTacticalSpells();
+	if (OpponentBrain) { OpponentBrain->ResetBattleState(); }
 
 	// S5：回收全部弹道（防对象池泄漏）
 	ReleaseAllProjectiles();
@@ -709,10 +722,17 @@ ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex,
     if (Id.IsNone()) { return ELKPlayResult::HandEmpty; }
     const ULKCardDefinition* Card = FindCard(Id);
     if (!Card || Card->Cost < 0) { return ELKPlayResult::InvalidCardData; }
+    // 阵营权限的最终校验：玩家永远不能施放敌方专属卡（UI 过滤不能代替校验）。
+    if (Team == ELKTeam::Player && !LKCardRules::IsPlayerObtainable(Id)) { return ELKPlayResult::InvalidCardData; }
     if (Card->CardType == ELKCardType::Spell)
     {
-        if (Card->SpellEffect == ELKSpellEffect::None || !FMath::IsFinite(Card->SpellValue) || Card->SpellValue <= 0.f
-            || !FMath::IsFinite(Card->SpellRadius) || Card->SpellRadius <= 0.f) { return ELKPlayResult::InvalidCardData; }
+        if (Card->SpellEffect == ELKSpellEffect::None || !FMath::IsFinite(Card->SpellRadius) || Card->SpellRadius <= 0.f)
+        { return ELKPlayResult::InvalidCardData; }
+        // 区域召唤法术走独立数值字段（法阵无直接伤害），其余法术仍要求 SpellValue > 0。
+        if (Card->SpellEffect != ELKSpellEffect::SummonZone
+            && (!FMath::IsFinite(Card->SpellValue) || Card->SpellValue <= 0.f)) { return ELKPlayResult::InvalidCardData; }
+        if (Card->SpellEffect == ELKSpellEffect::SummonZone)
+        { return ELKPlayResult::InvalidCardData; } // 区域召唤只服务敌方战术通道。
         if (!IsInsideField(Location)) { return ELKPlayResult::InvalidLocation; }
         if (!CanPlaceSpellAt(Team, Location))
         {
@@ -873,6 +893,16 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
         if ((*It)->IsAlive() && (*It)->IsBuilding() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < GameData->UnitBodyRadius + (*It)->GetBodyRadius() + 2.f) { return nullptr; }
     }
 
+    // 敌方实例倍率：深度曲线 × 遭遇预算，只作用于敌方基础生命/攻击，且每个实例只应用一次。
+    // 复活按实例已计算的最大生命恢复（ReviveDuringBattle -> RestoreHeroLife(GetMaxHealth())），不会二次放大。
+    if (Team == ELKTeam::Enemy)
+    {
+        float HealthScale = 1.f, DamageScale = 1.f;
+        LKBalanceRules::InstanceScalesFor(CurrentEncounter, UnitId, Data.UnitClass, HealthScale, DamageScale);
+        if (HealthScale != 1.f) { Data.BaseHealth *= HealthScale; }
+        if (DamageScale != 1.f) { Data.AttackDamage *= DamageScale; }
+    }
+
     // D3 卡牌升级：仅远征中的玩家"出牌生成"携带来源卡（波次/兵营产兵/部署/召唤不升级）。
     // 数值 = 基础行 × 1.1^Lv（攻击与生命同步），只作用于本次生成实例。
     if (bExpeditionBattle && Team == ELKTeam::Player && !SourceCardId.IsNone())
@@ -881,7 +911,7 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
             [&SourceCardId](const FLKRunCardState& Item) { return Item.CardId == SourceCardId; });
         if (CardState && CardState->UpgradeLevel > 0)
         {
-            const float Scale = FMath::Pow(1.1f, CardState->UpgradeLevel);
+            const float Scale = LKCardRules::UpgradeMultiplier(CardState->UpgradeLevel);
             Data.BaseHealth *= Scale;
             Data.AttackDamage *= Scale;
             UE_LOG(LogLKBattle, Log, TEXT("[Run] 卡升级应用：%s Lv%d -> %s（生命 %.1f / 攻击 %.1f）"),
@@ -940,6 +970,116 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	}
 
 	return Unit;
+}
+
+bool ALKBattleGameMode::IsSpawnPointFree(const FVector& Location, float BodyRadius) const
+{
+	if (!GameData || !IsInsideField(Location) || Location.ContainsNaN()) { return false; }
+	if (FMath::Abs(Location.X) + BodyRadius >= GameData->FieldHalfWidth
+		|| FMath::Abs(Location.Y) + BodyRadius >= GameData->FieldHalfHeight) { return false; }
+	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+	{
+		const ALKUnitBase* Unit = *It;
+		if (!Unit || !Unit->IsAlive()) { continue; }
+		if (FVector::Dist2D(Location, Unit->GetActorLocation()) < BodyRadius + Unit->GetBodyRadius() + 2.f) { return false; }
+	}
+	return true;
+}
+
+bool ALKBattleGameMode::FindFreeSpawnLocation(const FVector& Preferred, float SearchRadius, FVector& OutLocation,
+	FRandomStream& Stream, int32 MaxAttempts) const
+{
+	if (!GameData || !FMath::IsFinite(SearchRadius) || SearchRadius <= 0.f) { return false; }
+	const float BodyRadius = GameData->UnitBodyRadius;
+	// 均匀圆盘采样：r = R√u, θ = 2πv（半径已扣除单位体积由调用方保证）。
+	for (int32 Attempt = 0; Attempt < FMath::Max(1, MaxAttempts); ++Attempt)
+	{
+		const float U = FMath::Clamp(Stream.FRand(), 0.f, 1.f);
+		const float V = FMath::Clamp(Stream.FRand(), 0.f, 1.f);
+		const float Radius = SearchRadius * FMath::Sqrt(U);
+		const float Angle = 2.f * PI * V;
+		const FVector Candidate(Preferred.X + Radius * FMath::Cos(Angle), Preferred.Y + Radius * FMath::Sin(Angle), 0.f);
+		if (!IsSpawnPointFree(Candidate, BodyRadius)) { continue; }
+		OutLocation = Candidate;
+		return true;
+	}
+	return false;
+}
+
+int32 ALKBattleGameMode::CountTargetsInRadius(ELKTeam CasterTeam, const FVector& Location, float Radius) const
+{
+	if (!GetWorld() || !FMath::IsFinite(Radius) || Radius <= 0.f) { return 0; }
+	int32 Count = 0;
+	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+	{
+		const ALKUnitBase* Unit = *It;
+		if (!Unit || Unit->IsCamp() || !Unit->IsTargetable() || !Unit->IsCombatEnabled()) { continue; }
+		if (Unit->GetTeam() == CasterTeam) { continue; }
+		if (FVector::Dist2D(Location, Unit->GetActorLocation()) <= Radius) { ++Count; }
+	}
+	return Count;
+}
+
+ALKSkeletonCircle* ALKBattleGameMode::CastEnemyTacticalSpell(FName CardId, const FVector& Location)
+{
+	if (Phase != ELKGamePhase::Battle || !GetWorld()) { return nullptr; }
+	ULKCardDefinition* Card = FindCard(CardId);
+	if (!Card || Card->CardType != ELKCardType::Spell || Card->SpellEffect != ELKSpellEffect::SummonZone) { return nullptr; }
+	// 敌方战术法术通道只服务敌方专属卡；玩家侧入口仍受 ValidateCardPlay 的半场限制约束。
+	if (LKCardRules::IsPlayerObtainable(CardId)) { return nullptr; }
+	const FLKSkeletonCircleParams& Params = Card->Circle;
+	if (!IsInsideField(Location) || Location.ContainsNaN()) { return nullptr; }
+	const int32 MaxActive = CurrentEncounter.EnemySpell.MaxActive;
+	if (!CurrentEncounter.EnemySpell.bEnabled || MaxActive <= 0) { return nullptr; }
+	if (GetActiveTacticalCircleCount() >= MaxActive) { return nullptr; }
+	// 扣费时再次检查目标合法：没有敌对目标就不空放、不扣费。
+	if (CountTargetsInRadius(ELKTeam::Enemy, Location, Params.Radius) < 1) { return nullptr; }
+	ULKSilverComponent* Silver = GetTeamSilver(ELKTeam::Enemy);
+	if (!Silver || Card->Cost < 0 || Silver->GetSilver() < Card->Cost) { return nullptr; }
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Owner = this;
+	ALKSkeletonCircle* Circle = GetWorld()->SpawnActor<ALKSkeletonCircle>(
+		ALKSkeletonCircle::StaticClass(), Location, FRotator::ZeroRotator, SpawnParams);
+	if (!Circle) { return nullptr; }
+	const int32 CircleSeed = static_cast<int32>(static_cast<uint32>(BattleRandom.GetInitialSeed()) + TacticalSpellSerial * 7919u);
+	if (!Circle->InitializeCircle(this, ELKTeam::Enemy, Location, Params, CircleSeed, CardId))
+	{
+		Circle->Destroy();
+		return nullptr;
+	}
+	// 合法施法扣费一次；召唤被人数上限阻止也不退费。
+	if (!Silver->TrySpend(Card->Cost))
+	{
+		Circle->Destroy();
+		return nullptr;
+	}
+	ActiveSkeletonCircles.Add(Circle);
+	++TacticalSpellSerial;
+	++MatchStats.Enemy.CardsPlayed;
+	UE_LOG(LogLKBattle, Log, TEXT("[Circle] 敌方战术法术 %s 在 %s 释放（银币 %.1f -> %.1f）"),
+		*CardId.ToString(), *Location.ToCompactString(), Silver->GetSilver() + Card->Cost, Silver->GetSilver());
+	return Circle;
+}
+
+int32 ALKBattleGameMode::GetActiveTacticalCircleCount() const
+{
+	int32 Count = 0;
+	for (const TObjectPtr<ALKSkeletonCircle>& Circle : ActiveSkeletonCircles)
+	{
+		if (IsValid(Circle) && !Circle->IsFinished()) { ++Count; }
+	}
+	return Count;
+}
+
+void ALKBattleGameMode::ClearTacticalSpells()
+{
+	for (const TObjectPtr<ALKSkeletonCircle>& Circle : ActiveSkeletonCircles)
+	{
+		if (IsValid(Circle)) { Circle->Destroy(); }
+	}
+	ActiveSkeletonCircles.Reset();
 }
 
 const FLKUnitRow* ALKBattleGameMode::GetUnitRow(FName UnitId) const
@@ -1200,6 +1340,9 @@ bool ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const
 
 bool ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
 {
+    if (!Card || (Team == ELKTeam::Player && !LKCardRules::IsPlayerObtainable(Card->CardId))) { return false; }
+    // 区域召唤由独立战术事务处理，不能在瞬时法术通道空扣银币。
+    if (Card->SpellEffect == ELKSpellEffect::SummonZone) { return false; }
     if (!GetWorld() || !Card || Card->SpellEffect == ELKSpellEffect::None || !CanPlaceSpellAt(Team, Location)) { return false; }
     FLKCombatSource Source;
     Source.bHasTeam = true; Source.Team = Team; Source.ActionId = Card->CardId; Source.Kind = ELKCombatSourceKind::Spell;
@@ -1209,11 +1352,15 @@ bool ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const F
         if ((*It)->IsTargetable() && FVector::Dist2D(Location, (*It)->GetActorLocation()) <= Card->SpellRadius) { Targets.Add(*It); }
     }
     BeginCombatBatch();
-    if (Card->CardId == TEXT("Spell_Fireball")) { NotifyFireballCast(Location, Card->SpellRadius); }
+    float Scale=1.f;
+    if (Team==ELKTeam::Player && bExpeditionBattle)
+    { for (const auto& C:BattleContext.PlayerCards) { if (C.CardId==Card->CardId) { Scale=LKCardRules::UpgradeMultiplier(C.UpgradeLevel); break; } } }
+    if (Card->CardId == TEXT("Spell_Fireball") || Card->CardId.ToString().StartsWith(TEXT("Spell_ResearchFireball"))) { NotifyFireballCast(Location, Card->SpellRadius); }
     for (ALKUnitBase* Unit : Targets)
     {
-        if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, Card->SpellValue, nullptr, false, &Source); }
-        else if (Card->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team) { LKGameplay::ApplyHeal(Unit, Card->SpellValue, nullptr, &Source); }
+        if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, Card->SpellValue*Scale, nullptr, false, &Source); }
+        else if (Card->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team)
+        { LKGameplay::ApplyHeal(Unit,(Card->SpellValue+(Unit->IsHero()?Unit->GetMaxHealth()*Card->HeroHealPercent:0.f))*Scale,nullptr,&Source); }
     }
     EndCombatBatch();
     return true; // 合法空放是玩家选择，也会消耗卡牌和银币。
@@ -1238,3 +1385,11 @@ void ALKBattleGameMode::DrawFieldBounds() const
 
 	// 正式中线由 LKPresentationHUD 绘制，不依赖调试开关或地面深度。
 }
+
+int32 ALKBattleGameMode::GetCardUpgradeLevel(FName Id) const
+{
+    if (bExpeditionBattle) { for (const auto& C:BattleContext.PlayerCards) { if (C.CardId==Id) { return C.UpgradeLevel; } } }
+    return 0;
+}
+float ALKBattleGameMode::GetCardUpgradeScale(FName Id,ELKTeam Team) const
+{ return Team==ELKTeam::Player?LKCardRules::UpgradeMultiplier(GetCardUpgradeLevel(Id)):1.f; }

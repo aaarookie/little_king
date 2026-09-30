@@ -1,5 +1,7 @@
 # 新增卡牌：代码入口、接口与接入顺序
 
+2026-09-28 新接口：敌方专属卡必须登记 `LKCardRules::FactionOf/IsPlayerObtainable`，不能只从奖励 UI 隐藏。`ULKDeckState::CardAllowed` 保护玩家牌组初始化/添加/转换，GameMode 还执行最终权限校验。持续召唤区用 `ELKSpellEffect::SummonZone`、`FLKSkeletonCircleParams`、`ALKSkeletonCircle`，敌方通过 `CastEnemyTacticalSpell` 扣费，不走普通手牌入口。减速使用 `ApplyAreaSlow/RemoveAreaSlow` 按来源清理；敌方生成倍率由 `LKBalanceRules::InstanceScalesFor` 统一应用一次。完整协作记录和资产同步步骤见 [49](49-BalanceV1Implementation.md)。
+
 日期：2026-09-16。先于本轮七张新卡实施编写。适用 UE 5.8；沿用“原生代码保证身份，数据表调整数值，缺美术使用色块文字”。本轮具体规则与数值见 [35](35-TrollAndSiegeCards.md)，实施结果归入 [29](29-OptimizationChangeLog.md)。
 
 ## 1. 从卡牌到战斗单位
@@ -82,3 +84,17 @@ Caster->GetStatusComponent()->Empower(8.f, 1.3f, .75f);
 新增卡牌的技能表现复用 `ULKPresentationSubsystem::Emit(World, Type, Location, Radius, Origin)` 和 `Sound(World, Id, Location)`；伤害、治疗、眩晕等仍由原战斗接口执行，不能从特效计时反向触发伤害。通用治疗、退场、控制状态已在底层生效处接好，不要在每张新卡里重复播放。新专属声音先加入 `LKWorldArt::SoundIds/SoundInterval` 及导入源目录，再由 GameData 的默认映射补齐；资源覆盖/显式静音继续通过 SoundMap 配置。
 
 表现实例不写入远征存档，不消耗 `GetBattleRandom()`。队列自动限额和过期清理，火球震动仍由 GameMode 的既有释放入口控制。营地/地图/FX 路径、实际绑定表与素材来源见 [40](40-WorldSkillsArtIntegration.md)。
+
+## v0.8.2：获取来源、研究和休息升级接口
+
+注册目录目前 32 卡。`LKCardRules::IsTemporaryMercenary` 同时检查原生兵种与临时目录，远征新卡仅允许此集合；`IsPlayerObtainable` 拒绝三张敌方专属。攻城投石炮作为建筑不再进入临时佣兵掉落池。
+
+研究目录为 `LKResearchContent::All/Find/EnsureCards`：稳定 CardId、材料类别、法术阶位、价格、最早区域深度、权重、默认数值。运行时定义复制到 GameData 私有目录；既有法术图标被复用，阶位由代码保证，效果数值允许资产覆盖。新增图纸也须注册建筑定义。永久材料存于 Profile，购买后本轮携带于 Run，终态结算以同一 ID 幂等交付；`ULKProfileSubsystem::ResearchCard` 消耗材料并永久解锁，保存失败回滚。
+
+`LKResearchContent::GenerateMarket` 按稳定 CRC + RunSeed 生成后冻结。`ULKRunSubsystem::PurchaseMarketOffer` 在一次存档事务中修改金币、售出回执和牌组／材料；禁止重复买、重复卡、未知材料。不要由 UI 直接修改钱包或材料。
+
+`ULKRunSubsystem::UpgradeAtRest` 仅在未消费休息节点、已有合法法术／建筑、等级匹配时成功，关闭回血选项；`LKCardRules::UpgradeMultiplier` 数值为 `1.1^Lv`。战斗奖励只允许佣兵升级。`HeroHealPercent` 是英雄最大生命的附加治疗比例，普通与英雄的固定治疗项都应用升级系数；学徒模仿沿用被模仿卡的本轮等级。
+
+容量来自冻结的 `DeckCapacityMinimum/Maximum`，默认 8/8；`SetDeckCapacityRule` 可在安全点改变未来规则。`ValidateReplacement` 使用按释放格数／张数的动态规划求固定上限的最小必要方案，区间规则仅检验最终区间和五种牌底线。正式出征至少七种，UI 同步读取当前动态上限。跨房保存和重新加载不回到硬编码八格。
+
+新增技能或界面前先阅读 [50](50-v0.8.2ExpeditionChanges.md)，验证获取权限、回滚、旧档、暂停、等级展示和素材归档，不从旧教程恢复建筑奖励或临时回家入口。

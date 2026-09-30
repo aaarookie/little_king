@@ -70,6 +70,7 @@ void ALKUnitBuilding::TrySpawnUnit()
 {
     ALKBattleGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<ALKBattleGameMode>() : nullptr;
     if (!GM || !GM->GetGameData() || SpawnUnitId.IsNone()) { return; }
+    if (GM->GetGameData()->MaxUnitsPerTeam > 0 && GM->CountAliveUnits(Team) >= GM->GetGameData()->MaxUnitsPerTeam) { return; }
     const float Distance = GetBodyRadius() + GM->GetGameData()->UnitBodyRadius + 8.f;
     for (int32 Index = 0; Index < 8; ++Index)
     {

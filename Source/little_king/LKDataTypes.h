@@ -219,6 +219,57 @@ struct FLKEncounterAISettings
 };
 
 /**
+ * 敌方战术法术节奏（独立于波次与敌方牌组；共用敌方银币组件）。
+ * 波次是"增援预算"，法术是"法术经济"，两套来源互不扣费。
+ */
+USTRUCT(BlueprintType)
+struct FLKEnemySpellSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) bool bEnabled = false;
+	/** 敌方专属区域法术卡（CardId 驱动统一权限/落点/扣费校验） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName SpellId = "Spell_SkeletonCircle";
+	/** 开战多久之后才允许第一次施法（秒） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float FirstCastTime = 12.f;
+	/** 密度评估间隔（秒） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1")) float CheckInterval = 0.5f;
+	/** 成功施法后的释放冷却（秒）；按遭遇强度取 20/17/14 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float Cooldown = 20.f;
+	/** 同时存在的法阵数量上限（1 = 不叠场） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0", ClampMax = "4")) int32 MaxActive = 1;
+	/** 优先覆盖的玩家战斗单位数量；达不到时允许只覆盖单英雄 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "10")) int32 PreferredTargets = 2;
+	/** 超过该时间不再新增法阵（秒）；已存在的法阵正常走完 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1.0")) float StopTime = 180.f;
+};
+
+/** 骷髅法阵参数（敌方专属区域法术）；由卡牌定义携带，运行时只读。 */
+USTRUCT(BlueprintType)
+struct FLKSkeletonCircleParams
+{
+	GENERATED_BODY()
+
+	/** 预警时长（秒）：预警不计入持续 3 秒，期间可躲避 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float WarnSeconds = 0.75f;
+	/** 生效持续（秒） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1")) float Duration = 3.f;
+	/** 影响半径（UE 单位） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "10.0")) float Radius = 320.f;
+	/** 区域内移动速度倍率（<1 为减速） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1", ClampMax = "1.0")) float MoveMultiplier = 0.65f;
+	/** 区域内攻击速度倍率（<1 为变慢）；等价于攻击间隔 ÷ 该值 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1", ClampMax = "1.0")) float AttackSpeedMultiplier = 0.70f;
+	/** 召唤尝试间隔（秒）；从施法完成后开始，不在 t=0 多召 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.1")) float SummonInterval = 0.5f;
+	/** 单次法阵最多召唤数量 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "12")) int32 MaxSummons = 6;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName SummonUnitId = "Unit_Skeleton";
+	/** 单个召唤点的最大尝试次数（避开实体与边界） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "64")) int32 PlacementAttempts = 12;
+};
+
+/**
  * DT_Encounters 行。整行在远征开始时复制到 RunState，再复制到每房 BattleContext；
  * 后续修改 DataTable 或共享 DA_GameData 不会改变已经开始的远征。
  */
@@ -239,4 +290,18 @@ struct FLKEncounterRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1.0")) float EnemySilverCap = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float EnemyStartingSilver = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FLKEncounterAISettings AI;
+	/** 敌方战术法术（独立通道；不与波次共用预算） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FLKEnemySpellSettings EnemySpell;
+
+	// ---------- 平衡快照（由远征生成写入；战斗只消费，不重算） ----------
+	/** 0 = 未写入快照（表行/旧档）；非 0 必须等于 LKBalanceRules::CurrentBalanceVersion */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 BalanceVersion = 0;
+	/** 地理拓扑深度 d = 5 × 区域深度 + 层号；最大 19 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0", ClampMax = "19")) int32 Depth = 0;
+	/** 通用敌方生命倍率（深度曲线） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float EnemyHealthScale = 1.f;
+	/** 通用敌方攻击倍率（深度曲线） */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float EnemyDamageScale = 1.f;
+	/** 与 EnemyHeroIds 对齐的英雄生命倍率（遭遇预算 × 深度曲线），最终实例直接用此值 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<float> EnemyHeroHealthScale;
 };

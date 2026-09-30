@@ -96,12 +96,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy", meta = (ClampMin = "1"))
 	int32 HandSize = 4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Expedition", meta=(ClampMin="1",ClampMax="64"))
+	int32 DeckCapacityMinimum = 8;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Expedition", meta=(ClampMin="1",ClampMax="64"))
+	int32 DeckCapacityMaximum = 8;
+
 	// ---------- 流程 ----------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow", meta = (ClampMin = "5.0"))
 	float DeploymentTime = 20.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow", meta = (ClampMin = "60.0"))
-	float BattleTimeLimit = 480.f;
+	float BattleTimeLimit = 300.f;
 
 	/** 超时后：每 Tick 对英雄造成最大生命百分比伤害（无平局机制） */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow", meta = (ClampMin = "0.0"))
@@ -255,7 +260,7 @@ public:
 
 	/**
 	 * 确保运行时卡牌目录可用（只改运行时副本，不写资产）：
-	 * CardLibrary 为空时注入七张内置卡；并始终保证 D3 奖励卡（骷髅兵/骷髅射手）存在。
+	 * CardLibrary 为空时注入七张内置卡；并始终保证敌方专属骷髅卡与【骷髅法阵】存在。
 	 * 战斗 GameMode 与家园 GameMode 共用，避免家园收藏页读到空目录。
 	 */
 	void EnsureCardLibrary();

@@ -10,6 +10,20 @@ enum class ELKRunPhase : uint8 { Inactive, ChoosingNode, EnteringBattle, InBattl
 UENUM(BlueprintType)
 enum class ELKDungeonNodeType : uint8 { Battle, Elite, Rest, Event, Boss, Market };
 
+UENUM(BlueprintType)
+enum class ELKMarketOfferKind : uint8 { Mercenary, SpellBook, BuildingBlueprint };
+
+USTRUCT(BlueprintType)
+struct FLKMarketOffer
+{
+    GENERATED_BODY()
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid OfferId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKMarketOfferKind Kind = ELKMarketOfferKind::Mercenary;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FName CardId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Price = 0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bSold = false;
+};
+
 /** 固定世界版图的一个区域；多边形/入口/出口随存档冻结，不随节点随机种子漂移。 */
 USTRUCT(BlueprintType)
 struct FLKWorldRegion
@@ -71,10 +85,10 @@ struct FLKHomeRewardRules
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 BossWin = 40;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 RunCompletedBonus = 20;
 	/** 旧收益规则兼容字段；Schema 6 终态固定全额带回钱包 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float FailureKeepPercent = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float FailureKeepPercent = .8f;
 	/** 旧放弃规则兼容字段；新轮不再按百分比折算 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float AbandonKeepPercent = 1.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 RuleVersion = 2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 RuleVersion = 3;
 };
 
 /** H4：远征终态的金币结算回执（先冻结在 Run 档，再由 Profile 幂等入账） */
@@ -88,6 +102,7 @@ struct FLKSettlementReceipt
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid ProfileId;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 GoldAmount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKRunPhase TerminalPhase = ELKRunPhase::Inactive;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> ResearchMaterials;
 	/** 本轮是否参与家园金币结算（v0.6 旧档迁移标记为 false，避免追算与重复赠送） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bEligibleForHomeReward = true;
 	/** Profile 已完成入账（回执交接状态；重启按同一 SettlementId 重放） */
@@ -132,6 +147,8 @@ struct FLKExpeditionStartRequest
 	/** 正式远征使用五区域地图；旧签名仅保留小图作兼容回归。 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bUseWorldMap = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 StartingGold = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMinimum = 8;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMaximum = 8;
 	/** 本轮是否参与家园金币结算（独立测试/调试轮可关闭） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bEligibleForHomeReward = true;
 };
@@ -185,6 +202,8 @@ struct FLKDungeonNode
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector2D MapPosition = FVector2D::ZeroVector;
 	/** 区域内从左向右的层号，跨区边必须进入下游区域的入口。 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Layer = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bMarketGenerated = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FLKMarketOffer> MarketOffers;
 };
 
 USTRUCT(BlueprintType)
@@ -236,7 +255,12 @@ USTRUCT(BlueprintType)
 struct FLKRunState
 {
     GENERATED_BODY()
-    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 8;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 10;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMinimum = 8;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMaximum = 8;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> CarriedResearchMaterials;
+    /** 平衡规则版本：0 = 本版之前创建的远征（读档时做一次性生命/快照迁移）。 */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 BalanceVersion = 0;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid RunId;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Seed = 12345;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKRunPhase Phase = ELKRunPhase::Inactive;

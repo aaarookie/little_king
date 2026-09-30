@@ -213,7 +213,9 @@ bool FLKD4RestAndFullRunTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Room one win"), Run->SubmitBattleOutcome(D4Win(Room1)));
 	const FName Row2Rest = FirstOfType(Run, ELKDungeonNodeType::Rest, { "Node_R2A", "Node_R2B" });
 	TestEqual(TEXT("Rest node is selectable after win"),
-		Run->SelectNode(Row2Rest), ELKNodeSelectionResult::RestResolved);
+		Run->SelectNode(Row2Rest), ELKNodeSelectionResult::ServiceEntered);
+	TestTrue(TEXT("Resolve selected rest heal"),Run->ResolveServiceNode(TEXT("RestHeal")));
+	FString SaveError; TestTrue(TEXT("Legacy rest preserves a loadable region identity"),ULKRunSubsystem::ValidateStoredRun(Run->GetRunState(),SaveError));
 	TestTrue(TEXT("Rest heals to ninety percent"), FMath::IsNearlyEqual(
 		Run->GetRunState().Heroes[0].Health, Run->GetRunState().Heroes[0].MaxHealth * 0.9f, 0.1f));
 	TestTrue(TEXT("Still choosing after rest"), Run->CanSelectNextNode());
@@ -222,7 +224,8 @@ bool FLKD4RestAndFullRunTest::RunTest(const FString& Parameters)
 	// 第三排再选休息：90% → 封顶 100%。
 	const FName Row3Rest = FirstOfType(Run, ELKDungeonNodeType::Rest, { "Node_R3A", "Node_R3B" });
 	TestEqual(TEXT("Second rest is selectable from row three"),
-		Run->SelectNode(Row3Rest), ELKNodeSelectionResult::RestResolved);
+		Run->SelectNode(Row3Rest), ELKNodeSelectionResult::ServiceEntered);
+	TestTrue(TEXT("Resolve selected rest heal"),Run->ResolveServiceNode(TEXT("RestHeal")));
 	TestTrue(TEXT("Rest caps at full health"), FMath::IsNearlyEqual(
 		Run->GetRunState().Heroes[0].Health, Run->GetRunState().Heroes[0].MaxHealth, 0.1f));
 

@@ -5,7 +5,8 @@
 /** 世界版图和节点目录与 UMG/战斗 Actor 无关，生成结果完全保存到 Run。 */
 namespace LKWorldMapContent
 {
-	constexpr int32 LayoutVersion = 1;
+	constexpr int32 LayoutVersion = 2;
+	constexpr int32 LayersPerRegion = 15;
 	const TArray<FLKWorldRegion>& Regions();
 	FName StartNodeId();
 	bool IsCombat(ELKDungeonNodeType Type);

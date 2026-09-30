@@ -126,7 +126,8 @@ struct FLKProfileState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> ResearchMaterials;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid ProfileId;
 	/** 每次成功写入 +1；A/B 双槽按最大有效修订选择 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Revision = 0;

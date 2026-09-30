@@ -5,7 +5,11 @@ bool ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimi
 {
     const int32 Slots = FMath::Max(1, InHandSizeLimit);
     TArray<FName> Cards;
-    for (FName Id : DeckCards) { if (!Id.IsNone()) { Cards.AddUnique(Id); } }
+    for (FName Id : DeckCards)
+    {
+        if (CardAllowed && !CardAllowed(Id)) { return false; }
+        if (!Id.IsNone()) { Cards.AddUnique(Id); }
+    }
     if (Cards.Num() <= Slots) { return false; }
 
     FRandomStream Random(Seed);
@@ -54,6 +58,7 @@ TArray<FName> ULKDeckState::GetAllCards() const
 
 bool ULKDeckState::AddCardToDeck(FName CardId)
 {
+    if (CardAllowed && !CardAllowed(CardId)) { return false; }
     if (!IsReady() || LKCardRules::Used(GetAllCards()) + LKCardRules::Slots(CardId) > LKCardRules::Capacity || CardId.IsNone() || ContainsCard(CardId)) { return false; }
     DrawPile.Add(CardId);
     BroadcastHandChanged();
@@ -76,6 +81,7 @@ bool ULKDeckState::RemoveCardFromDeck(FName CardId)
 
 bool ULKDeckState::TransformCard(FName OldCardId, FName NewCardId)
 {
+    if (CardAllowed && !CardAllowed(NewCardId)) { return false; }
     if (!IsReady() || NewCardId.IsNone() || ContainsCard(NewCardId)
         || LKCardRules::Used(GetAllCards()) - LKCardRules::Slots(OldCardId) + LKCardRules::Slots(NewCardId) > LKCardRules::Capacity) { return false; }
     for (TArray<FName>* Pile : { &Hand, &DrawPile })

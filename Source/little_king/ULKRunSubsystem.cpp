@@ -1,7 +1,11 @@
 #include "ULKRunSubsystem.h"
+#include "LKResearchContent.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "LKBalanceRules.h"
 #include "LKEncounterContent.h"
+#include "LKExpeditionMercenaryContent.h"
+#include "LKUnitContent.h"
 #include "LKHomeContent.h"
 #include "LKWorldMapContent.h"
 #include "LKLog.h"
@@ -10,16 +14,19 @@
 #include "LKCardPresentation.h"
 #include "LKCardRules.h"
 #include "ALKBattleGameMode.h"
-
 namespace
 {
-    FLKDungeonNode MakeNode(FName Id, ELKDungeonNodeType Type, FName Encounter, TArray<FName> Next = {})
+    FLKDungeonNode MakeNode(FName Id, ELKDungeonNodeType Type, FName Encounter, TArray<FName> Next = {}, int32 Layer = 0)
     {
         FLKDungeonNode Node;
         Node.NodeId = Id;
         Node.Type = Type;
         Node.EncounterId = Encounter;
         Node.NextNodeIds = MoveTemp(Next);
+        Node.Layer = Layer;
+        // 旧签名小图也按"地理深度"给节点归属：只有起点区域，深度 = 层号。
+        const TArray<FLKWorldRegion>& Regions = LKWorldMapContent::Regions();
+        if (Regions.Num() > 0) { Node.RegionId = Regions[0].RegionId; }
         return Node;
     }
 
@@ -29,13 +36,95 @@ namespace
 			|| TraitId == "Trait_Sacrifice" || TraitId == "Trait_FaceFear" || TraitId == "Taunt";
 	}
 
+	/**
+	 * 终态判定（与 ULKRunSubsystem::IsTerminal 同口径）。
+	 * 终态旧远征只补版本标记：英雄、牌组、已完成遭遇、历史与领取回执都属于既成历史。
+	 */
+	bool IsTerminalPhase(ELKRunPhase Phase)
+	{
+		return Phase == ELKRunPhase::Completed || Phase == ELKRunPhase::Failed || Phase == ELKRunPhase::Abandoned;
+	}
+
+	/**
+	 * docs/48 §3 之前的玩家英雄原生基础生命。
+	 * 新原生值/旧原生值同比缩放 BaseMaxHealth/MaxHealth/Health；
+	 * 不在此表（旧档创建时不存在、或非玩家原生英雄）的自定义英雄没有旧基准，不迁移其数值。
+	 */
+	bool LegacyNativeBaseHealth(FName HeroId, float& OutBaseHealth)
+	{
+		static const TMap<FName, float> LegacyRows = {
+			{ FName("Hero_Knight"), 450.f }, { FName("Hero_Mage"), 300.f }, { FName("Hero_Ranger"), 350.f } };
+		if (const float* Found = LegacyRows.Find(HeroId)) { OutBaseHealth = *Found; return true; }
+		return false;
+	}
+
+	/** 迁移/禁用卡替换后的家园战备快照同步：只替换禁用卡，不重写历史战报与回执。 */
+	void SyncInitialLoadoutAfterReplacement(FLKRunState& InOutState, const TMap<FName, FName>& ReplacedById)
+	{
+		TArray<FName>& CardIds = InOutState.InitialLoadout.CardIds;
+		if (CardIds.IsEmpty()) { return; }
+		TArray<FName> Synced;
+		TSet<FName> Seen;
+		for (FName Entry : CardIds)
+		{
+			FName CardId = Entry;
+			if (!CardId.IsNone() && !LKCardRules::IsPlayerObtainable(CardId))
+			{
+				if (const FName* Mapped = ReplacedById.Find(CardId)) { CardId = *Mapped; }
+				else
+				{
+					// 快照里有、牌组里没有的禁用卡：按同一七张池确定性替换。
+					CardId = NAME_None;
+					for (FName Pool : LKCardRules::ReplacementCardIds())
+					{
+						if (LKCardRules::IsPlayerObtainable(Pool) && !Seen.Contains(Pool)) { CardId = Pool; break; }
+					}
+				}
+			}
+			if (CardId.IsNone() || Seen.Contains(CardId)) { continue; }
+			Seen.Add(CardId);
+			Synced.Add(CardId);
+		}
+		// 家园面板直接读这份战备：替换后至少保留 5 个合法条目，优先用本轮实际持有的卡。
+		auto PadOne = [&InOutState, &Synced, &Seen]() -> bool
+		{
+			for (const FLKRunCardState& Card : InOutState.Cards)
+			{
+				if (Card.CardId.IsNone() || !LKCardRules::IsPlayerObtainable(Card.CardId) || Seen.Contains(Card.CardId)) { continue; }
+				Seen.Add(Card.CardId); Synced.Add(Card.CardId); return true;
+			}
+			for (FName Pool : LKCardRules::ReplacementCardIds())
+			{
+				if (!LKCardRules::IsPlayerObtainable(Pool) || Seen.Contains(Pool)) { continue; }
+				Seen.Add(Pool); Synced.Add(Pool); return true;
+			}
+			return false;
+		};
+		for (int32 Guard = 0; Synced.Num() < LKCardRules::MinimumCards && Guard < 32 && PadOne(); ++Guard) {}
+		CardIds = MoveTemp(Synced);
+	}
+
+	/** 迁移提示文本（UI 只读；空 = 本次载入没有发生平衡迁移）。 */
+	FText BuildBalanceMigrationNotice(const FLKBalanceMigrationReport& Report)
+	{
+		if (Report.bTerminalHistoryPreserved)
+		{
+			return FText::FromString(FString::Printf(
+				TEXT("平衡规则已升级（Balance %d → %d）：本轮旧远征已结束，英雄、牌组、已完成遭遇与历史记录保持不变。"),
+				Report.PreviousBalanceVersion, LKBalanceRules::CurrentBalanceVersion));
+		}
+		return FText::FromString(FString::Printf(
+			TEXT("平衡规则已升级：英雄生命按新基线同比换算（%d 名），未完成节点的敌人已按地理深度重算（%d 个），%d 张敌方专属卡已替换。"),
+			Report.ScaledHeroes, Report.UnfinishedEncounters, Report.ReplacedCards));
+	}
+
 	/** 自动化测试钩子：远征槽名（默认 LittleKing_Run） */
 	FString GRunSlotName = TEXT("LittleKing_Run");
 }
 
 bool ULKRunSubsystem::ValidateStartingParty(const TArray<FLKRunHeroState>& Heroes, const TArray<FLKRunCardState>& Cards) const
 {
-    if (Heroes.IsEmpty() || Cards.Num() < 5 || LKCardRules::Used(Cards) > LKCardRules::Capacity) { return false; }
+    if (Heroes.IsEmpty() || Cards.Num() < 5 || LKCardRules::Used(Cards) > 64) { return false; }
     TSet<FName> HeroIds;
     for (const FLKRunHeroState& Hero : Heroes)
     {
@@ -55,6 +144,8 @@ bool ULKRunSubsystem::ValidateStartingParty(const TArray<FLKRunHeroState>& Heroe
     for (const FLKRunCardState& Card : Cards)
     {
         if (Card.CardId.IsNone() || Card.UpgradeLevel < 0 || CardIds.Contains(Card.CardId)) { return false; }
+        // 阵营权限：敌方专属卡（骷髅兵/骷髅射手/骷髅法阵）不能作为新远征的玩家牌组进入战斗。
+        if (!LKCardRules::IsPlayerObtainable(Card.CardId)) { return false; }
         CardIds.Add(Card.CardId);
     }
     return true;
@@ -140,6 +231,8 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
     State = FLKRunState();
     State.RunId = FGuid::NewGuid();
     State.Seed = Request.Seed;
+	// 新远征直接用当前平衡版本创建：不需要也不允许再做生命迁移。
+	State.BalanceVersion = LKBalanceRules::CurrentBalanceVersion;
 	State.ProfileId = Request.ProfileId;
 	State.RegionId = Request.RegionId;
 	State.InitialLoadout = Request.Loadout;
@@ -148,6 +241,11 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
 	State.bHomeRewardEligible = Request.bEligibleForHomeReward && Request.ProfileId.IsValid();
 	State.PendingGold = 0;
 	State.StartingGold = Request.StartingGold;
+	State.DeckCapacityMinimum=Request.DeckCapacityMinimum;
+	State.DeckCapacityMaximum=Request.DeckCapacityMaximum;
+    if (Request.DeckCapacityMinimum<1 || Request.DeckCapacityMaximum<Request.DeckCapacityMinimum || Request.DeckCapacityMaximum>64
+        || LKCardRules::Used(Request.Cards)>Request.DeckCapacityMaximum
+        || (Request.bUseWorldMap && Request.Cards.Num()<LKCardRules::MinimumDepartureCards)) { State=PreviousState; return false; }
 	State.WalletGold = Request.StartingGold;
 	State.PendingSettlement = FLKSettlementReceipt();
     State.Heroes = Request.Heroes;
@@ -209,6 +307,8 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
 			State.BonusSnapshot.HeroRecoveryPercent * 100.f, State.BonusSnapshot.PlayerSilverPerSecond,
 			State.BonusSnapshot.PlayerSilverCap, State.BonusSnapshot.StatueLevel, State.BonusSnapshot.TreasuryLevel);
 	}
+    bMigratedForBalance = false;
+    MigrationNotice = FText::GetEmpty();
     return true;
 }
 
@@ -232,7 +332,7 @@ bool ULKRunSubsystem::GenerateGraphAndEncounters(FRandomStream& Stream, FString&
 
 	// 生成一个战斗遭遇（动态 ID 入 State.Encounters）。
 	auto MakeBattle = [this, &Stream, &OutError](FName NodeId, FName EncounterId,
-		const FLKEncounterRow& Template, ELKEncounterRank Rank,
+		const FLKEncounterRow& Template, ELKEncounterRank Rank, int32 Layer,
 		const TArray<FName>& Heroes, const TArray<FName>& Bosses) -> FLKDungeonNode
 	{
 		FLKEncounterRow Dynamic;
@@ -242,24 +342,25 @@ bool ULKRunSubsystem::GenerateGraphAndEncounters(FRandomStream& Stream, FString&
 			OutError = FString::Printf(TEXT("节点 %s：%s"), *NodeId.ToString(), *Error);
 			return FLKDungeonNode();
 		}
+		LKBalanceRules::ApplySnapshot(Dynamic, LKBalanceRules::NodeDepth(0, Layer));
 		State.Encounters.Add(MoveTemp(Dynamic));
-		return MakeNode(NodeId, NodeTypeForRank(Rank), EncounterId);
+		return MakeNode(NodeId, NodeTypeForRank(Rank), EncounterId, {}, Layer);
 	};
 
 	// 第二、三排左右槽位：战斗/精英 与 休息 的左右由种子决定。
 	const bool bSwapRow2 = Stream.RandRange(0, 1) == 1;
 	const bool bSwapRow3 = Stream.RandRange(0, 1) == 1;
 
-	FLKDungeonNode R1 = MakeBattle(TEXT("Node_R1"), TEXT("Enc_Dyn_R1"), *NormalTemplate, ELKEncounterRank::Normal, HeroPool, BossPool);
-	FLKDungeonNode R2Battle = MakeBattle(TEXT("Node_R2Battle"), TEXT("Enc_Dyn_R2"), *NormalTemplate, ELKEncounterRank::Normal, HeroPool, BossPool);
-	FLKDungeonNode R2Rest = MakeNode(TEXT("Node_R2Rest"), ELKDungeonNodeType::Rest, NAME_None);
-	FLKDungeonNode R3Elite = MakeBattle(TEXT("Node_R3Elite"), TEXT("Enc_Dyn_R3"), *EliteTemplate, ELKEncounterRank::Elite, HeroPool, BossPool);
-	FLKDungeonNode R3Rest = MakeNode(TEXT("Node_R3Rest"), ELKDungeonNodeType::Rest, NAME_None);
-	FLKDungeonNode Boss = MakeBattle(TEXT("Node_Boss"), TEXT("Enc_Dyn_Boss"), *BossTemplate, ELKEncounterRank::Boss, HeroPool, BossPool);
+	FLKDungeonNode R1 = MakeBattle(TEXT("Node_R1"), TEXT("Enc_Dyn_R1"), *NormalTemplate, ELKEncounterRank::Normal, 1, HeroPool, BossPool);
+	FLKDungeonNode R2Battle = MakeBattle(TEXT("Node_R2Battle"), TEXT("Enc_Dyn_R2"), *NormalTemplate, ELKEncounterRank::Normal, 2, HeroPool, BossPool);
+	FLKDungeonNode R2Rest = MakeNode(TEXT("Node_R2Rest"), ELKDungeonNodeType::Rest, NAME_None, {}, 2);
+	FLKDungeonNode R3Elite = MakeBattle(TEXT("Node_R3Elite"), TEXT("Enc_Dyn_R3"), *EliteTemplate, ELKEncounterRank::Elite, 3, HeroPool, BossPool);
+	FLKDungeonNode R3Rest = MakeNode(TEXT("Node_R3Rest"), ELKDungeonNodeType::Rest, NAME_None, {}, 3);
+	FLKDungeonNode Boss = MakeBattle(TEXT("Node_Boss"), TEXT("Enc_Dyn_Boss"), *BossTemplate, ELKEncounterRank::Boss, 4, HeroPool, BossPool);
 	if (R1.NodeId.IsNone() || R2Battle.NodeId.IsNone() || R3Elite.NodeId.IsNone() || Boss.NodeId.IsNone())
 	{ return false; }
 
-	State.Nodes.Add(MakeNode(TEXT("Node_Start"), ELKDungeonNodeType::Event, NAME_None, { TEXT("Node_R1") }));
+	State.Nodes.Add(MakeNode(TEXT("Node_Start"), ELKDungeonNodeType::Event, NAME_None, { TEXT("Node_R1") }, 0));
 	R1.NextNodeIds = { TEXT("Node_R2A"), TEXT("Node_R2B") };
 	State.Nodes.Add(MoveTemp(R1));
 
@@ -439,6 +540,13 @@ bool ULKRunSubsystem::OfferRewardBatch(const TArray<FLKRunRewardOffer>& Offers)
     // 只在"胜利且可推进下一间"的窗口接受（SubmitBattleOutcome 已把阶段置为 ChoosingNode）。
     if (State.Phase != ELKRunPhase::ChoosingNode || Offers.IsEmpty() || Offers.Num() > 3) { return false; }
     if (HasPendingRewardChoice() || State.PendingRewardOffers.Num() > 0) { return false; }
+    for (const FLKRunRewardOffer& Offer : Offers)
+    {
+        if (!LKCardRules::IsPlayerObtainable(Offer.CardId)) { return false; }
+        if (Offer.Kind!=ELKRunRewardKind::AddCard && Offer.Kind!=ELKRunRewardKind::UpgradeCard) { return false; }
+        if (Offer.Kind==ELKRunRewardKind::AddCard && !LKCardRules::IsTemporaryMercenary(Offer.CardId)) { return false; }
+        if (Offer.Kind==ELKRunRewardKind::UpgradeCard && (LKCardRules::IsSpell(Offer.CardId)||LKCardRules::IsBuilding(Offer.CardId))) { return false; }
+    }
     // 同一次胜利只发一批：领取/跳过不能再次发批（防刷奖励）。
     if (State.bRewardOfferedForCurrentNode) { return false; }
 
@@ -477,10 +585,13 @@ bool ULKRunSubsystem::ChooseRewardReplacingCards(int32 Index, const TArray<FName
     // 应用奖励（先生成"待提交"变化，任何一步失败都不落盘）。
     const FLKRunRewardOffer Offer = State.PendingRewardOffers[Index];
     if (Offer.CardId.IsNone()) { return false; }
+    // 阵营权限的最终校验：敌方专属卡不能从奖励路径进入玩家牌组（生成层已过滤，这里是防御层）。
+    if (!LKCardRules::IsPlayerObtainable(Offer.CardId)) { return false; }
     const FLKRunState Before = State;
 
     if (Offer.Kind == ELKRunRewardKind::UpgradeCard)
     {
+        if (LKCardRules::IsSpell(Offer.CardId) || LKCardRules::IsBuilding(Offer.CardId)) { return false; }
         if (!ReplacedCardIds.IsEmpty() || Offer.LevelBefore < 0 || Offer.LevelAfter != Offer.LevelBefore + 1) { return false; }
         FLKRunCardState* Card = State.Cards.FindByPredicate(
             [CardId = Offer.CardId](const FLKRunCardState& Item) { return Item.CardId == CardId; });
@@ -491,6 +602,9 @@ bool ULKRunSubsystem::ChooseRewardReplacingCards(int32 Index, const TArray<FName
     }
     else if (Offer.Kind == ELKRunRewardKind::AddCard)
     {
+        FString ReplacementError;
+        if (!LKCardRules::IsTemporaryMercenary(Offer.CardId)
+            || !LKCardRules::ValidateReplacement(State.Cards,Offer.CardId,ReplacedCardIds,State.DeckCapacityMinimum,State.DeckCapacityMaximum,ReplacementError)) { return false; }
         // 加牌候选只在"未持有"时生成；此处复核，防止重复副本入库。
         if (State.Cards.ContainsByPredicate([CardId = Offer.CardId](const FLKRunCardState& Item)
             { return Item.CardId == CardId; })) { return false; }
@@ -508,7 +622,7 @@ bool ULKRunSubsystem::ChooseRewardReplacingCards(int32 Index, const TArray<FName
             Candidate.RemoveAt(OldIndex);
         }
         Candidate.Insert(NewCard, FMath::Min(InsertAt, Candidate.Num()));
-        if (Candidate.Num() < LKCardRules::MinimumCards || LKCardRules::Used(Candidate) > LKCardRules::Capacity) { return false; }
+        if (Candidate.Num() < LKCardRules::MinimumCards || LKCardRules::Used(Candidate) > State.DeckCapacityMaximum) { return false; }
         State.Cards = MoveTemp(Candidate);
     }
     else { return false; }
@@ -590,10 +704,12 @@ ELKNodeSelectionResult ULKRunSubsystem::SelectNode(FName NodeId)
 		return ELKNodeSelectionResult::Rejected;
 	}
 	const FLKRunState Before = State;
-	if (State.WorldMapVersion > 0 && (Next->Type == ELKDungeonNodeType::Rest || Next->Type == ELKDungeonNodeType::Market))
+	if (Next->Type == ELKDungeonNodeType::Rest || Next->Type == ELKDungeonNodeType::Market)
 	{
-		State.CurrentNodeId = NodeId; State.RegionId = Next->RegionId;
+		State.CurrentNodeId = NodeId; if (!Next->RegionId.IsNone()) { State.RegionId = Next->RegionId; }
 		State.Phase = ELKRunPhase::ResolvingNode; State.PendingBattle = FLKBattleContext();
+        if (Next->Type==ELKDungeonNodeType::Market)
+        { LKResearchContent::GenerateMarket(*FindNode(NodeId),State.Seed,LKBalanceRules::ComputeRegionDepth(State.WorldRegions,State.RegionId)); }
 		if (bAutoSaveEnabled && !SaveExpedition()) { State = Before; return ELKNodeSelectionResult::Rejected; }
 		OnServiceNodeEntered.Broadcast(NodeId, Next->Type);
 		return ELKNodeSelectionResult::ServiceEntered;
@@ -741,7 +857,7 @@ bool ULKRunSubsystem::RemoveHeroTrait(FName HeroId, FName TraitId)
 
 void ULKRunSubsystem::AbandonRun()
 {
-    if (HasRun() && !IsTerminal()) { State.Phase = ELKRunPhase::Abandoned; State.PendingBattle = FLKBattleContext(); }
+    AbandonCurrentRun();
 }
 
 void ULKRunSubsystem::FreezeTerminalSettlement()
@@ -756,6 +872,8 @@ void ULKRunSubsystem::FreezeTerminalSettlement()
     Receipt.bEligibleForHomeReward = State.bHomeRewardEligible;
 
     int32 Amount = State.WalletGold;
+    Receipt.ResearchMaterials=State.CarriedResearchMaterials;
+    if (State.Phase==ELKRunPhase::Failed) { Amount=int32((int64(Amount)*80)/100); }
     if (State.Phase == ELKRunPhase::Completed)
     {
         Amount = int32(FMath::Min<int64>(MAX_int32, int64(Amount) + FMath::Max(0, State.RewardRules.RunCompletedBonus)));
@@ -771,7 +889,7 @@ void ULKRunSubsystem::FreezeTerminalSettlement()
 
 bool ULKRunSubsystem::AbandonCurrentRun()
 {
-    if (!HasRunInProgress()) { return false; }
+    if (!HasRunInProgress() || State.Phase==ELKRunPhase::InBattle || State.Phase==ELKRunPhase::EnteringBattle) { return false; }
     const FLKRunState PreviousState = State;
     const FName NodeId = State.CurrentNodeId;
     State.Phase = ELKRunPhase::Abandoned;
@@ -857,7 +975,7 @@ bool ULKRunSubsystem::HasRunInProgress() const
 
 bool ULKRunSubsystem::IsTerminal() const
 {
-    return State.Phase == ELKRunPhase::Completed || State.Phase == ELKRunPhase::Failed || State.Phase == ELKRunPhase::Abandoned;
+    return IsTerminalPhase(State.Phase);
 }
 
 int32 ULKRunSubsystem::GetTotalRoomCount() const
@@ -963,6 +1081,48 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
         return false;
     }
     if (State.Encounters.IsEmpty()) { OutError = TEXT("遭遇快照为空"); return false; }
+    // 平衡快照：已写入的必须自洽（版本/深度/倍率/英雄预算条目）。
+    if (State.BalanceVersion < 0 || State.BalanceVersion > LKBalanceRules::CurrentBalanceVersion)
+    {
+        OutError = FString::Printf(TEXT("平衡版本 %d 不受支持（当前 %d）"), State.BalanceVersion, LKBalanceRules::CurrentBalanceVersion);
+        return false;
+    }
+    for (const FLKEncounterRow& Encounter : State.Encounters)
+    {
+        if (!LKBalanceRules::ValidateSnapshot(Encounter, OutError)) { return false; }
+    }
+    // 迁移后的存档不允许再出现敌方专属卡（迁移前允许，正是为了能载入并替换）。
+    // 覆盖玩家牌组、待开战副本与待领奖励的所有种类（升级候选同样不能指向敌方专属卡）。
+    // 终态（Completed/Failed/Abandoned）旧远征保留历史牌组与冻结奖励，且不可能再进入任何战斗，
+    // 因此不对其施加阵营限制——否则“终态历史不改”与载入兼容会互相矛盾。
+    if (State.BalanceVersion >= LKBalanceRules::CurrentBalanceVersion && !IsTerminalPhase(State.Phase))
+    {
+        for (const FLKRunCardState& Card : State.Cards)
+        {
+            if (!LKCardRules::IsPlayerObtainable(Card.CardId))
+            {
+                OutError = FString::Printf(TEXT("牌组含玩家不可获得的敌方专属卡 %s"), *Card.CardId.ToString());
+                return false;
+            }
+        }
+        for (const FLKRunCardState& Card : State.PendingBattle.PlayerCards)
+        {
+            if (!LKCardRules::IsPlayerObtainable(Card.CardId))
+            {
+                OutError = FString::Printf(TEXT("待开战牌组副本含玩家不可获得的敌方专属卡 %s"), *Card.CardId.ToString());
+                return false;
+            }
+        }
+        for (const FLKRunRewardOffer& Offer : State.PendingRewardOffers)
+        {
+            if (!LKCardRules::IsPlayerObtainable(Offer.CardId))
+            {
+                OutError = FString::Printf(TEXT("待领奖励含玩家不可获得的敌方专属卡 %s（%s）"),
+                    *Offer.CardId.ToString(), Offer.Kind == ELKRunRewardKind::UpgradeCard ? TEXT("升级候选") : TEXT("新卡候选"));
+                return false;
+            }
+        }
+    }
     // H3/H4：新档必须带区域与加成快照（旧档由 MigrateStoredRun 补默认值后再校验）。
     if (State.SchemaVersion >= 5)
     {
@@ -987,6 +1147,31 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
             if (!Current || Current->bResolved || (Current->Type != ELKDungeonNodeType::Rest && Current->Type != ELKDungeonNodeType::Market))
             { OutError = TEXT("非战斗节点恢复点无效"); return false; }
         }
+    }
+    if (State.SchemaVersion>=10)
+    {
+        if (State.DeckCapacityMinimum<1 || State.DeckCapacityMaximum<State.DeckCapacityMinimum || State.DeckCapacityMaximum>64
+            || !LKResearchContent::ValidateMaterials(State.CarriedResearchMaterials)
+            || !LKResearchContent::ValidateMaterials(State.PendingSettlement.ResearchMaterials))
+        { OutError=TEXT("容量或研究材料无效"); return false; }
+        TSet<FGuid> OfferIds;
+        for (const auto& Node:State.Nodes)
+        {
+            if (Node.MarketOffers.Num()>5 || (!Node.MarketOffers.IsEmpty() && (Node.Type!=ELKDungeonNodeType::Market || !Node.bMarketGenerated)))
+            { OutError=TEXT("市场商品快照无效"); return false; }
+            for (const auto& O:Node.MarketOffers)
+            {
+                const auto* R=LKResearchContent::Find(O.CardId);
+                if (!O.OfferId.IsValid() || OfferIds.Contains(O.OfferId) || O.Price<1 || O.Price>1000000
+                    || (O.Kind==ELKMarketOfferKind::Mercenary?!LKCardRules::IsTemporaryMercenary(O.CardId):!R||R->Kind!=O.Kind))
+                { OutError=TEXT("市场商品身份或价格无效"); return false; }
+                OfferIds.Add(O.OfferId);
+            }
+        }
+        if (!IsTerminalPhase(State.Phase) && State.BalanceVersion>=LKBalanceRules::CurrentBalanceVersion)
+        { for (const auto& O:State.PendingRewardOffers)
+            { if (O.Kind==ELKRunRewardKind::AddCard?!LKCardRules::IsTemporaryMercenary(O.CardId):LKCardRules::IsSpell(O.CardId)||LKCardRules::IsBuilding(O.CardId))
+                { OutError=TEXT("奖励不符合佣兵获取与休息升级规则"); return false; } } }
     }
     // 战斗阶段要求待开战上下文完整可解析（恢复点语义）。
     if (State.Phase == ELKRunPhase::EnteringBattle || State.Phase == ELKRunPhase::InBattle)
@@ -1023,14 +1208,31 @@ bool ULKRunSubsystem::SaveExpeditionToSlot(const FString& SlotName) const
         { if (A[Index].CardId != B[Index].CardId || A[Index].UpgradeLevel != B[Index].UpgradeLevel) { return false; } }
         return true;
     };
+    auto SameMarkets=[](const TArray<FLKDungeonNode>& A,const TArray<FLKDungeonNode>& B)
+    {
+        if (A.Num()!=B.Num()) { return false; }
+        for (int32 I=0;I<A.Num();++I)
+        {
+            if (A[I].NodeId!=B[I].NodeId || A[I].bResolved!=B[I].bResolved || A[I].bMarketGenerated!=B[I].bMarketGenerated || A[I].MarketOffers.Num()!=B[I].MarketOffers.Num()) { return false; }
+            for (int32 J=0;J<A[I].MarketOffers.Num();++J)
+            { const auto& X=A[I].MarketOffers[J]; const auto& Y=B[I].MarketOffers[J]; if (X.OfferId!=Y.OfferId || X.CardId!=Y.CardId || X.Kind!=Y.Kind || X.Price!=Y.Price || X.bSold!=Y.bSold) { return false; } }
+        } return true;
+    };
     if (!ReadBack || ReadBack->RunState.RunId != State.RunId || ReadBack->RunState.Phase != State.Phase
         || ReadBack->RunState.CurrentNodeId != State.CurrentNodeId || ReadBack->RunState.WalletGold != State.WalletGold
         || ReadBack->RunState.ProcessedWalletTransactions != State.ProcessedWalletTransactions
         || !SameCards(ReadBack->RunState.Cards, State.Cards)
         || !SameCards(ReadBack->RunState.PendingBattle.PlayerCards, State.PendingBattle.PlayerCards)
+        || !SameMarkets(ReadBack->RunState.Nodes,State.Nodes)
+        || ReadBack->RunState.PendingBattle.AttemptId!=State.PendingBattle.AttemptId
+        || ReadBack->RunState.PendingBattle.Seed!=State.PendingBattle.Seed
+        || ReadBack->RunState.PendingBattle.EnemyHeroIds!=State.PendingBattle.EnemyHeroIds
         || ReadBack->RunState.PendingRewardBatchId != State.PendingRewardBatchId
         || ReadBack->RunState.ClaimedRewardBatchIds != State.ClaimedRewardBatchIds
-        || ReadBack->RunState.PendingSettlement.bProfileApplied != State.PendingSettlement.bProfileApplied)
+        || ReadBack->RunState.PendingSettlement.bProfileApplied != State.PendingSettlement.bProfileApplied
+        || ReadBack->RunState.DeckCapacityMinimum!=State.DeckCapacityMinimum || ReadBack->RunState.DeckCapacityMaximum!=State.DeckCapacityMaximum
+        || !ReadBack->RunState.CarriedResearchMaterials.OrderIndependentCompareEqual(State.CarriedResearchMaterials)
+        || !ReadBack->RunState.PendingSettlement.ResearchMaterials.OrderIndependentCompareEqual(State.PendingSettlement.ResearchMaterials))
     { UE_LOG(LogLKBattle, Warning, TEXT("[Run] 安全点读回校验失败（槽 %s）"), *SlotName); return false; }
     UE_LOG(LogLKBattle, Log, TEXT("[Run] 安全节点已保存（槽 %s，Phase=%d，节点 %s）"),
         *SlotName, int32(State.Phase), *State.CurrentNodeId.ToString());
@@ -1062,20 +1264,63 @@ bool ULKRunSubsystem::LoadExpeditionFromSlot(const FString& SlotName, bool bAllo
         UE_LOG(LogLKBattle, Warning, TEXT("[Run] 存档校验失败：%s（保留原档，不静默覆盖）"), *Error);
         return false;
     }
-    State = Save->RunState;
-    if (State.SchemaVersion < CurrentSchemaVersion)
+
+    // 迁移在本地 Candidate 上进行：只有“迁移结果再次通过校验”后才提交到内存 State。
+    // 失败时调用前正在使用的远征（bAllowExistingRun=true）不会被 Reset 掉，提示 flag 也不写入。
+    FLKRunState Candidate = Save->RunState;
+    if (Candidate.SchemaVersion < CurrentSchemaVersion)
     {
         // H5：v0.6 及更早的远征档迁移到 Schema 5（补默认区域/加成/战备，旧轮不参与家园金币结算）。
-        MigrateStoredRun(State);
+        MigrateStoredRun(Candidate);
     }
-    UE_LOG(LogLKBattle, Log, TEXT("[Run] 已从存档恢复远征 %s（Phase=%d，第 %d 战，Schema=%d，区域 %s）"),
-        *State.RunId.ToString(), int32(State.Phase), GetCurrentRoomIndex(), State.SchemaVersion, *State.RegionId.ToString());
+    const bool bNeedsBalanceMigration = Candidate.BalanceVersion < LKBalanceRules::CurrentBalanceVersion;
+    FLKBalanceMigrationReport Report;
+    if (bNeedsBalanceMigration)
+    {
+        // Balance V1：一次性迁移（生命同比换算 + 未完成节点快照刷新 + 禁用卡替代）。
+        Report = MigrateRunToBalanceV1(Candidate);
+        // 迁移结果必须先通过同一套校验才允许使用/落盘，绝不静默写坏档。
+        FString MigratedError;
+        if (!ValidateStoredRun(Candidate, MigratedError))
+        {
+            UE_LOG(LogLKBattle, Error, TEXT("[Run] 平衡迁移结果校验失败：%s（保留原档与原内存状态，不写回）"), *MigratedError);
+            return false;
+        }
+    }
+
+    FString FinalError;
+    if (!ValidateStoredRun(Candidate,FinalError)) { UE_LOG(LogLKBattle,Warning,TEXT("[Run] 迁移校验失败：%s"),*FinalError); return false; }
+    State = MoveTemp(Candidate);
+    // 提交成功后才写提示：失败的载入不会留下“已迁移”痕迹。
+    bMigratedForBalance = bNeedsBalanceMigration && Report.bChanged;
+    MigrationNotice = bNeedsBalanceMigration ? BuildBalanceMigrationNotice(Report) : FText::GetEmpty();
+    if (bNeedsBalanceMigration && bAutoSaveEnabled)
+    {
+        // 迁移结果立刻落安全点：反复读档不会二次缩放（迁移本身也按版本幂等）。
+        if (!SaveExpedition()) { UE_LOG(LogLKBattle, Warning, TEXT("[Run] 平衡迁移后写盘失败；本次会话按内存状态继续")); }
+    }
+    UE_LOG(LogLKBattle, Log, TEXT("[Run] 已从存档恢复远征 %s（Phase=%d，第 %d 战，Schema=%d，Balance=%d，区域 %s）"),
+        *State.RunId.ToString(), int32(State.Phase), GetCurrentRoomIndex(), State.SchemaVersion, State.BalanceVersion, *State.RegionId.ToString());
     return true;
 }
 
 void ULKRunSubsystem::MigrateStoredRun(FLKRunState& InOutState) const
 {
     const int32 PreviousSchema = InOutState.SchemaVersion;
+    if (PreviousSchema<10)
+    {
+        InOutState.DeckCapacityMinimum=InOutState.DeckCapacityMaximum=8;
+        if (!IsTerminalPhase(InOutState.Phase))
+        {
+            InOutState.RewardRules.FailureKeepPercent=.8f; InOutState.RewardRules.AbandonKeepPercent=1.f; InOutState.RewardRules.RuleVersion=3;
+            if (InOutState.BalanceVersion>=LKBalanceRules::CurrentBalanceVersion)
+            { InOutState.PendingRewardOffers.RemoveAll([](const auto& O){return O.Kind==ELKRunRewardKind::AddCard?!LKCardRules::IsTemporaryMercenary(O.CardId):LKCardRules::IsSpell(O.CardId)||LKCardRules::IsBuilding(O.CardId);}); }
+            if (InOutState.Phase==ELKRunPhase::ChoosingReward && InOutState.PendingRewardOffers.IsEmpty())
+            { InOutState.ClaimedRewardBatchIds.AddUnique(InOutState.PendingRewardBatchId); InOutState.PendingRewardBatchId.Invalidate(); InOutState.Phase=ELKRunPhase::ChoosingNode; }
+        }
+        if (!IsTerminalPhase(InOutState.Phase))
+        { for (auto& N:InOutState.Nodes) { LKResearchContent::GenerateMarket(N,InOutState.Seed,LKBalanceRules::ComputeRegionDepth(InOutState.WorldRegions,N.RegionId)); } }
+    }
     if (PreviousSchema >= 6)
     {
         // No wallet/route rewrite. Excess legacy cards await an explicit player choice in the reward UI.
@@ -1086,7 +1331,7 @@ void ULKRunSubsystem::MigrateStoredRun(FLKRunState& InOutState) const
     {
         // 已有路线/随机内容/冻结回执原样保留；正在进行的旧轮以后全额带回。
         InOutState.WalletGold = InOutState.PendingGold; InOutState.StartingGold = 0;
-        InOutState.RewardRules.FailureKeepPercent = 1.f; InOutState.RewardRules.AbandonKeepPercent = 1.f;
+        InOutState.RewardRules.FailureKeepPercent = .8f; InOutState.RewardRules.AbandonKeepPercent = 1.f;
         InOutState.SchemaVersion = CurrentSchemaVersion;
         return;
     }
@@ -1140,11 +1385,308 @@ void ULKRunSubsystem::MigrateStoredRun(FLKRunState& InOutState) const
         PreviousSchema, InOutState.SchemaVersion, *InOutState.RegionId.ToString());
 }
 
+int32 ULKRunSubsystem::NodeBalanceDepth(const FLKRunState& InOutState, const FLKDungeonNode& Node) const
+{
+    // 世界地图：区域拓扑深度（不是区域数组序号）；旧小图只有起点区域，深度 = 层号。
+    if (InOutState.WorldMapVersion > 0 && !InOutState.WorldRegions.IsEmpty())
+    {
+        const int32 RegionDepth = LKBalanceRules::ComputeRegionDepth(InOutState.WorldRegions, Node.RegionId);
+        return LKBalanceRules::NodeDepth(RegionDepth, InOutState.WorldMapVersion>=2?FMath::RoundToInt(float(Node.Layer)*4.f/14.f):Node.Layer);
+    }
+    return LKBalanceRules::NodeDepth(0, Node.Layer);
+}
+
+int32 ULKRunSubsystem::ReplaceDisabledCards(FLKRunState& InOutState) const
+{
+    // 稳定顺序替代：优先剑士、弓箭手、盾卫、火球、治疗波、箭塔、兵营；替代卡 Lv0。
+    // 这七张基础卡（含火球/治疗波两张法术）由 LKCardRules::ReplacementCardIds() 显式登记。
+    // 旧实现额外要求 LKUnitContent::Find 命中；法术没有单位行会被静默跳过，
+    // 于是"五张单位/建筑候选已被占用"的合法旧牌组补不满五张。这里只按阵营权限复核。
+    TSet<FName> Used;
+    for (const FLKRunCardState& Card : InOutState.Cards)
+    {
+        if (LKCardRules::IsPlayerObtainable(Card.CardId)) { Used.Add(Card.CardId); }
+    }
+    auto PickReplacement = [&Used]() -> FName
+    {
+        for (FName Candidate : LKCardRules::ReplacementCardIds())
+        {
+            if (Candidate.IsNone() || Used.Contains(Candidate)) { continue; }
+            if (!LKCardRules::IsPlayerObtainable(Candidate)) { continue; }
+            return Candidate;
+        }
+        return NAME_None;
+    };
+
+    TMap<FName, FName> ReplacedById;
+    int32 Replaced = 0;
+    for (FLKRunCardState& Card : InOutState.Cards)
+    {
+        if (LKCardRules::IsPlayerObtainable(Card.CardId)) { continue; }
+        const FName Replacement = PickReplacement();
+        if (!Replacement.IsNone())
+        {
+            UE_LOG(LogLKBattle, Log, TEXT("[Run] 禁用卡替代：%s -> %s（Lv0）"), *Card.CardId.ToString(), *Replacement.ToString());
+            ReplacedById.Add(Card.CardId, Replacement);
+            Card.CardId = Replacement;
+            Card.UpgradeLevel = 0;
+            Used.Add(Replacement);
+            ++Replaced;
+        }
+        else
+        {
+            UE_LOG(LogLKBattle, Warning, TEXT("[Run] 禁用卡 %s 无可用替代，按移除处理"), *Card.CardId.ToString());
+            Card.CardId = NAME_None;
+        }
+    }
+    InOutState.Cards.RemoveAll([](const FLKRunCardState& Card) { return Card.CardId.IsNone(); });
+    // 至少 5 张：不足时按稳定顺序补齐（不消耗金币、不重抽已领取奖励）。
+    for (int32 Guard = 0; InOutState.Cards.Num() < LKCardRules::MinimumCards && Guard < 32; ++Guard)
+    {
+        const FName Replacement = PickReplacement();
+        if (Replacement.IsNone()) { break; }
+        FLKRunCardState Card;
+        Card.CardId = Replacement;
+        InOutState.Cards.Add(Card);
+        Used.Add(Replacement);
+        ++Replaced;
+    }
+
+    // 家园战备快照同步（面板直接展示 InitialLoadout）：只替换禁用卡，不重写历史战报。
+    SyncInitialLoadoutAfterReplacement(InOutState, ReplacedById);
+
+    // 冻结的待选奖励：所有种类都不得指向敌方专属卡。
+    // 旧 UpgradeCard 指向敌方专属卡时确定性换成"合法升级或新卡"，不使用随机池、不重抽、不动领取回执。
+    if (!InOutState.PendingRewardOffers.IsEmpty())
+    {
+        TSet<FName> Owned;
+        for (const FLKRunCardState& Card : InOutState.Cards) { Owned.Add(Card.CardId); }
+        // 与牌组替代共用同一份"七张显式登记基础卡（含法术）"清单，避免两处漂移。
+        TArray<FName> RewardPool = LKCardRules::ReplacementCardIds();
+        for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
+        { RewardPool.AddUnique(Definition.Unit.UnitId); }
+
+        // 本批已占用的候选：保证批次内无重复候选（升级目标与加牌候选天然不同集合）。
+        TSet<FName> ChosenAdd;
+        TSet<FName> ChosenUpgrade;
+        auto PickAddCandidate = [&RewardPool, &Owned, &ChosenAdd]() -> FName
+        {
+            for (FName Candidate : RewardPool)
+            {
+                if (Candidate.IsNone() || !LKCardRules::IsTemporaryMercenary(Candidate)) { continue; }
+                if (Owned.Contains(Candidate) || ChosenAdd.Contains(Candidate)) { continue; }
+                return Candidate;
+            }
+            return NAME_None;
+        };
+        auto PickUpgradeTarget = [&InOutState, &ChosenUpgrade]() -> const FLKRunCardState*
+        {
+            for (const FLKRunCardState& Card : InOutState.Cards)
+            {
+                if (Card.CardId.IsNone() || !LKCardRules::IsPlayerObtainable(Card.CardId) || LKCardRules::IsSpell(Card.CardId) || LKCardRules::IsBuilding(Card.CardId)) { continue; }
+                if (ChosenUpgrade.Contains(Card.CardId)) { continue; }
+                return &Card;
+            }
+            return nullptr;
+        };
+
+        for (FLKRunRewardOffer& Offer : InOutState.PendingRewardOffers)
+        {
+            const bool bLegalCard = !Offer.CardId.IsNone() && LKCardRules::IsPlayerObtainable(Offer.CardId) && (Offer.Kind==ELKRunRewardKind::AddCard?LKCardRules::IsTemporaryMercenary(Offer.CardId):!LKCardRules::IsSpell(Offer.CardId)&&!LKCardRules::IsBuilding(Offer.CardId));
+            if (Offer.Kind == ELKRunRewardKind::UpgradeCard)
+            {
+                const FLKRunCardState* Target = bLegalCard ? InOutState.Cards.FindByPredicate(
+                    [&Offer](const FLKRunCardState& Card) { return Card.CardId == Offer.CardId; }) : nullptr;
+                if (Target && !ChosenUpgrade.Contains(Target->CardId))
+                {
+                    // 等级以存档牌组为准：旧批次的脏 LevelBefore/After 在这里被纠正为合法值。
+                    Offer.LevelBefore = Target->UpgradeLevel;
+                    Offer.LevelAfter = Target->UpgradeLevel + 1;
+                    ChosenUpgrade.Add(Target->CardId);
+                    continue;
+                }
+                const FLKRunCardState* ReplacementTarget = PickUpgradeTarget();
+                if (ReplacementTarget)
+                {
+                    UE_LOG(LogLKBattle, Log, TEXT("[Run] 待领升级候选替代：%s -> %s"), *Offer.CardId.ToString(), *ReplacementTarget->CardId.ToString());
+                    Offer.CardId = ReplacementTarget->CardId;
+                    Offer.LevelBefore = ReplacementTarget->UpgradeLevel;
+                    Offer.LevelAfter = ReplacementTarget->UpgradeLevel + 1;
+                    ChosenUpgrade.Add(Offer.CardId);
+                    continue;
+                }
+                const FName NewCard = PickAddCandidate();
+                if (!NewCard.IsNone())
+                {
+                    UE_LOG(LogLKBattle, Log, TEXT("[Run] 待领升级候选降级为新卡候选：%s -> %s"), *Offer.CardId.ToString(), *NewCard.ToString());
+                    Offer.Kind = ELKRunRewardKind::AddCard;
+                    Offer.CardId = NewCard;
+                    Offer.LevelBefore = 0;
+                    Offer.LevelAfter = 0;
+                    ChosenAdd.Add(NewCard);
+                    continue;
+                }
+                Offer.CardId = NAME_None;
+            }
+            else if (Offer.Kind == ELKRunRewardKind::AddCard)
+            {
+                if (bLegalCard && !Owned.Contains(Offer.CardId) && !ChosenAdd.Contains(Offer.CardId))
+                {
+                    // AddCard 语义：LevelBefore/After 恒为 0。
+                    Offer.LevelBefore = 0;
+                    Offer.LevelAfter = 0;
+                    ChosenAdd.Add(Offer.CardId);
+                    continue;
+                }
+                const FName NewCard = PickAddCandidate();
+                if (!NewCard.IsNone())
+                {
+                    UE_LOG(LogLKBattle, Log, TEXT("[Run] 待领奖励禁用候选替代：%s -> %s"), *Offer.CardId.ToString(), *NewCard.ToString());
+                    Offer.CardId = NewCard;
+                    Offer.LevelBefore = 0;
+                    Offer.LevelAfter = 0;
+                    ChosenAdd.Add(NewCard);
+                    continue;
+                }
+                const FLKRunCardState* ReplacementTarget = PickUpgradeTarget();
+                if (ReplacementTarget)
+                {
+                    UE_LOG(LogLKBattle, Log, TEXT("[Run] 待领新卡候选改为升级候选：%s -> %s"), *Offer.CardId.ToString(), *ReplacementTarget->CardId.ToString());
+                    Offer.Kind = ELKRunRewardKind::UpgradeCard;
+                    Offer.CardId = ReplacementTarget->CardId;
+                    Offer.LevelBefore = ReplacementTarget->UpgradeLevel;
+                    Offer.LevelAfter = ReplacementTarget->UpgradeLevel + 1;
+                    ChosenUpgrade.Add(Offer.CardId);
+                    continue;
+                }
+                Offer.CardId = NAME_None;
+            }
+            else
+            {
+                // 未知种类（损坏档）：丢弃候选而不是把非法内容留在面板上。
+                Offer.CardId = NAME_None;
+            }
+        }
+        InOutState.PendingRewardOffers.RemoveAll([](const FLKRunRewardOffer& Offer) { return Offer.CardId.IsNone(); });
+        if (InOutState.PendingRewardOffers.IsEmpty())
+        {
+            // 防御性兜底（迁移后牌组至少 5 张合法卡，正常不会走到）：没有合法候选时作废本批，
+            // 避免玩家卡在无法领取的面板上；批次 ID 与领取回执的语义与既有跳过入口一致。
+            InOutState.ClaimedRewardBatchIds.Add(InOutState.PendingRewardBatchId);
+            InOutState.PendingRewardBatchId = FGuid();
+            if (InOutState.Phase == ELKRunPhase::ChoosingReward) { InOutState.Phase = ELKRunPhase::ChoosingNode; }
+            UE_LOG(LogLKBattle, Log, TEXT("[Run] 待领奖励整批作废（候选全部非法且无确定性替代）"));
+        }
+    }
+
+    // 待开始战斗的牌组副本必须与迁移后的牌组一致，避免从恢复路径绕过限制。
+    // 牌组副本无条件同步（即使上下文已不是恢复点，也不允许留下敌方专属卡）；
+    // 英雄副本只在确实是待开战上下文时同步，避免改写无关快照。
+    InOutState.PendingBattle.PlayerCards = InOutState.Cards;
+    if (InOutState.PendingBattle.bExpedition)
+    {
+        InOutState.PendingBattle.PlayerHeroes = InOutState.Heroes;
+    }
+    return Replaced;
+}
+
+FLKBalanceMigrationReport ULKRunSubsystem::MigrateRunToBalanceV1(FLKRunState& InOutState) const
+{
+    FLKBalanceMigrationReport Report;
+    Report.PreviousBalanceVersion = InOutState.BalanceVersion;
+    if (InOutState.BalanceVersion >= LKBalanceRules::CurrentBalanceVersion) { return Report; }
+
+    // 终态旧远征只补版本标记（Schema 迁移在上层已完成）：
+    // 英雄、牌组、已完成遭遇、路线、钱包、历史与领取回执都属于既成历史，不再改写，也不重抽奖励。
+    if (IsTerminalPhase(InOutState.Phase))
+    {
+        InOutState.BalanceVersion = LKBalanceRules::CurrentBalanceVersion;
+        InOutState.SchemaVersion = CurrentSchemaVersion;
+        Report.bTerminalHistoryPreserved = true;
+        Report.bChanged = false;
+        UE_LOG(LogLKBattle, Log, TEXT("[Run] 平衡迁移：终态旧远征（Phase=%d）保留历史，只写入 Balance=%d"),
+            int32(InOutState.Phase), InOutState.BalanceVersion);
+        return Report;
+    }
+
+    // 1) 玩家英雄：按"新原生生命 / 旧原生生命"同比缩放 BaseMaxHealth、MaxHealth、Health。
+    //    同比缩放同时满足两件事：当前血量相对旧 MaxHealth 的百分比不变（半血仍半血），
+    //    且 BaseMaxHealth 相对旧原生基准的永久升级、以及 MaxHealth 上的特性增幅都按同一比例保留。
+    //    旧实现的 HealthRatio=Health/BaseMaxHealth 会在存在永久增幅时把血量补回，等于凭空回血。
+    for (FLKRunHeroState& Hero : InOutState.Heroes)
+    {
+        const FLKUnitRow* Row = LKUnitContent::Find(Hero.HeroId);
+        if (!Row || !FMath::IsFinite(Row->BaseHealth) || Row->BaseHealth <= 0.f) { continue; }
+        float OldNative = 0.f;
+        // 自定义英雄（旧档创建时不存在，或非玩家原生英雄）没有旧基准：保持原数值，不参与同比缩放。
+        if (!LegacyNativeBaseHealth(Hero.HeroId, OldNative) || OldNative <= 0.f) { continue; }
+        const float Scale = Row->BaseHealth / OldNative;
+        const float OldMaximum = (FMath::IsFinite(Hero.MaxHealth) && Hero.MaxHealth > 0.f) ? Hero.MaxHealth : OldNative;
+        // BaseMaxHealth<=0 仅见于更早的 D1 快照：按旧 MaxHealth 兼容迁移，不让永久基准丢失。
+        const float OldBase = (FMath::IsFinite(Hero.BaseMaxHealth) && Hero.BaseMaxHealth > 0.f) ? Hero.BaseMaxHealth : OldMaximum;
+        const float WasHealth = (FMath::IsFinite(Hero.Health) && Hero.Health > 0.f) ? Hero.Health : 0.f;
+        const float HealthRatio = FMath::Clamp(WasHealth / OldMaximum, 0.f, 1.f);
+        Hero.BaseMaxHealth = OldBase * Scale;
+        Hero.MaxHealth = OldMaximum * Scale;
+        // 0 血仍是失能：比例 0 不会被更新复活。
+        Hero.Health = FMath::Clamp(Hero.MaxHealth * HealthRatio, 0.f, Hero.MaxHealth);
+        ++Report.ScaledHeroes;
+        UE_LOG(LogLKBattle, Log, TEXT("[Run] 平衡迁移：%s 基础 %.0f -> %.0f（同比 ×%.4f），生命 %.0f/%.0f -> %.0f/%.0f"),
+            *Hero.HeroId.ToString(), OldBase, Hero.BaseMaxHealth, Scale, WasHealth, OldMaximum, Hero.Health, Hero.MaxHealth);
+    }
+
+    // 2) 只迁移未完成节点及其对应遭遇：已完成路线、种子、钱包、领取回执不改。
+    //    已完成节点的遭遇保持旧快照（历史兼容）；旧实现用第二个循环对所有快照行 ApplySnapshot，
+    //    会把已完成遭遇一起改写，这里不再有全量兜底循环。
+    TSet<FName> RefreshedEncounters;
+    for (const FLKDungeonNode& Node : InOutState.Nodes)
+    {
+        if (!LKWorldMapContent::IsCombat(Node.Type) || Node.bResolved) { continue; }
+        for (FLKEncounterRow& Encounter : InOutState.Encounters)
+        {
+            if (Encounter.EncounterId != Node.EncounterId) { continue; }
+            LKBalanceRules::BuildReinforcementWaves(Encounter.Rank, Encounter.Waves);
+            Encounter.EnemySilverPerSecond = LKBalanceRules::EnemySilverRate(Encounter.Rank);
+            Encounter.EnemySilverCap = 10.f;
+            Encounter.EnemyStartingSilver = 0.f;
+            Encounter.EnemySpell.Cooldown = LKBalanceRules::CircleCooldown(Encounter.Rank);
+            Encounter.EnemySpell.bEnabled = true;
+            LKBalanceRules::ApplySnapshot(Encounter, NodeBalanceDepth(InOutState, Node));
+            RefreshedEncounters.Add(Encounter.EncounterId);
+            break;
+        }
+    }
+    Report.UnfinishedEncounters = RefreshedEncounters.Num();
+    // 3) 待恢复战斗同步新快照（从既有安全点重建，不复制两套增援；AttemptId/种子不变）。
+    if (InOutState.PendingBattle.bExpedition)
+    {
+        const FLKDungeonNode* PendingNode = InOutState.Nodes.FindByPredicate(
+            [&InOutState](const FLKDungeonNode& Node) { return Node.NodeId == InOutState.PendingBattle.NodeId; });
+        if (PendingNode && !PendingNode->bResolved && LKWorldMapContent::IsCombat(PendingNode->Type))
+        {
+            if (const FLKEncounterRow* Source = LKEncounterContent::Find(InOutState.Encounters, InOutState.PendingBattle.EncounterId))
+            {
+                InOutState.PendingBattle.Encounter = *Source;
+                InOutState.PendingBattle.EnemyHeroIds = Source->EnemyHeroIds;
+            }
+        }
+    }
+
+    // 4) 禁用卡替代（牌组/战备快照/待领奖励/待开战副本；不重写历史战报与回执）。
+    Report.ReplacedCards = ReplaceDisabledCards(InOutState);
+    InOutState.BalanceVersion = LKBalanceRules::CurrentBalanceVersion;
+    InOutState.SchemaVersion = CurrentSchemaVersion;
+    Report.bChanged = true;
+
+    UE_LOG(LogLKBattle, Log, TEXT("[Run] Balance V1 迁移完成：Balance %d -> %d，英雄 %d 名，未完成节点遭遇 %d 个，禁用卡替代 %d 张"),
+        Report.PreviousBalanceVersion, InOutState.BalanceVersion, Report.ScaledHeroes, Report.UnfinishedEncounters, Report.ReplacedCards);
+    return Report;
+}
+
 bool ULKRunSubsystem::SaveExpedition()
 {
     return SaveExpeditionToSlot(GetStorageSlot());
 }
-
 bool ULKRunSubsystem::LoadExpedition()
 {
     return LoadExpeditionFromSlot(GetStorageSlot());

@@ -1,5 +1,7 @@
 #include "ULKGameData.h"
+#include "LKResearchContent.h"
 #include "LKLog.h"
+#include "LKCardRules.h"
 #include "ULKCardDefinition.h"
 #include "LKExpeditionMercenaryContent.h"
 #include "LKBattleArt.h"
@@ -33,6 +35,15 @@ ULKGameData::ULKGameData()
 
 void ULKGameData::EnsureDefaultDecks()
 {
+	const int32 Removed = DefaultPlayerDeck.RemoveAll([](FName Id) { return !LKCardRules::IsPlayerObtainable(Id); });
+	if (Removed > 0)
+	{
+		for (FName Id : LKCardRules::ReplacementCardIds())
+		{
+			if (DefaultPlayerDeck.Num() >= LKCardRules::MinimumCards) { break; }
+			DefaultPlayerDeck.AddUnique(Id);
+		}
+	}
 	if (DefaultPlayerDeck.Num() == 0)
 	{
 		DefaultPlayerDeck = {
@@ -80,14 +91,14 @@ void ULKGameData::EnsureCardLibrary()
 		AddCard(TEXT("Unit_Archer"),       TEXT("弓箭手"), 2, ELKCardType::Unit,     TEXT("Unit_Archer"),       ELKSpellEffect::None,   0.f,   0.f);
 		AddCard(TEXT("Unit_Shieldbearer"), TEXT("盾卫"),   2, ELKCardType::Unit,     TEXT("Unit_Shieldbearer"), ELKSpellEffect::None,   0.f,   0.f);
 		AddCard(TEXT("Spell_Fireball"),    TEXT("火球术"), 2, ELKCardType::Spell,    NAME_None,                 ELKSpellEffect::Damage, 60.f,  250.f);
-		AddCard(TEXT("Spell_HealWave"),    TEXT("治疗波"), 2, ELKCardType::Spell,    NAME_None,                 ELKSpellEffect::Heal,   40.f,  300.f);
+		AddCard(TEXT("Spell_HealWave"),    TEXT("治疗波"), 2, ELKCardType::Spell,    NAME_None,                 ELKSpellEffect::Heal,   120.f,  300.f);
+		for (auto& C:CardLibrary) { if (C && C->CardId=="Spell_HealWave") { C->HeroHealPercent=.06f; } }
 		AddCard(TEXT("Building_ArrowTower"), TEXT("箭塔"), 2, ELKCardType::Building, TEXT("Building_ArrowTower"), ELKSpellEffect::None, 0.f,   0.f);
 		AddCard(TEXT("Building_Barracks"), TEXT("兵营"),   2, ELKCardType::Building, TEXT("Building_Barracks"), ELKSpellEffect::None,   0.f,   0.f);
 		UE_LOG(LogLK, Log, TEXT("[GameData] 已注入 %d 张内置卡（未配置 CardLibrary）"), CardLibrary.Num());
 	}
 
-	// D3 奖励新卡：骷髅兵/骷髅射手（1 费，缺省美术由 B 批补全）。
-	// 无论 DA_GameData 是否已配置 CardLibrary，都保证运行时目录存在（只改运行时副本，不写资产）。
+	// 敌方专属骷髅卡（保留卡库条目与召唤单位，但玩家不能获取/施放：见 LKCardRules 阵营权限）。
 	const TPair<FName, const TCHAR*> SkeletonCards[] = {
 		{ TEXT("Unit_Skeleton"), TEXT("骷髅兵") },
 		{ TEXT("Unit_SkeletonArcher"), TEXT("骷髅射手") },
@@ -105,8 +116,40 @@ void ULKGameData::EnsureCardLibrary()
 		Card->SpawnUnitId = Entry.Key;
 		Card->BuildingUnitId = Entry.Key;
 		CardLibrary.Add(Card);
-		UE_LOG(LogLK, Log, TEXT("[GameData] 注入奖励卡：%s（%s，1 费）"), *Entry.Key.ToString(), Entry.Value);
+		UE_LOG(LogLK, Log, TEXT("[GameData] 注入敌方专属卡：%s（%s，1 费）"), *Entry.Key.ToString(), Entry.Value);
 	}
+
+	// 敌方专属战术法术【骷髅法阵】：5 银币、区域减速 + 召唤，玩家不可获取。
+	{
+		const FName CircleId = "Spell_SkeletonCircle";
+		ULKCardDefinition* Existing = nullptr;
+		for (TObjectPtr<ULKCardDefinition>& Entry : CardLibrary)
+		{
+			if (Entry && Entry->CardId == CircleId) { Existing = Entry.Get(); break; }
+		}
+		// 共享资产不能被就地改写：需要时先复制一份到本资产私有副本。
+		ULKCardDefinition* Card = (Existing && Existing->GetOuter() != this)
+			? DuplicateObject<ULKCardDefinition>(Existing, this) : Existing;
+		if (!Card)
+		{
+			Card = NewObject<ULKCardDefinition>(this, CircleId);
+			CardLibrary.Add(Card);
+			UE_LOG(LogLK, Log, TEXT("[GameData] 注入敌方专属法术：%s（骷髅法阵，5 费）"), *CircleId.ToString());
+		}
+		else if (Card != Existing) { CardLibrary[CardLibrary.IndexOfByKey(Existing)] = Card; }
+		Card->CardId = CircleId;
+		Card->CardName = FText::FromString(TEXT("骷髅法阵"));
+		Card->Description = FText::FromString(TEXT("敌方专属：区域减速并在 3 秒内召唤最多 6 名骷髅兵。"));
+		Card->Cost = 5;
+		Card->CardType = ELKCardType::Spell;
+		Card->SpellEffect = ELKSpellEffect::SummonZone;
+		Card->SpellValue = 0.f; // 与 Damage/Heal 的 SpellValue 通道独立：法阵本身无直接伤害。
+		Card->SpellRadius = Card->Circle.Radius;
+		Card->SpellGrade = ELKSpellGrade::Intermediate1; // 仅用于显示的中阶一级占位。
+		Card->bExpeditionOnly = true;
+		if (Card->Icon.IsNull()) { Card->Icon = LKBattleArt::CardIcon("Unit_Skeleton"); }
+	}
+
     for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
     {
         const FName Id = Definition.Unit.UnitId;
@@ -119,9 +162,17 @@ void ULKGameData::EnsureCardLibrary()
         Card->SpawnUnitId = Id; Card->BuildingUnitId = Id; Card->bExpeditionOnly = true;
         if (Existing) { CardLibrary[CardLibrary.IndexOfByKey(*Existing)] = Card; } else { CardLibrary.Add(Card); }
     }
+    LKResearchContent::EnsureCards(*this);
     for (TObjectPtr<ULKCardDefinition>& Entry : CardLibrary)
     {
-        if (!Entry || !Entry->Icon.IsNull()) { continue; }
+        if (!Entry) { continue; }
+        // 阵营规范身份由代码登记：数据资产即使被误改成 Both，也不会把敌方专属卡开放给玩家。
+        if (LKCardRules::FactionOf(Entry->CardId) != Entry->Faction)
+        {
+            if (Entry->GetOuter() != this) { Entry = DuplicateObject<ULKCardDefinition>(Entry.Get(), this); }
+            LKCardRules::ApplyCanonicalFaction(*Entry);
+        }
+        if (!Entry->Icon.IsNull()) { continue; }
         const TSoftObjectPtr<UTexture2D> DefaultIcon = LKBattleArt::CardIcon(Entry->CardId);
         if (DefaultIcon.IsNull()) { continue; }
         // The library may contain a shared authored asset. Never write presentation defaults into it.

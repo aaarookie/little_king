@@ -95,7 +95,7 @@ bool StartRun(ULKRunSubsystem* Run, int32 CardCount = 7)
         FLKRunHeroState Hero; Hero.HeroId = Id; Hero.Health = Hero.MaxHealth = Hero.BaseMaxHealth = LKUnitContent::Find(Id)->BaseHealth; Heroes.Add(Hero);
     }
     TArray<FLKRunCardState> Cards;
-    TArray<FName> Ids = LKHomeContent::DefaultUnlockedCards(); Ids.Add("Unit_Skeleton"); Ids.Add("Unit_SkeletonArcher");
+    TArray<FName> Ids = LKHomeContent::DefaultUnlockedCards(); Ids.Add("Unit_GoblinBlade"); Ids.Add("Unit_ElfGuard");
     for (int32 I = 0; I < CardCount; ++I) { FLKRunCardState Card; Card.CardId = Ids[I]; Cards.Add(Card); }
     return Run->StartNewRun(Heroes, Cards, 815);
 }
@@ -108,15 +108,15 @@ bool FLKCharacterCatalogTest::RunTest(const FString& Parameters)
 {
     ULKGameData* Data = NewObject<ULKGameData>(); Data->EnsureDefaultDecks(); Data->EnsureCardLibrary();
     TestEqual(TEXT("28 native character definitions"), LKUnitContent::Units().Num(), 28);
-    TestEqual(TEXT("24 cards including fifteen expedition cards"), Data->CardLibrary.Num(), 24);
-    Data->EnsureCardLibrary(); TestEqual(TEXT("Repeated registration does not duplicate"), Data->CardLibrary.Num(), 24);
+    TestEqual(TEXT("25 cards including fifteen expedition cards and the enemy-only skeleton circle"), Data->CardLibrary.Num(), 32);
+    Data->EnsureCardLibrary(); TestEqual(TEXT("Repeated registration does not duplicate"), Data->CardLibrary.Num(), 32);
     for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
     {
         const FLKUnitRow* Unit = LKUnitContent::Find(Definition.Unit.UnitId);
         if (!TestNotNull(TEXT("Native unit resolves without a data table row"), Unit)) { return false; }
         const TObjectPtr<ULKCardDefinition>* Card = Data->CardLibrary.FindByPredicate([Unit](const TObjectPtr<ULKCardDefinition>& C) { return C && C->CardId == Unit->UnitId; });
         if (!TestNotNull(TEXT("Card automatically resolves"), Card)) { return false; }
-        TestTrue(TEXT("Temporary flag"), (*Card)->bExpeditionOnly);
+        TestEqual(TEXT("Only mercenaries are temporary; catapult is researched at home"), (*Card)->bExpeditionOnly, Unit->UnitClass!=ELKUnitClass::Building);
         TestFalse(TEXT("Not initially unlocked"), LKHomeContent::DefaultUnlockedCards().Contains(Unit->UnitId));
         TestFalse(TEXT("Not in default deck"), Data->DefaultPlayerDeck.Contains(Unit->UnitId));
         TestTrue(TEXT("UI describes skill"), !(*Card)->Description.IsEmpty());
@@ -402,7 +402,7 @@ bool FLKCharacterUITest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Legacy selector preserves all nine choices"), Replacement->GetChildrenCount(), 9);
     TestFalse(TEXT("Map choices are hidden until excess is resolved"), GM->CanSelectNextNode());
     TestFalse(TEXT("Legacy excess cannot advance to combat"), Run->AdvanceToNextBattle());
-    TestTrue(TEXT("Player can discard an old card instead of new temporary card"), Run->DiscardExcessCard("Unit_Skeleton"));
+    TestTrue(TEXT("Player can discard an old card instead of new temporary card"), Run->DiscardExcessCard("Unit_GoblinBlade"));
     TestEqual(TEXT("Preserved temporary card keeps upgrade"), Run->GetRunState().Cards.Last().UpgradeLevel, 2);
     TestFalse(TEXT("Legacy capacity repaired"), Run->NeedsDeckReduction());
     UGameplayStatics::DeleteGameInSlot(SlotName, 0);

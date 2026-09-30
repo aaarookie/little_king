@@ -5,6 +5,7 @@
 #if WITH_EDITOR
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
+#include "LKSkeletonCircle.h"
 #include "ALKHeroCamp.h"
 #include "LKBattleArt.h"
 #include "ULKGameData.h"
@@ -27,7 +28,7 @@
 
 namespace LKBattleArtPreview
 {
-bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview")); }
+bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview")) || FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview")); }
 void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
 {
     // Separate process, explicit editor-only option, no player save reads or writes.
@@ -39,9 +40,43 @@ void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
     Data = Source ? DuplicateObject<ULKGameData>(Source, Mode) : NewObject<ULKGameData>(Mode);
     Data->bEnableExpeditionFlow = false;
     Data->bDrawDebugShapes = false;
+    if (FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview"))) { Data->EnemyEncounterId="Patrol"; }
+}
+static void TickBalancePreview(ALKBattleGameMode* Mode)
+{
+    static int32 Frame=0;
+    static TWeakObjectPtr<ALKSkeletonCircle> Circle;
+    if (!Mode->GetBattleHUDWidget()) { return; }
+    ++Frame;
+    auto FreezeActors=[&]()
+    { for (TActorIterator<ALKUnitBase> It(Mode->GetWorld()); It; ++It) { It->SetActorTickEnabled(false); } };
+    auto Shot=[&](const TCHAR* Name)
+    {
+        const FString Dir=FPaths::ProjectSavedDir()/TEXT("Screenshots/BalanceV1");
+        IFileManager::Get().MakeDirectory(*Dir,true);
+        FScreenshotRequest::RequestScreenshot(Dir/Name,true,false);
+    };
+    if (Frame==1)
+    {
+        for (int32 I=0; I<Mode->AvailableHeroes.Num(); ++I)
+        { Mode->DeployHero(ELKTeam::Player,Mode->AvailableHeroes[I],FVector((I-1)*700.f,-850.f,0)); }
+        Mode->ForceStartBattle();
+        Mode->GetTeamSilver(ELKTeam::Player)->AddSilver(5.f);
+        Mode->SpawnUnitForTeam("Unit_ElfWarrior",ELKTeam::Player,FVector(-200,-600,0));
+        Mode->SpawnUnitForTeam("Unit_ElfArcher",ELKTeam::Player,FVector(150,-600,0));
+        Mode->GetTeamSilver(ELKTeam::Enemy)->AddSilver(5.f);
+        Circle=Mode->CastEnemyTacticalSpell("Spell_SkeletonCircle",FVector(0,-600,0));
+        if (Circle.IsValid()) { Circle->SetActorTickEnabled(false); }
+        FreezeActors();
+    }
+    if (Frame==80) { Shot(TEXT("Warning.png")); }
+    if (Frame==100 && Circle.IsValid()) { Circle->AdvanceForTest(2.25f); FreezeActors(); }
+    if (Frame==150) { Shot(TEXT("Active.png")); }
+    if (Frame==190) { FPlatformMisc::RequestExit(false); }
 }
 void Tick(ALKBattleGameMode* Mode)
 {
+    if (FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview"))) { TickBalancePreview(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview"))) { LKMovementFixPreview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview"))) { LKPolishArtPreview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview"))) { LKWorldArtPreview::Tick(Mode); return; }

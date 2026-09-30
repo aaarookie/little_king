@@ -67,6 +67,9 @@ private:
 	UFUNCTION() void HandleOption2Clicked();
 	UFUNCTION() void HandleSkipClicked();
 	UFUNCTION() void HandleReturnHomeClicked();
+	UFUNCTION() void HandleAbandonClicked();
+	UPROPERTY(Transient) TObjectPtr<UTextBlock> AbandonLabel;
+	bool bConfirmAbandon=false;
 
 	UPROPERTY(Transient) TObjectPtr<UTextBlock> ProgressText;
 	UPROPERTY(Transient) TObjectPtr<UTextBlock> DeckSummaryText;

@@ -15,5 +15,5 @@ namespace LKCardPresentation
     FText Classification(const ULKCardDefinition& Card);
     FLinearColor Color(const ULKCardDefinition& Card);
     FText Label(const ULKCardDefinition& Card);
-    FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow = nullptr);
+    FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow = nullptr, int32 UpgradeLevel = 0);
 }
