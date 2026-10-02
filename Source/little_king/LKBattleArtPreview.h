@@ -6,6 +6,7 @@ class ULKGameData;
 namespace LKBattleArtPreview
 {
     bool Enabled();
+    bool RunsBattle();
     void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data);
     void Tick(ALKBattleGameMode* Mode);
 }

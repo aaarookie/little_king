@@ -26,6 +26,16 @@ public:
      */
     void ApplyAreaSlow(FName SourceId, float MoveMultiplier, float AttackSpeedMultiplier, float Seconds);
     void RemoveAreaSlow(FName SourceId);
+    /** Black cloud: each live field owns one independent concealment source. */
+    void ApplyConcealment(FName SourceId, float Seconds);
+    void RemoveConcealment(FName SourceId);
+    bool IsConcealed() const { return !ConcealmentRemaining.IsEmpty(); }
+    bool HasConcealment(FName SourceId) const { return ConcealmentRemaining.Contains(SourceId); }
+    /** Wind overrides voluntary movement without stunning or disabling attacks. */
+    void ApplyWind(FName SourceId, float Seconds);
+    void RemoveWind(FName SourceId);
+    bool HasWind(FName SourceId) const { return WindRemaining.Contains(SourceId); }
+    bool IsWindDriven() const { return !WindRemaining.IsEmpty(); }
     bool HasAreaSlow(FName SourceId) const { return AreaSlowRemaining.Contains(SourceId); }
     /** 供法阵每帧刷新存活来源；过期来源自动清理。 */
     void TickAreaSlowRemaining(float DeltaSeconds);
@@ -74,6 +84,8 @@ private:
         float Remaining = 0.f;
     };
     TMap<FName, FAreaSlowEntry> AreaSlowRemaining;
+    TMap<FName, float> ConcealmentRemaining;
+    TMap<FName, float> WindRemaining;
     bool bSpearSupport = false;
     bool bWarriorSupport = false;
     ELKBreathHead LastBreath = ELKBreathHead::None;

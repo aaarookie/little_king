@@ -4,6 +4,7 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "ULKPresentationSubsystem.h"
+#include "ULKUnitStatusComponent.h"
 
 ULKUnitMovementComponent::ULKUnitMovementComponent()
 {
@@ -99,6 +100,15 @@ void ULKUnitMovementComponent::MoveToward(const FVector& InDestination, float In
     Speed = FMath::Max(0.f, InSpeed);
 }
 
+FVector ULKUnitMovementComponent::MoveWindDelta(const FVector& Delta)
+{
+    const FVector Before = GetOwner() ? GetOwner()->GetActorLocation() : FVector::ZeroVector;
+    const FVector After = MoveSkillDelta(Delta);
+    // Keep a separate accumulator: the field can tick before or after this component.
+    WindVisualTravel += After - Before;
+    return After;
+}
+
 void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -108,7 +118,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     if (!Self || !Self->IsAlive() || Self->IsBuilding() || DeltaTime <= 0.f
         || (!Self->IsCombatEnabled() && !Self->IsManualMoving())) { return; }
     RepathTimer -= DeltaTime;
-    if (bMoving && Speed > 0.f)
+    if (bMoving && Speed > 0.f && !Self->GetStatusComponent()->IsWindDriven())
     {
         const FVector BeforeMovement = Self->GetActorLocation();
         TArray<LKNavigation::FObstacle> Obstacles;

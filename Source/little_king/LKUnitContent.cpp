@@ -2,6 +2,7 @@
 
 #include "LKUndeadContent.h"
 #include "LKExpeditionMercenaryContent.h"
+#include "LKV083Content.h"
 #include "LKBattleArt.h"
 
 namespace LKUnitContent
@@ -75,6 +76,9 @@ const TMap<FName, FLKUnitRow>& Units()
         }
         for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
         { Result.Add(Definition.Unit.UnitId, Definition.Unit); }
+        // 天使只有单位定义，没有单位卡牌；研究只解锁其召唤法术。
+        for (const TPair<FName, FLKUnitRow>& Pair : LKV083Content::Units())
+        { Result.Add(Pair.Key, Pair.Value); }
         for (TPair<FName, FLKUnitRow>& Pair : Result)
         { Pair.Value.Sprite = LKBattleArt::Sprite(Pair.Key); }
         return Result;
@@ -103,6 +107,7 @@ FLKUnitRow MergeAuthoredTuning(const FLKUnitRow& Canonical, const FLKUnitRow* Au
     Result.ActiveAbility = Canonical.ActiveAbility;
     Result.DeckSlots = Canonical.DeckSlots;
     Result.bTargetsBuildingsOnly = Canonical.bTargetsBuildingsOnly;
+    Result.bBasicAttackHeals = Canonical.bBasicAttackHeals;
     if (Canonical.ActiveAbility != ELKActiveAbility::None && Result.SkillCooldown <= 0.f) { Result.SkillCooldown = Canonical.SkillCooldown; }
     Result.bSkeleton = Canonical.bSkeleton;
     Result.PassiveAbility = Canonical.PassiveAbility;

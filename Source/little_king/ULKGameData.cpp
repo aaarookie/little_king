@@ -6,6 +6,7 @@
 #include "LKExpeditionMercenaryContent.h"
 #include "LKBattleArt.h"
 #include "LKWorldArt.h"
+#include "LKV083Art.h"
 #include "Engine/Texture2D.h"
 #include "Sound/SoundBase.h"
 
@@ -19,6 +20,8 @@ void ULKGameData::EnsurePresentationDefaults()
         const FString Name = TEXT("S_") + Key.ToString();
         SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(TEXT("/Game/Art/StorybookV1/Audio/") + Name + TEXT(".") + Name)));
     }
+    for (FName Key : LKV083Art::SoundIds())
+    { if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKV083Art::SoundPath(Key)))); } }
     for (FName Key : LKWorldArt::SoundIds())
     {
         if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKWorldArt::SoundPath(Key)))); }

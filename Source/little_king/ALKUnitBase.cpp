@@ -98,6 +98,7 @@ UAbilitySystemComponent* ALKUnitBase::GetAbilitySystemComponent() const
 void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId)
 {
     StatusComponent->Clear();
+    MovementComponent->ResetVisualTravel();
 	GameDataCached = InGameData;
 
 	// UnitId 以行内字段为准；为空时用行名兜底（并告警提示补齐数据表）
@@ -119,6 +120,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
     Race = Row.Race;
     Quality = Row.Quality;
     bTargetsBuildingsOnly = Row.bTargetsBuildingsOnly;
+    bBasicAttackHeals = Row.bBasicAttackHeals;
 	bIsMage = Row.bIsMage;
 	AttackType = Row.AttackType;
 	HeroTraits = Row.HeroTraits;
@@ -216,6 +218,7 @@ bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
 void ALKUnitBase::ResetTransientRoomState()
 {
     AnimationComponent->ResetPresentation();
+    MovementComponent->ResetVisualTravel();
     StatusComponent->Clear();
     if (ActiveComponent) { ActiveComponent->Stop(); }
 	ChangeTarget(nullptr);
@@ -520,7 +523,7 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
         // 英雄保持由玩家指挥/回到集结点（子类处理）。
         if (!IsHero() && IsCombatEnabled())
         {
-            if (AActor* FarEnemy = FindNearestEnemy(false, true))
+            if (AActor* FarEnemy = bBasicAttackHeals ? FindInjuredAlly(true) : FindNearestEnemy(false, true))
             {
                 State = ELKUnitState::Moving;
                 MovementComponent->MoveToward(FarEnemy->GetActorLocation(), GetMoveSpeed());
@@ -547,7 +550,8 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
 
 bool ALKUnitBase::ShouldReleaseTarget(const ALKUnitBase* Target) const
 {
-    if (!Target) { return true; }
+    if (!CanPursueTarget(Target)) { return true; }
+    if (bBasicAttackHeals) { return DistanceTo2D(Target) > AcquireRadius * 1.15f; }
     if (ActiveComponent->GetLockedTarget() == Target) { return false; }
     // 集火指令目标不受索敌范围限制（AI 战术可跨图）。
     if (ForcedTargetActor.Get() == Target) { return false; }
@@ -564,9 +568,41 @@ bool ALKUnitBase::ShouldReleaseTarget(const ALKUnitBase* Target) const
 
 bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
 {
-    return Target && Target->IsTargetable() && Target->GetTeam() != Team
+    return CanDiscoverTarget(Target)
+        && (bBasicAttackHeals
+            ? Target->GetTeam() == Team && Target->GetHealth() < Target->GetMaxHealth() - .01f
+            : Target->GetTeam() != Team)
         && (!bTargetsBuildingsOnly || Target->IsBuilding())
         && (!IsBuilding() || DistanceTo2D(Target) <= GetAttackRange());
+}
+
+bool ALKUnitBase::CanDiscoverTarget(const ALKUnitBase* Target) const
+{
+    return IsAlive() && Target && Target->IsTargetable()
+        && (Target == this || !Target->GetStatusComponent()->IsConcealed());
+}
+
+void ALKUnitBase::RefreshDiscoveredTarget()
+{
+    if (ActiveComponent) { ActiveComponent->DropUndiscoverableTarget(); }
+    bool bRefresh = false;
+    if (ALKUnitBase* Forced = Cast<ALKUnitBase>(ForcedTargetActor.Get()); Forced && !CanDiscoverTarget(Forced))
+    { ForcedTargetActor.Reset(); ForcedTargetRemaining = 0.f; bRefresh = true; }
+    if (ALKUnitBase* Current = Cast<ALKUnitBase>(TargetActor.Get()); Current && !CanDiscoverTarget(Current))
+    {
+        ChangeTarget(nullptr);
+        AbilitySystem->CancelAllAbilities();
+        AnimationComponent->CancelAttack();
+        bRefresh = true;
+    }
+    if (bRefresh) { TargetRetryTimer = 0.f; AcquireTarget(); }
+}
+
+FVector ALKUnitBase::ApplyWindDisplacement(const FVector& Delta)
+{
+    if (!IsTargetable() || IsBuilding() || !IsCombatEnabled() || Delta.ContainsNaN()) { return GetActorLocation(); }
+    // Wind is displacement, not stun: a valid attack windup or ranged shot can continue.
+    return MovementComponent->MoveWindDelta(Delta);
 }
 
 FVector ALKUnitBase::GetChaseDestination(const ALKUnitBase* Target) const
@@ -584,6 +620,8 @@ void ALKUnitBase::ChangeTarget(AActor* NewTarget)
 
 void ALKUnitBase::SetTarget(AActor* NewTarget)
 {
+    if (bBasicAttackHeals)
+    { ChangeTarget(CanPursueTarget(Cast<ALKUnitBase>(NewTarget)) ? NewTarget : FindInjuredAlly()); return; }
     if (ALKUnitBase* Locked = ActiveComponent->GetLockedTarget()) { ChangeTarget(Locked); return; }
     AActor* Taunter = FindNearestEnemy(true);
     ChangeTarget(Taunter ? Taunter : (CanPursueTarget(Cast<ALKUnitBase>(NewTarget)) ? NewTarget : nullptr));
@@ -591,6 +629,7 @@ void ALKUnitBase::SetTarget(AActor* NewTarget)
 
 void ALKUnitBase::AcquireTarget()
 {
+    if (bBasicAttackHeals) { ChangeTarget(FindInjuredAlly()); return; }
     if (ALKUnitBase* Locked = ActiveComponent->GetLockedTarget()) { ChangeTarget(Locked); return; }
     // 嘲讽始终高于集火、普通目标指定和最近目标。
     if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); return; }
@@ -624,6 +663,7 @@ void ALKUnitBase::TickForcedTarget(float DeltaSeconds)
 
 AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRange) const
 {
+    if (bBasicAttackHeals) { return nullptr; }
     if (bTauntersOnly && PassiveComponent->GetAbility() == ELKPassiveAbility::TauntImmunity) { return nullptr; }
     AActor* Best = nullptr;
     float BestDistance = TNumericLimits<float>::Max();
@@ -648,10 +688,30 @@ AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRan
     return Best;
 }
 
+AActor* ALKUnitBase::FindInjuredAlly(bool bIgnoreAcquireRange) const
+{
+    if (!bBasicAttackHeals || !GetWorld()) { return nullptr; }
+    ALKUnitBase* Best = nullptr;
+    float BestRatio = 2.f;
+    float BestDistance = TNumericLimits<float>::Max();
+    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+    {
+        ALKUnitBase* Other = *It;
+        if (!CanPursueTarget(Other)) { continue; }
+        const float Distance = DistanceTo2D(Other);
+        if (!bIgnoreAcquireRange && Distance > AcquireRadius) { continue; }
+        const float Ratio = Other->GetHealth() / FMath::Max(.01f, Other->GetMaxHealth());
+        if (Ratio < BestRatio - KINDA_SMALL_NUMBER
+            || (FMath::IsNearlyEqual(Ratio, BestRatio) && Distance < BestDistance))
+        { Best = Other; BestRatio = Ratio; BestDistance = Distance; }
+    }
+    return Best;
+}
+
 void ALKUnitBase::TryAttack(float DeltaSeconds)
 {
     if (IsControlled()) { CancelAttackWindup(); return; }
-    if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); }
+    if (!bBasicAttackHeals) { if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); } }
     ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
     if (!Target || !CanPursueTarget(Target) || DistanceTo2D(Target) > GetAttackRange() || IsManualMoving())
     {
@@ -690,6 +750,22 @@ void ALKUnitBase::PerformAttack(AActor* Target)
     const float Damage = GetAttackDamage() * (bKingStrike ? 1.5f : 1.f);
     ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
     if (GM) { GM->BeginCombatBatch(); }
+    if (bBasicAttackHeals)
+    {
+        const FVector Muzzle = GetActorLocation() + FVector(0.f, 0.f, 20.f);
+        const FVector Direction = (Victim->GetActorLocation() - Muzzle).GetSafeNormal2D();
+        ALKProjectile* Projectile = GM ? GM->AcquireProjectile(Muzzle, Damage, Team, this, Direction)
+            : GetWorld()->SpawnActor<ALKProjectile>(ALKProjectile::StaticClass(), Muzzle, FRotator::ZeroRotator);
+        if (Projectile)
+        {
+            if (!GM) { Projectile->Init(Damage, Team, this, Direction); }
+            Projectile->SetHealingPayload(Victim);
+        }
+        ULKPresentationSubsystem::Sound(GetWorld(), "MagicShot", GetActorLocation());
+        StatusComponent->AfterAttack();
+        if (GM) { GM->EndCombatBatch(); }
+        return;
+    }
     if (AttackType == ELKAttackType::Ranged)
     {
         const FVector Muzzle = GetActorLocation() + FVector(0, 0, 20);
@@ -942,6 +1018,7 @@ void ALKUnitBase::DrawDebugShape() const
 
 void ALKUnitBase::SetCombatEnabled(bool bEnabled)
 {
+    if (!bEnabled && MovementComponent) { MovementComponent->ResetVisualTravel(); }
     if (!bEnabled && ActiveComponent) { ActiveComponent->Stop(); }
     if (!bEnabled && StatusComponent) { StatusComponent->Clear(); }
     bCombatEnabled = bEnabled;

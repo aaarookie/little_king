@@ -3,6 +3,8 @@
 #include "LKCardPresentation.h"
 #include "ULKUnitStatusComponent.h"
 #include "ALKBattleGameMode.h"
+#include "ALKSpellField.h"
+#include "ULKDeckState.h"
 #include "ALKPlayerController.h"
 #include "ALKHeroCamp.h"
 #include "ALKUnitHero.h"
@@ -203,6 +205,8 @@ void ALKPresentationHUD::DrawHUD()
         FString StatusLabel;
         if (Status->IsStunned()) { StatusLabel += TEXT("眩晕 "); }
         if (Status->IsFrozen()) { StatusLabel += TEXT("冰冻 "); }
+        if (Status->IsConcealed()) { StatusLabel += TEXT("隐蔽 "); }
+        if (Status->IsWindDriven()) { StatusLabel += TEXT("受风 "); }
         if (Status->IsEmpowered()) { StatusLabel += FString::Printf(TEXT("强化 %.0f%% "), Status->GetStunMeter() * 100.f); }
         if (Status->GetBurnStacks() > 0) { StatusLabel += FString::Printf(TEXT("点燃×%d"), Status->GetBurnStacks()); }
         if (!StatusLabel.IsEmpty()) { DrawText(StatusLabel, FLinearColor(1.f,.8f,.25f), Screen.X - 28.f * Scale, Top - 17.f * Scale, nullptr, .75f * Scale); }
@@ -215,7 +219,7 @@ void ALKPresentationHUD::DrawHUD()
 		const FVector Head = (*It)->GetActorLocation();
 		if (ProjectPoint(Head, A) && ProjectPoint(Head - (*It)->GetFlightDirection() * 65.f, B))
 		{
-            const FLinearColor ShotColor = It->GetBreathHead() == ELKBreathHead::Ice ? FLinearColor(.3f,.8f,1.f)
+            const FLinearColor ShotColor = It->IsHealingShot() ? FLinearColor(.65f,.9f,.6f) : It->GetBreathHead() == ELKBreathHead::Ice ? FLinearColor(.3f,.8f,1.f)
                 : (It->GetBreathHead() == ELKBreathHead::Fire ? FLinearColor(1.f,.3f,.1f) : FLinearColor(1.f,.83f,.3f));
             const FVector2D Dir=(A-B).GetSafeNormal(), Side(-Dir.Y,Dir.X);
             if (It->IsSiegeShot())
@@ -234,10 +238,21 @@ void ALKPresentationHUD::DrawHUD()
             }
 		}
 	}
+    for (TActorIterator<ALKSpellField> It(GetWorld()); It; ++It) { It->Draw(this); }
 	FVector Preview; float Radius = 0.f, AttackRadius = 0.f; bool bValid = false;
 	if (PC->GetPlacementPreview(Preview, Radius, bValid, &AttackRadius))
 	{
-		DrawWorldCircle(Preview, Radius, bValid ? FLinearColor::Green : FLinearColor::Red, 2.f);
+        const auto* PreviewCard = PC->GetDeckState() ? GM->FindCard(PC->GetDeckState()->GetHandCard(PC->GetPlacingHandIndex())) : nullptr;
+        const FLinearColor PreviewColor = bValid ? FLinearColor(.65f,.85f,.60f) : FLinearColor::Red;
+        if (PC->GetPlacementMode() == ELKPlacementMode::Card && PreviewCard && PreviewCard->SpellEffect == ELKSpellEffect::Hurricane)
+        {
+            const FVector2D H=PreviewCard->SpellHalfExtents;
+            const FVector Corners[] = {Preview+FVector(-H.X,-H.Y,0),Preview+FVector(H.X,-H.Y,0),Preview+FVector(H.X,H.Y,0),Preview+FVector(-H.X,H.Y,0)};
+            for(int I=0;I<4;++I) { FVector2D A,B; if(ProjectPoint(Corners[I],A)&&ProjectPoint(Corners[(I+1)%4],B)) { DrawLine(A.X,A.Y,B.X,B.Y,PreviewColor,2.f); } }
+            FVector2D A,B; if(ProjectPoint(Preview,A)&&ProjectPoint(Preview+FVector(0,H.Y,0),B)) { DrawLine(A.X,A.Y,B.X,B.Y,PreviewColor,3.f); DrawLine(B.X,B.Y,B.X-10*Scale,B.Y-7*Scale,PreviewColor,3.f); DrawLine(B.X,B.Y,B.X-10*Scale,B.Y+7*Scale,PreviewColor,3.f); }
+        }
+        else if (PreviewCard && PreviewCard->SpellEffect == ELKSpellEffect::DivineBlessing) { DrawText(TEXT("神圣祝福 · 己方全场"),PreviewColor,24.f*Scale,90.f*Scale,nullptr,Scale); }
+        else { DrawWorldCircle(Preview, Radius, PreviewColor, 2.f); }
 		if (AttackRadius > 0.f)
 		{
             const FLinearColor RangeColor = bValid ? FLinearColor(1.f,.75f,.15f) : FLinearColor::Red;

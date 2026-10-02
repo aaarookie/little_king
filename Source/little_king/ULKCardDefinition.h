@@ -66,6 +66,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "CardType==ELKCardType::Spell", EditConditionHides, ClampMin = "10.0"))
 	float SpellRadius = 300.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float EffectDuration = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") FVector2D SpellHalfExtents = FVector2D(650.f, 350.f);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float ForceMoveSpeed = 220.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float DrawCooldown = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float SecondarySpellValue = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float MaxHealthDamageFraction = .2f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") float SecondaryDelay = .2f;
+	/** 增援法术自身允许全场落点，与法师特性独立。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") bool bGlobalPlacement = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spell") TArray<FName> SummonedUnitIds;
+
 	/** 区域召唤法术（SpellEffect=SummonZone）的专用参数；与 Damage/Heal 的 SpellValue 通道独立。 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "SpellEffect==ELKSpellEffect::SummonZone", EditConditionHides))
 	FLKSkeletonCircleParams Circle;

@@ -1,6 +1,7 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Misc/AutomationTest.h"
+#include "LKContentTestHelpers.h"
 #include "Tests/AutomationCommon.h"
 #include "Components/Button.h"
 #include "Components/PanelWidget.h"
@@ -144,7 +145,8 @@ bool FLKD1RunFlowTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKD1UnitRulesTest, "LittleKing.D1.Configuration.BuiltInUnitRules", D1Flags)
 bool FLKD1UnitRulesTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("All shipped combat units including stage-three mercenaries are registered"), LKUnitContent::Units().Num(), 28);
+    TestEqual(TEXT("All content catalogs are represented by native units"), LKUnitContent::Units().Num(), LKContentTest::UnitIds().Num());
+    for (FName Id : LKContentTest::UnitIds()) { TestNotNull(TEXT("Catalog unit identity resolves"), LKUnitContent::Find(Id)); }
     for (const TPair<FName, FLKUnitRow>& Pair : LKUnitContent::Units())
     {
         const FLKUnitRow& Canonical = Pair.Value;

@@ -70,7 +70,7 @@ namespace LKHomeContent
 				TEXT("每场战斗结束后按等级恢复玩家英雄生命：40% / 60% / 80% / 100% 最大生命。"),
 				true, StatueMaxLevel, { 60, 120, 200 }),
 			MakeBuilding(BuildingLibrary, TEXT("图书馆"),
-				TEXT("查看永久解锁的法术与说明。首版只读，不提供购买或研究。"), false, 1, {}),
+				TEXT("查看永久解锁法术；研究远征带回的法术书和建筑图纸，永久解锁对应卡牌。"), false, 1, {}),
 			MakeBuilding(BuildingGate, TEXT("大门"),
 				TEXT("查看出征英雄、牌组和携带金币，从固定起点出发；已有远征时从这里继续。"), false, 1, {}),
 			MakeBuilding(BuildingHeroHouse, TEXT("英雄之家"),
@@ -81,7 +81,7 @@ namespace LKHomeContent
 			MakeBuilding(BuildingBarracks, TEXT("军营"),
 				TEXT("分页查看永久解锁的佣兵与战斗建筑。首版只读。"), false, 1, {}),
 			MakeBuilding(BuildingWarRoom, TEXT("战备处"),
-				TEXT("保存三名英雄与至少五种卡；部队容量上限 8 格，多格卡仍只占一张手牌。下次新远征生效。"), false, 1, {})
+				TEXT("保存三名英雄与至少七种卡；部队容量默认上限 8 格，多格卡仍只占一张手牌。下次新远征生效。"), false, 1, {})
 		};
 		return Definitions;
 	}

@@ -11,6 +11,7 @@
 #include "ULKUnitStatusComponent.h"
 #include "LKLog.h"
 #include "EngineUtils.h"
+#include "ULKPresentationSubsystem.h"
 
 ALKProjectile::ALKProjectile()
 {
@@ -36,7 +37,7 @@ ALKProjectile::ALKProjectile()
 void ALKProjectile::ApplyLaunchParams(float InDamage, ELKTeam InTeam, AActor* InInstigator, const FVector& InDirection)
 {
 	Damage = InDamage;
-    BreathHead = ELKBreathHead::None; bSiegeShot = false; SiegeTarget.Reset();
+    BreathHead = ELKBreathHead::None; bSiegeShot = bHealingShot = false; SiegeTarget.Reset(); HealingTarget.Reset();
 	Team = InTeam;
 	InstigatorActor = InInstigator;
     LaunchSource = LKGameplay::MakeSource(InInstigator, ELKCombatSourceKind::Projectile, TEXT("RangedAttack"));
@@ -83,9 +84,22 @@ void ALKProjectile::ActivateFromPool(const FVector& InLocation, float InDamage, 
     SetActorTickEnabled(true);
 }
 
+void ALKProjectile::SetHealingPayload(ALKUnitBase* FriendlyTarget)
+{
+    bHealingShot = true;
+    bSiegeShot = false;
+    SiegeTarget.Reset();
+    HealingTarget = FriendlyTarget;
+    LaunchSource.ActionId = "BasicHeal";
+    if (FriendlyTarget)
+    {
+        Lifetime = FMath::Max(Lifetime, FVector::Dist2D(GetActorLocation(), FriendlyTarget->GetActorLocation()) / FMath::Max(1.f, Speed) + 1.f);
+    }
+}
+
 void ALKProjectile::DeactivateToPool()
 {
-    BreathHead = ELKBreathHead::None; bSiegeShot = false; SiegeTarget.Reset();
+    BreathHead = ELKBreathHead::None; bSiegeShot = bHealingShot = false; SiegeTarget.Reset(); HealingTarget.Reset();
     bPooledActive = false;
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
@@ -106,10 +120,21 @@ void ALKProjectile::Tick(float DeltaSeconds)
     const FVector Start = GetActorLocation();
     ALKUnitBase* Closest = nullptr;
     float ClosestDistance = Travel + 1.f;
+    if (bHealingShot)
+    {
+        ALKUnitBase* Target = HealingTarget.Get();
+        const ALKUnitBase* Source = Cast<ALKUnitBase>(InstigatorActor.Get());
+        if (!Target || !Target->IsTargetable() || Target->GetTeam() != Team
+            || !Source || !Source->CanDiscoverTarget(Target) || Target->GetHealth() >= Target->GetMaxHealth() - .01f)
+        { if (GM) { GM->ReleaseProjectile(this); } else { Destroy(); } return; }
+        Direction = (Target->GetActorLocation() - Start).GetSafeNormal2D();
+        if (FVector::Dist2D(Start, Target->GetActorLocation()) <= Travel + Target->GetBodyRadius()) { Closest = Target; }
+    }
     if (bSiegeShot)
     {
         ALKUnitBase* Target = SiegeTarget.Get();
-        if (!Target || !Target->IsTargetable() || !Target->IsBuilding() || Target->GetTeam() == Team)
+        if (!Target || !Target->IsTargetable() || !Target->IsBuilding() || Target->GetTeam() == Team
+            || Target->GetStatusComponent()->IsConcealed())
         { if (GM) { GM->ReleaseProjectile(this); } else { Destroy(); } return; }
         Direction = (Target->GetActorLocation() - Start).GetSafeNormal2D();
         if (FVector::Dist2D(Start, Target->GetActorLocation()) <= Travel + Target->GetBodyRadius()) { Closest = Target; }
@@ -118,7 +143,7 @@ void ALKProjectile::Tick(float DeltaSeconds)
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         ALKUnitBase* Unit = *It;
-        if (bSiegeShot || !Unit->IsTargetable() || Unit->GetTeam() == Team) { continue; }
+        if (bSiegeShot || bHealingShot || !Unit->IsTargetable() || Unit->GetTeam() == Team) { continue; }
         FVector Offset = Unit->GetActorLocation() - Start; Offset.Z = 0.f;
         const float Radius = Unit->GetBodyRadius() + 12.f;
         const float Along = FVector::DotProduct(Offset, Direction);
@@ -133,9 +158,18 @@ void ALKProjectile::Tick(float DeltaSeconds)
         const float HitDamage = Damage;
         const FLKCombatSource Source = LaunchSource;
         const ELKBreathHead Head = BreathHead;
+        const bool bHeal = bHealingShot;
         AActor* SourceActor = InstigatorActor.Get();
         if (GM) { GM->ReleaseProjectile(this); } else { DeactivateToPool(); }
-        if (Head != ELKBreathHead::None) { Closest->GetStatusComponent()->ReceiveBreath(Head, HitDamage, SourceActor, Source); }
+        if (bHeal)
+        {
+            if (LKGameplay::ApplyHeal(Closest, HitDamage, SourceActor, &Source) > 0.f)
+            {
+                ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Heal, Closest->GetActorLocation(), 60.f);
+                ULKPresentationSubsystem::Sound(GetWorld(), "Heal", Closest->GetActorLocation());
+            }
+        }
+        else if (Head != ELKBreathHead::None) { Closest->GetStatusComponent()->ReceiveBreath(Head, HitDamage, SourceActor, Source); }
         else { LKGameplay::ApplyDamage(Closest, HitDamage, SourceActor, false, &Source); }
         if (!GM) { Destroy(); }
         return;

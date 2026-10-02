@@ -94,7 +94,8 @@ enum class ELKSpellEffect : uint8
 	Damage	UMETA(DisplayName = "范围伤害"),
 	Heal	UMETA(DisplayName = "范围治疗"),
 	/** 区域召唤区（敌方专属骷髅法阵）：无直接伤害，按节奏召唤并减速区域内敌对单位 */
-	SummonZone UMETA(DisplayName = "区域召唤")
+	SummonZone UMETA(DisplayName = "区域召唤"),
+	Freeze, Reinforcements, BlackCloud, Lightning, Hurricane, DivineBlessing
 };
 
 /** 卡牌阵营权限：规范身份由代码注册，数据资产不能意外开放。 */
@@ -149,7 +150,7 @@ enum class ELKRace : uint8
 {
     Human UMETA(DisplayName = "人类"), Elf UMETA(DisplayName = "精灵"),
     Goblin UMETA(DisplayName = "哥布林"), Undead UMETA(DisplayName = "亡灵"), None UMETA(DisplayName = "无"),
-    Troll UMETA(DisplayName = "巨魔"), Dragon UMETA(DisplayName = "龙"), Construct UMETA(DisplayName = "构装体")
+    Troll UMETA(DisplayName = "巨魔"), Dragon UMETA(DisplayName = "龙"), Construct UMETA(DisplayName = "构装体"), Angel UMETA(DisplayName = "天使")
 };
 
 UENUM(BlueprintType)

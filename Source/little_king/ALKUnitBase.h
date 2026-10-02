@@ -71,6 +71,12 @@ public:
 	void RemoveAuraTauntSource(ALKUnitBase* Source);
 	bool ResolveTrait(FName TraitId, FLKTraitRow& OutRow) const;
 	virtual bool CanPursueTarget(const ALKUnitBase* Target) const;
+    /** Discovery is separate from targetability: ground effects still affect hidden units. */
+    bool CanDiscoverTarget(const ALKUnitBase* Target) const;
+    void RefreshDiscoveredTarget();
+    bool BasicAttackHeals() const { return bBasicAttackHeals; }
+    /** Forced wind movement uses field/static-body geometry, even while controlled. */
+    FVector ApplyWindDisplacement(const FVector& Delta);
 	virtual FVector GetChaseDestination(const ALKUnitBase* Target) const;
 	virtual bool IsManualMoving() const { return false; }
 	void CancelAttackWindup();
@@ -286,6 +292,7 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "LK|Unit") TObjectPtr<ULKUnitActiveComponent> ActiveComponent;
     UPROPERTY(VisibleAnywhere, Category = "LK|Unit") TObjectPtr<ULKUnitStatusComponent> StatusComponent;
     bool bTargetsBuildingsOnly = false;
+    bool bBasicAttackHeals = false;
     ELKRace Race = ELKRace::Human;
     ELKQuality Quality = ELKQuality::Common;
 	void RestoreHeroLife(float Health, bool bResumeCombat);
@@ -301,6 +308,7 @@ protected:
 	virtual void PerformAttack(AActor* Target);
 	/** 最近敌人：默认只考虑索敌范围内；bIgnoreAcquireRange=true 用于行军方向（全图最近） */
 	AActor* FindNearestEnemy(bool bTauntersOnly = false, bool bIgnoreAcquireRange = false) const;
+    AActor* FindInjuredAlly(bool bIgnoreAcquireRange = false) const;
 	/** 目标是否应放弃（普通目标离开索敌范围、嘲讽者离开嘲讽半径；集火目标不受限） */
 	bool ShouldReleaseTarget(const ALKUnitBase* Target) const;
 	float DistanceTo2D(const AActor* Other) const;

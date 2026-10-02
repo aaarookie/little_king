@@ -11,7 +11,7 @@ class USoundBase;
 enum class ELKVisualCue : uint8
 {
     Slash, Impact, Fireball, Heal, HealLink, Summon, Sacrifice, Revive,
-    Backstab, Coin, Mimic, Dash, Empower, HeavyHit, SiegeImpact, Command, Death
+    Backstab, Coin, Mimic, Dash, Empower, HeavyHit, SiegeImpact, Command, Death, FreezeSpell, Lightning, DivineBlessing
 };
 struct FLKVisualCue
 {

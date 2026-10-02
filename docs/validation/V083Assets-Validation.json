@@ -1,0 +1,222 @@
+{
+  "version": "0.8.3",
+  "date": "2026-10-02",
+  "sourceImages": [
+    {
+      "file": "ArtSource/StorybookV1/V083/Animations/T_Anim_AngelWarrior.png",
+      "sha256": "99f6ff7c7f01a7980728a6b91fff39b7aeed39a1343d85ab009d6791a4980ce0",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.527017213179389,
+      "poses": 16,
+      "groundAnchorWorldOffset": 72.00000000000001,
+      "groundAnchorSpread": 4.263256414560601e-14,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Animations/T_Anim_AngelArcher.png",
+      "sha256": "045f877b4441a422c1af1dffe1b589b9f8877ee19dda95907acd2c48973d6c64",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.5557062694433633,
+      "poses": 16,
+      "groundAnchorWorldOffset": 73.5,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Animations/T_Anim_AngelPriest.png",
+      "sha256": "84db459b41f0bd221f8dfc150014a78faa3397fa08e3b214e7cdca188fec2d43",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.5693582767997273,
+      "poses": 16,
+      "groundAnchorWorldOffset": 75.00000000000001,
+      "groundAnchorSpread": 4.263256414560601e-14,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Animations/T_Anim_DivineJudge.png",
+      "sha256": "0ba0a256461f1d739669023dea8a56b17d8821b284ffbda45cce510baeef133f",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.500002543694309,
+      "poses": 16,
+      "groundAnchorWorldOffset": 85.5,
+      "groundAnchorSpread": 1.1368683772161603e-13,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Animations/T_Anim_ChosenHighPriest.png",
+      "sha256": "5655a441b6c2e6b72a921c5b7ee939faa1bb9bcd94e40f6adeba42f585766e1e",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.4714368566043207,
+      "poses": 16,
+      "groundAnchorWorldOffset": 84.00000000000001,
+      "groundAnchorSpread": 1.1368683772161603e-13,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_Freeze.png",
+      "sha256": "64f10b9ec28478956dc138a615dcc05d67c61c00da95d6fe3d7d4e81107b3843",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_MariaNovice.png",
+      "sha256": "db533bd1896d53dd02c44d0c045b0c26dde9928d2bff7defa8470f8d7204bac2",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_MariaIntermediate.png",
+      "sha256": "ed59bdf7ef806b2ad42772275c849de5526520737fd73452af081adf499eeb51",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_MariaAdvanced.png",
+      "sha256": "b6c3636a7eec0cf9e25d2471c51926a478447426e2191374504a721233471b6c",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_MariaDivine.png",
+      "sha256": "67f75dee812a32090191540b24abb8174973fe8f89c9da1e110dcc201f2de7e8",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_BlackCloud.png",
+      "sha256": "c0ffb4e32b086250bc754a9677f2a9ed7125cb1f7dce269697dde84d0dc7afdb",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_Lightning.png",
+      "sha256": "411e1b0ae753dda7bd57b184cad272f9aca3f4cd2114c6277a041e697f9c90bf",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_Hurricane.png",
+      "sha256": "602e10ebc91d0d45e5267b1b2cd2bc434d3686b512ca680e8b9a8ae392ee228e",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V083/Cards/T_Card_Spell_DivineBlessing.png",
+      "sha256": "630e42ecf09ed712ef6e1c32cf8768235c158ca8c0920e3bd246fa5f8b74a0a8",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "matchesOriginalGenerationBytes": true
+    }
+  ],
+  "sounds": [
+    {
+      "key": "FreezeSpell",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_FreezeSpell.wav",
+      "sha256": "1ced39c574ea0cdb683f06722ba52d9f44e51a86cdb17aa6538119526e84b81c",
+      "seconds": 0.72,
+      "peakDbFS": -24.998226918452502,
+      "rmsDbFS": -38.241046794297915,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "HolySummon",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_HolySummon.wav",
+      "sha256": "fac4dbce9e12587a8083fb6199c51d47aa2c0afe60e072ca860ae59fd9e1385b",
+      "seconds": 1.24,
+      "peakDbFS": -21.999250260649266,
+      "rmsDbFS": -34.781022094184344,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "BlackCloud",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_BlackCloud.wav",
+      "sha256": "ed3439474e55929bcae00b2e88ebfa111ba47bcc94e11ba4bdf5e9c97ffccf06",
+      "seconds": 0.86,
+      "peakDbFS": -26.00127056716554,
+      "rmsDbFS": -39.76864343828478,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "Lightning",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_Lightning.wav",
+      "sha256": "bf5cc20c8b3f9e4343766148bd95b42646c440748b8b355167ab50c0a6c3532e",
+      "seconds": 0.66,
+      "peakDbFS": -22.998973925015985,
+      "rmsDbFS": -43.55731078322803,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "Hurricane",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_Hurricane.wav",
+      "sha256": "13ce5ff49b0a2db8e2c1517971bda71cd9292c208dbc80b2391c9a687917dc93",
+      "seconds": 1.35,
+      "peakDbFS": -24.998226918452502,
+      "rmsDbFS": -39.59112232423727,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "DivineBlessing",
+      "file": "ArtSource/StorybookV1/V083/Audio/S_DivineBlessing.wav",
+      "sha256": "6b972794cfe149a14828e39df9c626791921b9d4479081174de9de1cfca932ea",
+      "seconds": 1.62,
+      "peakDbFS": -21.999250260649266,
+      "rmsDbFS": -36.32242052819496,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    }
+  ],
+  "frameCount": 80,
+  "unitCount": 11,
+  "status": "passed",
+  "scope": "source byte hashes, image alpha/frame rectangles, complete prompts and PCM format/levels; no subjective listening claim"
+}

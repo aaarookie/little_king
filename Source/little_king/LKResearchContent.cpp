@@ -2,6 +2,7 @@
 #include "LKExpeditionMercenaryContent.h"
 #include "LKCardRules.h"
 #include "LKBattleArt.h"
+#include "LKV083Content.h"
 #include "ULKGameData.h"
 #include "ULKCardDefinition.h"
 #include "Misc/Crc.h"
@@ -19,6 +20,15 @@ const TArray<FLKResearchDefinition>& All()
         {"Spell_ResearchHeal_A1",FText::FromString(TEXT("圣光潮汐")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Advanced1,2,480,6.f,4,ELKSpellEffect::Heal,220,340,.12f},
         {"Spell_ResearchHeal_D1",FText::FromString(TEXT("生命礼赞")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Divine1,3,800,1.f,5,ELKSpellEffect::Heal,300,380,.16f},
         {"Building_SiegeCatapult",FText::FromString(TEXT("攻城投石炮")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,350,1.f,4,ELKSpellEffect::None,0,0,0},
+        {"Spell_Freeze",FText::FromString(TEXT("冰冻法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,180,80.f,2,ELKSpellEffect::Freeze,0,300,0},
+        {"Spell_MariaNovice",FText::FromString(TEXT("圣玛丽亚的初阶增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,220,70.f,5,ELKSpellEffect::Reinforcements,0,180,0},
+        {"Spell_MariaIntermediate",FText::FromString(TEXT("圣玛丽亚的中阶增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Intermediate3,1,380,18.f,7,ELKSpellEffect::Reinforcements,0,180,0},
+        {"Spell_MariaAdvanced",FText::FromString(TEXT("圣玛丽亚的高阶增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Advanced3,2,650,4.f,9,ELKSpellEffect::Reinforcements,0,180,0},
+        {"Spell_MariaDivine",FText::FromString(TEXT("圣玛丽亚的神圣增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Divine3,3,1400,.6f,11,ELKSpellEffect::Reinforcements,0,180,0},
+        {"Spell_BlackCloud",FText::FromString(TEXT("黑云法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice2,0,140,100.f,2,ELKSpellEffect::BlackCloud,0,350,0},
+        {"Spell_Lightning",FText::FromString(TEXT("雷电法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Intermediate1,1,320,25.f,4,ELKSpellEffect::Lightning,200,350,0},
+        {"Spell_Hurricane",FText::FromString(TEXT("飓风法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,180,80.f,3,ELKSpellEffect::Hurricane,0,350,0},
+        {"Spell_DivineBlessing",FText::FromString(TEXT("神圣祝福")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Divine1,3,1000,1.f,8,ELKSpellEffect::DivineBlessing,1,0,.2f},
     };
     return Rows;
 }
@@ -36,9 +46,10 @@ void EnsureCards(ULKGameData& Data)
         C->CardId=R.CardId; C->CardName=R.Name; C->CardType=ELKCardType::Spell; C->bExpeditionOnly=false;
         C->SpellGrade=R.Grade;
         if (I==INDEX_NONE) { C->Cost=R.SilverCost; C->SpellEffect=R.Effect; C->SpellValue=R.Value; C->SpellRadius=R.Radius; C->HeroHealPercent=R.HeroHealPercent; }
+        const bool bV083=LKV083Content::ConfigureCard(*C,I==INDEX_NONE);
         if (C->Icon.IsNull())
         { const TCHAR* Name=R.Effect==ELKSpellEffect::Heal?TEXT("Spell_HealWave"):TEXT("Spell_Fireball"); C->Icon=TSoftObjectPtr<UTexture2D>(FSoftObjectPath(FString::Printf(TEXT("/Game/Icons/%s.%s"),Name,Name))); }
-        C->Description=FText::FromString(TEXT("图书馆研究永久解锁；远征中的升级只增加本轮数值。"));
+        if (!bV083) { C->Description=FText::FromString(TEXT("图书馆研究永久解锁；远征中的升级只增加本轮数值。")); }
         if (I==INDEX_NONE) { Data.CardLibrary.Add(C); } else { Data.CardLibrary[I]=C; }
     }
 }
@@ -62,7 +73,13 @@ void GenerateMarket(FLKDungeonNode& Node,int32 RunSeed,int32 Depth)
         for (const auto& R:All())
         { if (R.Kind!=ELKMarketOfferKind::SpellBook || Depth<R.MinimumRegionDepth) { continue; } Pick-=R.Weight; if (Pick<=0) { Add(R.Kind,R.CardId,R.Price); break; } }
     }
-    if (Depth>=1 && Stream.FRand()<.005f) { const auto& R=All().Last(); Add(R.Kind,R.CardId,R.Price); }
+    if (Depth>=1 && Stream.FRand()<.005f)
+    {
+        // 图纸以种类筛选，不能依赖目录最后一行恰好是建筑。
+        TArray<const FLKResearchDefinition*> Blueprints;
+        for (const auto& R:All()) { if (R.Kind==ELKMarketOfferKind::BuildingBlueprint && Depth>=R.MinimumRegionDepth) { Blueprints.Add(&R); } }
+        if (!Blueprints.IsEmpty()) { const auto& R=*Blueprints[Stream.RandRange(0,Blueprints.Num()-1)]; Add(R.Kind,R.CardId,R.Price); }
+    }
     Node.bMarketGenerated=true;
 }
 }

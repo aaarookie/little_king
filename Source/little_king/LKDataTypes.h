@@ -35,6 +35,8 @@ struct FLKUnitRow : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") ELKActiveAbility ActiveAbility = ELKActiveAbility::None;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity", meta = (ClampMin = "1", ClampMax = "8")) int32 DeckSlots = 1;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") bool bTargetsBuildingsOnly = false;
+    /** 普攻治疗受伤友军；职业行为，不占用技能或特性。 */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity") bool bBasicAttackHeals = false;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0.1")) float EmpowerDuration = 8.f;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "1")) float EmpowerMoveMultiplier = 1.3f;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (ClampMin = "0.1", ClampMax = "1")) float EmpowerIntervalMultiplier = .75f;

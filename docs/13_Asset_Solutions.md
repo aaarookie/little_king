@@ -1,6 +1,12 @@
 # 免费素材获取、制作与 UE 5.8 接入
 
-更新：2026-09-22。本页替代旧泛用推荐清单，以 A/B/C/D 批实际采用的资源为准。风格 [07](07-ArtStyleGuide.md)，全部需求 [12](12-AssetRequest.md)，来源/提示词 [36](36-ArtAudioSources.md)，整合记录 [A 批 37](37-ArtAudioIntegration.md) / [B 批 38](38-BattleArtIntegration.md) / [C 批 40](40-WorldSkillsArtIntegration.md) / [D 批 42](42-PolishArtIntegration.md)。
+更新：2026-10-02。本页替代旧泛用推荐清单，以 A/B/C/D 批及后续版本实际采用的资源为准。风格 [07](07-ArtStyleGuide.md)，全部需求 [12](12-AssetRequest.md)，来源/提示词 [36](36-ArtAudioSources.md)，整合记录 [A 批 37](37-ArtAudioIntegration.md) / [B 批 38](38-BattleArtIntegration.md) / [C 批 40](40-WorldSkillsArtIntegration.md) / [D 批 42](42-PolishArtIntegration.md)。
+
+## v0.8.3 天使与法术
+
+本轮新增五张角色动画图集、九张法术卡图、六条原创程序合成音效。11 个天使单位共享五种角色外观，每种有待机、移动、攻击、受击、退场五个状态；天使不能作为独立佣兵卡获得。原有地图、UI 色板、字体、音乐与战斗排序继续使用。新 PNG 不做像素后处理，导入器按真实轮廓设置 UV 和枢轴。素材来源与完整提示词见 [54](54-v0.8.3Assets.md)，新手试玩、试听和可选重导入见 [55](55-v0.8.3Guide.md)。
+
+源文件在 `ArtSource/StorybookV1/V083`，引擎资源在 `/Game/Art/StorybookV1/V083`。`PrepareV083Audio.py` 可复现六声音，`PrepareV083Frames.py` 只读取原 PNG 生成元数据，`ImportV083Assets.py` 创建引擎资源。所有声音复用既有 `SC_Combat`，不增加连续播放的五秒循环声，也不新增背景音乐。本批没有需要手动下载的外部素材；自动审计覆盖文件哈希、透明与帧尺寸、声音格式和峰值，主观画面与混音仍需编辑器试玩。
 
 ## 直接试玩：本批不需要手动下载
 

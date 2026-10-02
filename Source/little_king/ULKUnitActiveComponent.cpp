@@ -4,6 +4,7 @@
 #include "LKCardRules.h"
 #include "LKGameplayHelpers.h"
 #include "ULKCardDefinition.h"
+#include "LKSpellExecutor.h"
 #include "ULKDeckState.h"
 #include "ULKSilverComponent.h"
 #include "ULKUnitMovementComponent.h"
@@ -152,7 +153,7 @@ bool ULKUnitActiveComponent::TrollEmpower()
     bool bFoundKing = false;
     for (ALKUnitBase* Other : LivingUnits(GetWorld()))
     {
-        if (Other == Unit || Other->GetTeam() != Unit->GetTeam() || Other->GetRace() != ELKRace::Troll) { continue; }
+        if (Other == Unit || !Unit->CanDiscoverTarget(Other) || Other->GetTeam() != Unit->GetTeam() || Other->GetRace() != ELKRace::Troll) { continue; }
         const bool bKing = Other->GetUnitId() == "Unit_TrollKing";
         const double Distance = FVector::DistSquared2D(Unit->GetActorLocation(), Other->GetActorLocation());
         if ((bKing && !bFoundKing) || (bKing == bFoundKing && Distance < BestDistance))
@@ -162,6 +163,12 @@ bool ULKUnitActiveComponent::TrollEmpower()
     Unit->GetStatusComponent()->Empower(EmpowerDuration, EmpowerMove, EmpowerInterval);
     if (Target) { Target->GetStatusComponent()->Empower(EmpowerDuration, EmpowerMove, EmpowerInterval); }
     return true;
+}
+
+void ULKUnitActiveComponent::DropUndiscoverableTarget()
+{
+    const auto* Unit = Cast<ALKUnitBase>(GetOwner());
+    if (LockedTarget.IsValid() && (!Unit || !Unit->CanDiscoverTarget(LockedTarget.Get()))) { LockedTarget.Reset(); }
 }
 
 bool ULKUnitActiveComponent::MimicSpell()
@@ -175,56 +182,31 @@ bool ULKUnitActiveComponent::MimicSpell()
         for (FName Id : Ids)
         {
             const ULKCardDefinition* Card = GM->FindCard(Id);
-            // 学徒模仿只复制玩家可获得的法术：敌方专属（骷髅法阵）不在候选里。
             if (Card && Card->CardType == ELKCardType::Spell && LKCardRules::IsPlayerObtainable(Id)
                 && Card->SpellGrade <= ELKSpellGrade::Novice3
-                && Card->SpellEffect != ELKSpellEffect::None && Card->SpellEffect != ELKSpellEffect::SummonZone
-                && Card->SpellValue > 0.f && FMath::IsFinite(Card->SpellValue)
-                && Card->SpellRadius > 0.f && FMath::IsFinite(Card->SpellRadius)) { Spells.Add(Card); }
+                && LKSpellExecutor::Validate(GM, Card, Unit->GetTeam(), Unit->GetActorLocation(), true) == ELKPlayResult::Success) { Spells.Add(Card); }
         }
     }
-    const ULKCardDefinition* Chosen = Spells.IsEmpty() ? nullptr : Spells[GM->GetBattleRandom().RandRange(0, Spells.Num() - 1)];
-    if (!Chosen)
-    {
-        const ULKCardDefinition* Fireball = GM->FindCard("Spell_Fireball");
-        if (Fireball && Fireball->SpellGrade == ELKSpellGrade::Novice1 && Fireball->SpellEffect == ELKSpellEffect::Damage
-            && FMath::IsFinite(Fireball->SpellValue) && Fireball->SpellValue > 0.f && FMath::IsFinite(Fireball->SpellRadius) && Fireball->SpellRadius > 0.f) { Chosen = Fireball; }
-    }
-    const ELKSpellEffect Effect = Chosen ? Chosen->SpellEffect : ELKSpellEffect::Damage;
-    const float Scale=Chosen?GM->GetCardUpgradeScale(Chosen->CardId,Unit->GetTeam()):1.f;
-    const float Value = (Chosen ? Chosen->SpellValue : 60.f)*Scale, Radius = Chosen ? Chosen->SpellRadius : 250.f;
-    const float HeroPercent=Chosen?Chosen->HeroHealPercent*Scale:0.f;
-    const bool bHeal = Effect == ELKSpellEffect::Heal;
-    const TArray<ALKUnitBase*> Units = LivingUnits(GetWorld());
-    FVector Center = Unit->GetActorLocation();
-    float BestScore = -1.f;
-    bool bHasTarget = false;
+    const ULKCardDefinition* Chosen = Spells.IsEmpty() ? GM->FindCard("Spell_Fireball") : Spells[GM->GetBattleRandom().RandRange(0, Spells.Num()-1)];
+    if (!Chosen) { return false; }
+    FVector Center = Unit->GetActorLocation(); float BestScore = -1.f;
+    const bool bFriendly = Chosen->SpellEffect == ELKSpellEffect::Heal || Chosen->SpellEffect == ELKSpellEffect::BlackCloud || Chosen->SpellEffect == ELKSpellEffect::Reinforcements;
+    const auto Units = LivingUnits(GetWorld());
     for (ALKUnitBase* Candidate : Units)
     {
-        if ((Candidate->GetTeam() == Unit->GetTeam()) != bHeal) { continue; }
+        if (!Unit->CanDiscoverTarget(Candidate) || (Candidate->GetTeam()==Unit->GetTeam()) != bFriendly) { continue; }
         float Score = 0.f;
         for (ALKUnitBase* Other : Units)
         {
-            if ((Other->GetTeam() == Unit->GetTeam()) == bHeal && FVector::Dist2D(Candidate->GetActorLocation(), Other->GetActorLocation()) <= Radius)
-            { Score += bHeal ? FMath::Min(Value+(Other->IsHero()?Other->GetMaxHealth()*HeroPercent:0.f), Other->GetMaxHealth() - Other->GetHealth()) : (Other->IsHero() ? 2.f : 1.f); }
+            if (!Unit->CanDiscoverTarget(Other) || (Other->GetTeam()==Unit->GetTeam()) != bFriendly || FVector::Dist2D(Candidate->GetActorLocation(),Other->GetActorLocation()) > Chosen->SpellRadius) { continue; }
+            Score += Chosen->SpellEffect == ELKSpellEffect::Heal ? FMath::Max(0.f,Other->GetMaxHealth()-Other->GetHealth()) : 1.f;
         }
-        if (Score > BestScore) { BestScore = Score; Center = Candidate->GetActorLocation(); bHasTarget = true; }
+        if (Score > BestScore) { BestScore=Score; Center=Candidate->GetActorLocation(); }
     }
-    if (!bHasTarget) { return false; }
-    Unit->CancelAttackWindup();
-    LastSpellId = Chosen ? Chosen->CardId : FName("Spell_Fireball");
-    ULKPresentationSubsystem::Emit(GetWorld(), ELKVisualCue::Mimic, Unit->GetActorLocation());
-    ULKPresentationSubsystem::Sound(GetWorld(), "Mimic", Unit->GetActorLocation());
-    const FLKCombatSource Source = LKGameplay::MakeSource(Unit, ELKCombatSourceKind::Skill, LastSpellId);
-    GM->BeginCombatBatch();
-    if (LastSpellId == "Spell_Fireball") { GM->NotifyFireballCast(Center, Radius); }
-    for (ALKUnitBase* Other : Units)
-    {
-        if (FVector::Dist2D(Center, Other->GetActorLocation()) > Radius) { continue; }
-        if (bHeal && Other->GetTeam() == Unit->GetTeam()) { LKGameplay::ApplyHeal(Other, Value+(Other->IsHero()?Other->GetMaxHealth()*HeroPercent:0.f), Unit, &Source); }
-        else if (!bHeal && Other->GetTeam() != Unit->GetTeam()) { LKGameplay::ApplyDamage(Other, Value, Unit, false, &Source); }
-    }
-    GM->EndCombatBatch();
+    if (!LKSpellExecutor::Execute(GM, Chosen, Unit->GetTeam(), Center, Unit, true)) { return false; }
+    Unit->CancelAttackWindup(); LastSpellId=Chosen->CardId;
+    ULKPresentationSubsystem::Emit(GetWorld(),ELKVisualCue::Mimic,Unit->GetActorLocation());
+    ULKPresentationSubsystem::Sound(GetWorld(),"Mimic",Unit->GetActorLocation());
     return true;
 }
 
@@ -255,6 +237,7 @@ bool ULKUnitActiveComponent::StartDash()
 
 void ULKUnitActiveComponent::TickDash(float DeltaSeconds)
 {
+    if (CastChecked<ALKUnitBase>(GetOwner())->GetStatusComponent()->IsWindDriven()) { return; }
     ALKUnitBase* Unit = CastChecked<ALKUnitBase>(GetOwner());
     ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
     const FVector Start = Unit->GetActorLocation();

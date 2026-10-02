@@ -1,5 +1,6 @@
 #include "ULKPresentationSubsystem.h"
 #include "LKWorldArt.h"
+#include "LKV083Art.h"
 #include "LKGameplayHelpers.h"
 #include "ALKBattleGameMode.h"
 #include "ULKGameData.h"
@@ -30,9 +31,9 @@ void ULKPresentationSubsystem::Emit(UWorld* World, ELKVisualCue Type, FVector Lo
 }
 bool ULKPresentationSubsystem::AdmitSound(FName Id, double Now)
 {
-    if (!LKWorldArt::SoundIds().Contains(Id) || !FMath::IsFinite(Now)) { return false; }
+    if ((!LKWorldArt::SoundIds().Contains(Id) && !LKV083Art::SoundIds().Contains(Id)) || !FMath::IsFinite(Now)) { return false; }
     if (const double* Previous = LastSound.Find(Id))
-    { if (Now >= *Previous && Now - *Previous < LKWorldArt::SoundInterval(Id)) { return false; } }
+    { if (Now >= *Previous && Now - *Previous < (LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundInterval(Id) : LKWorldArt::SoundInterval(Id))) { return false; } }
     LastSound.Add(Id, Now); return true;
 }
 void ULKPresentationSubsystem::Fireball(UWorld* World, FVector Location, float Radius)
@@ -58,7 +59,7 @@ void ULKPresentationSubsystem::Sound(UWorld* World, FName Id, FVector Location, 
     else if (bUI)
     {
         TObjectPtr<USoundBase>& Cue = P->UISounds.FindOrAdd(Id);
-        if (!Cue) { Cue = LoadObject<USoundBase>(nullptr, *LKWorldArt::SoundPath(Id), nullptr, LOAD_NoWarn); }
+        if (!Cue) { Cue = LoadObject<USoundBase>(nullptr, *(LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundPath(Id) : LKWorldArt::SoundPath(Id)), nullptr, LOAD_NoWarn); }
         if (Cue) { UGameplayStatics::PlaySound2D(World, Cue); }
     }
 }
@@ -171,7 +172,15 @@ void ULKPresentationSubsystem::Draw(AHUD* HUD)
         if (Cue.Type == ELKVisualCue::Sacrifice || Cue.Type == ELKVisualCue::Backstab) { C = FLinearColor(.70f,.30f,.42f,1.f-T); }
         if (Cue.Type == ELKVisualCue::Fireball) { C = FLinearColor(1.f,.34f,.08f,1.f-T); }
         if (Cue.Type == ELKVisualCue::Death || Cue.Type == ELKVisualCue::SiegeImpact) { C = FLinearColor(.72f,.65f,.48f,1.f-T); }
+        if (Cue.Type == ELKVisualCue::FreezeSpell) { C = FLinearColor(.48f,.76f,.91f,1.f-T); }
+        if (Cue.Type == ELKVisualCue::DivineBlessing) { C = FLinearColor(.96f,.84f,.48f,1.f-T); }
         const FVector Center = Cue.Location + FVector(0,0,25);
+        if (Cue.Type == ELKVisualCue::Lightning)
+        {
+            const FVector Top = Center+FVector(0,0,380);
+            const FVector A = Center+FVector(0,-40,240), B = Center+FVector(0,30,160);
+            Line(Top,A,C,4); Line(A,B,C,4); Line(B,Center,C,4); continue;
+        }
         if (Cue.Type==ELKVisualCue::Fireball)
         { Stamp("FX_EmberBurst",Center,Cue.Radius*(1.f+T),.65f*(1.f-T),T*30.f); }
         if (Cue.Type==ELKVisualCue::Death || Cue.Type==ELKVisualCue::SiegeImpact || Cue.Type==ELKVisualCue::Summon || Cue.Type==ELKVisualCue::Revive)

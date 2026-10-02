@@ -1,0 +1,1364 @@
+{
+  "auditedAt": "2026-10-01T18:20:04.606878+00:00",
+  "version": "v0.8.3",
+  "projectVersion": "0.8.3",
+  "baseline": "de67b7ffb3eea37e173a422a911ed9cf1fd29b3a",
+  "engine": "UE 5.8.1 / Win64 Development Editor",
+  "scope": "Verified local working-tree implementation; this record does not claim a Git push or published tag.",
+  "builds": [
+    {
+      "path": "Saved/Logs/V083Build07.log",
+      "sha256": "7ed323356a5d96fcb4280117605a04b52ad76cf27394d7d61508f20c3eec2d76",
+      "result": "Succeeded"
+    },
+    {
+      "path": "Saved/Logs/V083Build10.log",
+      "sha256": "7721f420ec42604b2e61cf6f60c1067de37c128a21074e69c9a25b1c744cbb01",
+      "result": "Succeeded"
+    }
+  ],
+  "buildSequence": "Full03 uses Build07. Later builds only adjust isolated preview sampling and long card-label font fitting; final Build10 native UMG captures are reverified at both resolutions.",
+  "fullAutomation": {
+    "path": "Saved/Automation/V083Full03/index.json",
+    "sha256": "341b163fd367dc1a2ab2cb06218cf56a6e2afaa1914c03831ed826c71de7f6de",
+    "reportCreatedOn": "2026.10.01-18.08.10",
+    "succeeded": 64,
+    "succeededWithWarnings": 65,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "totalDuration": 161.5576934814453
+  },
+  "specializedTests": [
+    {
+      "name": "LittleKing.V083.Content.MarketDepthAndRulePresentation",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Content.StableIdentityAndAuthoredTuning",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Content.SummonedRolesAndSpellDefinitions",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.Cooldown150BoundaryAndFIFO",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.FiveCardFallbackAndAtomicRejection",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.MultipleCooldownMutationAndBattleReset",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Research.MaterialConsumptionAndPermanentUnlock",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.BlackCloudDynamicOverlapDiscoveryAndCleanup",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.DivineBlessingAlliesIncapacityAndDrawCooldown",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.FreezeDurationAndTeamFilter",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.HurricaneDirectionRectangleFixedBuildingsAndExpiry",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.LightningCurrentHealthRetargetRangeAndResult",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.MalformedSummonAndFieldParametersAreAtomic",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.ReinforcementGradesPlacementAndTransaction",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.SummonUpgradeUsesInitializationNotHealing",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.ConcealmentTargetsAndSources",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.HealerPriorityProjectileAndConcealment",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.WindGeometryFacingAndControl",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.WindOverridesWalkingWithoutStun",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.ArtCatalogue",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "warningReview": "65 tests pass with warnings: synthetic worlds without camera/viewport; intentional malformed data, rejected placement/unit caps, save failures and legacy/corrupt fixtures. Startup SDK/online probes are not packaging results. Zero test failures; render completion logs have no Error entries.",
+  "renders": [
+    {
+      "path": "Saved/Logs/V083Preview03.log",
+      "sha256": "39a8372582e069baa52745e53b65116b9ddf68e4f32be8eaa7e381b27f97b62b",
+      "completion": "[2026.10.01-18.10.00:789][738]LogTemp: Display: V083_PREVIEW_OK roleIdentities=5 poseCaptures=16 cardCaptures=1 walkCaptures=8 stoppedCaptures=2 fieldCaptures=1"
+    },
+    {
+      "path": "Saved/Logs/V083Preview04.log",
+      "sha256": "4e92fc89241879ca393040ebba547ca15655f52a159108439de5afc26fb0fb86",
+      "completion": "[2026.10.01-18.12.17:555][738]LogTemp: Display: V083_PREVIEW_OK roleIdentities=5 poseCaptures=16 cardCaptures=1 walkCaptures=8 stoppedCaptures=2 fieldCaptures=1"
+    },
+    {
+      "path": "Saved/Logs/V083HUD05.log",
+      "sha256": "a4067bafecc075d267624d5e830e10a0e697dde403ed04fa64e742d226cf7cf9",
+      "completion": "[2026.10.01-18.16.35:625][ 92]LogTemp: Display: V083_HUD_PREVIEW_OK hand=4 unique=4 cooldown=148.33 silver=15.33 label=神圣祝福 · 149 秒后可抽取"
+    },
+    {
+      "path": "Saved/Logs/V083HUD06.log",
+      "sha256": "063a552a32224fc77149515e512cd9d3accf33b400700edddd138f9248c4a0f6",
+      "completion": "[2026.10.01-18.16.36:721][ 92]LogTemp: Display: V083_HUD_PREVIEW_OK hand=4 unique=4 cooldown=148.33 silver=15.33 label=神圣祝福 · 149 秒后可抽取"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "Saved/Screenshots/V083/Fields_1080.png",
+      "sha256": "7491df40bda6119ed8f7b25550c3193028dc384e3cf301cd1c746068509d34c7",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Fields_720.png",
+      "sha256": "246eff84d917822675d1afd51d2ac9e59b65d8eb5809b75e258b939f40d33126",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/HUDCooldown_1080.png",
+      "sha256": "92893a47fb6185524d70169e912f5956b9637b3ec6b45bf0167bf41fe2149154",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/HUDCooldown_720.png",
+      "sha256": "bcce32759685cb5e523812ecf0895fc757d65a929382c61270e869b5dc80221e",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_00_Idle_1080.png",
+      "sha256": "fa80aa36214a43f94a322dc92e92bf3b251d0fb354c80db1b8c1f21020d957ba",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_00_Idle_720.png",
+      "sha256": "182d829cdea00dda8b85c6e83128b0cfb4f6d01aae707704607cdc79f8f4848c",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_01_Idle_1080.png",
+      "sha256": "b02484a9294af1f481c23a4870cf6ce33c0ee5c92f7769f1b287b45592dbd2ad",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_01_Idle_720.png",
+      "sha256": "503e71d4042397b66951bb6e8b1343c6c04f7c76a302eb63af3b0e71767270f8",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_02_Idle_1080.png",
+      "sha256": "3230e38e4c131063c1ce496b200f15ad2b44b848e9fb8a03fa4494bbcf74acb3",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_02_Idle_720.png",
+      "sha256": "9e2200084aa38d1508d052b216b2195becf71dce3df8df42163a75e885be9329",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_03_Idle_1080.png",
+      "sha256": "5a6b165f537b56b00257cf6207133c2322f77031abda1aab87a715df702bce1d",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_03_Idle_720.png",
+      "sha256": "fc611fe9d2ebe39387e29ed5515625da438ec14bddfef7dea65419733c6a1f24",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_04_Move_1080.png",
+      "sha256": "6be1a278e8554c3377aa3c05940249005b32f3b174f3f5fc63968f5e3f650045",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_04_Move_720.png",
+      "sha256": "6bef740058548df80fbeec57ef8d79f30aced63aaa0399bfe216523e07fe4dde",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_05_Move_1080.png",
+      "sha256": "29bb5667586bc56b85b8d1f79c039a2d94c2073eda42bb62ec896d4225ecbca4",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_05_Move_720.png",
+      "sha256": "5963fcab451a8043188f253a38f8d1131c79f1625a143f651f3dbfb5e1a59ca3",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_06_Move_1080.png",
+      "sha256": "23fa551f10b3a4f679150ced6ede3ebf9f5b2ed8c0119c1947424f5842a6ce92",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_06_Move_720.png",
+      "sha256": "7fd49d5d3f983cae08fc42d4138f8efc2e2a6ce09dec0c8b350dac005e50eaef",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_07_Move_1080.png",
+      "sha256": "5ec48814f924cb9fb96a20efa86bda573b8ece9590c5b9b36590f83f6f787c63",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_07_Move_720.png",
+      "sha256": "00238c562a0d95217a882f5219ab184e97a843efd5adf965d55019fe31cc15b6",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_08_Attack_1080.png",
+      "sha256": "24abc3393d2c88436a50d3f79b5b6d56561744041f277b6a453bbeb8947abc50",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_08_Attack_720.png",
+      "sha256": "3656026cb5520fa7f51a21cd5786a4aa9570d74f8fe2ad9ef6d50e360479b723",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_09_Attack_1080.png",
+      "sha256": "6cd202b0c888586cdc0b61c6bbafc15383c5b68d0ad5271a51322066de8a2a15",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_09_Attack_720.png",
+      "sha256": "926ea6fce0ab8eab0886d2868fc94a83207cb1f9712515849e733e9df701b891",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_10_Attack_1080.png",
+      "sha256": "9b84251bdf79d04a01c8c3d5e7b19512d40481333754cd2c8f88eaf4493e457c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_10_Attack_720.png",
+      "sha256": "46a328f8e9cb0eca476a13801cc109f00e03650ba623f1ef066140123cc7fb33",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_11_Attack_1080.png",
+      "sha256": "eb6fdc3ec1779c7147c7a54df14024c4a301cf12016041f80790e63bb59d418b",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_11_Attack_720.png",
+      "sha256": "919a141501de0a35760cdf2a5763937a85e3110d0e4449dabb108c2156387e35",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_12_Hit_1080.png",
+      "sha256": "2fb36cf6987b34163c32d240aac62f0ff2dc82ca292f5d524ba5d3df96b86b00",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_12_Hit_720.png",
+      "sha256": "7a1d085a632db38ef3924bd6baa8a1783b7d23c5de9e3a8aef7712b8762023ee",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_13_Hit_1080.png",
+      "sha256": "22f7102dcdb76b764c10891de72b7d8014d5487c8621538edc18611d2d3aff0f",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_13_Hit_720.png",
+      "sha256": "f2277c67f45a531c6d56f46092503c97787086a723f7e37c0447b132cc8e69ba",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_14_Death_1080.png",
+      "sha256": "b0598854124f6eee02dbe39c4ee5ab270b96548d9e23cee28fb39c3cb737433d",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_14_Death_720.png",
+      "sha256": "6f7ad1eac6bd6048ad502477ab54774784b9a556eb6d2fc485f7e6017e37f9a0",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_15_Death_1080.png",
+      "sha256": "9ca1aadd3deb06936b4d710fe188cc3914a16c09405d5003911f5e1d9ad02033",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Pose_15_Death_720.png",
+      "sha256": "ee0bc4aed7e725be8cb47a864388263878afe176935ad689847196afe5551826",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/SpellCards_1080.png",
+      "sha256": "8d469dfd46e5320162a92f9790c3047b5e4f8ca1db4c79773440d9d1d20b358c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/SpellCards_720.png",
+      "sha256": "97dbef129f2f958818d1c128017a4cedb96940fc289e56722884e13d6a40572c",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Stopped_Left_1080.png",
+      "sha256": "dbcaadd1d575b6ab91b1404873703ab948d7ed198603d3b949145a4bf3223b70",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Stopped_Left_720.png",
+      "sha256": "028b98d52a0ecdf005379929b6fb0994dbb180311d1365085529c262664023b3",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Stopped_Right_1080.png",
+      "sha256": "488598e66a6a33c66ea6f39e7de1d798c2dec4e77c66460c68cd6f291bc3e136",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Stopped_Right_720.png",
+      "sha256": "7637de4101af2e34daeec2987da0fcd5c35cf271968c8adef00ca7411b436553",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_00_1080.png",
+      "sha256": "f34d7f9312122087ffe63de7af601e88f004e269172de06fdb108055713e5887",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_00_720.png",
+      "sha256": "735798aeb66cc863c5354e632e17662a2eea066ca58ca4aa4097a3f19fbaab34",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_01_1080.png",
+      "sha256": "2433359d844decee24f217304e70f42cb537083428495c09a83ec2252592ad81",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_01_720.png",
+      "sha256": "0884007b01a5924c672fbc7c39e32e0adfcd06e0a7fbcfef4fd6c38cc6dd068c",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_02_1080.png",
+      "sha256": "af4c4bdd3cee302646ed7f19a7bde42accc6a11a51e0f356f8616e6648d51c65",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_02_720.png",
+      "sha256": "6507e1ebc8fe740b4c9548283eccb80bceda3a76eb1bf4c4aa6a6827b4a5843e",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_03_1080.png",
+      "sha256": "e613f5088beb12f6b1ffec3cfa3a6ffb9a0f0850e61eefbd9fbd5cfa045c9619",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Left_03_720.png",
+      "sha256": "26ef3e86b6eda63fa11c64be0d689d6af21a17962cecb231b8fbe2110e743442",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_00_1080.png",
+      "sha256": "b53e11572f0fcc69ba285b2fdf1950431246a52a238392c34dc9102945c4ae34",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_00_720.png",
+      "sha256": "4d0426c904fe3924f7beb4bf7bca2558e6052be6fef6380110034ed07c800614",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_01_1080.png",
+      "sha256": "a28f091b56356c18ca8ffe0abe42e9beb95217b97f5dc481e686be3a7c43313a",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_01_720.png",
+      "sha256": "38a62b0fbed081b7d981adf8253815e61d55bc4a818806c0bef652214fb84001",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_02_1080.png",
+      "sha256": "ad3c13d6eaa4dc7d075c36c97cd7ec841122b7f7d5b6b107ab1d484ad2902846",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_02_720.png",
+      "sha256": "fd307e52ffc0163ac38e551376977a54755537b91ca8526c112051b54cc7d0b6",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_03_1080.png",
+      "sha256": "293c05cb9f417abfb5589bc2fda125a539eb6a6866366c0a113aa943b3df9953",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "Saved/Screenshots/V083/Walk_Right_03_720.png",
+      "sha256": "a39279b024a3623fa6668c186b98b4b2e30d4568941e8b09a824bfcd8fddfe1b",
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "visualReview": "Inspected actual role pose and bidirectional walking captures, nine card icons, cloud/freeze/hurricane fields and native UMG at 720p/1080p. Four reinforcement labels fit in portrait hand slots. Renderer demonstration freezes actors and does not substitute for functional automation.",
+  "assetAudit": {
+    "path": "docs/validation/V083Assets-Validation.json",
+    "sha256": "4353c7779e1d3e8fa4ce56b6c02a23b92dead366bc51b2ce2819f579b907e8ee",
+    "status": "passed",
+    "images": 14,
+    "poses": 80,
+    "unitVariants": 11,
+    "sounds": 6
+  },
+  "import": {
+    "path": "Saved/V083AssetsImport.json",
+    "sha256": "8a6b456254ac392d34ae57e3e276c96d7cbf90325bf26ab87378e2b33ddc09a5",
+    "count": 125,
+    "partial": false
+  },
+  "runtimeAssets": [
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelArcher_Attack.uasset",
+      "sha256": "00228743ef0d35672463d87f2331a9c504a81c8541e023aa659fdf841a24d479"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelArcher_Death.uasset",
+      "sha256": "eb498b5e6ed1c950f69cb9aaba77aa42e69945ebb7f4e5d9e6f43243793af9eb"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelArcher_Hit.uasset",
+      "sha256": "9b989f870a3b1609906d9bea1e2661df3317dab989320311eaf52afd6b7d6075"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelArcher_Idle.uasset",
+      "sha256": "2b67f07710d287261741ec43f3b65dc035780b72558ea15c327d0c70845f5d4c"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelArcher_Move.uasset",
+      "sha256": "4cf766e7bee23df1974ade4ccdf68b769c0b51fd1dad4da6f6cfde907d422528"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelPriest_Attack.uasset",
+      "sha256": "9a343dc835f8289fac38fbb67563659a734622495352f24b56b9c572599c894e"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelPriest_Death.uasset",
+      "sha256": "77666a791b655c779fb967a8c3a89a0b837fbeec28367404429fe43bc5a903ed"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelPriest_Hit.uasset",
+      "sha256": "f7cc999a3bdf468b9c6b402e09f7e91d4f528445af75cf13b27aca1f79adb3db"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelPriest_Idle.uasset",
+      "sha256": "96da4af1cd0344f474ddeb94c57ad6162f6dbfecb0f0a23cec4227d602648c4f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelPriest_Move.uasset",
+      "sha256": "2f46e0a5764b0e5a6a2b39e5807d320a09c9451671f10ce3522a46857a7710e2"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelWarrior_Attack.uasset",
+      "sha256": "68a6a5f64af8d185e435b8dcbd0c9a55a86e192be17d3076b0364f7ae00e2425"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelWarrior_Death.uasset",
+      "sha256": "a696c234ca72ffaf9848cf7a9f3c3142e80f28683c59e9f592a5755162a56567"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelWarrior_Hit.uasset",
+      "sha256": "25e8bb115ebfcfc3d9370f070040419f58ed6fe9b8642f394203ab47cd068bd6"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelWarrior_Idle.uasset",
+      "sha256": "b4c8f1f72d6931941046f4180cab4c9a186899dc418c0c1b8409723b8be86e2c"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_AngelWarrior_Move.uasset",
+      "sha256": "0a81fbbe3dc15ea3a780e4b49fe34d5a27d2d5c514a2b5e1009701d7d6b2b145"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_ChosenHighPriest_Attack.uasset",
+      "sha256": "2c84240a1cb42ea61fe6f34122d6f9f0ba14facdd30beb11b637b229eb7ae4e7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_ChosenHighPriest_Death.uasset",
+      "sha256": "540e41b22c78bef0fc267370ed06178260bba42611d122b4391778bc2eb95383"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_ChosenHighPriest_Hit.uasset",
+      "sha256": "2bf472ce5102ef3522df0475c9169ba3d11d499b9178cbbb385586b031cf9200"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_ChosenHighPriest_Idle.uasset",
+      "sha256": "a09fd9688d63c214bb999e8e6cf99030730d6eecb0763c2890943db51f65a9cd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_ChosenHighPriest_Move.uasset",
+      "sha256": "39e9cc474f5a82512311ab41990a5ec0c00ce880ed6ec3d11ebcf7f21f0d329b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_DivineJudge_Attack.uasset",
+      "sha256": "907fa7ef53e18b40eff43a4fa12603fd06265b3d6319dbb9bc005f6ce9bb1e85"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_DivineJudge_Death.uasset",
+      "sha256": "577dc6be7f216f5a6bf9eeca897528c50ab84835dce4fcf6ea7531033bad33b4"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_DivineJudge_Hit.uasset",
+      "sha256": "daad3a6e420cf476cd1c0b2d32076a0cc51eb119273c2f089da83506d25ac60f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_DivineJudge_Idle.uasset",
+      "sha256": "754053eff504ad5f55205e743e004a399b3906b8f8826fde954a559798b68ea2"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/FB_DivineJudge_Move.uasset",
+      "sha256": "392f37a34a46d23033359573c5b05a3ad7bd2bf86aedc08f39cdd4d00bb42cdd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_00.uasset",
+      "sha256": "8024e392c5953cfa688bdaa88bbb2ea4afddb9298f01fbc5e8f1d11122ef36f1"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_01.uasset",
+      "sha256": "b6f173bba1218911e037345cce8c5da08f0492df9a1292cc47387415fe672890"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_02.uasset",
+      "sha256": "93dbcc55855c540d4082936c967e27d92b4d437a6b16af172848a1bdd7b43290"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_03.uasset",
+      "sha256": "af8e37e95c3c15a51d59d30fee65c94c2e0e7528c6cac65fb682a1f06e27b886"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_04.uasset",
+      "sha256": "c7a79b4afd7a26675f5c30257568f044e1b21fc2acbec1689d8962a90d6980db"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_05.uasset",
+      "sha256": "1f3df990461dce75b4f7f825b2b7446cbe9d6115306abb4d115b2b8de166576b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_06.uasset",
+      "sha256": "7addc27577170c38d3b7514018aa9f606c08ffa4dc5d0afbabc03a2bb0a9f270"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_07.uasset",
+      "sha256": "0e607c267627b822f44347a951926bc4635a741c0eb00a24b8601776e0fce8a8"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_08.uasset",
+      "sha256": "275629086f8c5a4164d0a0b9cda31c4853141c1627d48ac8e7353c39e13b9c5d"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_09.uasset",
+      "sha256": "11c086060d656506b1a56dae72916bc22c68bfcbab7b110d30911ada32ac728f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_10.uasset",
+      "sha256": "765eafca14cf917b034b3cfab91b73572bb86f4f889ba031b8ee609238e20c0e"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_11.uasset",
+      "sha256": "97f9c0f2e2adb324df45f56ce4b0627300b453865781545a0938fe958e526d70"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_12.uasset",
+      "sha256": "8c3beadbe4be1705db77dbd2ce04df09c0c81f82c3e3f3c538c1b785ef95e277"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_13.uasset",
+      "sha256": "3040230992e01c8f0597ca88db756362d73693dd9a89f9f384bdb8616224b1c8"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_14.uasset",
+      "sha256": "77e2579caeeb5ef89dd78fcc47693cdebb828f0ab5388acc9c76363ca1aaceb5"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelArcher_15.uasset",
+      "sha256": "1d6f25f52faece6e43fd4d204fc9aeb1c85ec5a3b1b74cc98719297e4e58db21"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_00.uasset",
+      "sha256": "82ef61da52c4593cf5d7df19e2000f1ec1a82369db886ba5093272ce8b809b60"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_01.uasset",
+      "sha256": "5534b6c842f259a91d659eb1869d1f13cfd89cdc3ec91543e331f11db616f3d7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_02.uasset",
+      "sha256": "3677656c87ea12dc104b10ed61632e5f3ab39745396c11eb8d04f2d5c347d893"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_03.uasset",
+      "sha256": "6c62069c1d97fc97608244e6456681efe5a774ccddf55d86c46b7a374d0b6a2f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_04.uasset",
+      "sha256": "9462aa8232a2f7f98aa72393850509296d19fd864a9eea7732c57838f1df3c66"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_05.uasset",
+      "sha256": "f7de3ba60eb73dd0b55c34c4761dbf7f8432556142e8a2834d3c611ac5ac2b79"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_06.uasset",
+      "sha256": "8cd658337152c0eeaaa1aab4fc8843b2e99db6a682155f3e445022aaa84c7846"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_07.uasset",
+      "sha256": "4f0d942a8be482e38873c2bdae653c837485c6fb96dbea79445a486f04da1a21"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_08.uasset",
+      "sha256": "177ef52432af5d9935754b127174eec0f2621be7367f326b83a4fb1deca173b7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_09.uasset",
+      "sha256": "04559011f41ab70e1c648090b5f689633de85f31ac4d1c50d66131e489064fb6"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_10.uasset",
+      "sha256": "4b51a826668d34b78e364467813ab4a862282f5b6dce10409d40b6d26615e88b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_11.uasset",
+      "sha256": "defaa86bbad0544f94c4c792c62298e79562fe2def616ac705cf2c7c12f159d9"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_12.uasset",
+      "sha256": "d802ed628b6346ff4ffe662d57ab6c72e55ae707f94cd1b637389837e476a405"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_13.uasset",
+      "sha256": "f3f99d86ced04934654872abca2ac11ec779bc3088bbe1d7a5a4d66c0808c4ff"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_14.uasset",
+      "sha256": "4b6fde279eb49f51af875b5ef35215d381eafecee225fc6402c2caca56de9a91"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelPriest_15.uasset",
+      "sha256": "fd6d66009772d98b7466fe94dd886c0888036bfedef30bc29898e8eafb8bffcc"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_00.uasset",
+      "sha256": "1f501f52cf667033f70d382a4ffd4a82a812baac3e17fd1b097db79141be3f4b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_01.uasset",
+      "sha256": "c24246ae8b5589326914b77406fd4343fb086ff239d73ec5f925cd85f423bddd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_02.uasset",
+      "sha256": "b5a2bc7314176f9be351d6188a6f344795bf798b63885f8a28400570058dc715"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_03.uasset",
+      "sha256": "0cb2fe8bb86f185791b19bf9ec09f68529cda7b3d6b34ed417762ffa9d934331"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_04.uasset",
+      "sha256": "cb7444b389bf7349a81bf04f655324295d161e4a1ec2638c574d16ce99a69762"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_05.uasset",
+      "sha256": "132a5a5ab07c18961c37eed6d15b38129a86568b8d71bab47fac9a226d0e3c91"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_06.uasset",
+      "sha256": "204942e86f396b83477cba785d7378fd81f9fa23b86aaae36d4ef912ac5d4e04"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_07.uasset",
+      "sha256": "a4863d68418c78df85efd68218b310e0c381f333c27b39f3838dd2735d80300a"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_08.uasset",
+      "sha256": "f8891914234ac9ac565db3d192b167986d5e404e3612eab9b6bc50ec9ea38c38"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_09.uasset",
+      "sha256": "b7996549124571786c47c9b11cc44cac97b299853d872970e2ec4853ab23e79c"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_10.uasset",
+      "sha256": "1fbf5a50d0ce26f2f7ff898920037cc0ccab4775abef5dfcb9b65248f6b46d22"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_11.uasset",
+      "sha256": "806042304c671ebde0e27b5099326ac3b508dbba3172b42772a576ab8e87c07e"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_12.uasset",
+      "sha256": "1d51925386088b6fbe3e5f16e2a17a072bdec04887f1819e26fd04179308eb6a"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_13.uasset",
+      "sha256": "299100176e2aad0cf5852d7d79fdec95fc4547bd9945aa7cd1e5f83b72fcb9cc"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_14.uasset",
+      "sha256": "81c3b857ea4160d223536d9c6a25cce15d9ec6a40e432b8862b2f7350577ca36"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_AngelWarrior_15.uasset",
+      "sha256": "05a9f9bfdc2e14d4f0327843fc0826d0467547ef40b7def801af4fd3bd4cd2d8"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_00.uasset",
+      "sha256": "b557e4be6485a9c7543cbb6489d1f245fac3c6889c38dc471bf92f24da74172e"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_01.uasset",
+      "sha256": "e572ac97a259de48e954d550bac69c3acf12e6b3e9ac9b0d43f24daa6f0164da"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_02.uasset",
+      "sha256": "516383dd1303984e1565565b05a60744082958e810ac16d9fe802c213cab52cf"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_03.uasset",
+      "sha256": "34b47a73867c8197f54a73f3afe554e6e95ff834212e039b71cede9097b3527e"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_04.uasset",
+      "sha256": "cac6731ce556ba177c124686df00046dc7ae8ae58c54b5edc745b5fe41ab8bbc"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_05.uasset",
+      "sha256": "edadfb6763adb0c01f4228c6515022adf14051ca612c45c0615654277bc5362a"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_06.uasset",
+      "sha256": "34c93094ee557737fa35ae61ddc503df88a83ee26ff7687c49e957f48b4d9d1f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_07.uasset",
+      "sha256": "6fde5059cc524dba0c0921ed059f6b1795e4a765e6ad503ac21832f4cc4baa5b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_08.uasset",
+      "sha256": "c6609bc2ce3fe1c52f12e81e9a699c35746477fa9f9d825ab38e4543689f69fd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_09.uasset",
+      "sha256": "0aa273affaa701fbef601127728a9afeac2636534088efa2db42c8703a312bc2"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_10.uasset",
+      "sha256": "3f7d19262cb5b988f9331dfa78a75d12eeefec85a6abdfecb44192b6cca777f2"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_11.uasset",
+      "sha256": "444ba2fc95e2da710cf267fdd38758a39505803abdc1132e76dd8f48a832bb4c"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_12.uasset",
+      "sha256": "47a23d63f7b1fdcbbfcaf102ee2423b0cae345eedc7f6e0264129edfcf1422cd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_13.uasset",
+      "sha256": "3264f52f2ec1ff68baf03398bb20c206cf4a36ece3437985527c43c53a5ebb95"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_14.uasset",
+      "sha256": "f22e25db064ef25011207a5f127ad5db580e24a806b596cebb9c33da7cb286e7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_ChosenHighPriest_15.uasset",
+      "sha256": "87cb7876bf745642fc2f9cfcd654ff38ce958e7b3fe803ecdfd91c331a496931"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_00.uasset",
+      "sha256": "eae131078678ad9fb55acf139991255a7207dbd9891e36fdd8ef3638dc6f995b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_01.uasset",
+      "sha256": "5d1f51f7856478e111f53fa3a1641c35b584bd3b4cfe01ce452c692a9fa02b49"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_02.uasset",
+      "sha256": "9c8edef4c4016da1cc5f859255d38e16ad2a177c5501de448810090bc3fa0f8f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_03.uasset",
+      "sha256": "6bf190d27f7b84219e3ce4227ab05da7b12fab6a65b2d40b66271bfc91d55589"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_04.uasset",
+      "sha256": "ebe9fc3167249cb514a06ac7af49e97aeb89e4605baa2663d59ee56a17164864"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_05.uasset",
+      "sha256": "3aa02c927f1f0bba8a8ac9964a0b8622e7863aa6436e34f2b734034b54d545ce"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_06.uasset",
+      "sha256": "447bafe1b23c8069364553d3dae9ba9eff762b682b58b3463954c86455ca30b5"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_07.uasset",
+      "sha256": "de4b5a7af309f9f8e9353f2d27da9bee93c6c9b8c453ed752f9822618a18f029"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_08.uasset",
+      "sha256": "9211c59e7e5edcaaf5ea483512ee01cda8d4518cad2ea2d0d76300b11f407ae1"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_09.uasset",
+      "sha256": "023eca67d4a1577803ae31995d14c6d4ae5999b51e40ccdf4cf53fa804253213"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_10.uasset",
+      "sha256": "d2ef220adf3c2053eba1d7d33519d7d0ec0cf8cedb26dc0d5671e5cae441ad86"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_11.uasset",
+      "sha256": "931fe2d36666aaf4c42592157c1010419259c10a03ba820fef017f6c817dfed8"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_12.uasset",
+      "sha256": "73e6d873dfbeed09006174bb034fd0bbb0a475985f9e7a0e9a1677b9f1f70a98"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_13.uasset",
+      "sha256": "2126be26033fe2968e2469f291282e3e2d031a287df54f1574e72cbf01147191"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_14.uasset",
+      "sha256": "24c0331060504953dfffb7d2a63de7b0f6351b254b9b4dd5fc0bc5e15c98d884"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/SP_DivineJudge_15.uasset",
+      "sha256": "7a45d4e8d51247d846077c0bdcb31fb87b6a628fc9a3f16bc2a679482d67b6cd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/T_Anim_AngelArcher.uasset",
+      "sha256": "930312f71dc7f8c8333b4058a5e2de2bc1fed0d1fa849d537d32ffd6d58e0fa7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/T_Anim_AngelPriest.uasset",
+      "sha256": "03f07a9e1bd47537bee4bde0338d74efa1e6c7c5d4ed4bfe0a6bb032808a723b"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/T_Anim_AngelWarrior.uasset",
+      "sha256": "bb16ccf292e4afa3c1346086fe0a1e104eb40af52ec77aff7d2beea273f955da"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/T_Anim_ChosenHighPriest.uasset",
+      "sha256": "dcbcfeaf2bed9c0edd0089e115a436b7f966cf5f12233c9d373a44164129b365"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Animations/T_Anim_DivineJudge.uasset",
+      "sha256": "4a51e5d257de31431f5fb35cabc03d01ef4b3e75a558c3d9739b50d700f68ccd"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_BlackCloud.uasset",
+      "sha256": "8b87e900fa59a2c6ac05985c1bcb7be1972a2d15e9bacb2bad593c8a63b2426f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_DivineBlessing.uasset",
+      "sha256": "8aaf53cb2e60324b10236d8158ff985b5ef86e56695ef88fa6d67f4a13bbad59"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_FreezeSpell.uasset",
+      "sha256": "3b8a819ef2df96d92f438be29727a317806e90328c18e4c0d9c23756abfa6fc7"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_HolySummon.uasset",
+      "sha256": "b6aa5599ef76a9736f67490412e18ac2dd7d6218b569726c0a74d5dfcf77d65d"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_Hurricane.uasset",
+      "sha256": "e49f92920a357bfcab21c09ee17caf73e62ddbe71aa3287bd847ea7627928946"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Audio/S_Lightning.uasset",
+      "sha256": "9d54b24f862bc39be074d3f3e0db724d54c0e40b19335ef48ca35ca12432de48"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_BlackCloud.uasset",
+      "sha256": "7a80546fd1c02b5cf382cbf3a01ac9c8fad78112d79d673879e293e308dd8b87"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_DivineBlessing.uasset",
+      "sha256": "4f29af6fe761475e525aecbb227141e66afe4fd279198ff0157765c88bd0d82f"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_Freeze.uasset",
+      "sha256": "5cc48f172f02812f36280d77441aa855897eacd407ec9b93c21d3d439e4694fc"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_Hurricane.uasset",
+      "sha256": "38d7dc52e23d0e38b2f93a01776e21abbd657aac221c1ca1d976eade4b6c1db6"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_Lightning.uasset",
+      "sha256": "5ec45baf193f31a69ba2302ada061cd6cd541ed393be5e4ea9d00a24a230d9fa"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_MariaAdvanced.uasset",
+      "sha256": "a57aaa1548e99c4390456942922b63e2c9f3a8d00ab39f0b079a4501d88ad5a5"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_MariaDivine.uasset",
+      "sha256": "eec443daf856805315bab655d6d83e01b805c70c9fa8be1b22587721c69eed84"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_MariaIntermediate.uasset",
+      "sha256": "4db913dd59d5aa7b721675edb64233642b2040eaba60612a66dfd8b479b89f20"
+    },
+    {
+      "path": "Content/Art/StorybookV1/V083/Cards/T_Card_Spell_MariaNovice.uasset",
+      "sha256": "7dc98b7ae8c69827413d001b4a2c686918e97af3d5c3fac95357f6afec5200ac"
+    }
+  ],
+  "provenance": [
+    {
+      "path": "ArtSource/StorybookV1/V083/generation.json",
+      "sha256": "d6863c3628c977a59bd03923afa604c80b14577ed99577f624ecc61c8f9f590a"
+    },
+    {
+      "path": "ArtSource/StorybookV1/V083/manifest.json",
+      "sha256": "32dabc4b3c9641508be3a4b4704905c9bae67e32076e573f0f4333d16459f827"
+    },
+    {
+      "path": "ArtSource/StorybookV1/V083/frames.json",
+      "sha256": "df1bfb473530af7a9e71a40567e1ec9da667876bd438be28e075d3fd29671750"
+    },
+    {
+      "path": "ArtSource/StorybookV1/V083/Audio/manifest.json",
+      "sha256": "8156587a5d461175aca0b495982686a7b12bf709d4e2b72cf8fdc8ea27322868"
+    }
+  ],
+  "reusedCloudTexture": {
+    "path": "ArtSource/StorybookV1/World/Images/T_FX_Dust.png",
+    "sha256": "61c35d6a44153d85ea2195aea4576ebd776d94f7d782a7483a7d67ec338358bc"
+  },
+  "saveIntegrity": [
+    {
+      "file": "LittleKing_BalanceMig_Cards_8513C71046B0FFD771099894A9255333.sav",
+      "before": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "after": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_A.sav",
+      "before": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "after": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_B.sav",
+      "before": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "after": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_A.sav",
+      "before": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "after": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_B.sav",
+      "before": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "after": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Run.sav",
+      "before": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "after": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "unchanged": true
+    }
+  ],
+  "compatibility": {
+    "runSchema": 10,
+    "profileSchema": 2,
+    "noAutomaticUnlocks": true,
+    "frozenMarketsRetained": true,
+    "sharedTrackedContentUnchanged": true
+  },
+  "sourceFiles": [
+    {
+      "path": "Scripts/AuditV083Assets.py",
+      "sha256": "ddb5e53875521ace95530547ac3f49453c0e751067ae06212fcb27d0cbff9c04"
+    },
+    {
+      "path": "Scripts/ImportV083Assets.py",
+      "sha256": "7f4925628d8e4d5667cfafac0bf96c66a1c50e2c1530a56e2f88dfcfbdb43d62"
+    },
+    {
+      "path": "Scripts/PrepareV083Audio.py",
+      "sha256": "1362a6721aead8ae1e613e8df354af61a416b04f7b222909755274bf623d482b"
+    },
+    {
+      "path": "Scripts/PrepareV083Frames.py",
+      "sha256": "b7ca46add7a56b8660d508bd8c8fbcc8a6303533214e47d04f0f91aa67d4ce43"
+    },
+    {
+      "path": "Scripts/WriteV083AssetPrompts.py",
+      "sha256": "a72d3b831552c82bc6c485a7a2a2341ee7db1461e229ddaf6f013c13da6b7ae5"
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.cpp",
+      "sha256": "9be9911778136aa454c56cad58754cd919ac8299d9c5830013c8304a9f9e3bb6"
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.cpp",
+      "sha256": "38d5f0f05d7031fe2be6baa309bb871679fdf7dcb1e31aefaa086d12ef41086c"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.cpp",
+      "sha256": "45a95c5ac80c6253f4d906603d0f3e64cb30fdae17d703e507a5aeba1c2fe2b6"
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.h",
+      "sha256": "04384352bffc2ef99eee056e359c0fcc57db00ddc9635317b13a29b2e5fdeb5a"
+    },
+    {
+      "path": "Source/little_king/ALKSpellField.cpp",
+      "sha256": "c23202ec4570741a14dffd2c310241a752cff0d03278fbce580af25b6e3f666e"
+    },
+    {
+      "path": "Source/little_king/ALKSpellField.h",
+      "sha256": "67c39198f9c09f944e6a27946e9b7cc2f403e2d5711824391d817eef9d497ec1"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.cpp",
+      "sha256": "56d1392b54efdf74224af2d5f4f8a2b70654ccd107a099cdb7c052adc6eea581"
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.h",
+      "sha256": "52e23e4f1ce390a536d4873b177fc63b9b1399c8e5c0d0f102528da186f126f9"
+    },
+    {
+      "path": "Source/little_king/LKBattleArt.cpp",
+      "sha256": "b1a11759f55bb05254952b3a051e4a53a00ef1c915831856d35e2115ecd7dc22"
+    },
+    {
+      "path": "Source/little_king/LKBattleArtPreview.cpp",
+      "sha256": "5d24c130b51ceefac3dc645de143fcc06a506ae4207936220800356ff457630c"
+    },
+    {
+      "path": "Source/little_king/LKBattleArtPreview.h",
+      "sha256": "77c856cf3b2ad1888ce988d76f128c622de953a58b9556d3e8efeb232dda86bc"
+    },
+    {
+      "path": "Source/little_king/LKCardPresentation.cpp",
+      "sha256": "9d3e59fb706858da7466d24c7ed23266f832bea9e6cd6e656fc4f9fd6db2daa3"
+    },
+    {
+      "path": "Source/little_king/LKDataTypes.h",
+      "sha256": "5e3824b51c615220251c08b56f2096c9fbd28ef571f498d95bd82726cb29994e"
+    },
+    {
+      "path": "Source/little_king/LKHomeContent.cpp",
+      "sha256": "f4f8912ca08fa8224a21bf296bc67509a8f1bf476be50fa85345dc16a4e7e67e"
+    },
+    {
+      "path": "Source/little_king/LKPolishArt.cpp",
+      "sha256": "f2ea2d264170166af3dd2d586d61771f79771754b4943a339d0d3add19497248"
+    },
+    {
+      "path": "Source/little_king/LKPolishArt.h",
+      "sha256": "b1a215917df00082f31a8ee16589bb27885bf517ba8dd2a7f42aa99fd30c3667"
+    },
+    {
+      "path": "Source/little_king/LKResearchContent.cpp",
+      "sha256": "f648d7fcd9abffd36952c3d603be4c8edcc0823c692fd60d666cb202401a76ea"
+    },
+    {
+      "path": "Source/little_king/LKSpellExecutor.cpp",
+      "sha256": "3f08564d69bbe417266e4bd06183f6214f793c12fb7a45d1cb9e6e91bfd9ed80"
+    },
+    {
+      "path": "Source/little_king/LKSpellExecutor.h",
+      "sha256": "ac120df4847b24dc35c68c022748ebb06e174e6a919e573ce89abdd57e62d350"
+    },
+    {
+      "path": "Source/little_king/LKTypes.h",
+      "sha256": "c99347fdec526a10f55f3f11b1d65c19a13d24ee26e40886237c1c165971eae9"
+    },
+    {
+      "path": "Source/little_king/LKUnitContent.cpp",
+      "sha256": "3a2a5dadf5d22ed9c6fd3cd1f69e3575fdc2d9494e81a2baf8c8538390186be9"
+    },
+    {
+      "path": "Source/little_king/LKV083Art.cpp",
+      "sha256": "a1e200b22d4848f3026bcddd525df3439dc954651c6d2d83a21aa65ef046a8af"
+    },
+    {
+      "path": "Source/little_king/LKV083Art.h",
+      "sha256": "8c6d9677639b6193e7f6a336d39257189b687e7621351233b12cad9739cae8ad"
+    },
+    {
+      "path": "Source/little_king/LKV083Content.cpp",
+      "sha256": "f810eb6b6e5df5f53e9093b14c81e59e20b7ee95471ac65205a683355539f071"
+    },
+    {
+      "path": "Source/little_king/LKV083Content.h",
+      "sha256": "0f5a3c9b73de6b91720c29f9f9771e2c30064c195dcccac080f1f5c7776c94c2"
+    },
+    {
+      "path": "Source/little_king/LKV083Preview.cpp",
+      "sha256": "6af7b691b35ef8c1ae839b95ccfff975adb40ff059ef727203e658e9bf17f58d"
+    },
+    {
+      "path": "Source/little_king/LKV083Preview.h",
+      "sha256": "d65c27d137c082a56804aaf7bc951cd933dfb8a0071d57cc8261ebbff5fd5570"
+    },
+    {
+      "path": "Source/little_king/Tests/LKBattleArtTests.cpp",
+      "sha256": "1a8f008baec5e83e6daf8d3e9577b4800097e37abe4b3079348367b8a080b293"
+    },
+    {
+      "path": "Source/little_king/Tests/LKContentTestHelpers.h",
+      "sha256": "558a94163fa69f42d7e698ca2c88e9364fd8294b4b7f2297c3daf8609904d39d"
+    },
+    {
+      "path": "Source/little_king/Tests/LKD1Tests.cpp",
+      "sha256": "c52aa1a4ec5c2d430bd324ffbcb6ce0f0a06e9e8affc4bc9d49ed54e9ab5392c"
+    },
+    {
+      "path": "Source/little_king/Tests/LKOptimization3Tests.cpp",
+      "sha256": "bc9a00a4b04d68d2327789c9a6b7abeae282de86eb135c5cb46397bdfbd79c14"
+    },
+    {
+      "path": "Source/little_king/Tests/LKPolishArtTests.cpp",
+      "sha256": "ff915138da26e13cf0dd3f7f7985a933d16ff146fe491eaf8b772f552b943ca9"
+    },
+    {
+      "path": "Source/little_king/Tests/LKPresentationAssetsTests.cpp",
+      "sha256": "9fa74e3433296a0a69b202f689aa2881139a5aaa29a1a25152409e2b57f7d8b4"
+    },
+    {
+      "path": "Source/little_king/Tests/LKTrollCardsTests.cpp",
+      "sha256": "421d9012540a637745075f730d8ca236f3765b36e1c4956238ea39ab98fdc558"
+    },
+    {
+      "path": "Source/little_king/Tests/LKV083ArtTests.cpp",
+      "sha256": "f4129f1a316e349f0a98991585791f84ea43c61a9017d377a72759c847e8796d"
+    },
+    {
+      "path": "Source/little_king/Tests/LKV083ContentTests.cpp",
+      "sha256": "3db4aeea96274475a5814c8d93e20f8fdcf23ffa800b05b96af36d8b487fb0b0"
+    },
+    {
+      "path": "Source/little_king/Tests/LKV083DeckTests.cpp",
+      "sha256": "1d29e9326658fff71c83fc43d5eb0709e62424cb55bdd836865158227c72dfdc"
+    },
+    {
+      "path": "Source/little_king/Tests/LKV083SpellTests.cpp",
+      "sha256": "56dd8700e6da8db3f39fd03e29af7b32ea724e935d2f000fa63c5d44a0fb33da"
+    },
+    {
+      "path": "Source/little_king/Tests/LKV083UnitTests.cpp",
+      "sha256": "838d49b12308e8381298dd01869788a3fffcfd0d121e8d44e8f2ab9e7f630284"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.cpp",
+      "sha256": "2c2bcb2c84ec106f9a3ccec9c183062ff0851238d3c07b80145bbf61ece293a6"
+    },
+    {
+      "path": "Source/little_king/ULKBattleHUDWidget.h",
+      "sha256": "377cbf142dcd15d23c52be6a66ad7f2404ee2806f71883fe0d87a6bb60ee8e6c"
+    },
+    {
+      "path": "Source/little_king/ULKCardDefinition.h",
+      "sha256": "32a8838f859d616ae786fcffd7a141e8936756e7dd67a020bf1faf2f9638fb42"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.cpp",
+      "sha256": "ef86eb7497486df0800a4dd4607cf44aa17e13a87e449b0643a1c6d19c73bcce"
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.h",
+      "sha256": "78aa0d910fbf458ff9d2d3dd49bf6cc43099c31a55c2232d79f07fab8ad7f7e6"
+    },
+    {
+      "path": "Source/little_king/ULKGameData.cpp",
+      "sha256": "e0dd0d646e58c5f5e8d9ce18a92a6ec18ba4303ee6f2df81ac04db9f620f6918"
+    },
+    {
+      "path": "Source/little_king/ULKPresentationSubsystem.cpp",
+      "sha256": "b69b05d4a8e66a3310b200093cb6aa049019ad2f856a0f7289cd543a70a2c980"
+    },
+    {
+      "path": "Source/little_king/ULKPresentationSubsystem.h",
+      "sha256": "41a277c9c737b4401a67a405fc2718fe65dc64e80b4977a21e9888c80bd3a8ff"
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.cpp",
+      "sha256": "8e4967ae33651ee75e5f533e5b10eece2b76e764d83eeb15a5fab38c9a67d71a"
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.h",
+      "sha256": "0004a1d4b48f51e4d9325052b07347473a9e0196c4d1e5a48dbd37235900677e"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAnimationComponent.cpp",
+      "sha256": "0e37c88640a905952cf298c8cde11503e4b6d0e144f5a251d512d2507ba9bb17"
+    },
+    {
+      "path": "Source/little_king/ULKUnitAnimationComponent.h",
+      "sha256": "d1640b0d195dbdb73655da267a248bb4ed60e23613a6acce4a5de3769b9af5bc"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.cpp",
+      "sha256": "f26044b5bc627bde315bcbc137ccddee6e4a585d646aa3e3ab6c6da50124c4d7"
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.h",
+      "sha256": "c8c4684f4ae0c087dfdf6ba5f66c549e37abff120e7c6ed936d35445ee9b8819"
+    },
+    {
+      "path": "Source/little_king/ULKUnitPassiveComponent.cpp",
+      "sha256": "d4a16cd9eef7a4ac7effa19c22c64f218d796c5db2177b5c3f8ad1a98d3dec00"
+    },
+    {
+      "path": "Source/little_king/ULKUnitStatusComponent.cpp",
+      "sha256": "fbf145fe2be9b5fcc0caea517b507f901ec1156a703e82679052298cf27f48a2"
+    },
+    {
+      "path": "Source/little_king/ULKUnitStatusComponent.h",
+      "sha256": "9593dc6f307a9f4ce501436fb067d4618b1ad4f47a74b1c17a6ecc74df5d6330"
+    }
+  ],
+  "deferred": [
+    "Subjective listening on the player’s audio device",
+    "Long expedition balance with new spells",
+    "Packaging and hardware acceptance, as previously deferred"
+  ],
+  "hashScope": "SHA-256 of verified working-tree bytes. Git checkout line-ending normalization may change text hashes without changing content."
+}

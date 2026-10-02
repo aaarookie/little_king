@@ -32,7 +32,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKPolishCatalogueTest,"LittleKing.Presentation
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FLKPolishCatalogueTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("All battle entities animated"),LKPolishArt::UnitIds().Num(),28);
+    TestEqual(TEXT("All battle entities animated"),LKPolishArt::UnitIds().Num(),39);
     TSet<UPaperSprite*> Sprites;
     for(FName Id:LKPolishArt::UnitIds())
     {
@@ -60,7 +60,7 @@ bool FLKPolishCatalogueTest::RunTest(const FString& Parameters)
             }
         }
     }
-    TestEqual(TEXT("448 distinct authored poses"),Sprites.Num(),448);
+    TestEqual(TEXT("448 previous poses and 80 shared angel poses"),Sprites.Num(),528);
     TestNull(TEXT("Unknown entities keep fallback"),LKPolishArt::Animation("Unknown","Idle"));
     for(bool Title:{false,true})
     {

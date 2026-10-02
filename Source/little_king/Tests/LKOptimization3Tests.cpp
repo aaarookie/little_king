@@ -1,5 +1,6 @@
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
+#include "LKContentTestHelpers.h"
 #include "Tests/AutomationCommon.h"
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
@@ -107,9 +108,11 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKCharacterCatalogTest, "LittleKing.Optimizati
 bool FLKCharacterCatalogTest::RunTest(const FString& Parameters)
 {
     ULKGameData* Data = NewObject<ULKGameData>(); Data->EnsureDefaultDecks(); Data->EnsureCardLibrary();
-    TestEqual(TEXT("28 native character definitions"), LKUnitContent::Units().Num(), 28);
-    TestEqual(TEXT("25 cards including fifteen expedition cards and the enemy-only skeleton circle"), Data->CardLibrary.Num(), 32);
-    Data->EnsureCardLibrary(); TestEqual(TEXT("Repeated registration does not duplicate"), Data->CardLibrary.Num(), 32);
+    TestEqual(TEXT("Native units cover all content catalogs"), LKUnitContent::Units().Num(), LKContentTest::UnitIds().Num());
+    TestEqual(TEXT("Cards cover base, hostile, temporary and research catalogs"), Data->CardLibrary.Num(), LKContentTest::CardIds().Num());
+    Data->EnsureCardLibrary(); TestEqual(TEXT("Repeated registration does not duplicate"), Data->CardLibrary.Num(), LKContentTest::CardIds().Num());
+    for (FName Id : LKContentTest::CardIds())
+    { TestTrue(TEXT("Catalog card identity resolves"), Data->CardLibrary.ContainsByPredicate([Id](const auto& C) { return C && C->CardId == Id; })); }
     for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
     {
         const FLKUnitRow* Unit = LKUnitContent::Find(Definition.Unit.UnitId);

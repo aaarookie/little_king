@@ -66,6 +66,42 @@ void ULKUnitStatusComponent::RemoveAreaSlow(FName SourceId)
     AreaSlowRemaining.Remove(SourceId);
 }
 
+void ULKUnitStatusComponent::ApplyConcealment(FName SourceId, float Seconds)
+{
+    ALKUnitBase* Owner = Unit();
+    if (SourceId.IsNone() || !Owner || !Owner->IsTargetable() || !Owner->IsCombatEnabled()
+        || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return; }
+    const bool bWasConcealed = IsConcealed();
+    float& Remaining = ConcealmentRemaining.FindOrAdd(SourceId);
+    Remaining = FMath::Max(Remaining, Seconds);
+    if (!bWasConcealed)
+    {
+        // Lose existing targets on entry, including taunt/focus and healing windups.
+        // Do not cancel the hidden unit's own attacks: it can still discover outside units.
+        for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
+        { if (*It != Owner && It->IsAlive()) { It->RefreshDiscoveredTarget(); } }
+    }
+}
+
+void ULKUnitStatusComponent::RemoveConcealment(FName SourceId)
+{
+    ConcealmentRemaining.Remove(SourceId);
+}
+
+void ULKUnitStatusComponent::ApplyWind(FName SourceId, float Seconds)
+{
+    ALKUnitBase* Owner = Unit();
+    if (SourceId.IsNone() || !Owner || !Owner->IsTargetable() || Owner->IsBuilding() || !Owner->IsCombatEnabled()
+        || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return; }
+    float& Remaining = WindRemaining.FindOrAdd(SourceId);
+    Remaining = FMath::Max(Remaining, Seconds);
+}
+
+void ULKUnitStatusComponent::RemoveWind(FName SourceId)
+{
+    WindRemaining.Remove(SourceId);
+}
+
 void ULKUnitStatusComponent::TickAreaSlowRemaining(float DeltaSeconds)
 {
     if (AreaSlowRemaining.IsEmpty()) { return; }
@@ -140,6 +176,16 @@ void ULKUnitStatusComponent::TickStatus(float DeltaSeconds)
     FreezeRemaining = FMath::Max(0.f, FreezeRemaining - DeltaSeconds);
     EmpowerRemaining = FMath::Max(0.f, EmpowerRemaining - DeltaSeconds);
     TickAreaSlowRemaining(DeltaSeconds);
+    for (auto It = ConcealmentRemaining.CreateIterator(); It; ++It)
+    {
+        It.Value() -= DeltaSeconds;
+        if (It.Value() <= 0.f) { It.RemoveCurrent(); }
+    }
+    for (auto It = WindRemaining.CreateIterator(); It; ++It)
+    {
+        It.Value() -= DeltaSeconds;
+        if (It.Value() <= 0.f) { It.RemoveCurrent(); }
+    }
     if (!IsEmpowered()) { StunMeter = 0.f; }
     if (BurnStacks > 0)
     {
@@ -203,5 +249,7 @@ void ULKUnitStatusComponent::Clear()
     BurnStacks = AttackCount = 0; LastBreath = ELKBreathHead::None; BurnSource = FLKCombatSource(); BurnInstigator.Reset();
     // 临时区域状态不写入远征存档：换房/死亡/控制清理时一并移除。
     AreaSlowRemaining.Reset();
+    ConcealmentRemaining.Reset();
+    WindRemaining.Reset();
     SetWarriorSupport(false); bSpearSupport = false;
 }

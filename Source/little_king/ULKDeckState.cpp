@@ -19,21 +19,76 @@ bool ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimi
     for (int32 i = 0; i < Slots; ++i) { Hand.Add(Cards[i]); }
     Cards.RemoveAt(0, Slots);
     DrawPile = MoveTemp(Cards);
+    DrawCooldownRemaining.Reset();
     BroadcastHandChanged();
     return true;
 }
 
 bool ULKDeckState::DrawCard() { return false; }
 
-FName ULKDeckState::PlayCard(int32 HandIndex)
+FName ULKDeckState::PlayCard(int32 HandIndex, float DrawCooldownSeconds)
 {
-    if (!IsReady() || !Hand.IsValidIndex(HandIndex)) { return NAME_None; }
+    if (!CanPlayWithCooldown(HandIndex, DrawCooldownSeconds)) { return NAME_None; }
     const FName Played = Hand[HandIndex];
-    Hand[HandIndex] = DrawPile[0];
-    DrawPile.RemoveAt(0);
-    DrawPile.Add(Played);
+    const int32 DrawIndex = FindDrawableIndex();
+    if (DrawCooldownSeconds > 0.f) { DrawCooldownRemaining.Add(Played, DrawCooldownSeconds); }
+    if (DrawIndex != INDEX_NONE)
+    {
+        Hand[HandIndex] = DrawPile[DrawIndex];
+        DrawPile.RemoveAt(DrawIndex);
+        DrawPile.Add(Played);
+    }
+    // Minimum compatibility: a five-card deck with one cooling card has exactly
+    // four usable kinds. Re-draw the just-played non-cooldown card, never an empty
+    // slot or an additional copy. Cooldown cards stay in their original queue order.
     BroadcastHandChanged();
     return Played;
+}
+
+bool ULKDeckState::CanPlayWithCooldown(int32 HandIndex, float DrawCooldownSeconds) const
+{
+    if (!IsReady() || !Hand.IsValidIndex(HandIndex) || !FMath::IsFinite(DrawCooldownSeconds)
+        || DrawCooldownSeconds < 0.f || GetCooldownRemaining(Hand[HandIndex]) > 0.f) { return false; }
+    int32 UsableKinds = 0;
+    const FName Played = Hand[HandIndex];
+    for (FName CardId : GetAllCards())
+    {
+        if (GetCooldownRemaining(CardId) <= 0.f && (CardId != Played || DrawCooldownSeconds <= 0.f)) { ++UsableKinds; }
+    }
+    return UsableKinds >= HandSizeLimit && (FindDrawableIndex() != INDEX_NONE || DrawCooldownSeconds <= 0.f);
+}
+
+int32 ULKDeckState::FindDrawableIndex() const
+{
+    for (int32 Index = 0; Index < DrawPile.Num(); ++Index)
+    {
+        if (GetCooldownRemaining(DrawPile[Index]) <= 0.f) { return Index; }
+    }
+    return INDEX_NONE;
+}
+
+FName ULKDeckState::GetNextCard() const
+{
+    const int32 Index = FindDrawableIndex();
+    return DrawPile.IsValidIndex(Index) ? DrawPile[Index] : NAME_None;
+}
+
+float ULKDeckState::GetCooldownRemaining(FName CardId) const
+{
+    const float* Remaining = DrawCooldownRemaining.Find(CardId);
+    return Remaining ? FMath::Max(0.f, *Remaining) : 0.f;
+}
+
+void ULKDeckState::AdvanceCooldowns(float DeltaSeconds)
+{
+    if (!FMath::IsFinite(DeltaSeconds) || DeltaSeconds <= 0.f) { return; }
+    bool bExpired = false;
+    for (auto It = DrawCooldownRemaining.CreateIterator(); It; ++It)
+    {
+        It.Value() = FMath::Max(0.f, It.Value() - DeltaSeconds);
+        if (It.Value() <= 0.f) { It.RemoveCurrent(); bExpired = true; }
+    }
+    if (bExpired) { BroadcastHandChanged(); }
 }
 
 FName ULKDeckState::GetHandCard(int32 HandIndex) const
@@ -71,10 +126,13 @@ bool ULKDeckState::RemoveCardFromDeck(FName CardId)
     const int32 Slot = Hand.IndexOfByKey(CardId);
     if (Slot != INDEX_NONE)
     {
-        Hand[Slot] = DrawPile[0];
-        DrawPile.RemoveAt(0);
+        const int32 DrawIndex = FindDrawableIndex();
+        if (DrawIndex == INDEX_NONE) { return false; }
+        Hand[Slot] = DrawPile[DrawIndex];
+        DrawPile.RemoveAt(DrawIndex);
     }
     else { DrawPile.RemoveSingle(CardId); }
+    DrawCooldownRemaining.Remove(CardId);
     BroadcastHandChanged();
     return true;
 }
@@ -90,6 +148,8 @@ bool ULKDeckState::TransformCard(FName OldCardId, FName NewCardId)
         if (Index != INDEX_NONE)
         {
             (*Pile)[Index] = NewCardId;
+            if (const float Remaining = GetCooldownRemaining(OldCardId); Remaining > 0.f)
+            { DrawCooldownRemaining.Remove(OldCardId); DrawCooldownRemaining.Add(NewCardId, Remaining); }
             BroadcastHandChanged();
             return true;
         }

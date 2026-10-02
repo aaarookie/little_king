@@ -31,6 +31,8 @@
 #include "LKGameplayHelpers.h"
 #include "LKLog.h"
 #include "LKSkeletonCircle.h"
+#include "LKSpellExecutor.h"
+#include "ALKSpellField.h"
 #include "LKUnitContent.h"
 #include "ULKCardDefinition.h"
 #include "ULKBattleHUDWidget.h"
@@ -296,7 +298,7 @@ void ALKBattleGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 #if WITH_EDITOR
     if (LKBattleArtPreview::Enabled())
-    { TryInitPlayerState(); LKBattleArtPreview::Tick(this); return; }
+    { TryInitPlayerState(); LKBattleArtPreview::Tick(this); if (!LKBattleArtPreview::RunsBattle()) { return; } }
 #endif
 
 	switch (Phase)
@@ -382,6 +384,8 @@ void ALKBattleGameMode::TryInitPlayerState()
 void ALKBattleGameMode::TickBattle(float DeltaSeconds)
 {
 	BattleElapsed += DeltaSeconds;
+    for (ELKTeam Team : { ELKTeam::Player, ELKTeam::Enemy })
+    { if (ULKDeckState* Deck = GetTeamDeck(Team)) { Deck->AdvanceCooldowns(DeltaSeconds); } }
 	TickPlayerSilver(DeltaSeconds);
 
 	if (OpponentBrain)
@@ -724,36 +728,11 @@ ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex,
     if (!Card || Card->Cost < 0) { return ELKPlayResult::InvalidCardData; }
     // 阵营权限的最终校验：玩家永远不能施放敌方专属卡（UI 过滤不能代替校验）。
     if (Team == ELKTeam::Player && !LKCardRules::IsPlayerObtainable(Id)) { return ELKPlayResult::InvalidCardData; }
+    if (!Deck->CanPlayWithCooldown(HandIndex, Card->DrawCooldown)) { return ELKPlayResult::InvalidCardData; }
     if (Card->CardType == ELKCardType::Spell)
     {
-        if (Card->SpellEffect == ELKSpellEffect::None || !FMath::IsFinite(Card->SpellRadius) || Card->SpellRadius <= 0.f)
-        { return ELKPlayResult::InvalidCardData; }
-        // 区域召唤法术走独立数值字段（法阵无直接伤害），其余法术仍要求 SpellValue > 0。
-        if (Card->SpellEffect != ELKSpellEffect::SummonZone
-            && (!FMath::IsFinite(Card->SpellValue) || Card->SpellValue <= 0.f)) { return ELKPlayResult::InvalidCardData; }
-        if (Card->SpellEffect == ELKSpellEffect::SummonZone)
-        { return ELKPlayResult::InvalidCardData; } // 区域召唤只服务敌方战术通道。
-        if (!IsInsideField(Location)) { return ELKPlayResult::InvalidLocation; }
-        if (!CanPlaceSpellAt(Team, Location))
-        {
-            // BUG-017 排查埋点：全场施法只取决于"存活英雄是否带 GlobalSpellPlacement"。
-            // 把当时的存活英雄和各自特性写进日志，避免"法师明明在场却被拦"无从定位。
-            FString AliveInfo;
-            for (const ALKUnitBase* Hero : AliveHeroes[int32(Team)])
-            {
-                if (!IsValid(Hero)) { continue; }
-                const TArray<FName> Traits = Hero->GetTraits();
-                const FString TraitText = Traits.Num() > 0
-                    ? FString::JoinBy(Traits, TEXT(","), [](const FName& Id) { return Id.ToString(); })
-                    : FString(TEXT("无特性"));
-                AliveInfo += FString::Printf(TEXT("%s[%s] "), *Hero->GetUnitId().ToString(), *TraitText);
-            }
-            const FString HeroesText = AliveInfo.IsEmpty() ? FString(TEXT("无")) : AliveInfo;
-            UE_LOG(LogLKBattle, Warning,
-                TEXT("[Spell] %s 在敌方半场 %s 施法被拒绝：存活英雄 %s（需要 Trait_MageSpellReach 全场施法）"),
-                Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), *Location.ToCompactString(), *HeroesText);
-            return ELKPlayResult::SpellLocked;
-        }
+        const ELKPlayResult Result = LKSpellExecutor::Validate(this, Card, Team, Location);
+        if (Result != ELKPlayResult::Success) { return Result; }
     }
     else
     {
@@ -782,7 +761,7 @@ ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, 
     const bool bResolved = bPaid && Phase == ELKGamePhase::Battle && ResolveCard(Card, Team, Location);
     if (bResolved)
     {
-        Deck->PlayCard(HandIndex);
+        Deck->PlayCard(HandIndex, Card->DrawCooldown);
         ++(Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy).CardsPlayed;
         PlayLKOneShot(TEXT("CardPlay"), Location, 0.8f);
     }
@@ -919,6 +898,7 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
         }
     }
 
+    if (!FMath::IsFinite(Data.BaseHealth) || Data.BaseHealth <= 0.f || !FMath::IsFinite(Data.AttackDamage)) { return nullptr; }
 	UClass* ClassToSpawn = ALKUnitBase::StaticClass();
 	switch (Data.UnitClass)
 	{
@@ -1080,6 +1060,7 @@ void ALKBattleGameMode::ClearTacticalSpells()
 		if (IsValid(Circle)) { Circle->Destroy(); }
 	}
 	ActiveSkeletonCircles.Reset();
+    if (GetWorld()) { for (TActorIterator<ALKSpellField> It(GetWorld()); It; ++It) { It->Destroy(); } }
 }
 
 const FLKUnitRow* ALKBattleGameMode::GetUnitRow(FName UnitId) const
@@ -1341,29 +1322,7 @@ bool ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const
 bool ALKBattleGameMode::CastSpell(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
 {
     if (!Card || (Team == ELKTeam::Player && !LKCardRules::IsPlayerObtainable(Card->CardId))) { return false; }
-    // 区域召唤由独立战术事务处理，不能在瞬时法术通道空扣银币。
-    if (Card->SpellEffect == ELKSpellEffect::SummonZone) { return false; }
-    if (!GetWorld() || !Card || Card->SpellEffect == ELKSpellEffect::None || !CanPlaceSpellAt(Team, Location)) { return false; }
-    FLKCombatSource Source;
-    Source.bHasTeam = true; Source.Team = Team; Source.ActionId = Card->CardId; Source.Kind = ELKCombatSourceKind::Spell;
-    TArray<ALKUnitBase*> Targets;
-    for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
-    {
-        if ((*It)->IsTargetable() && FVector::Dist2D(Location, (*It)->GetActorLocation()) <= Card->SpellRadius) { Targets.Add(*It); }
-    }
-    BeginCombatBatch();
-    float Scale=1.f;
-    if (Team==ELKTeam::Player && bExpeditionBattle)
-    { for (const auto& C:BattleContext.PlayerCards) { if (C.CardId==Card->CardId) { Scale=LKCardRules::UpgradeMultiplier(C.UpgradeLevel); break; } } }
-    if (Card->CardId == TEXT("Spell_Fireball") || Card->CardId.ToString().StartsWith(TEXT("Spell_ResearchFireball"))) { NotifyFireballCast(Location, Card->SpellRadius); }
-    for (ALKUnitBase* Unit : Targets)
-    {
-        if (Card->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, Card->SpellValue*Scale, nullptr, false, &Source); }
-        else if (Card->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team)
-        { LKGameplay::ApplyHeal(Unit,(Card->SpellValue+(Unit->IsHero()?Unit->GetMaxHealth()*Card->HeroHealPercent:0.f))*Scale,nullptr,&Source); }
-    }
-    EndCombatBatch();
-    return true; // 合法空放是玩家选择，也会消耗卡牌和银币。
+    return LKSpellExecutor::Execute(this, Card, Team, Location);
 }
 
 void ALKBattleGameMode::DrawFieldBounds() const

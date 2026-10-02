@@ -1,5 +1,11 @@
 # 美术与音频来源台账
 
+## 2026-10-01 至 10-02 v0.8.3 天使与法术
+
+新增五张透明天使角色图集、九张法术卡图、六条原创合成声音。图片由本项目通过内置 `imagegen` 制作，原始 PNG 字节保留在 `ArtSource/StorybookV1/V083`；11 个天使单位共享五套图集，没有新增可获得的天使单位卡。图片完整提示词、实际生成返回路径、归档路径与 SHA-256 见 [54](54-v0.8.3Assets.md) 和 [V083 manifest](../ArtSource/StorybookV1/V083/manifest.json)。角色三阶品质、费用与名称由 UI 绘制，不在图片中烘焙。
+
+六声音 `FreezeSpell / HolySummon / BlackCloud / Lightning / Hurricane / DivineBlessing` 使用 NumPy 和标准库 wave 合成，没有第三方采样。48 kHz/16-bit/mono WAV、随机种子、时长、峰值上限、SHA-256 与制作说明归档在 [音频 manifest](../ArtSource/StorybookV1/V083/Audio/manifest.json)，源码为 `Scripts/PrepareV083Audio.py`。图片登记为项目生成，不标成 CC0；声音登记为项目原创合成。既有 Kenney 许可、Noto 字体和 Music3 音乐来源不变，本批没有新的外部下载。引擎资源、五状态绑定与试听方法见 [55](55-v0.8.3Guide.md)，自动审计与引擎资源验证不替代真实设备上的主观试听。
+
 ## 2026-09-28 骷髅法阵
 
 未新增外部或生成素材。目录临时图标复用项目已有 `T_Card_Unit_Skeleton`（沿用 B 批来源）；预警、生效范围与文字由 `ALKPresentationHUD` 的 Canvas 绘制，不新增图片、音效、震动或提示词。该卡为敌方专属，不出现在玩家手牌。

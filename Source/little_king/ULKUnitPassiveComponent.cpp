@@ -97,7 +97,7 @@ void ULKUnitPassiveComponent::ObserveCombatEvent(const FLKCombatEvent& Event)
         ALKUnitBase* Unit = *It;
         if (!Unit->IsTargetable() || Unit->GetTeam() != OwnerUnit->GetTeam()) { continue; }
         if (Unit->GetFName() == Event.TargetInstanceId && Unit->GetRace() == ELKRace::Elf) { bElfHealed = true; }
-        if (!Unit->IsHero()) { continue; }
+        if (!Unit->IsHero() || !OwnerUnit->CanDiscoverTarget(Unit)) { continue; }
         const float Ratio = Unit->GetHealth() / FMath::Max(1.f, Unit->GetMaxHealth());
         if (Ratio < LowestRatio || (Ratio == LowestRatio && Lowest && Unit->GetFName().LexicalLess(Lowest->GetFName())))
         { Lowest = Unit; LowestRatio = Ratio; }

@@ -20,19 +20,19 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKBattleArtDefaultsTest, "LittleKing.Presentat
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FLKBattleArtDefaultsTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("Twenty missing entity illustrations"), LKBattleArt::UnitIds().Num(), 20);
+    TestEqual(TEXT("Battle catalogue includes eleven summon-only angel units"), LKBattleArt::UnitIds().Num(), 31);
     ULKGameData* Authored = LoadObject<ULKGameData>(nullptr, TEXT("/Game/Data/DA_GameData.DA_GameData"));
     if (!TestNotNull(TEXT("Shipped data loads"), Authored)) { return false; }
     ULKGameData* Data = DuplicateObject<ULKGameData>(Authored, GetTransientPackage());
     Data->EnsureCardLibrary();
-    TestEqual(TEXT("All 25 cards retained (incl. enemy-only skeleton circle)"), Data->CardLibrary.Num(), 32);
+    TestEqual(TEXT("All cards retained, including nine unlockable v0.8.3 spells"), Data->CardLibrary.Num(), 41);
     int32 Defaults = 0;
     for (const auto& Card : Data->CardLibrary)
     {
         TestNotNull(*FString::Printf(TEXT("Card illustration %s"), *Card->CardId.ToString()), Card->Icon.LoadSynchronous());
         if (!LKBattleArt::CardIcon(Card->CardId).IsNull()) { ++Defaults; }
     }
-    TestEqual(TEXT("Seventeen new card illustrations"), Defaults, 17);
+    TestEqual(TEXT("Seventeen unit cards and nine new spell illustrations"), Defaults, 26);
     UPaperSprite* Original = LoadObject<UPaperSprite>(nullptr, TEXT("/Game/Sprites/Unit_Swordsman_sprite.Unit_Swordsman_sprite"));
     for (FName Id : LKBattleArt::UnitIds())
     {
@@ -76,11 +76,23 @@ bool FLKBattleArtSpawnTest::RunTest(const FString& Parameters)
     for (TActorIterator<ALKUnitBase> It(World); It; ++It) { It->Destroy(); }
     TArray<FName> Ids = { "Hero_Knight", "Hero_Mage", "Hero_Ranger", "Unit_Swordsman", "Unit_Archer", "Unit_Shieldbearer", "Building_ArrowTower", "Building_Barracks" };
     Ids.Append(LKBattleArt::UnitIds());
+    // Grow the catalogue without extending the historical four-row grid beyond
+    // the actual map bounds. Every shipped identity still spawns and is checked.
+    constexpr int32 Columns = 7;
+    const int32 Rows = FMath::DivideAndRoundUp(Ids.Num(), Columns);
+    const float Inset = GM->GetGameData()->UnitBodyRadius + 100.f;
+    const float HalfX = GM->GetGameData()->FieldHalfWidth - Inset;
+    const float HalfY = GM->GetGameData()->FieldHalfHeight - Inset;
+    if (!TestTrue(TEXT("Fixture field has room inside the collision margins"), HalfX > 0.f && HalfY > 0.f)) { return false; }
+    int32 Spawned = 0;
     for (int32 Index = 0; Index < Ids.Num(); ++Index)
     {
-        const FVector Position(975.f - (Index / 7) * 650.f, (Index % 7 - 3) * 600.f, 0);
+        const FVector Position(FMath::Lerp(HalfX, -HalfX, float(Index / Columns) / FMath::Max(1, Rows - 1)),
+            FMath::Lerp(-HalfY, HalfY, float(Index % Columns) / (Columns - 1)), 0);
+        TestTrue(TEXT("Each geometry fixture stays in its configured battlefield"), GM->IsInsideField(Position));
         ALKUnitBase* Unit = GM->SpawnUnitForTeam(Ids[Index], ELKTeam::Player, Position);
         if (!TestNotNull(*Ids[Index].ToString(), Unit)) { continue; }
+        ++Spawned;
         Unit->SetCombatEnabled(false);
         TestTrue(*FString::Printf(TEXT("Shipped entity initializes D animation: %s"),*Ids[Index].ToString()),Unit->GetAnimationComponent()->HasAnimations());
         UPaperSpriteComponent* Sprite = Unit->GetSpriteComponent();
@@ -93,6 +105,7 @@ bool FLKBattleArtSpawnTest::RunTest(const FString& Parameters)
         const FBoxSphereBounds Bounds = Sprite->CalcBounds(Sprite->GetComponentTransform());
         TestTrue(TEXT("Visible geometry correctly baked"), Bounds.BoxExtent.X > 50 && Bounds.BoxExtent.Y > 30);
     }
+    TestEqual(TEXT("Geometry coverage includes every registered shipped entity"), Spawned, Ids.Num());
     // Full viewport rendering is exercised by the editor-only -BattleArtPreview workflow.
     return true;
 }

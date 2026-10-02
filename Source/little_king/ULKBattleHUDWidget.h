@@ -15,6 +15,7 @@ class ULKRunRewardWidget;
 class ULKRunNodeSelectWidget;
 class ULKRunResumeWidget;
 class UButton;
+class UTextBlock;
 
 /**
  * 战斗 HUD 基类：C++ 逻辑 + 蓝图表现（行业标准分工）。
@@ -232,6 +233,7 @@ protected:
 	/** 兼容现有 WBP_BattleHUD 中名为 Btn_Restart 的结算按钮。 */
 	UPROPERTY(Transient)
 	TObjectPtr<UButton> ResultActionButton;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> SpellCooldownText;
 	UPROPERTY(Transient) TArray<TObjectPtr<UButton>> DeploymentButtons;
 
 	/** 可选的 ULKRunRewardWidget 蓝图子类；未设置时使用本轮提供的原生完整界面。 */

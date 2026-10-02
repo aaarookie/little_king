@@ -17,8 +17,8 @@ FLinearColor QualityColor(ELKQuality Quality)
 }
 FText RaceName(ELKRace Race)
 {
-    static const TCHAR* Names[] = { TEXT("人类"), TEXT("精灵"), TEXT("哥布林"), TEXT("亡灵"), TEXT("建筑"), TEXT("巨魔"), TEXT("龙"), TEXT("构装体") };
-    return FText::FromString(Names[FMath::Clamp(int32(Race), 0, 7)]);
+    static const TCHAR* Names[] = { TEXT("人类"), TEXT("精灵"), TEXT("哥布林"), TEXT("亡灵"), TEXT("建筑"), TEXT("巨魔"), TEXT("龙"), TEXT("构装体"), TEXT("天使") };
+    return FText::FromString(Names[FMath::Clamp(int32(Race), 0, 8)]);
 }
 FText SpellGradeName(ELKSpellGrade Grade)
 {
@@ -59,15 +59,49 @@ FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow, int32 Up
                 Card.Circle.Radius, Card.Circle.Duration, (1.f-Card.Circle.MoveMultiplier)*100.f,
                 (1.f-Card.Circle.AttackSpeedMultiplier)*100.f, Card.Circle.SummonInterval, Card.Circle.MaxSummons);
         }
+        else if (Card.SpellEffect == ELKSpellEffect::Freeze)
+        {
+            Text += FString::Printf(TEXT("\n敌方范围冻结 %.1f 秒 · 半径 %.0f"), Card.EffectDuration*Scale, Card.SpellRadius);
+        }
+        else if (Card.SpellEffect == ELKSpellEffect::BlackCloud)
+        {
+            Text += FString::Printf(TEXT("\n双方区域隐匿 %.1f 秒 · 半径 %.0f\n离开区域恢复可发现，地面法术仍可命中"), Card.EffectDuration*Scale, Card.SpellRadius);
+        }
+        else if (Card.SpellEffect == ELKSpellEffect::Lightning)
+        {
+            Text += FString::Printf(TEXT("\n半径 %.0f · 仅敌方非英雄\n第一击：当前生命最高者，%.0f%% 最大生命（上限 %.0f）\n%.1f 秒后第二击：重新选择当前生命最低者，造成 %.0f 伤害"),
+                Card.SpellRadius, Card.MaxHealthDamageFraction*100.f, Card.SpellValue*Scale, Card.SecondaryDelay, Card.SecondarySpellValue*Scale);
+        }
+        else if (Card.SpellEffect == ELKSpellEffect::Hurricane)
+        {
+            Text += FString::Printf(TEXT("\n矩形 %.0f × %.0f · 持续 %.1f 秒\n向战场右侧推移 %.0f/秒 · 双方可移动角色\n建筑和营地不移动"),
+                Card.SpellHalfExtents.X*2.f, Card.SpellHalfExtents.Y*2.f, Card.EffectDuration, Card.ForceMoveSpeed*Scale);
+        }
+        else if (Card.SpellEffect == ELKSpellEffect::DivineBlessing)
+        {
+            Text += FString::Printf(TEXT("\n全场己方存活单位\n非英雄恢复 100%% 最大生命；英雄恢复 %.1f%%\n抽牌冷却 %.0f 秒，期间不会抽入手牌"), FMath::Min(1.f,Card.HeroHealPercent*Scale)*100.f, Card.DrawCooldown);
+        }
+        else if (Card.SpellEffect == ELKSpellEffect::Reinforcements)
+        {
+            Text += FString::Printf(TEXT("\n全场合法地点增援 · %d 名 · 仅由法术召唤"), Card.SummonedUnitIds.Num());
+            for (FName Id : Card.SummonedUnitIds)
+            {
+                if (const FLKUnitRow* Row = LKUnitContent::Find(Id))
+                {
+                    Text += FString::Printf(TEXT("\n%s [%s]：生命 %.0f，%s %.0f / %.1f 秒"), *Row->DisplayName.ToString(), *QualityName(Row->Quality).ToString(),
+                        Row->BaseHealth*Scale, Row->bBasicAttackHeals?TEXT("治疗"):TEXT("攻击"), Row->AttackDamage*Scale, Row->AttackInterval);
+                }
+            }
+        }
         else { Text += FString::Printf(TEXT("\n%s %.0f · 半径 %.0f"), Card.SpellEffect == ELKSpellEffect::Heal ? TEXT("治疗") : TEXT("伤害"), Card.SpellValue*Scale, Card.SpellRadius);
             if (Card.SpellEffect==ELKSpellEffect::Heal && Card.HeroHealPercent>0) { Text+=FString::Printf(TEXT("\n英雄额外恢复 %.1f%% 最大生命"),Card.HeroHealPercent*Scale*100.f); } }
     }
     else if (const FLKUnitRow* Row = TunedRow ? TunedRow : LKUnitContent::Find(Card.CardType == ELKCardType::Building ? Card.BuildingUnitId : Card.SpawnUnitId))
     {
         const FString RangeText = Row->bTargetsBuildingsOnly ? TEXT("全图") : FString::Printf(TEXT("%.0f"), Row->AttackRange);
-        Text += FString::Printf(TEXT("\n%s · %s\n基础生命 %.0f · 攻击 %.0f\n间隔 %.1f 秒 · 射程 %s"),
+        Text += FString::Printf(TEXT("\n%s · %s\n基础生命 %.0f · %s %.0f\n间隔 %.1f 秒 · 射程 %s"),
             *RaceName(Row->Race).ToString(), Row->AttackType == ELKAttackType::Melee ? TEXT("近战") : TEXT("远程"),
-            Row->BaseHealth*Scale, Row->AttackDamage*Scale, Row->AttackInterval, *RangeText);
+            Row->BaseHealth*Scale, Row->bBasicAttackHeals?TEXT("治疗"):TEXT("攻击"), Row->AttackDamage*Scale, Row->AttackInterval, *RangeText);
         switch (Row->PassiveAbility)
         {
         case ELKPassiveAbility::AttackRenewal:

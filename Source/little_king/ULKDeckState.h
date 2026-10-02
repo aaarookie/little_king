@@ -8,6 +8,7 @@
  * 牌库状态：固定手牌 + 先进先出的待抽队列。
  * 牌库只存 CardId（FName），费用等通过 CostProvider 从 CardLibrary 解析。
  * CardId 全副牌唯一；有效牌组至少为手牌槽数 + 1。出牌后原槽立即补满。
+ * 施放冷却牌保留在待抽队列，到期前不进入手牌；冷却仅属于当前战斗。
  */
 UCLASS(ClassGroup = (LK), meta = (BlueprintSpawnableComponent))
 class ULKDeckState : public UActorComponent
@@ -30,8 +31,13 @@ public:
 	/** 兼容旧调试调用；有效牌组始终满手，额外抽牌不改变队列。 */
 	bool DrawCard();
 
-	/** 队首换入原槽，打出的牌排至队尾；只广播一次完整手牌。 */
-	FName PlayCard(int32 HandIndex);
+	/** 第一个未冷却队列项换入原槽，打出的牌排至队尾；只广播一次完整手牌。 */
+	FName PlayCard(int32 HandIndex, float DrawCooldownSeconds = 0.f);
+    /** 施法前验证补牌可行性；失败不得扣费、产生效果或改变牌库。 */
+    bool CanPlayWithCooldown(int32 HandIndex, float DrawCooldownSeconds) const;
+    /** GameMode 仅在战斗 Tick 中推进；暂停与换房由外层控制。 */
+    void AdvanceCooldowns(float DeltaSeconds);
+    float GetCooldownRemaining(FName CardId) const;
 
 	// ---------- 查询 ----------
 	UFUNCTION(BlueprintPure, Category = "LK|Deck")
@@ -47,7 +53,7 @@ public:
 	int32 GetDiscardSize() const { return 0; } // 兼容旧查询，不再使用弃牌堆。
 
 	UFUNCTION(BlueprintPure, Category = "LK|Deck")
-	FName GetNextCard() const { return DrawPile.IsEmpty() ? NAME_None : DrawPile[0]; }
+	FName GetNextCard() const;
 
 	UFUNCTION(BlueprintPure, Category = "LK|Deck")
 	bool IsReady() const { return Hand.Num() == HandSizeLimit && !DrawPile.IsEmpty(); }
@@ -69,7 +75,9 @@ public:
 private:
 	TArray<FName> DrawPile;
 	TArray<FName> Hand;
+    TMap<FName, float> DrawCooldownRemaining;
 	int32 HandSizeLimit = 4;
+    int32 FindDrawableIndex() const;
 	bool ContainsCard(FName CardId) const { return Hand.Contains(CardId) || DrawPile.Contains(CardId); }
 	void BroadcastHandChanged();
 };

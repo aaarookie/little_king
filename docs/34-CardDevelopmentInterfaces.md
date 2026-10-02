@@ -1,5 +1,7 @@
 # 新增卡牌：代码入口、接口与接入顺序
 
+2026-10-02 v0.8.3：新增九研究法术、十一召唤单位、统一法术执行器、按来源的黑云与飓风状态、治疗职业普攻以及施放后不可抽取的冷却接口。当前完整目录为 41 卡、39 单位；天使只注册单位，不注册佣兵卡。新增接口见本页末尾，变更记录见 [53](53-v0.8.3Changes.md)，素材与教程见 [54](54-v0.8.3Assets.md) / [55](55-v0.8.3Guide.md)。
+
 2026-09-28 新接口：敌方专属卡必须登记 `LKCardRules::FactionOf/IsPlayerObtainable`，不能只从奖励 UI 隐藏。`ULKDeckState::CardAllowed` 保护玩家牌组初始化/添加/转换，GameMode 还执行最终权限校验。持续召唤区用 `ELKSpellEffect::SummonZone`、`FLKSkeletonCircleParams`、`ALKSkeletonCircle`，敌方通过 `CastEnemyTacticalSpell` 扣费，不走普通手牌入口。减速使用 `ApplyAreaSlow/RemoveAreaSlow` 按来源清理；敌方生成倍率由 `LKBalanceRules::InstanceScalesFor` 统一应用一次。完整协作记录和资产同步步骤见 [49](49-BalanceV1Implementation.md)。
 
 日期：2026-09-16。先于本轮七张新卡实施编写。适用 UE 5.8；沿用“原生代码保证身份，数据表调整数值，缺美术使用色块文字”。本轮具体规则与数值见 [35](35-TrollAndSiegeCards.md)，实施结果归入 [29](29-OptimizationChangeLog.md)。
@@ -87,7 +89,7 @@ Caster->GetStatusComponent()->Empower(8.f, 1.3f, .75f);
 
 ## v0.8.2：获取来源、研究和休息升级接口
 
-注册目录目前 32 卡。`LKCardRules::IsTemporaryMercenary` 同时检查原生兵种与临时目录，远征新卡仅允许此集合；`IsPlayerObtainable` 拒绝三张敌方专属。攻城投石炮作为建筑不再进入临时佣兵掉落池。
+v0.8.2 时注册目录为 32 卡，v0.8.3 扩展为 41 卡。`LKCardRules::IsTemporaryMercenary` 同时检查原生兵种与临时目录，远征新卡仅允许此集合；`IsPlayerObtainable` 拒绝三张敌方专属。攻城投石炮作为建筑不再进入临时佣兵掉落池。
 
 研究目录为 `LKResearchContent::All/Find/EnsureCards`：稳定 CardId、材料类别、法术阶位、价格、最早区域深度、权重、默认数值。运行时定义复制到 GameData 私有目录；既有法术图标被复用，阶位由代码保证，效果数值允许资产覆盖。新增图纸也须注册建筑定义。永久材料存于 Profile，购买后本轮携带于 Run，终态结算以同一 ID 幂等交付；`ULKProfileSubsystem::ResearchCard` 消耗材料并永久解锁，保存失败回滚。
 
@@ -98,3 +100,72 @@ Caster->GetStatusComponent()->Empower(8.f, 1.3f, .75f);
 容量来自冻结的 `DeckCapacityMinimum/Maximum`，默认 8/8；`SetDeckCapacityRule` 可在安全点改变未来规则。`ValidateReplacement` 使用按释放格数／张数的动态规划求固定上限的最小必要方案，区间规则仅检验最终区间和五种牌底线。正式出征至少七种，UI 同步读取当前动态上限。跨房保存和重新加载不回到硬编码八格。
 
 新增技能或界面前先阅读 [50](50-v0.8.2ExpeditionChanges.md)，验证获取权限、回滚、旧档、暂停、等级展示和素材归档，不从旧教程恢复建筑奖励或临时回家入口。
+
+## v0.8.3 法术与召唤单位接口
+
+`LKV083Content::Units` 登记天使的角色身份和默认数值，`ConfigureCard` 登记九法术的规则身份。法术的阶位、书价、市场权重和数值仍通过 `LKResearchContent::All/EnsureCards` 接入研究流程。已有资产先复制成 GameData 私有定义，再恢复规则字段；身份不能因为调表而从治疗职业变成伤害单位，也不能把增援天使放进佣兵奖励池。
+
+`ELKSpellEffect` 追加 `Freeze / Reinforcements / BlackCloud / Lightning / Hurricane / DivineBlessing`，旧枚举序号保持不变。`ELKRace::Angel` 也是末尾追加。新增法术无需生成 DataAsset 才能运行，原生默认可用；研究资格仍由永久档校验，不能把“目录存在”等同于“玩家已解锁”。
+
+| 卡牌字段 | 用途与单位 | 升级行为 |
+| --- | --- | --- |
+| `EffectDuration` | 冰冻、黑云、飓风持续秒数 | 冰冻和黑云随本轮等级放大；飓风维持五秒 |
+| `SpellHalfExtents` | 飓风矩形半边长，厘米，X/Y 对应世界轴 | 范围不随本轮等级扩大 |
+| `ForceMoveSpeed` | 飓风朝画面右侧推移速度，厘米/秒 | 乘本轮升级系数 |
+| `DrawCooldown` | 施放成功后禁止再次抽取的战斗秒数 | 神圣祝福维持 150 秒，不随升级缩短 |
+| `SecondarySpellValue` | 雷电第二击的固定伤害 | 乘本轮升级系数 |
+| `MaxHealthDamageFraction` | 雷电第一击目标最大生命比例 | 保持 20%，不能随本轮等级扩大 |
+| `SpellValue` | 原伤害/治疗数值；雷电第一击伤害上限 | 雷电上限 200 随升级放大；实际伤害为比例项与上限的较小值 |
+| `SecondaryDelay` | 雷电第二击延迟秒数 | 保持 0.2 秒 |
+| `bGlobalPlacement` | 法术自身允许全场落点，与法师存活独立 | 增援与祝福由原生身份保证；不允许数值升级改变施法权限 |
+| `SummonedUnitIds` | 增援一次召唤的完整稳定 UnitId 清单 | 品质和角色清单不变；出生生命与攻击/治疗量受升级影响 |
+| `HeroHealPercent` | 治疗波的英雄附加项；神圣祝福的英雄恢复比例 | 祝福为 20% 乘系数、封顶 100%；非英雄始终恢复 100% 最大生命 |
+
+`SpellRadius` 继续服务圆形范围。祝福是全场效果，允许半径为零，不能被统一的“半径必须正数”校验拒绝。雷电最高和最低按当前绝对生命选择，延迟第二击必须重新选择目标；两击只选敌方非英雄，不因为黑云而禁止地面效果命中。
+
+### 统一施法入口
+
+`LKSpellExecutor::Validate` 返回明确的 `ELKPlayResult`，先检查合法位置、权限、参数与召唤容量。`PlanSummons` 使用确定性的环形候选，在建筑、营地、单位体积与战场边界之外，为完整队伍规划不重叠的位置；验证与失败不消耗战斗随机流。任何一个位置无法找到时拒绝整次召唤，不只生成部分角色。
+
+`LKSpellExecutor::Execute` 负责法术的实际效果，GameMode 普通出牌与学徒法师模仿共用它。真正的手牌施放由 `PlayCardForTeam` 执行权限与费用事务；执行器自身不扣费、不改变手牌。模仿没有手牌出牌事务，也不会给被模仿的卡施加抽取冷却。调用方必须清楚自己是在施放卡牌还是释放单位技能，不能直接绕过外层权限。
+
+`ALKSpellField` 承担黑云、飓风与雷电延迟的世界生命周期。场效只在战斗阶段推进，结算、销毁或换房清理来源状态，不留下跨房定时器。当前黑云作用于双方单位，离开区域即恢复可发现；飓风作用于双方可移动角色，建筑和营地保持固定。飓风方向为世界 `+Y`，与当前相机的画面右侧一致。
+
+```cpp
+// 普通卡牌从 GameMode 的事务入口施放，验证失败不会扣费或过牌。
+const ELKPlayResult Result = GM->PlayCardForTeam(ELKTeam::Player, HandIndex, Location);
+
+// 场效或单位技能执行器调用示意；GM、Card、Instigator 均需有效。
+// bIgnorePlacement=true 仅供明确授权的内部技能与隔离测试使用。
+const ELKPlayResult Check = LKSpellExecutor::Validate(GM, Card, Team, Location);
+if (Check == ELKPlayResult::Success)
+{
+    LKSpellExecutor::Execute(GM, Card, Team, Location, Instigator);
+}
+```
+
+增援生成时把对应法术 ID 传入 `SpawnUnitForTeam` 的 `SourceCardId`，在出生属性副本中应用本轮强化。不要先用普通数值出生、再通过伤害或治疗事件“补成升级值”，否则会误触发被动和统计。
+
+### 新状态与治疗普攻
+
+黑云使用 `ULKUnitStatusComponent::ApplyConcealment/RemoveConcealment`，飓风使用 `ApplyWind/RemoveWind`，每个场效 Actor 的名称作为独立来源 ID。同类场效重叠时只清自己的来源，不能清除另一个仍在生效的场效。`Clear` 和来源过期统一解除状态。
+
+`IsConcealed` 与 `IsTargetable` 分离：隐藏单位仍然存活，也仍能被地面法术影响。单位索敌使用 `CanDiscoverTarget` 与 `RefreshDiscoveredTarget`，常规目标过滤、嘲讽、集火、技能和弹丸追踪共同遵守可发现规则。不要把隐藏实现成无敌或删除碰撞。
+
+`IsWindDriven` 只阻止自主走路，不等同于眩晕或冰冻。`ALKUnitBase::ApplyWindDisplacement` 经 `ULKUnitMovementComponent::MoveWindDelta` 检查建筑、营地与边界，将实际位移积入动画旅行量；原生朝向和步态跟随风的方向。强制风移不能与逆向自动移动抵消，也不能用直接 `SetActorLocation` 穿越建筑。
+
+`FLKUnitRow::bBasicAttackHeals` 是代码保证的职业身份。牧师的 `AttackDamage` 表示单次基础治疗量，其他攻击间隔、射程、前摇仍使用公共普攻管线。治疗单位选择可发现的受伤友军，忽略敌方嘲讽；治疗弹丸用 `ALKProjectile::SetHealingPayload` 固定其友方目标，不拦截为敌人，也不触发普攻伤害类被动。真正恢复仍通过 `LKGameplay::ApplyHeal`，英雄失能后不能在战内救起。
+
+### 冷却与满手过牌
+
+出牌前调用 `ULKDeckState::CanPlayWithCooldown` 验证冷却施放后是否仍能维持四种可用手牌。成功执行法术后，通过 `PlayCard(HandIndex, DrawCooldownSeconds)` 开始冷却，并把第一个未冷却队列项补进原槽；失败不能先设冷却、扣银币或修改队列。
+
+`GetCooldownRemaining(CardId)` 只查询当前战斗的剩余冷却，`AdvanceCooldowns` 由 GameMode 战斗 Tick 推进，暂停不推进。`GetNextCard` 返回第一个未冷却项；暂不可抽的卡仍留在原队列，到期恢复正常 FIFO 资格，既不丢失也不重复。换房 `InitDeck` 清空冷却；退出重试仍从战斗前状态开始，不保存战中冷却。
+
+正式出征至少七种卡。旧兼容的五卡牌组若有一张冷却，仅余四种可用卡；此时打出非冷却卡后可以立即重抽同一张，保留四槽完整且唯一。如果再施放其他冷却卡会不足四种，预校验会拒绝。`TransformCard` 保留旧卡的剩余冷却，避免转化绕过冷却。
+
+### 新素材路径
+
+`LKV083Art::Sprite/Animation/CardIcon` 负责五套图集、九卡图的默认映射，`LKBattleArt` 与 `LKPolishArt` 统一分派。原有 `LKPolishArt::WalkingUnitIds` 只列历史 24 个 MovementFix 覆盖对象；天使移动使用自己的新图集，不必加入这份历史覆盖名单。39 单位共 528 个运行时独立姿态，三品质共享角色图集。
+
+新增声音使用 `LKV083Art::SoundIds/SoundPath/SoundInterval`，GameData 补缺省映射，Presentation 同时允许新旧声音 ID。明确自定义 Sprite/Icon/SoundMap、显式静音和关闭默认声音的选择仍优先。图片原始字节、完整提示词与六条声音参数归档到 `ArtSource/StorybookV1/V083`，引擎资源只写 `/Game/Art/StorybookV1/V083`。

@@ -27,13 +27,21 @@ public:
     bool CanStandAt(const FVector& Location, bool bIncludeUnits = false) const;
     bool TeleportToFreePoint(const FVector& Location);
     FVector MoveSkillDelta(const FVector& Delta);
+    FVector MoveWindDelta(const FVector& Delta);
 
 	void Stop() { bMoving = false; }
+    void ResetVisualTravel() { VisualTravel = WindVisualTravel = FVector::ZeroVector; }
 
 	bool IsMoving() const { return bMoving; }
 
-    /** Presentation consumes only voluntary path travel, never soft separation/knockback. */
-    FVector ConsumeVisualTravel() { const FVector Delta = VisualTravel; VisualTravel = FVector::ZeroVector; return Delta; }
+    /** Wind is authored visible travel; soft separation and instant knockback remain excluded. */
+    FVector ConsumeVisualTravel(bool* bWasWindDriven = nullptr)
+    {
+        if (bWasWindDriven) { *bWasWindDriven = !WindVisualTravel.IsNearlyZero(); }
+        const FVector Delta = VisualTravel + WindVisualTravel;
+        VisualTravel = WindVisualTravel = FVector::ZeroVector;
+        return Delta;
+    }
 
 	void SetSeparationRadius(float Radius) { SeparationRadius = FMath::Max(1.f, Radius); }
 
@@ -49,6 +57,7 @@ private:
 	FVector Destination = FVector::ZeroVector;
 	float Speed = 0.f;
     FVector VisualTravel = FVector::ZeroVector;
+    FVector WindVisualTravel = FVector::ZeroVector;
 	float SeparationRadius = 50.f;
 
 	FVector2D FieldHalfExtent = FVector2D(1200.f, 2000.f);

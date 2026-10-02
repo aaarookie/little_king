@@ -14,6 +14,7 @@ public:
     void Initialize();
     void Attack(float Windup=0.f);
     void Impact();
+    void CancelAttack() { AttackRemaining = 0.f; }
     void Hit();
     void ResetPresentation();
     bool HasAnimations() const { return Clips.Num()==5; }
@@ -37,5 +38,5 @@ private:
     float WalkPhase=0.f;
     float StrideDistance=150.f;
     void UpdateDepth();
-    void UpdateFacing(const FVector& Travel);
+    void UpdateFacing(const FVector& Travel, bool bWindDriven = false);
 };

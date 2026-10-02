@@ -2,6 +2,8 @@
 #include "LKWorldArtPreview.h"
 #include "LKPolishArtPreview.h"
 #include "LKMovementFixPreview.h"
+#include "LKV083Preview.h"
+#include "LKV083Art.h"
 #if WITH_EDITOR
 #include "ALKBattleGameMode.h"
 #include "ALKUnitBase.h"
@@ -28,7 +30,8 @@
 
 namespace LKBattleArtPreview
 {
-bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview")) || FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview")); }
+bool RunsBattle() { return FParse::Param(FCommandLine::Get(), TEXT("V083Sandbox")) || FParse::Param(FCommandLine::Get(), TEXT("V083HUDPreview")); }
+bool Enabled() { return FParse::Param(FCommandLine::Get(), TEXT("V083HUDPreview")) || FParse::Param(FCommandLine::Get(), TEXT("V083Sandbox")) || FParse::Param(FCommandLine::Get(), TEXT("V083Preview")) || FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview")) || FParse::Param(FCommandLine::Get(), TEXT("BattleArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("WorldArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview")) || FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview")); }
 void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
 {
     // Separate process, explicit editor-only option, no player save reads or writes.
@@ -40,6 +43,12 @@ void Prepare(ALKBattleGameMode* Mode, TObjectPtr<ULKGameData>& Data)
     Data = Source ? DuplicateObject<ULKGameData>(Source, Mode) : NewObject<ULKGameData>(Mode);
     Data->bEnableExpeditionFlow = false;
     Data->bDrawDebugShapes = false;
+    if (FParse::Param(FCommandLine::Get(), TEXT("V083Sandbox")) || FParse::Param(FCommandLine::Get(), TEXT("V083HUDPreview")))
+    {
+        Data->DefaultPlayerDeck=LKV083Art::SpellIds();
+        Data->SilverCap=20.f; Data->SilverPerSecond=2.f;
+        Data->EnemyEncounterId="Patrol";
+    }
     if (FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview"))) { Data->EnemyEncounterId="Patrol"; }
 }
 static void TickBalancePreview(ALKBattleGameMode* Mode)
@@ -76,6 +85,9 @@ static void TickBalancePreview(ALKBattleGameMode* Mode)
 }
 void Tick(ALKBattleGameMode* Mode)
 {
+    if (FParse::Param(FCommandLine::Get(), TEXT("V083HUDPreview"))) { LKV083Preview::TickHUD(Mode); return; }
+    if (FParse::Param(FCommandLine::Get(), TEXT("V083Sandbox"))) { return; }
+    if (FParse::Param(FCommandLine::Get(), TEXT("V083Preview"))) { LKV083Preview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("BalanceV1Preview"))) { TickBalancePreview(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("MovementFixPreview"))) { LKMovementFixPreview::Tick(Mode); return; }
     if (FParse::Param(FCommandLine::Get(), TEXT("PolishArtPreview"))) { LKPolishArtPreview::Tick(Mode); return; }

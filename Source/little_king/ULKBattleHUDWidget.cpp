@@ -13,6 +13,8 @@
 #include "Components/ProgressBar.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "PaperSprite.h"
 #include "Blueprint/WidgetTree.h"
 #include "LKPresentationStyle.h"
@@ -76,6 +78,21 @@ void ULKBattleHUDWidget::NativeOnInitialized()
 void ULKBattleHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+    if (WidgetTree && !SpellCooldownText)
+    {
+        if (auto* Canvas=Cast<UCanvasPanel>(WidgetTree->RootWidget))
+        {
+            SpellCooldownText=WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(),TEXT("SpellCooldownText"));
+            SpellCooldownText->SetFont(LKPresentationStyle::Font(14));
+            SpellCooldownText->SetColorAndOpacity(LKPresentationStyle::Gold());
+            SpellCooldownText->SetShadowColorAndOpacity(FLinearColor(0,0,0,.8f));
+            SpellCooldownText->SetShadowOffset(FVector2D(0,1));
+            auto* CooldownSlot=Canvas->AddChildToCanvas(SpellCooldownText);
+            CooldownSlot->SetAnchors(FAnchors(1,0)); CooldownSlot->SetAlignment(FVector2D(1,0));
+            CooldownSlot->SetPosition(FVector2D(-24,88)); CooldownSlot->SetAutoSize(true);
+            SpellCooldownText->SetVisibility(ESlateVisibility::Collapsed);
+        }
+    }
     if (WidgetTree)
     {
         WidgetTree->ForEachWidget([](UWidget* Widget)
@@ -283,6 +300,7 @@ void ULKBattleHUDWidget::HandleHandChanged()
             const int32 Cost = Deck->GetHandCost(Index);
             Costs.Add(Cost);
             Playable.Add(GM && GM->GetPhase() == ELKGamePhase::Battle && GM->FindCard(Hand[Index])
+                && Deck->CanPlayWithCooldown(Index,GM->FindCard(Hand[Index])->DrawCooldown)
                 && GetSilverComp() && GetSilverComp()->GetSilver() >= Cost);
         }
     }
@@ -300,7 +318,10 @@ void ULKBattleHUDWidget::HandleHandChanged()
         { CardWidget->SetToolTipText(FText::FromString(CardWidget->GetToolTipText().ToString() + TEXT("\n当前银币上限不足，请在家园升级金库。"))); }
         if (UTextBlock* Label = FindFirstTextBlock(CardWidget))
         {
-            FSlateFontInfo Font = Label->GetFont(); Font.Size = 14; Label->SetFont(LKPresentationStyle::Font(Font.Size));
+            // The Saint Maria names exceed the portrait slot at the old 14 pt
+            // size. Fit the three-line label without truncating the spell name.
+            const int32 FontSize=FMath::Clamp(112/FMath::Max(1,Card->CardName.ToString().Len()),9,14);
+            Label->SetFont(LKPresentationStyle::Font(FontSize));
             // Three explicit lines: auto-wrap uses stale pre-DPI widths at 720p and can
             // grow the label into the artwork area while the hand is being arranged.
             Label->SetAutoWrapText(false); Label->SetWrapTextAt(0.f);
@@ -798,6 +819,26 @@ UTexture2D* ULKBattleHUDWidget::GetCardIcon(FName CardId) const
 void ULKBattleHUDWidget::NativeTick(const FGeometry& Geometry, float DeltaTime)
 {
     Super::NativeTick(Geometry, DeltaTime);
+    if (SpellCooldownText)
+    {
+        FString Waiting;
+        if (auto* GM=GetBattleGameMode(); GM && GM->GetPhase()==ELKGamePhase::Battle)
+        {
+            if (auto* Deck=GetDeck())
+            {
+                for (FName Id:Deck->GetAllCards())
+                {
+                    const float Remaining=Deck->GetCooldownRemaining(Id);
+                    if (Remaining<=0.f) { continue; }
+                    const auto* Card=GM->FindCard(Id);
+                    if (!Waiting.IsEmpty()) { Waiting+=TEXT("\n"); }
+                    Waiting+=FString::Printf(TEXT("%s · %d 秒后可抽取"),Card?*Card->CardName.ToString():*Id.ToString(),FMath::CeilToInt(Remaining));
+                }
+            }
+        }
+        if (SpellCooldownText->GetText().ToString()!=Waiting) { SpellCooldownText->SetText(FText::FromString(Waiting)); }
+        SpellCooldownText->SetVisibility(Waiting.IsEmpty()?ESlateVisibility::Collapsed:ESlateVisibility::HitTestInvisible);
+    }
 	RefreshDeploymentButtons();
     // Migration bridge until the old aggregate widgets are deleted in the editor.
     for (FName Name : {FName("PlayerHeroBar"), FName("EnemyHeroBar")})

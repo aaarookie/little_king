@@ -10,7 +10,9 @@
 ULKUnitAnimationComponent::ULKUnitAnimationComponent()
 {
     PrimaryComponentTick.bCanEverTick=true;
-    PrimaryComponentTick.TickGroup=TG_PostPhysics;
+    // Spell fields apply forced movement in PostPhysics. Sample all resulting
+    // travel afterwards, so facing/gait match the position rendered this frame.
+    PrimaryComponentTick.TickGroup=TG_PostUpdateWork;
 }
 void ULKUnitAnimationComponent::Initialize()
 {
@@ -78,9 +80,9 @@ void ULKUnitAnimationComponent::UpdateDepth()
     Unit->GetSpriteComponent()->SetRelativeLocation(Location);
 }
 
-void ULKUnitAnimationComponent::UpdateFacing(const FVector& Travel)
+void ULKUnitAnimationComponent::UpdateFacing(const FVector& Travel, bool bWindDriven)
 {
-    if(Unit->IsBuilding()||Unit->IsDead()||Unit->IsControlled()){return;}
+    if(Unit->IsBuilding()||Unit->IsDead()||(Unit->IsControlled()&&!bWindDriven)){return;}
     const bool Enemy=Unit->GetTeam()==ELKTeam::Enemy;
     if(Enemy!=bLastEnemy){bFacingRight=!Enemy;bLastEnemy=Enemy;}
     FVector Direction=Travel.GetSafeNormal2D();
@@ -101,10 +103,11 @@ void ULKUnitAnimationComponent::TickComponent(float DeltaTime,ELevelTick TickTyp
     if(!Unit){return;}
     UpdateDepth();
     const FVector Position=Unit->GetActorLocation();
-    FVector Travel=Unit->GetMovementComponent()->ConsumeVisualTravel();
+    bool bWindDriven=false;
+    FVector Travel=Unit->GetMovementComponent()->ConsumeVisualTravel(&bWindDriven);
     if(Unit->IsSkillMoving()){Travel=Position-LastPosition;}
     LastPosition=Position;
-    UpdateFacing(Travel);
+    UpdateFacing(Travel,bWindDriven);
     if(!HasAnimations()){return;}
     const bool Moving=Travel.SizeSquared2D()>.0001f&&!Unit->IsBuilding();
     if(bWasDead&&!Unit->IsDead()){ResetPresentation();}

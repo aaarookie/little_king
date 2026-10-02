@@ -1,0 +1,119 @@
+[
+  {
+    "file": "Animations/T_Anim_AngelWarrior.png",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Production RGBA transparent square sprite atlas. EXACTLY four columns and four rows, sixteen equal cells, one full character per cell. Identical body size and camera, all face RIGHT in three-quarter view, every limb, wing and weapon STRICTLY inside cell with 12% padding; no floor, shadows or backdrop, true transparent alpha. Read left-to-right top-to-bottom. Row1 four subtle breathing idle poses. Row2 FOUR distinct genuine walking poses LEFT stride, passing feet, RIGHT stride, passing feet; feet and legs visibly alternate, body never floats or slides. Row3 ready, windup, action, recover. Row4 small recoil, recover, kneel, lie on side defeated without gore. Keep consistent foot baseline across rows1-3, all individual poses entire. No large particles. One youthful battle angel, short chestnut hair, compact folded ivory feathered wings, white and antique-gold plate over dark green tunic, one short sword and rounded small shield. Attack row3 sword ready, pull sword back, strike toward right, recover. Wings tucked and fully within cells.",
+    "output_hint": "Generated images are saved to C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1 as C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-2c7fcff3-fe8b-4ed9-b98c-9f7bd5adeccd.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "id": "T_Anim_AngelWarrior",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-2c7fcff3-fe8b-4ed9-b98c-9f7bd5adeccd.png",
+    "tool": "image_gen",
+    "date": "2026-10-01"
+  },
+  {
+    "file": "Animations/T_Anim_AngelArcher.png",
+    "id": "T_Anim_AngelArcher",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Production RGBA transparent square sprite atlas. EXACTLY four columns and four rows, sixteen equal cells, one full character per cell. Identical body size and camera, all face RIGHT in three-quarter view, every limb, wing and weapon STRICTLY inside cell with 12% padding; no floor, shadows or backdrop, true transparent alpha. Read left-to-right top-to-bottom. Row1 four subtle breathing idle poses. Row2 FOUR distinct genuine walking poses LEFT stride, passing feet, RIGHT stride, passing feet; feet and legs visibly alternate, body never floats or slides. Row3 ready, windup, action, recover. Row4 small recoil, recover, kneel, lie on side defeated without gore. Keep consistent foot baseline across rows1-3, all individual poses entire. No large particles. One youthful archer angel with small ivory feathered wings, green hood lowered, cream tunic with antique-gold clasp, warm brown hair, compact short wooden bow and quiver. Attack row3 bow ready, draw string, release arrow toward right, recover; no flying arrows outside subject.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-39ace8ce-a7e8-42e9-a16d-9bbb011c84c7.png",
+    "tool": "image_gen",
+    "date": "2026-10-02",
+    "output_hint": "Generated images are saved to C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1 as C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-39ace8ce-a7e8-42e9-a16d-9bbb011c84c7.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "file": "Animations/T_Anim_AngelPriest.png",
+    "id": "T_Anim_AngelPriest",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Production RGBA transparent square sprite atlas. EXACTLY four columns and four rows, sixteen equal cells, one full character per cell. Identical body size and camera, all face RIGHT in three-quarter view, every limb, wing and weapon STRICTLY inside cell with 12% padding; no floor, shadows or backdrop, true transparent alpha. Read left-to-right top-to-bottom. Row1 four subtle breathing idle poses. Row2 FOUR distinct genuine walking poses LEFT stride, passing feet, RIGHT stride, passing feet; feet and legs visibly alternate, body never floats or slides. Row3 ready, windup, action, recover. Row4 small recoil, recover, kneel, lie on side defeated without gore. Keep consistent foot baseline across rows1-3, all individual poses entire. No large particles. One kindly angel priest with small ivory feathered wings, cream and pine-green ankle robe, gold trim, blond hair, short golden staff with leaf-shaped tip. Row3 healing gesture: staff ready, raise staff, extend open palm toward right with tiny muted gold glow at palm, recover. Visible shoes alternate genuinely walking.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-80b1bbd7-b984-4806-afde-be55f3ecce4d.png",
+    "tool": "image_gen",
+    "date": "2026-10-02",
+    "output_hint": "Generated images are saved to C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1 as C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-80b1bbd7-b984-4806-afde-be55f3ecce4d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "file": "Animations/T_Anim_DivineJudge.png",
+    "id": "T_Anim_DivineJudge",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Production RGBA transparent square sprite atlas. EXACTLY four columns and four rows, sixteen equal cells, one full character per cell. Identical body size and camera, all face RIGHT in three-quarter view, every limb, wing and weapon STRICTLY inside cell with 12% padding; no floor, shadows or backdrop, true transparent alpha. Read left-to-right top-to-bottom. Row1 four subtle breathing idle poses. Row2 FOUR distinct genuine walking poses LEFT stride, passing feet, RIGHT stride, passing feet; feet and legs visibly alternate, body never floats or slides. Row3 ready, windup, action, recover. Row4 small recoil, recover, kneel, lie on side defeated without gore. Keep consistent foot baseline across rows1-3, all individual poses entire. No large particles. One imposing but storybook saintly divine judge angel, ivory feathered wings folded, silver-white and antique-gold armour, dark pine-green sash, warm silver hair, two-handed broad sword. Slightly taller stronger silhouette, no extra traits. Row3 heavy sword ready, wind up overhead, strike toward right, recover. Weapon and wings never cross cells.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-7b1b9bc9-cec2-4a74-be51-d8b23bfa2c79.png",
+    "tool": "image_gen",
+    "date": "2026-10-02",
+    "output_hint": "Generated images are saved to C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1 as C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-7b1b9bc9-cec2-4a74-be51-d8b23bfa2c79.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "file": "Animations/T_Anim_ChosenHighPriest.png",
+    "id": "T_Anim_ChosenHighPriest",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Production RGBA transparent square sprite atlas. EXACTLY four columns and four rows, sixteen equal cells, one full character per cell. Identical body size and camera, all face RIGHT in three-quarter view, every limb, wing and weapon STRICTLY inside cell with 12% padding; no floor, shadows or backdrop, true transparent alpha. Read left-to-right top-to-bottom. Row1 four subtle breathing idle poses. Row2 FOUR distinct genuine walking poses LEFT stride, passing feet, RIGHT stride, passing feet; feet and legs visibly alternate, body never floats or slides. Row3 ready, windup, action, recover. Row4 small recoil, recover, kneel, lie on side defeated without gore. Keep consistent foot baseline across rows1-3, all individual poses entire. No large particles. One dignified chosen angel high priestess, ivory feathered wings tucked, cream full robe with pine-green panels and antique-gold embroidered trim, silver-blond braided hair, compact golden ceremonial staff and simple circlet. Row3 staff ready, blessing windup, open palm toward right with tiny muted gold healing light, recover. Walking cycle must alternate visible foot positions under robes.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-97d85ec5-0bb5-47ec-a6e4-154182d79e3c.png",
+    "tool": "image_gen",
+    "date": "2026-10-02",
+    "output_hint": "Generated images are saved to C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1 as C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-97d85ec5-0bb5-47ec-a6e4-154182d79e3c.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "file": "Cards/T_Card_Spell_Freeze.png",
+    "id": "T_Card_Spell_Freeze",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. A clear central crystalline snowflake above several tiny frostbound dark skeleton silhouettes in a medium circular ice ring, blue teal ice accents on parchment.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-d53bfd12-6aaf-4baf-8a78-b69c3bde40af.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_MariaNovice.png",
+    "id": "T_Card_Spell_MariaNovice",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. Three small ivory-winged angels arrive together from a soft golden circular portal: sword and shield warrior, wooden bow archer, short staff healer, simple green and cream garments, welcoming meadow.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-680bc2a8-6d1f-486a-b7f8-80eaa57aabf3.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_MariaIntermediate.png",
+    "id": "T_Card_Spell_MariaIntermediate",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. Three ivory-winged angels arrive together from an ornate gold circle, sword warrior, bow archer and staff healer, dignified upgraded silver armour and deeper green cloth, blue lapis trim.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-b7807340-3795-4f5c-a16c-ff62f3334f06.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_MariaAdvanced.png",
+    "id": "T_Card_Spell_MariaAdvanced",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. Three ivory-winged angels arrive in a majestic gold sun halo above old ruins, sword warrior, bow archer and healer, elaborate cream gold armour, restrained amethyst accents.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-dbf3ba64-e207-4a74-8bea-171229686eaf.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_MariaDivine.png",
+    "id": "T_Card_Spell_MariaDivine",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. Two sacred angels emerge from radiant antique-gold sun: a strong armoured angel judge bearing a broad sword and a dignified angel high priestess with staff, full figures, legendary orange-gold accents.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-825c67f4-4016-4a37-b584-bbdc61c41fd8.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_BlackCloud.png",
+    "id": "T_Card_Spell_BlackCloud",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. A dense charcoal-green magical cloud blankets a battlefield patch, hidden vague silhouettes behind the mist, airy hand-painted smoke, clear central black cloud reads instantly.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-700a338a-05a8-4539-95cf-9e6579498fbb.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_Lightning.png",
+    "id": "T_Card_Spell_Lightning",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. A bright angular muted gold lightning bolt forks between two dark skeleton silhouettes on parchment, two distinct impact spots, stormy pine-green sky and limestone ruins.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-4d0925d8-2fca-4b78-b78b-7ca44defdbb1.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_Hurricane.png",
+    "id": "T_Card_Spell_Hurricane",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. Several sweeping pale teal wind ribbons and leaf shapes blow emphatically LEFT TO RIGHT across a broad horizontal battlefield band, tiny units pushed right, clear directional motion.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-fe177ef9-6088-4a63-8673-3ee1865a7224.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  },
+  {
+    "file": "Cards/T_Card_Spell_DivineBlessing.png",
+    "id": "T_Card_Spell_DivineBlessing",
+    "prompt": "Warm hand-painted fantasy storybook gouache game art, crisp chestnut contours, matte limestone white, pine green #193A32, parchment #E7D7AE, antique gold #BE9650, warm top-left lighting, simplified cute expressive proportions, small clear silhouettes, consistent Little King game art. No text, letters, watermarks, logo, border or grid. Square full-bleed illustrated fantasy spell card icon. One strong central symbolic composition, readable at 64 pixels, soft textured parchment at edges, no UI framing. A sacred golden sun with a simple white feathered wing motif rains gentle cream gold rays over a gathering of tiny allied figures, green healing leaves, warm peaceful glow.",
+    "source": "C:\\Users\\userl\\.codex\\generated_images\\01a07274-b95b-7572-82e6-79d82296f5a1\\exec-e9d5018f-898c-41d8-adcd-a07637108b9b.png",
+    "tool": "image_gen",
+    "date": "2026-10-02"
+  }
+]

@@ -1,5 +1,6 @@
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
+#include "LKContentTestHelpers.h"
 #include "Tests/AutomationCommon.h"
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
@@ -117,8 +118,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKTrollCatalogTest, "LittleKing.TrollCards.Con
 bool FLKTrollCatalogTest::RunTest(const FString& Parameters)
 {
     ULKGameData* Data = NewObject<ULKGameData>(); Data->EnsureDefaultDecks(); Data->EnsureCardLibrary();
-    TestEqual(TEXT("Native unit count"), LKUnitContent::Units().Num(), 28);
-    TestEqual(TEXT("Full card count (adds the enemy-only skeleton circle)"), Data->CardLibrary.Num(), 32);
+    TestEqual(TEXT("Native unit count matches contributing catalogs"), LKUnitContent::Units().Num(), LKContentTest::UnitIds().Num());
+    TestEqual(TEXT("Full card count matches contributing catalogs"), Data->CardLibrary.Num(), LKContentTest::CardIds().Num());
     TestEqual(TEXT("Four troll cards cost two slots"), LKCardRules::Slots("Unit_TrollKing"), 2);
     TestEqual(TEXT("Colossus costs three slots"), LKCardRules::Slots("Unit_Colossus"), 3);
     TestEqual(TEXT("Spell costs one slot"), LKCardRules::Slots("Spell_Fireball"), 1);

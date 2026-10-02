@@ -39,6 +39,9 @@ public:
     bool IsSiegeShot() const { return bSiegeShot; }
     FName GetSourceUnitId() const { return LaunchSource.UnitId; }
     void SetAttackPayload(ELKBreathHead Head, ALKUnitBase* BuildingTarget = nullptr);
+    /** Ranged healers send a directed friendly bolt through the same projectile pool. */
+    void SetHealingPayload(ALKUnitBase* FriendlyTarget);
+    bool IsHealingShot() const { return bHealingShot; }
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -64,5 +67,7 @@ protected:
 	FLKCombatSource LaunchSource;
     ELKBreathHead BreathHead = ELKBreathHead::None;
     bool bSiegeShot = false;
+    bool bHealingShot = false;
     TWeakObjectPtr<ALKUnitBase> SiegeTarget;
+    TWeakObjectPtr<ALKUnitBase> HealingTarget;
 };

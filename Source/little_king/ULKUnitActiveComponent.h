@@ -18,6 +18,7 @@ public:
     bool TryActivate();
     void ObserveDefeat(const ALKUnitBase* Victim);
     void Stop();
+    void DropUndiscoverableTarget();
     void InterruptMovement() { DashRemaining = 0.f; DashHits.Reset(); }
     ALKUnitBase* GetLockedTarget() const;
     bool IsDashing() const { return DashRemaining > 0.f; }
