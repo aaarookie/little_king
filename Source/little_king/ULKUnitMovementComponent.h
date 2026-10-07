@@ -23,6 +23,9 @@ public:
 	/** 朝目标点移动（Speed 由调用方每帧传入，便于读 GAS 属性） */
 	void MoveToward(const FVector& Destination, float Speed);
 	bool CanReach(const FVector& Target) const;
+    /** Return a reachable enemy wall when a completed enclosure blocks the destination. */
+    class ALKUnitBuilding* FindBlockingEnemyWall(const FVector& Target);
+    bool HasClearMeleePath(const class ALKUnitBase* Target) const;
     /** Skill movement obeys the same field/static-body geometry as normal navigation. */
     bool CanStandAt(const FVector& Location, bool bIncludeUnits = false) const;
     bool TeleportToFreePoint(const FVector& Location);
@@ -65,6 +68,9 @@ private:
 	TArray<FVector> Path;
 	FVector PathDestination = FVector::ZeroVector;
 	float RepathTimer = 0.f;
+    float BreachRetryTime = -1.f;
+    FVector BreachDestination = FVector::ZeroVector;
+    TWeakObjectPtr<class ALKUnitBuilding> BreachWall;
 	void CollectNavigation(TArray<LKNavigation::FObstacle>& Obstacles, LKNavigation::FBounds& Bounds) const;
 
 	/** 与周围单位径向分离 */

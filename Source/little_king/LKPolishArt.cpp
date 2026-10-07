@@ -1,6 +1,7 @@
 #include "LKPolishArt.h"
 #include "LKBattleArt.h"
 #include "LKV083Art.h"
+#include "LKV084Art.h"
 #include "PaperFlipbook.h"
 #include "PaperSprite.h"
 #include "Engine/Font.h"
@@ -30,13 +31,14 @@ const TArray<FName>& WalkingUnitIds()
     {
         TArray<FName> Result;
         for(FName Id:UnitIds())
-        {if(!Id.ToString().StartsWith(TEXT("Building_"))&&Id!="Unit_TwoHeadedDragon"&&!LKV083Art::UnitIds().Contains(Id)){Result.Add(Id);}}
+        {if(!Id.ToString().StartsWith(TEXT("Building_"))&&Id!="Unit_TwoHeadedDragon"&&!LKV083Art::UnitIds().Contains(Id)&&!LKV084Art::UnitIds().Contains(Id)){Result.Add(Id);}}
         return Result;
     }();
     return Ids;
 }
 UPaperFlipbook* Animation(FName Id,FName State)
 {
+    if (LKV084Art::UnitIds().Contains(Id)) { return LKV084Art::Animation(Id,State); }
     if (LKV083Art::UnitIds().Contains(Id)) { return LKV083Art::Animation(Id, State); }
     if(!UnitIds().Contains(Id)){return nullptr;}
     if(State=="Move"&&WalkingUnitIds().Contains(Id))

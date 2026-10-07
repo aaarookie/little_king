@@ -15,24 +15,25 @@
 #include "../ULKGameData.h"
 #include "../ULKRunSubsystem.h"
 #include "../ULKUnitAnimationComponent.h"
+#include "LKContentTestHelpers.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKBattleArtDefaultsTest, "LittleKing.Presentation.BattleArtDefaultsAndOverrides",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FLKBattleArtDefaultsTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("Battle catalogue includes eleven summon-only angel units"), LKBattleArt::UnitIds().Num(), 31);
+    TestEqual(TEXT("Battle catalogue includes summon-only angels and seven new buildings"), LKBattleArt::UnitIds().Num(), 38);
     ULKGameData* Authored = LoadObject<ULKGameData>(nullptr, TEXT("/Game/Data/DA_GameData.DA_GameData"));
     if (!TestNotNull(TEXT("Shipped data loads"), Authored)) { return false; }
     ULKGameData* Data = DuplicateObject<ULKGameData>(Authored, GetTransientPackage());
     Data->EnsureCardLibrary();
-    TestEqual(TEXT("All cards retained, including nine unlockable v0.8.3 spells"), Data->CardLibrary.Num(), 41);
+    TestEqual(TEXT("All registered card identities retained"), Data->CardLibrary.Num(), LKContentTest::CardIds().Num());
     int32 Defaults = 0;
     for (const auto& Card : Data->CardLibrary)
     {
         TestNotNull(*FString::Printf(TEXT("Card illustration %s"), *Card->CardId.ToString()), Card->Icon.LoadSynchronous());
         if (!LKBattleArt::CardIcon(Card->CardId).IsNull()) { ++Defaults; }
     }
-    TestEqual(TEXT("Seventeen unit cards and nine new spell illustrations"), Defaults, 26);
+    TestEqual(TEXT("Seventeen unit cards, nine spells and seven building illustrations"), Defaults, 33);
     UPaperSprite* Original = LoadObject<UPaperSprite>(nullptr, TEXT("/Game/Sprites/Unit_Swordsman_sprite.Unit_Swordsman_sprite"));
     for (FName Id : LKBattleArt::UnitIds())
     {
@@ -80,7 +81,18 @@ bool FLKBattleArtSpawnTest::RunTest(const FString& Parameters)
     // the actual map bounds. Every shipped identity still spawns and is checked.
     constexpr int32 Columns = 7;
     const int32 Rows = FMath::DivideAndRoundUp(Ids.Num(), Columns);
-    const float Inset = GM->GetGameData()->UnitBodyRadius + 100.f;
+    // Walls occupy their full segment, not the circular unit-body radius. Keep
+    // every footprint away from the edge while retaining all catalogue entries.
+    float MaxHalfExtent = GM->GetGameData()->UnitBodyRadius;
+    for (FName Id : Ids)
+    {
+        const FLKUnitRow* Row = GM->GetUnitRow(Id);
+        if (Row && Row->BuildingBehavior == ELKBuildingBehavior::Wall)
+        {
+            MaxHalfExtent = FMath::Max(MaxHalfExtent, FMath::Max(Row->WallLength, Row->WallThickness) * .5f);
+        }
+    }
+    const float Inset = MaxHalfExtent + 100.f;
     const float HalfX = GM->GetGameData()->FieldHalfWidth - Inset;
     const float HalfY = GM->GetGameData()->FieldHalfHeight - Inset;
     if (!TestTrue(TEXT("Fixture field has room inside the collision margins"), HalfX > 0.f && HalfY > 0.f)) { return false; }

@@ -1,4 +1,6 @@
 #include "ALKPresentationHUD.h"
+#include "ALKUnitBuilding.h"
+#include "LKBuildingGeometry.h"
 #include "ULKUnitAnimationComponent.h"
 #include "LKCardPresentation.h"
 #include "ULKUnitStatusComponent.h"
@@ -96,6 +98,7 @@ void ALKPresentationHUD::DrawHUD()
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
+		if (Unit->IsSheltered()) { continue; }
 		if (!Unit->IsAlive() && !Unit->IsHero()) { continue; }
 		FVector2D Screen;
 		if (!ProjectPoint(Unit->GetActorLocation(), Screen)) { continue; }
@@ -149,6 +152,23 @@ void ALKPresentationHUD::DrawHUD()
 		const float Ratio = FMath::Clamp(Unit->GetHealth() / FMath::Max(1.f, Unit->GetMaxHealth()), 0.f, 1.f);
 		DrawRect(FLinearColor(0.03f, 0.03f, 0.03f, 0.9f), Screen.X - Width * 0.5f - 1.f, Top - 1.f, Width + 2.f, 6.f * Scale);
 		DrawRect(TeamColor, Screen.X - Width * 0.5f, Top, Width * Ratio, 4.f * Scale);
+        if (const auto* Building=Cast<ALKUnitBuilding>(Unit))
+        {
+            if (!Building->IsConstructionComplete())
+            {
+                DrawRect(FLinearColor(.12f,.09f,.06f,.85f),Screen.X-Width*.5f,Top+7.f*Scale,Width,4.f*Scale);
+                DrawRect(FLinearColor(1.f,.75f,.2f),Screen.X-Width*.5f,Top+7.f*Scale,Width*Building->GetConstructionProgress(),4.f*Scale);
+                DrawText(FString::Printf(TEXT("施工 %.0f%%"),100.f*Building->GetConstructionProgress()),LKPresentationStyle::Paper(),
+                    Screen.X-Width,Top-18.f*Scale,LKPolishArt::Font(false),Scale);
+            }
+            if (Building->BuildingBehavior==ELKBuildingBehavior::MageTower || Building->BuildingBehavior==ELKBuildingBehavior::HealingStation)
+            {
+                const ALKUnitBase* Occupant=Building->GetOccupant();
+                FString Label=Occupant ? FString::Printf(TEXT("%s · %s"),*Occupant->GetDisplayName().ToString(),Occupant->IsSheltered()?TEXT("驻守"):TEXT("前往中")) : TEXT("空置 · 等待驻守者");
+                if (const ALKUnitBase* Patient=Building->GetPatient()) { Label+=FString::Printf(TEXT(" | 治疗 %s"),*Patient->GetDisplayName().ToString()); }
+                DrawText(Label,LKPresentationStyle::Paper(),Screen.X-Width,Top-18.f*Scale,LKPolishArt::Font(false),.9f*Scale);
+            }
+        }
 		if (Unit->GetPassiveComponent()->GetAbility() == ELKPassiveAbility::BoneRegeneration)
 		{
 			DrawText(FString::Printf(TEXT("%d / %d"), Unit->GetPassiveComponent()->GetBoneCount(), Unit->GetPassiveComponent()->GetRevivalThreshold()),
@@ -244,7 +264,41 @@ void ALKPresentationHUD::DrawHUD()
 	{
         const auto* PreviewCard = PC->GetDeckState() ? GM->FindCard(PC->GetDeckState()->GetHandCard(PC->GetPlacingHandIndex())) : nullptr;
         const FLinearColor PreviewColor = bValid ? FLinearColor(.65f,.85f,.60f) : FLinearColor::Red;
-        if (PC->GetPlacementMode() == ELKPlacementMode::Card && PreviewCard && PreviewCard->SpellEffect == ELKSpellEffect::Hurricane)
+        FVector WallCenter; float WallYaw=0.f; FVector2D WallSize; FString WallAction;
+        if (PC->GetWallPlacementPreview(WallCenter,WallYaw,WallSize,WallAction))
+        {
+            const auto Shape=LKBuildingGeometry::WallShape(WallCenter,WallYaw,WallSize.X,WallSize.Y);
+            const FVector Axis=FRotator(0,WallYaw,0).Vector(), Front(-Axis.Y,Axis.X,0);
+            FVector Previous;
+            for(int32 I=0;I<=32;++I)
+            {
+                const float Angle=I*2.f*PI/32.f;
+                const FVector Normal=Axis*FMath::Cos(Angle)+Front*FMath::Sin(Angle);
+                const FVector P=WallCenter+(FMath::Cos(Angle)>=0?Shape.HalfSegment:-Shape.HalfSegment)+Normal*Shape.Radius;
+                FVector2D A,B;
+                if(I>0 && ProjectPoint(Previous,A) && ProjectPoint(P,B)) { DrawLine(A.X,A.Y,B.X,B.Y,PreviewColor,3.f*Scale); }
+                Previous=P;
+            }
+            FVector2D A,B,L,R;
+            if(ProjectPoint(WallCenter,A)&&ProjectPoint(WallCenter+Front*100.f,B)
+                &&ProjectPoint(WallCenter+Front*75.f+Axis*20.f,L)&&ProjectPoint(WallCenter+Front*75.f-Axis*20.f,R))
+            { DrawLine(A.X,A.Y,B.X,B.Y,PreviewColor,2.f*Scale); DrawLine(B.X,B.Y,L.X,L.Y,PreviewColor,2.f*Scale); DrawLine(B.X,B.Y,R.X,R.Y,PreviewColor,2.f*Scale); }
+            DrawText(WallAction,PreviewColor,24.f*Scale,90.f*Scale,LKPolishArt::Font(false),1.4f*Scale);
+            const FLKUnitRow* WallRow=PreviewCard ? GM->GetUnitRow(PreviewCard->BuildingUnitId) : nullptr;
+            if (WallRow && WallRow->Quality==ELKQuality::Legendary)
+            {
+                for(int32 Side : {-1,1})
+                {
+                    const FLinearColor Color=Side>0?FLinearColor(1,.65f,.2f):FLinearColor(.3f,1,.65f);
+                    const FVector Edge=Front*(WallSize.Y*.5f), End=Front*(WallSize.Y*.5f+300.f);
+                    const FVector Points[]={WallCenter-Axis*WallSize.X*.5f+Edge*Side,WallCenter+Axis*WallSize.X*.5f+Edge*Side,
+                        WallCenter+Axis*WallSize.X*.5f+End*Side,WallCenter-Axis*WallSize.X*.5f+End*Side};
+                    for(int I=0;I<4;++I) { if(ProjectPoint(Points[I],A)&&ProjectPoint(Points[(I+1)%4],B)) { DrawLine(A.X,A.Y,B.X,B.Y,Color,Scale); } }
+                }
+                DrawText(TEXT("箭头前方：攻击 +10% | 后方：每秒恢复 1% 最大生命 | 同类叠加"),LKPresentationStyle::Paper(),24.f*Scale,118.f*Scale,LKPolishArt::Font(false),Scale);
+            }
+        }
+        else if (PC->GetPlacementMode() == ELKPlacementMode::Card && PreviewCard && PreviewCard->SpellEffect == ELKSpellEffect::Hurricane)
         {
             const FVector2D H=PreviewCard->SpellHalfExtents;
             const FVector Corners[] = {Preview+FVector(-H.X,-H.Y,0),Preview+FVector(H.X,-H.Y,0),Preview+FVector(H.X,H.Y,0),Preview+FVector(-H.X,H.Y,0)};
@@ -318,7 +372,7 @@ void ALKPresentationHUD::HandleResult(ELKPlayResult Result)
 	case ELKPlayResult::Success: return;
 	case ELKPlayResult::DeploymentIncomplete: Tip = TEXT("请先部署全部 3 名英雄"); break;
 	case ELKPlayResult::SpellLocked: Tip = TEXT("没有全场施法特性：法术只能放在己方半场"); break;
-	case ELKPlayResult::HeroMoveBlocked: Tip = TEXT("目标地点不可达：被阻挡或为建筑/营地"); break;
+	case ELKPlayResult::HeroMoveBlocked: Tip = TEXT("无法移动：地点受阻，或英雄正在驻守／接受治疗"); break;
 	case ELKPlayResult::NotEnoughSilver: Tip = TEXT("银币不足"); break;
 	case ELKPlayResult::AlreadyDeployed: Tip = TEXT("该英雄已部署，请点击营地指挥"); break;
 	case ELKPlayResult::UnitLimitReached: Tip = TEXT("单位数量达到上限"); break;

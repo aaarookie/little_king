@@ -1,6 +1,7 @@
 #include "ULKPresentationSubsystem.h"
 #include "LKWorldArt.h"
 #include "LKV083Art.h"
+#include "LKV084Art.h"
 #include "LKGameplayHelpers.h"
 #include "ALKBattleGameMode.h"
 #include "ULKGameData.h"
@@ -31,9 +32,9 @@ void ULKPresentationSubsystem::Emit(UWorld* World, ELKVisualCue Type, FVector Lo
 }
 bool ULKPresentationSubsystem::AdmitSound(FName Id, double Now)
 {
-    if ((!LKWorldArt::SoundIds().Contains(Id) && !LKV083Art::SoundIds().Contains(Id)) || !FMath::IsFinite(Now)) { return false; }
+    if ((!LKWorldArt::SoundIds().Contains(Id) && !LKV083Art::SoundIds().Contains(Id) && !LKV084Art::SoundIds().Contains(Id)) || !FMath::IsFinite(Now)) { return false; }
     if (const double* Previous = LastSound.Find(Id))
-    { if (Now >= *Previous && Now - *Previous < (LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundInterval(Id) : LKWorldArt::SoundInterval(Id))) { return false; } }
+    { if (Now >= *Previous && Now - *Previous < (LKV084Art::SoundIds().Contains(Id) ? LKV084Art::SoundInterval(Id) : LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundInterval(Id) : LKWorldArt::SoundInterval(Id))) { return false; } }
     LastSound.Add(Id, Now); return true;
 }
 void ULKPresentationSubsystem::Fireball(UWorld* World, FVector Location, float Radius)
@@ -59,7 +60,7 @@ void ULKPresentationSubsystem::Sound(UWorld* World, FName Id, FVector Location, 
     else if (bUI)
     {
         TObjectPtr<USoundBase>& Cue = P->UISounds.FindOrAdd(Id);
-        if (!Cue) { Cue = LoadObject<USoundBase>(nullptr, *(LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundPath(Id) : LKWorldArt::SoundPath(Id)), nullptr, LOAD_NoWarn); }
+        if (!Cue) { Cue = LoadObject<USoundBase>(nullptr, *(LKV084Art::SoundIds().Contains(Id) ? LKV084Art::SoundPath(Id) : LKV083Art::SoundIds().Contains(Id) ? LKV083Art::SoundPath(Id) : LKWorldArt::SoundPath(Id)), nullptr, LOAD_NoWarn); }
         if (Cue) { UGameplayStatics::PlaySound2D(World, Cue); }
     }
 }

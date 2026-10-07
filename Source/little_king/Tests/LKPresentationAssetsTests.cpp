@@ -21,7 +21,7 @@ bool FLKPresentationAudioTest::RunTest(const FString& Parameters)
         TEXT("/Game/Art/StorybookV1/Textures/T_MenuKingdom.T_MenuKingdom")));
     ULKGameData* Data = NewObject<ULKGameData>();
     Data->EnsurePresentationDefaults();
-    TestEqual(TEXT("Eight base, 28 specialised and six V083 cues have defaults"), Data->SoundMap.Num(), 42);
+    TestEqual(TEXT("Eight base, 28 specialised, six V083 and seven V084 cues have defaults"), Data->SoundMap.Num(), 49);
     for (const auto& Pair : Data->SoundMap)
     {
         USoundWave* Sound = Cast<USoundWave>(Pair.Value.LoadSynchronous());

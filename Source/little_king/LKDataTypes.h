@@ -108,6 +108,18 @@ struct FLKUnitRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ELKBuildingBehavior BuildingBehavior = ELKBuildingBehavior::None;
 
+    /** 建筑施工和墙体参数；尺寸使用厘米，朝向由放置命令提供。 */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building", meta = (ClampMin = "0"))
+    float ConstructionSeconds = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building", meta = (ClampMin = "1"))
+    float WallLength = 300.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building", meta = (ClampMin = "1"))
+    float WallThickness = 36.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building", meta = (ClampMin = "0"))
+    float ReflectDamage = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building", meta = (ClampMin = "0"))
+    float WallAuraRange = 300.f;
+
 	/** 兵营产出的单位 ID */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName SpawnUnitId = NAME_None;

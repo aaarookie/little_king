@@ -34,7 +34,8 @@ bool ALKSpellField::Initialize(ALKBattleGameMode* GM, const ULKCardDefinition* C
     {
         for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
         { const FVector Offset=It->GetActorLocation()-Center;
-          if (It->IsTargetable() && !It->IsBuilding() && FMath::Abs(Offset.X)<=HalfExtents.X && FMath::Abs(Offset.Y)<=HalfExtents.Y)
+          if (It->IsTargetable() && (!It->IsBuilding() || It->IsMobileBuilding()) && !It->IsSheltered()
+              && FMath::Abs(Offset.X)<=HalfExtents.X && FMath::Abs(Offset.Y)<=HalfExtents.Y)
           { HiddenUnits.Add(*It); It->GetStatusComponent()->ApplyWind(GetFName(),Remaining+.1f); } }
     }
     ULKPresentationSubsystem::Sound(GetWorld(), Effect == ELKSpellEffect::BlackCloud ? "BlackCloud" : Effect == ELKSpellEffect::Hurricane ? "Hurricane" : "Lightning", Center);
@@ -45,7 +46,7 @@ void ALKSpellField::RefreshCloud()
     TSet<TWeakObjectPtr<ALKUnitBase>> Inside;
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
-        if (It->IsTargetable() && FVector::DistSquared2D(Center, It->GetActorLocation()) <= FMath::Square(Radius))
+        if (It->IsTargetable() && !It->IsSheltered() && FVector::DistSquared2D(Center, It->GetActorLocation()) <= FMath::Square(Radius))
         { Inside.Add(*It); It->GetStatusComponent()->ApplyConcealment(GetFName(), Remaining + .1f); }
     }
     for (const auto& Unit : HiddenUnits)
@@ -64,7 +65,7 @@ void ALKSpellField::StrikeLowest()
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         ALKUnitBase* Unit = *It;
-        if (!Unit->IsTargetable() || Unit->IsHero() || Unit->GetTeam() == CasterTeam || FVector::DistSquared2D(Center, Unit->GetActorLocation()) > FMath::Square(Radius)) { continue; }
+        if (!Unit->IsTargetable() || Unit->IsSheltered() || Unit->IsHero() || Unit->GetTeam() == CasterTeam || FVector::DistSquared2D(Center, Unit->GetActorLocation()) > FMath::Square(Radius)) { continue; }
         if (!Lowest || Unit->GetHealth() < Lowest->GetHealth() || (Unit->GetHealth() == Lowest->GetHealth() && Unit->GetFName().LexicalLess(Lowest->GetFName()))) { Lowest = Unit; }
     }
     if (Lowest)
@@ -94,7 +95,8 @@ void ALKSpellField::Tick(float DeltaSeconds)
             for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
             {
                 const FVector Offset = It->GetActorLocation() - Center;
-                if (!It->IsTargetable() || It->IsBuilding() || FMath::Abs(Offset.X) > HalfExtents.X || FMath::Abs(Offset.Y) > HalfExtents.Y) { continue; }
+                if (!It->IsTargetable() || (It->IsBuilding() && !It->IsMobileBuilding()) || It->IsSheltered()
+                    || FMath::Abs(Offset.X) > HalfExtents.X || FMath::Abs(Offset.Y) > HalfExtents.Y) { continue; }
                 Inside.Add(*It); It->GetStatusComponent()->ApplyWind(GetFName(), Remaining + .1f);
                 It->ApplyWindDisplacement(FVector(0.f, Speed * Dt, 0.f));
                 const FVector After=It->GetActorLocation()-Center;

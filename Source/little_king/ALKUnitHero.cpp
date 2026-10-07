@@ -49,8 +49,8 @@ void ALKUnitHero::Tick(float DeltaSeconds)
 	}
 
 	// 冷却自然流逝（简单冷却：一个计时字段，不用 GE 冷却资产）
-	SkillCooldownRemaining = FMath::Max(0.f, SkillCooldownRemaining - DeltaSeconds);
-    if (IsManualMoving() || IsControlled()) { return; }
+	SkillCooldownRemaining = FMath::Max(0.f, SkillCooldownRemaining - DeltaSeconds * GetSkillCooldownRate());
+    if (IsManualMoving() || IsControlled() || IsBuildingServiceMoving()) { return; }
 
 	AbilityCheckTimer -= DeltaSeconds;
 	if (AbilityCheckTimer <= 0.f)
@@ -120,7 +120,7 @@ void ALKUnitHero::ResetTransientRoomState()
 
 void ALKUnitHero::TryCastAbilities()
 {
-	if (!IsAlive() || !IsCombatEnabled() || !AbilitySystem || !bAbilitiesResolved || !GetTarget() || IsManualMoving() || IsControlled())
+	if (!IsAlive() || !IsCombatEnabled() || !AbilitySystem || !bAbilitiesResolved || !GetTarget() || IsManualMoving() || IsControlled() || IsBuildingServiceMoving())
 	{
 		return;
 	}
@@ -171,6 +171,7 @@ void ALKUnitHero::SetCamp(ALKHeroCamp* Camp, float Radius)
 
 bool ALKUnitHero::CommandMove(const FVector& Destination)
 {
+    if (GetServiceBuilding() || GetPatientStation()) { return false; }
     const ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
     // 活动范围不限距离：只校验目标地点可达性（出界/建筑与营地占据/路径被阻挡 → false）。
     if (!IsAlive() || !HeroCamp.IsValid() || !GM || GM->GetPhase() == ELKGamePhase::Result
@@ -200,6 +201,7 @@ FVector ALKUnitHero::GetChaseDestination(const ALKUnitBase* Target) const
 
 void ALKUnitHero::UpdateStateMachine(float DeltaSeconds)
 {
+    if (IsSheltered()) { Super::UpdateStateMachine(DeltaSeconds); return; }
     if (bManualMoving)
     {
         CancelAttackWindup();
@@ -240,6 +242,13 @@ void ALKUnitHero::UpdateStateMachine(float DeltaSeconds)
 }
 
 ALKHeroCamp* ALKUnitHero::GetCamp() const { return HeroCamp.Get(); }
+
+void ALKUnitHero::CancelManualMove()
+{
+    bManualMoving = false;
+    ManualMoveStuckTimer = 0.f;
+    MovementComponent->Stop();
+}
 
 void ALKUnitHero::SetCombatEnabled(bool bEnabled)
 {

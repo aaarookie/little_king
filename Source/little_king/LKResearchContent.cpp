@@ -3,6 +3,7 @@
 #include "LKCardRules.h"
 #include "LKBattleArt.h"
 #include "LKV083Content.h"
+#include "LKV084Content.h"
 #include "ULKGameData.h"
 #include "ULKCardDefinition.h"
 #include "Misc/Crc.h"
@@ -19,7 +20,14 @@ const TArray<FLKResearchDefinition>& All()
         {"Spell_ResearchHeal_M1",FText::FromString(TEXT("生命泉涌")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Intermediate1,1,260,30.f,3,ELKSpellEffect::Heal,160,320,.09f},
         {"Spell_ResearchHeal_A1",FText::FromString(TEXT("圣光潮汐")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Advanced1,2,480,6.f,4,ELKSpellEffect::Heal,220,340,.12f},
         {"Spell_ResearchHeal_D1",FText::FromString(TEXT("生命礼赞")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Divine1,3,800,1.f,5,ELKSpellEffect::Heal,300,380,.16f},
-        {"Building_SiegeCatapult",FText::FromString(TEXT("攻城投石炮")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,350,1.f,4,ELKSpellEffect::None,0,0,0},
+        {"Building_SiegeCatapult",FText::FromString(TEXT("攻城投石炮")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,350,60.f,4,ELKSpellEffect::None,0,0,0},
+        {"Card_WallCommon",FText::FromString(TEXT("普通防御墙")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,0,180,100.f,3,ELKSpellEffect::None,0,0,0},
+        {"Card_WallRare",FText::FromString(TEXT("稀有防御墙")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,400,30.f,5,ELKSpellEffect::None,0,0,0},
+        {"Card_WallEpic",FText::FromString(TEXT("史诗防御墙")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,2,750,6.f,7,ELKSpellEffect::None,0,0,0},
+        {"Card_WallImperial",FText::FromString(TEXT("禁军之墙")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,3,1300,1.f,10,ELKSpellEffect::None,0,0,0},
+        {"Card_SiegeCart",FText::FromString(TEXT("攻城车")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,480,25.f,6,ELKSpellEffect::None,0,0,0},
+        {"Card_MageTower",FText::FromString(TEXT("法师塔")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,2,800,6.f,8,ELKSpellEffect::None,0,0,0},
+        {"Card_HealingStation",FText::FromString(TEXT("牧师治疗站")),ELKMarketOfferKind::BuildingBlueprint,ELKSpellGrade::Novice1,1,420,30.f,5,ELKSpellEffect::None,0,0,0},
         {"Spell_Freeze",FText::FromString(TEXT("冰冻法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,180,80.f,2,ELKSpellEffect::Freeze,0,300,0},
         {"Spell_MariaNovice",FText::FromString(TEXT("圣玛丽亚的初阶增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,220,70.f,5,ELKSpellEffect::Reinforcements,0,180,0},
         {"Spell_MariaIntermediate",FText::FromString(TEXT("圣玛丽亚的中阶增援")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Intermediate3,1,380,18.f,7,ELKSpellEffect::Reinforcements,0,180,0},
@@ -37,6 +45,7 @@ bool ValidateMaterials(const TMap<FName,int32>& Materials)
 { for (const auto& P:Materials) { if (!Find(P.Key) || P.Value<1 || P.Value>10000) { return false; } } return true; }
 void EnsureCards(ULKGameData& Data)
 {
+    LKV084Content::EnsureCards(Data);
     for (const auto& R:All())
     {
         const int32 I=Data.CardLibrary.IndexOfByPredicate([&R](const auto& C){return C && C->CardId==R.CardId;});
@@ -73,12 +82,19 @@ void GenerateMarket(FLKDungeonNode& Node,int32 RunSeed,int32 Depth)
         for (const auto& R:All())
         { if (R.Kind!=ELKMarketOfferKind::SpellBook || Depth<R.MinimumRegionDepth) { continue; } Pick-=R.Weight; if (Pick<=0) { Add(R.Kind,R.CardId,R.Price); break; } }
     }
-    if (Depth>=1 && Stream.FRand()<.005f)
+    if (Stream.FRand()<.005f)
     {
         // 图纸以种类筛选，不能依赖目录最后一行恰好是建筑。
         TArray<const FLKResearchDefinition*> Blueprints;
         for (const auto& R:All()) { if (R.Kind==ELKMarketOfferKind::BuildingBlueprint && Depth>=R.MinimumRegionDepth) { Blueprints.Add(&R); } }
-        if (!Blueprints.IsEmpty()) { const auto& R=*Blueprints[Stream.RandRange(0,Blueprints.Num()-1)]; Add(R.Kind,R.CardId,R.Price); }
+        float Total = 0.f;
+        for (const auto* R : Blueprints) { Total += FMath::Max(0.f, R->Weight); }
+        if (Total > 0.f)
+        {
+            float Pick = Stream.FRand() * Total;
+            for (const auto* R : Blueprints)
+            { Pick -= FMath::Max(0.f, R->Weight); if (Pick <= 0.f) { Add(R->Kind, R->CardId, R->Price); break; } }
+        }
     }
     Node.bMarketGenerated=true;
 }

@@ -19,6 +19,7 @@ class ULKUnitPassiveComponent;
 class ULKUnitActiveComponent;
 class ULKUnitStatusComponent;
 class ULKUnitAnimationComponent;
+class ALKUnitBuilding;
 struct FLKUnitRow;
 struct FLKRunHeroState;
 
@@ -34,6 +35,7 @@ class ALKUnitBase : public AActor, public IAbilitySystemInterface
 	friend struct FLKSprint5TestAccess;
 	friend struct FLKD2TestAccess;
     friend struct FLKTrollTestAccess;
+    friend struct FLKV084RuntimeTestAccess;
 
 public:
 	ALKUnitBase();
@@ -42,6 +44,19 @@ public:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual bool IsCamp() const { return false; }
+	virtual bool IsMobileBuilding() const { return false; }
+	bool IsSheltered() const;
+	ALKUnitBuilding* GetShelterBuilding() const;
+	ALKUnitBuilding* GetServiceBuilding() const;
+	ALKUnitBuilding* GetPatientStation() const;
+	bool IsBuildingServiceMoving() const;
+	float GetSkillCooldownRate() const;
+	float GetStationHealingMultiplier(const ALKUnitBase* Target) const;
+	bool ReserveBuildingService(ALKUnitBuilding* Building, bool bAsPatient, const FVector& Approach);
+	void ReleaseBuildingService(ALKUnitBuilding* Building);
+	void EnterShelter(ALKUnitBuilding* Building);
+	virtual void CancelManualMove() {}
+	virtual void OnDamageReceived(AActor* DamageInstigator, float ActualAmount, const FLKCombatSource& Source) {}
 	bool IsTargetable() const { return !bDead && !IsCamp(); }
 	float GetBodyRadius() const { return BodyRadius; }
 	UPaperSpriteComponent* GetSpriteComponent() const { return SpriteComponent; }
@@ -243,6 +258,10 @@ protected:
 
 	ELKUnitState State = ELKUnitState::Idle;
 	TWeakObjectPtr<AActor> TargetActor;
+    /** A physically blocking wall may be hit while the intended enemy remains enclosed. */
+    TWeakObjectPtr<ALKUnitBase> NavigationBreachTarget;
+    TWeakObjectPtr<ALKUnitBase> NavigationBreachGoal;
+    float NavigationBreachCheck = 0.f;
 	float TargetRetryTimer = 0.f;
 	float AttackCooldownRemaining = 0.f;
 	bool bDead = false;
@@ -295,6 +314,13 @@ protected:
     bool bBasicAttackHeals = false;
     ELKRace Race = ELKRace::Human;
     ELKQuality Quality = ELKQuality::Common;
+	TWeakObjectPtr<ALKUnitBuilding> ServiceBuilding;
+	TWeakObjectPtr<ALKUnitBuilding> PatientStation;
+	FVector ServiceApproach = FVector::ZeroVector;
+	float ServicePathCheckTimer = 0.f;
+	bool bInsideShelter = false;
+	bool TickBuildingService(float DeltaSeconds);
+	void ClearBuildingService();
 	void RestoreHeroLife(float Health, bool bResumeCombat);
 
 	/** 缓存全局配置（InitUnit 时注入） */

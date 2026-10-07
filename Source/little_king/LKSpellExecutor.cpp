@@ -108,7 +108,8 @@ bool LKSpellExecutor::Execute(ALKBattleGameMode* GM, const ULKCardDefinition* C,
     }
     TArray<ALKUnitBase*> Targets;
     for (TActorIterator<ALKUnitBase> It(GM->GetWorld()); It; ++It)
-    { if (It->IsTargetable() && (C->SpellEffect == ELKSpellEffect::DivineBlessing || FVector::DistSquared2D(P, It->GetActorLocation()) <= FMath::Square(C->SpellRadius))) { Targets.Add(*It); } }
+    { if (It->IsTargetable() && (It->GetTeam() == Team || !It->IsSheltered())
+        && (C->SpellEffect == ELKSpellEffect::DivineBlessing || FVector::DistSquared2D(P, It->GetActorLocation()) <= FMath::Square(C->SpellRadius))) { Targets.Add(*It); } }
     GM->BeginCombatBatch();
     if (C->SpellEffect == ELKSpellEffect::Lightning)
     {
@@ -120,7 +121,7 @@ bool LKSpellExecutor::Execute(ALKBattleGameMode* GM, const ULKCardDefinition* C,
     }
     for (ALKUnitBase* Unit : Targets)
     {
-        if (!IsValid(Unit) || !Unit->IsTargetable()) { continue; }
+        if (!IsValid(Unit) || !Unit->IsTargetable() || (Unit->GetTeam() != Team && Unit->IsSheltered())) { continue; }
         if (C->SpellEffect == ELKSpellEffect::Damage && Unit->GetTeam() != Team) { LKGameplay::ApplyDamage(Unit, C->SpellValue * Scale, Instigator, false, &Source); }
         else if (C->SpellEffect == ELKSpellEffect::Heal && Unit->GetTeam() == Team) { LKGameplay::ApplyHeal(Unit, (C->SpellValue + (Unit->IsHero() ? Unit->GetMaxHealth() * C->HeroHealPercent : 0.f)) * Scale, Instigator, &Source); }
         else if (C->SpellEffect == ELKSpellEffect::Freeze && Unit->GetTeam() != Team) { Unit->GetStatusComponent()->Freeze(C->EffectDuration * Scale); }

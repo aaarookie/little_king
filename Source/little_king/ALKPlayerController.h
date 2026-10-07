@@ -34,6 +34,8 @@ public:
 	UPROPERTY(Transient) TObjectPtr<class ULKBattlePauseWidget> PauseWidget;
 	int32 GetPlacingHandIndex() const { return PlacingHandIndex; }
 	bool GetPlacementPreview(FVector& Location, float& Radius, bool& bValid, float* OutAttackRadius = nullptr) const;
+    bool GetWallPlacementPreview(FVector& Center, float& Yaw, FVector2D& Size, FString& Action) const;
+    float GetPlacementYaw() const { return PlacementYaw; }
 
 	// ---------- 放置状态机 ----------
 	UFUNCTION(BlueprintCallable, Category = "LK|Input")
@@ -95,6 +97,8 @@ protected:
 	void HandleLeftClick();
 	void HandleRightClick();
 	void TryPlaceActive();
+    void RotateWallLeft();
+    void RotateWallRight();
 
 private:
 	bool DeprojectMouseToGround(FVector& OutLocation) const;
@@ -106,6 +110,8 @@ private:
 	ELKPlacementMode PlacementMode = ELKPlacementMode::None;
 	int32 PlacingHandIndex = -1;
 	FName PlacingHeroId = NAME_None;
+    float PlacementYaw = 0.f;
+    float RotationHoldTime = 0.f;
 	TWeakObjectPtr<ALKHeroCamp> SelectedCamp;
 	ALKHeroCamp* FindCampAt(const FVector& Location) const;
 	void SelectCamp(ALKHeroCamp* Camp);

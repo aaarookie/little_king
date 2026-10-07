@@ -7,6 +7,7 @@
 #include "LKBattleArt.h"
 #include "LKWorldArt.h"
 #include "LKV083Art.h"
+#include "LKV084Art.h"
 #include "Engine/Texture2D.h"
 #include "Sound/SoundBase.h"
 
@@ -22,6 +23,8 @@ void ULKGameData::EnsurePresentationDefaults()
     }
     for (FName Key : LKV083Art::SoundIds())
     { if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKV083Art::SoundPath(Key)))); } }
+    for (FName Key : LKV084Art::SoundIds())
+    { if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKV084Art::SoundPath(Key)))); } }
     for (FName Key : LKWorldArt::SoundIds())
     {
         if (!SoundMap.Contains(Key)) { SoundMap.Add(Key, TSoftObjectPtr<USoundBase>(FSoftObjectPath(LKWorldArt::SoundPath(Key)))); }

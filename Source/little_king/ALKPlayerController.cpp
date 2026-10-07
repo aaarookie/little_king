@@ -1,4 +1,6 @@
 #include "ALKPlayerController.h"
+#include "ALKUnitBuilding.h"
+#include "LKBuildingGeometry.h"
 
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
@@ -50,6 +52,12 @@ void ALKPlayerController::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     if (GetPhase() == ELKGamePhase::Result && IsPlacing()) { CancelPlacement(); }
+    if (IsPlacing() && !UGameplayStatics::IsGamePaused(this))
+    {
+        const float Direction=(IsInputKeyDown(EKeys::E)?1.f:0.f)-(IsInputKeyDown(EKeys::Q)?1.f:0.f);
+        RotationHoldTime=Direction==0.f?0.f:RotationHoldTime+DeltaSeconds;
+        if (RotationHoldTime>.22f) { PlacementYaw=FRotator::ClampAxis(PlacementYaw+Direction*90.f*DeltaSeconds); }
+    }
     if (!bCameraShakeActive) { return; }
     AActor* Camera = ShakenCamera.Get();
     CameraShakeRemaining -= DeltaSeconds;
@@ -91,7 +99,14 @@ void ALKPlayerController::SetupInputComponent()
 	// 原生兜底快捷键：即使蓝图 HUD 的"开始"按钮因为界面状态没能触发，也能开始战斗。
 	InputComponent->BindKey(EKeys::SpaceBar, IE_Pressed, this, &ALKPlayerController::RequestStartBattle);
 	InputComponent->BindKey(EKeys::Enter, IE_Pressed, this, &ALKPlayerController::RequestStartBattle);
+    InputComponent->BindKey(EKeys::Q, IE_Pressed, this, &ALKPlayerController::RotateWallLeft);
+    InputComponent->BindKey(EKeys::E, IE_Pressed, this, &ALKPlayerController::RotateWallRight);
 }
+
+void ALKPlayerController::RotateWallLeft()
+{ if (IsPlacing() && !UGameplayStatics::IsGamePaused(this)) { PlacementYaw=FRotator::ClampAxis(PlacementYaw-15.f); RotationHoldTime=0.f; } }
+void ALKPlayerController::RotateWallRight()
+{ if (IsPlacing() && !UGameplayStatics::IsGamePaused(this)) { PlacementYaw=FRotator::ClampAxis(PlacementYaw+15.f); RotationHoldTime=0.f; } }
 
 void ALKPlayerController::HandleLeftClick()
 {
@@ -237,7 +252,7 @@ bool ALKPlayerController::DeprojectMouseToGround(FVector& OutLocation) const
 ELKPlayResult ALKPlayerController::TryPlayCard(int32 HandIndex, const FVector& WorldLocation)
 {
 	ALKBattleGameMode* GameMode = GetBattleGameMode();
-	return GameMode ? GameMode->PlayCardForTeam(ELKTeam::Player, HandIndex, WorldLocation) : ELKPlayResult::Unknown;
+	return GameMode ? GameMode->PlayCardForTeam(ELKTeam::Player, HandIndex, WorldLocation, PlacementYaw) : ELKPlayResult::Unknown;
 }
 
 ELKPlayResult ALKPlayerController::TryPlayCardAtMouse(int32 HandIndex)
@@ -345,7 +360,7 @@ bool ALKPlayerController::GetPlacementPreview(FVector& Location, float& Radius, 
         if (OutAttackRadius) { *OutAttackRadius = GM->GetBuildingPlacementAttackRange(Card->CardId); }
         if (Card->CardType == ELKCardType::Spell) { Radius = Card->SpellRadius; }
         else { Radius = GM->GetGameData()->UnitBodyRadius; }
-        bValid = GM->ValidateCardPlay(ELKTeam::Player, PlacingHandIndex, Location) == ELKPlayResult::Success;
+        bValid = GM->ValidateCardPlay(ELKTeam::Player, PlacingHandIndex, Location, PlacementYaw) == ELKPlayResult::Success;
     }
     else if (PlacementMode == ELKPlacementMode::Hero)
     {
@@ -358,12 +373,33 @@ bool ALKPlayerController::GetPlacementPreview(FVector& Location, float& Radius, 
         {
             Radius = Hero->GetBodyRadius();
             // 活动范围不限距离：仅当目标在场内且不与建筑/营地重叠时有效（真正可达性在点击时再验）。
-            bValid = Hero->IsAlive() && GM->IsInsideField(Location);
+            bValid = Hero->IsAlive() && !Hero->IsSheltered() && !Hero->IsBuildingServiceMoving() && GM->IsInsideField(Location);
             for (TActorIterator<ALKUnitBase> It(GetWorld()); It && bValid; ++It)
             {
-                if (It->IsAlive() && It->IsBuilding() && FVector::Dist2D(Location, It->GetActorLocation()) < Radius + It->GetBodyRadius() + 1.f) { bValid = false; }
+                if (LKBuildingGeometry::BlocksMovement(*It) && LKBuildingGeometry::SurfaceDistance(Location,*It)<Radius+1.f) { bValid = false; }
             }
         }
+    }
+    return true;
+}
+
+bool ALKPlayerController::GetWallPlacementPreview(FVector& Center, float& Yaw, FVector2D& Size, FString& Action) const
+{
+    const ALKBattleGameMode* GM=GetBattleGameMode();
+    const ULKDeckState* Deck=GetDeckState();
+    if (!GM || !Deck || PlacementMode!=ELKPlacementMode::Card || !DeprojectMouseToGround(Center)) { return false; }
+    const auto* Card=GM->FindCard(Deck->GetHandCard(PlacingHandIndex));
+    const auto* Row=Card && Card->CardType==ELKCardType::Building?GM->GetUnitRow(Card->BuildingUnitId):nullptr;
+    if (!Row || Row->BuildingBehavior!=ELKBuildingBehavior::Wall) { return false; }
+    Yaw=PlacementYaw; Size=FVector2D(Row->WallLength,Row->WallThickness);
+    Action=FString::Printf(TEXT("新建 · %.0f 秒施工 | Q / E 旋转，长按微调"),Row->ConstructionSeconds);
+    if (const auto* Old=LKBuildingGeometry::FindMatchingWall(GetWorld(),ELKTeam::Player,Center,Yaw))
+    {
+        Center=Old->GetActorLocation(); Yaw=Old->GetWallYaw(); Size=FVector2D(Old->GetWallLength(),Old->GetWallThickness());
+        Action=int32(Row->Quality)>int32(Old->GetQuality())
+            ? FString::Printf(TEXT("替换为 %s · 重新施工 %.0f 秒"),*Row->DisplayName.ToString(),Row->ConstructionSeconds)
+            : FString::Printf(TEXT("修补 %s · 恢复 %.0f 生命（不改变方向）"),*Old->GetDisplayName().ToString(),
+                FMath::Min(Old->GetMaxHealth()-Old->GetHealth(),Row->BaseHealth*GM->GetCardUpgradeScale(Card->CardId)));
     }
     return true;
 }

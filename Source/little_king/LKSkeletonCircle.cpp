@@ -253,7 +253,7 @@ void ALKSkeletonCircle::RefreshAreaSlow(float FrameDelta)
 	for (TActorIterator<ALKUnitBase> It(World); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
-		if (!Unit || Unit->IsCamp() || !Unit->IsAlive() || !Unit->IsCombatEnabled()) { continue; }
+		if (!Unit || Unit->IsCamp() || !Unit->IsAlive() || Unit->IsSheltered() || !Unit->IsCombatEnabled()) { continue; }
 		// 只影响敌对单位（法阵是敌方指挥官法术）。
 		if (Unit->GetTeam() == CasterTeam) { continue; }
 		if (FVector::Dist2D(Center, Unit->GetActorLocation()) > Params.Radius) { continue; }

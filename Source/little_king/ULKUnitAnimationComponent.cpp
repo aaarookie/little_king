@@ -38,7 +38,7 @@ void ULKUnitAnimationComponent::Initialize()
     }
     bLastEnemy=Unit->GetTeam()==ELKTeam::Enemy;
     bFacingRight=!bLastEnemy;
-    if(!Unit->IsBuilding()){Unit->SetVisualFacingRight(bFacingRight);}
+    if(!Unit->IsBuilding()||Unit->IsMobileBuilding()){Unit->SetVisualFacingRight(bFacingRight);}
     UpdateDepth();
 }
 void ULKUnitAnimationComponent::ResetPresentation()
@@ -82,7 +82,7 @@ void ULKUnitAnimationComponent::UpdateDepth()
 
 void ULKUnitAnimationComponent::UpdateFacing(const FVector& Travel, bool bWindDriven)
 {
-    if(Unit->IsBuilding()||Unit->IsDead()||(Unit->IsControlled()&&!bWindDriven)){return;}
+    if((Unit->IsBuilding()&&!Unit->IsMobileBuilding())||Unit->IsDead()||(Unit->IsControlled()&&!bWindDriven)){return;}
     const bool Enemy=Unit->GetTeam()==ELKTeam::Enemy;
     if(Enemy!=bLastEnemy){bFacingRight=!Enemy;bLastEnemy=Enemy;}
     FVector Direction=Travel.GetSafeNormal2D();
@@ -109,7 +109,7 @@ void ULKUnitAnimationComponent::TickComponent(float DeltaTime,ELevelTick TickTyp
     LastPosition=Position;
     UpdateFacing(Travel,bWindDriven);
     if(!HasAnimations()){return;}
-    const bool Moving=Travel.SizeSquared2D()>.0001f&&!Unit->IsBuilding();
+    const bool Moving=Travel.SizeSquared2D()>.0001f&&(!Unit->IsBuilding()||Unit->IsMobileBuilding());
     if(bWasDead&&!Unit->IsDead()){ResetPresentation();}
     bWasDead=Unit->IsDead();
     const bool Frozen=Unit->IsControlled();

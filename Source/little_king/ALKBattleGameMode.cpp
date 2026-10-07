@@ -1,4 +1,5 @@
 #include "ALKBattleGameMode.h"
+#include "LKBuildingGeometry.h"
 #include "ULKUnitPassiveComponent.h"
 #include "ALKHeroCamp.h"
 #include "ALKUnitHero.h"
@@ -533,7 +534,7 @@ float ALKBattleGameMode::GetBuildingPlacementAttackRange(FName CardId) const
     const ULKCardDefinition* Card = FindCard(CardId);
     if (!Card || Card->CardType != ELKCardType::Building) { return 0.f; }
     const FLKUnitRow* Row = GetUnitRow(Card->BuildingUnitId);
-    return Row && Row->BuildingBehavior == ELKBuildingBehavior::Turret && FMath::IsFinite(Row->AttackRange)
+    return Row && (Row->BuildingBehavior == ELKBuildingBehavior::Turret || Row->BuildingBehavior == ELKBuildingBehavior::SiegeCart) && FMath::IsFinite(Row->AttackRange)
         ? FMath::Max(0.f, Row->AttackRange) : 0.f;
 }
 
@@ -716,7 +717,7 @@ USoundBase* ALKBattleGameMode::FindPreloadedSound(FName Id) const
     return Sound ? Sound->Get() : nullptr;
 }
 
-ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex, const FVector& Location) const
+ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex, const FVector& Location, float PlacementYaw) const
 {
     if (Phase != ELKGamePhase::Battle) { return ELKPlayResult::WrongPhase; }
     const ULKDeckState* Deck = GetTeamDeck(Team);
@@ -741,16 +742,28 @@ ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex,
         if (!Row || Row->UnitClass != (Card->CardType == ELKCardType::Building ? ELKUnitClass::Building : ELKUnitClass::Soldier)) { return ELKPlayResult::InvalidCardData; }
         // -2 继承全局，-1 不限，>=0 卡牌自己的上限。
         const int32 Limit = Card->BuildingTypeLimitOverride == -2 ? GameData->BuildingTypeLimit : Card->BuildingTypeLimitOverride;
-        if (!IsPlacementValid(Location, Team, Card->CardType, UnitId, Limit)) { return ELKPlayResult::InvalidLocation; }
-        if (GameData->MaxUnitsPerTeam > 0 && CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam) { return ELKPlayResult::UnitLimitReached; }
+        const bool bWall=Row->BuildingBehavior==ELKBuildingBehavior::Wall;
+        if (bWall && !FMath::IsFinite(PlacementYaw)) { return ELKPlayResult::InvalidLocation; }
+        const ALKUnitBuilding* Existing=bWall ? LKBuildingGeometry::FindMatchingWall(GetWorld(),Team,Location,PlacementYaw) : nullptr;
+        if (bWall)
+        {
+            const FVector Center=Existing ? Existing->GetActorLocation() : Location;
+            const float Yaw=Existing ? Existing->GetWallYaw() : PlacementYaw;
+            if (!LKBuildingGeometry::CanPlaceWall(GetWorld(),Team,*Row,Center,Yaw,
+                FVector2D(GameData->FieldHalfWidth,GameData->FieldHalfHeight),Existing)) { return ELKPlayResult::InvalidLocation; }
+            const bool bAddsType=!Existing || (int32(Row->Quality)>int32(Existing->GetQuality()) && Existing->GetUnitId()!=UnitId);
+            if (bAddsType && Limit>=0 && BuildingCounts[int32(Team)].FindRef(UnitId)>=Limit) { return ELKPlayResult::InvalidLocation; }
+        }
+        else if (!IsPlacementValid(Location, Team, Card->CardType, UnitId, Limit)) { return ELKPlayResult::InvalidLocation; }
+        if (!Existing && GameData->MaxUnitsPerTeam > 0 && CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam) { return ELKPlayResult::UnitLimitReached; }
     }
     return Silver->GetSilver() >= Card->Cost ? ELKPlayResult::Success : ELKPlayResult::NotEnoughSilver;
 }
 
-ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, const FVector& Location)
+ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, const FVector& Location, float PlacementYaw)
 {
     if (bResolvingCard) { return ELKPlayResult::WrongPhase; }
-    const ELKPlayResult Validation = ValidateCardPlay(Team, HandIndex, Location);
+    const ELKPlayResult Validation = ValidateCardPlay(Team, HandIndex, Location, PlacementYaw);
     if (Validation != ELKPlayResult::Success) { return Validation; }
     TGuardValue<bool> Guard(bResolvingCard, true);
     ULKDeckState* Deck = GetTeamDeck(Team);
@@ -758,7 +771,7 @@ ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, 
     ULKCardDefinition* Card = FindCard(Deck->GetHandCard(HandIndex));
     BeginCombatBatch();
     const bool bPaid = Silver->TrySpend(Card->Cost);
-    const bool bResolved = bPaid && Phase == ELKGamePhase::Battle && ResolveCard(Card, Team, Location);
+    const bool bResolved = bPaid && Phase == ELKGamePhase::Battle && ResolveCard(Card, Team, Location, PlacementYaw);
     if (bResolved)
     {
         Deck->PlayCard(HandIndex, Card->DrawCooldown);
@@ -840,7 +853,7 @@ ELKPlayResult ALKBattleGameMode::DeployHero(ELKTeam Team, FName HeroUnitId, cons
     return ELKPlayResult::Success;
 }
 
-ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass, FName SourceCardId)
+ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass, FName SourceCardId, float PlacementYaw, ALKUnitBase* ReplacedWall)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -849,8 +862,10 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	}
 
 	// 战斗期单位总数上限（波次出兵/兵营出兵同样受控；部署期英雄不受限）
+    const ALKUnitBuilding* OldWall=Cast<ALKUnitBuilding>(ReplacedWall);
+    const bool bReplacement=OldWall && OldWall->IsWall() && OldWall->IsAlive() && OldWall->GetTeam()==Team;
 	if (Phase == ELKGamePhase::Battle && GameData->MaxUnitsPerTeam > 0
-		&& CountAliveUnits(Team) >= GameData->MaxUnitsPerTeam)
+		&& CountAliveUnits(Team)-(bReplacement?1:0) >= GameData->MaxUnitsPerTeam)
 	{
 		UE_LOG(LogLKUnit, Warning, TEXT("[Unit] %s 单位已达上限 %d，拒绝生成 %s"),
 			Team == ELKTeam::Player ? TEXT("玩家") : TEXT("敌方"), GameData->MaxUnitsPerTeam, *UnitId.ToString());
@@ -858,18 +873,37 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	}
 
     const FLKUnitRow* Row = GetUnitRow(UnitId);
-    if (!Row || !IsInsideField(Location)) { UE_LOG(LogLKUnit, Warning, TEXT("[Spawn] 无效单位或位置 %s"), *UnitId.ToString()); return nullptr; }
+    if (!Row || !IsInsideField(Location) || !FMath::IsFinite(PlacementYaw)) { UE_LOG(LogLKUnit, Warning, TEXT("[Spawn] 无效单位或位置 %s"), *UnitId.ToString()); return nullptr; }
     FLKUnitRow Data = *Row; // 本地副本：D3 卡升级在副本上放大数值，不改共享行/资产
+    if (Data.BuildingBehavior==ELKBuildingBehavior::Wall)
+    {
+        if (!FMath::IsFinite(Data.WallLength) || Data.WallLength<=0.f || !FMath::IsFinite(Data.WallThickness)
+            || Data.WallThickness<=0.f || Data.WallThickness>Data.WallLength || !FMath::IsFinite(Data.ConstructionSeconds)
+            || Data.ConstructionSeconds<0.f) { return nullptr; }
+        const auto Footprint=LKBuildingGeometry::WallShape(Location,PlacementYaw,Data.WallLength,Data.WallThickness);
+        const FVector Extent=Footprint.HalfSegment.GetAbs()+FVector(Footprint.Radius,Footprint.Radius,0.f);
+        if (FMath::Abs(Location.X)+Extent.X>=GameData->FieldHalfWidth || FMath::Abs(Location.Y)+Extent.Y>=GameData->FieldHalfHeight) { return nullptr; }
+    }
     if (Data.BaseHealth <= 0.f || !FMath::IsFinite(Data.BaseHealth)
         || !FMath::IsFinite(Data.MoveSpeed) || Data.MoveSpeed < 0.f
         || !FMath::IsFinite(Data.AttackRange) || Data.AttackRange < 0.f
         || !FMath::IsFinite(Data.AttackDamage) || Data.AttackDamage < 0.f
-        || !FMath::IsFinite(Data.AttackInterval) || Data.AttackInterval <= 0.f
-        || FMath::Abs(Location.X) + GameData->UnitBodyRadius >= GameData->FieldHalfWidth
-        || FMath::Abs(Location.Y) + GameData->UnitBodyRadius >= GameData->FieldHalfHeight) { return nullptr; }
+        || !FMath::IsFinite(Data.AttackInterval) || Data.AttackInterval <= 0.f) { return nullptr; }
+    // Walls already passed their oriented capsule bounds above. Reapplying the
+    // circular unit radius would reject thin walls after a valid green preview.
+    if (Data.BuildingBehavior!=ELKBuildingBehavior::Wall
+        && (FMath::Abs(Location.X) + GameData->UnitBodyRadius >= GameData->FieldHalfWidth
+            || FMath::Abs(Location.Y) + GameData->UnitBodyRadius >= GameData->FieldHalfHeight)) { return nullptr; }
     for (TActorIterator<ALKUnitBase> It(World); It; ++It)
     {
-        if ((*It)->IsAlive() && (*It)->IsBuilding() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < GameData->UnitBodyRadius + (*It)->GetBodyRadius() + 2.f) { return nullptr; }
+        if (!It->IsAlive() || !It->IsBuilding()) { continue; }
+        if (Data.BuildingBehavior==ELKBuildingBehavior::Wall)
+        {
+            const auto* OtherWall=Cast<ALKUnitBuilding>(*It);
+            if (OtherWall && OtherWall->IsWall()) { continue; }
+            if (LKBuildingGeometry::Overlaps(LKBuildingGeometry::WallShape(Location,PlacementYaw,Data.WallLength,Data.WallThickness),LKBuildingGeometry::Shape(*It,2.f))) { return nullptr; }
+        }
+        else if (LKBuildingGeometry::BlocksMovement(*It) && LKBuildingGeometry::SurfaceDistance(Location,*It)<GameData->UnitBodyRadius+2.f) { return nullptr; }
     }
 
     // 敌方实例倍率：深度曲线 × 遭遇预算，只作用于敌方基础生命/攻击，且每个实例只应用一次。
@@ -922,6 +956,7 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 
 	Unit->SetTeam(Team);
 	Unit->InitUnit(Data, GameData, UnitId);
+    if (auto* Building=Cast<ALKUnitBuilding>(Unit); Building && Building->IsWall()) { Building->SetWallYaw(PlacementYaw); }
 	Unit->SetCombatEnabled(Phase == ELKGamePhase::Battle);
 	Unit->OnUnitDied.AddDynamic(this, &ALKBattleGameMode::HandleUnitDied);
     ULKUnitStatusComponent::RefreshTeamSupport(World);
@@ -961,7 +996,7 @@ bool ALKBattleGameMode::IsSpawnPointFree(const FVector& Location, float BodyRadi
 	{
 		const ALKUnitBase* Unit = *It;
 		if (!Unit || !Unit->IsAlive()) { continue; }
-		if (FVector::Dist2D(Location, Unit->GetActorLocation()) < BodyRadius + Unit->GetBodyRadius() + 2.f) { return false; }
+		if (!Unit->IsSheltered() && LKBuildingGeometry::SurfaceDistance(Location,Unit) < BodyRadius + 2.f) { return false; }
 	}
 	return true;
 }
@@ -1269,7 +1304,7 @@ bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, 
     if (FMath::Abs(Location.X) + Radius >= GameData->FieldHalfWidth || FMath::Abs(Location.Y) + Radius >= GameData->FieldHalfHeight) { return false; }
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
-        if ((*It)->IsAlive() && FVector::Dist2D(Location, (*It)->GetActorLocation()) < Radius + (*It)->GetBodyRadius() + 2.f) { return false; }
+        if (It->IsAlive() && !It->IsSheltered() && LKBuildingGeometry::SurfaceDistance(Location,*It)<Radius+2.f) { return false; }
     }
     const int32 Limit = BuildingLimit == -2 ? GameData->BuildingTypeLimit : BuildingLimit;
     return CardType != ELKCardType::Building || Limit < 0 || BuildingUnitId.IsNone()
@@ -1306,14 +1341,37 @@ ULKDeckState* ALKBattleGameMode::GetTeamDeck(ELKTeam Team) const
 	return OpponentBrain ? OpponentBrain->GetDeck() : nullptr;
 }
 
-bool ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location)
+bool ALKBattleGameMode::ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location, float PlacementYaw)
 {
     if (!Card) { return false; }
     switch (Card->CardType)
     {
     // D3：出牌生成时携带来源卡 ID（玩家远征卡升级按 1.1^Level 放大攻击/生命；敌方/独立单场不受影响）
     case ELKCardType::Unit: return SpawnUnitForTeam(Card->SpawnUnitId, Team, Location, ELKUnitClass::Soldier, Card->CardId) != nullptr;
-    case ELKCardType::Building: return SpawnUnitForTeam(Card->BuildingUnitId, Team, Location, ELKUnitClass::Building, Card->CardId) != nullptr;
+    case ELKCardType::Building:
+    {
+        const FLKUnitRow* Row=GetUnitRow(Card->BuildingUnitId);
+        ALKUnitBuilding* Old=Row && Row->BuildingBehavior==ELKBuildingBehavior::Wall
+            ? LKBuildingGeometry::FindMatchingWall(GetWorld(),Team,Location,PlacementYaw) : nullptr;
+        if (Old && int32(Row->Quality)<=int32(Old->GetQuality()))
+        {
+            LKGameplay::ApplyHeal(Old,Row->BaseHealth*GetCardUpgradeScale(Card->CardId,Team),nullptr);
+            ULKPresentationSubsystem::Sound(GetWorld(),"WallRepair",Old->GetActorLocation());
+            return true;
+        }
+        ALKUnitBase* New=SpawnUnitForTeam(Card->BuildingUnitId,Team,Old?Old->GetActorLocation():Location,
+            ELKUnitClass::Building,Card->CardId,Old?Old->GetWallYaw():PlacementYaw,Old);
+        if (!New) { return false; }
+        if (Old)
+        {
+            // Replacement is an atomic build transaction, not a defeat (no death passives/rewards).
+            int32& Count=BuildingCounts[int32(Team)].FindOrAdd(Old->GetUnitId());
+            Count=FMath::Max(0,Count-1);
+            Old->OnUnitDied.RemoveDynamic(this,&ALKBattleGameMode::HandleUnitDied);
+            Old->Destroy();
+        }
+        return true;
+    }
     case ELKCardType::Spell: return CastSpell(Card, Team, Location);
     }
     return false;

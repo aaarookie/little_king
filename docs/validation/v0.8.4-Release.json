@@ -1,0 +1,2265 @@
+{
+  "auditedAt": "2026-10-07T17:58:22.761002+00:00",
+  "version": "v0.8.4",
+  "projectVersion": "0.8.4",
+  "baseline": "255dcd6b7aec68262b83375aa5ecb59e235d1481",
+  "engine": "UE 5.8.1 / Win64 Development Editor",
+  "scope": "Final local implementation validation before Git publication. Source hashes describe workspace bytes; Git may normalize line endings. Push is verified separately in the delivery message.",
+  "build": {
+    "path": "Saved/Logs/V084Build08.log",
+    "sha256": "6f9cab558774ac2fb1dc2574624905bdb67e77fbb40130e6342ee883750db055",
+    "bytes": 3429,
+    "result": "Succeeded"
+  },
+  "automation": {
+    "path": "Saved/Automation/V084Full02/index.json",
+    "sha256": "13a60f3eec14ba4490b7fa696263751fe588781b29755d1ef582d38dbe0c9ff0",
+    "bytes": 175873,
+    "succeeded": 83,
+    "succeededWithWarnings": 74,
+    "failed": 0,
+    "notRun": 0,
+    "inProcess": 0,
+    "totalDuration": 187.0753936767578
+  },
+  "tests": [
+    {
+      "name": "LittleKing.BalanceV1.Circle.AreaSlowTeamsLeaveOverlapAndCleanup",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Circle.GameModeGuardAndParamValidation",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Circle.HugeDeltaAndFailureCap",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Circle.LowFrameRateSlowRefresh",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Circle.WarningBoundaryAndSixSummons",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.CompletedEncountersStayHistorical",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.DisabledCardAndRewardReplacement",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.HealthRatioAndPermanentUpgrades",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.InvalidSnapshotKeepsMemoryState",
+      "state": "Success",
+      "warnings": 4,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.TempSlotRoundTripIsIdempotent",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.Migration.TerminalHistoryPreserved",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.BattleSampling",
+      "state": "Success",
+      "warnings": 159,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.RulesAndAuthoredAssets",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.BalanceV1.TacticalTransaction",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Content.RegistryAndEncounter",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Heroes.IncapacitationAndRecovery",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Undead.BoneRegenerationAndBatchOrder",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Undead.GiantBones",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Undead.RangedDamageClassification",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D0.Undead.SummoningAndSacrifice",
+      "state": "Success",
+      "warnings": 3,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D1.Configuration.BuiltInUnitRules",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D1.Integration.AuthoredGameModeAndResultButton",
+      "state": "Success",
+      "warnings": 4,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D1.Run.BossCompletion",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D1.Run.ThreeRoomFlow",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D2.Configuration.EncounterCatalog",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D2.Heroes.RoomBoundaryReset",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D2.Integration.AuthoredEncounterSnapshot",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D2.Run.EncounterSnapshotAndPermanentState",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D3.Rewards.ClaimBoundaries",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D3.Rewards.StateMachineAtomicity",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D4.Map.RowStructureAndVisibility",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D4.Roster.RandomizedEncounterRules",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D4.Run.RestHealAndFullClear",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D5.Save.IdentityTraitsRestoredOnLoad",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D5.Save.RecoverySemantics",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D5.Save.RoundTripAndNoDoubleClaim",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.D5.Save.ValidationRules",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H1.Profile.CreateRotateAndRecover",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H2.Loadout.ValidationAndPersistence",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H3.Expedition.SnapshotAndApplication",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H3.Resume.SafePointLeaveAndContinue",
+      "state": "Success",
+      "warnings": 4,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H3.World.BuildingsAndPanels",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H4.Settlement.MathAndHandoff",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H4.Upgrade.TransactionAndCurves",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.H5.Migration.LegacyRunToSchema5",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.HomeUI.AuthoredAssetsAndContent",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.HomeUI.DraftConfirmationAndDetails",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.HomeUI.RosterButtonsAndSafeReturn",
+      "state": "Success",
+      "warnings": 4,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization1.LegacyAndCrossSlotProtection",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization1.MenuButtonsAndAssets",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization1.MoneyConsoleCommand",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization1.SaveIsolationAndRecovery",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.BattleWorldPreservesMapAndService",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.BranchProgressionAndFullGold",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.MapServiceAndGateUI",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.OldMapMigrationAndDepartureFailure",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.WalletSettlementAndCrashRecovery",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization2.WorldGraph200Seeds",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Combat.BackstabAndLoot",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Combat.DashHitsKnockbackAndObstacles",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Combat.ElfHealingAndSharedSpring",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Combat.MimicFullDeckAndFallback",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Content.QualityGradesAndTemporaryCards",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.Deck.CapacityReplacementAndRollback",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Optimization3.UI.HandLabelsRewardReplacementAndRender",
+      "state": "Success",
+      "warnings": 6,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.AssetsAndAudioDefaults",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.BattleArtDefaultsAndOverrides",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.BattleArtSpawnGeometry",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.CampsGroundAndCombatEvents",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.CorrectedWalkAtlases",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.CueBudgetAndThrottling",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.FacingFollowsVoluntaryTravel",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.HomeIllustrations",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.OverlapDepthAndCamps",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.PolishAnimationIsolation",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.PolishCatalogue",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.PolishHomeLevelGeometry",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.PolishMusicAndRevealLifetime",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.WalkDistanceAndInterruption",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Presentation.WorldArtCatalogue",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Combat.ActualAmountsAndCardTransaction",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Combat.SimultaneousEliminationAndLastHit",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Combat.WindupCollisionAndProjectilePool",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Configuration.SavedDecksAndHUD",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Deck.UniqueHandAndCycling",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.AcquireRangeAndRelease",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.AuthoredSpellTerritory",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.DeploymentAndManualMovement",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.FreeRoamFightRegression",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.ManualMoveInterruptsCombat",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Heroes.TraitsTauntAndSpellTerritory",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Integration.LiveBattleAndBarracks",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Movement.CampPathGeometry",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.Sprint5.Placement.BuildingAttackRange",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.UI.MultiSelectAndRender",
+      "state": "Success",
+      "warnings": 6,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.ContentAndWeightedDeck",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.EmpowerControlAndSixthAttack",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.KingSupportHealthRatio",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.MultiReplacementAtomicity",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.SharedBreathBurnAndPool",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.TrollCards.SiegeOnlyBuildingsAcrossMap",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Capacity.ExamplesAndDynamicRanges",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.DepartureAndRest.UpgradesAndAcquisitionGuards",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Healing.HeroPercentAndFixedUnitAmount",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Map.FifteenStopsPerRegion",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Market.MaterialResearchAtomicity",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Market.RarityDepthAndFrozenContent",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.Resume.LockedRetryAndFailureSettlement",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V082.UI.LibraryMarketRestPauseAndRender",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Content.MarketDepthAndRulePresentation",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Content.StableIdentityAndAuthoredTuning",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Content.SummonedRolesAndSpellDefinitions",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.Cooldown150BoundaryAndFIFO",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.FiveCardFallbackAndAtomicRejection",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Deck.MultipleCooldownMutationAndBattleReset",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Research.MaterialConsumptionAndPermanentUnlock",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.BlackCloudDynamicOverlapDiscoveryAndCleanup",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.DivineBlessingAlliesIncapacityAndDrawCooldown",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.FreezeDurationAndTeamFilter",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.HurricaneDirectionRectangleFixedBuildingsAndExpiry",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.LightningCurrentHealthRetargetRangeAndResult",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.MalformedSummonAndFieldParametersAreAtomic",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.ReinforcementGradesPlacementAndTransaction",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Spells.SummonUpgradeUsesInitializationNotHealing",
+      "state": "Success",
+      "warnings": 2,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.ConcealmentTargetsAndSources",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.HealerPriorityProjectileAndConcealment",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.WindGeometryFacingAndControl",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.Units.WindOverridesWalkingWithoutStun",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V083.ArtCatalogue",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Content.AuthoredTuningAndStableIdentity",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Content.BlueprintMarketsAndCardRules",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Content.BuildingCardsAndAliases",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Research.PermanentUnlockAndRestClassification",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.CrowdedServiceEntrancesRerouteOrRelease",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.HealingStationPatientFlowAndCleanup",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.ImperialFrontRearStackAndCleanup",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.MageShelterPriorityProtectionAndCooldown",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.ReflectionPerSourceAndNoRecursion",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.ShelterQualityCostAndExclusiveReservation",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.ShelterRejectsHostileControlAndAllowsHealing",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.SiegeCartTargetsPercentDamageAndIdle",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.TauntedEnclosurePreservesAttackWindup",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.TroopsWalkAroundAnOpenWall",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Runtime.WallConstructionAndDisplacement",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.BoundedLargeNavigationAndGeometryCache",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.ConstructionDisplacesCoveredUnitSafely",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.CrossedSegmentsRemainBreakableByMeleeAndCart",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.DetourAndClosedEnclosure",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.EnclosedTargetRequiresReachableBreach",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.PlacementBoundsOverlapAndMatching",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.ProjectileHitsFarEndBeforeUnitBehind",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.RejectedPlacementKeepsSilverAndDeck",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.RepairReplacePaymentAndFullHand",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.RotatedFootprintAndFullSpanRayHit",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.ThinFootprintAtFieldEdgeCanBuildAndReplace",
+      "state": "Success",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.Walls.TwoHundredObstaclesStayWithinSearchBudget",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "name": "LittleKing.V084.ArtCatalogue",
+      "state": "Success",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "warningMessages": [
+    {
+      "message": "LogAbilitySystem: No GameplayCueNotifyPaths were specified in DefaultGame.ini under [/Script/GameplayAbilities.AbilitySystemGlobals]. Falling back to using all of /Game/. This may be slow on large projects. Consider specifying which paths are to be searched.",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Battle] 场景中没有相机（CameraActor / CameraComponent 都没有），视角保持默认位置",
+      "occurrences": 81
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档校验失败：英雄 Hero_Knight 数值非法（保留原档，不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档校验失败：牌组含玩家不可获得的敌方专属卡 Unit_Skeleton（保留原档，不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档校验失败：待开战牌组副本含玩家不可获得的敌方专属卡 Unit_SkeletonArcher（保留原档，不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档校验失败：待领奖励含玩家不可获得的敌方专属卡 Unit_Skeleton（升级候选）（保留原档，不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKUnit: [Unit] 敌方 单位已达上限 20，拒绝生成 Unit_Skeleton",
+      "occurrences": 99
+    },
+    {
+      "message": "LogLKUnit: [Unit] 敌方 单位已达上限 20，拒绝生成 Unit_SkeletonArcher",
+      "occurrences": 41
+    },
+    {
+      "message": "LogLKUnit: [Unit] 敌方 单位已达上限 8，拒绝生成 Unit_Skeleton",
+      "occurrences": 1
+    },
+    {
+      "message": "LogScript: Script Msg: No game viewport was found.",
+      "occurrences": 19
+    },
+    {
+      "message": "LogLKUnit: [Trait] 无效特性 Trait_DoesNotExist",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档文件版本 99 不受支持，拒绝载入（不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 永久档不可用：槽 LittleKing_ProfileHomeTest_B 内容非法：ProfileId 无效（原文件保留，未覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 永久档不可读：拒绝覆盖（原文件保留）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 拒绝保存战备：初始牌组至少 7 张（当前 5 张）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 拒绝保存战备：英雄必须恰好 3 名（当前 0 名）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 场景中没有相机（CameraActor / CameraComponent 都没有），请在家园地图里放一台俯视相机",
+      "occurrences": 2
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档校验失败：存档结构版本 99 不受支持（当前支持 1~10）（保留原档，不静默覆盖）",
+      "occurrences": 1
+    },
+    {
+      "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_39.WBP_BattleHUD_C_0",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_WorldMapTest_D1387E0B487325AD5353B6BD9DF29ED1?:/Unwritable）；内存状态保留，可继续当前会话",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_Stage3_?:/Unwritable）；内存状态保留，可继续当前会话",
+      "occurrences": 2
+    },
+    {
+      "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_52.WBP_BattleHUD_C_0",
+      "occurrences": 1
+    },
+    {
+      "message": "LogScript: Script Msg called by: LKRunRewardWidget /Engine/Transient.UnrealEdEngine_0:GameInstance_52.LKRunRewardWidget_1",
+      "occurrences": 1
+    },
+    {
+      "message": "LogScript: Script Msg called by: WBP_BattleHUD_C /Engine/Transient.UnrealEdEngine_0:GameInstance_75.WBP_BattleHUD_C_0",
+      "occurrences": 1
+    },
+    {
+      "message": "LogScript: Script Msg called by: LKRunRewardWidget /Engine/Transient.UnrealEdEngine_0:GameInstance_75.LKRunRewardWidget_1",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_Troll_?:/Unwritable）；内存状态保留，可继续当前会话",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLKBattle: [Run] 存档写入失败（槽 LittleKing_V082Test_8FCE50304105DD8CB986FDBE3BC46950?:/Unwritable）；内存状态保留，可继续当前会话",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 永久档写入失败（槽 LittleKing_V082Test_6FF6D4D245523936F28219978ADA6C53?:/Unwritable_A）：本次操作未生效",
+      "occurrences": 1
+    },
+    {
+      "message": "LogLK: [Home] 拒绝保存战备：卡牌未永久解锁：Unit_AngelWarrior_Uncommon",
+      "occurrences": 1
+    }
+  ],
+  "newTestCount": 28,
+  "assetAudit": {
+    "path": "docs/validation/V084Assets-Validation.json",
+    "sha256": "e75b452f3b49dee1185ae5c91fd6b7a8bd4da84bc6e293cdb1143ec520ba3984",
+    "bytes": 8068
+  },
+  "import": {
+    "path": "Saved/V084AssetsImport.json",
+    "sha256": "ff37277ae82406a1b7c3946c6756227e1b5cfe52adf38beb451c3b11795830c3",
+    "bytes": 6419,
+    "partial": false,
+    "count": 78,
+    "assets": [
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_WallCommon.T_Anim_WallCommon",
+      "/Game/Art/StorybookV1/V084/Animations/SP_WallCommon_00.SP_WallCommon_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallCommon_Idle.FB_WallCommon_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallCommon_Move.FB_WallCommon_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallCommon_Attack.FB_WallCommon_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallCommon_Hit.FB_WallCommon_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallCommon_Death.FB_WallCommon_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_WallRare.T_Anim_WallRare",
+      "/Game/Art/StorybookV1/V084/Animations/SP_WallRare_00.SP_WallRare_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallRare_Idle.FB_WallRare_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallRare_Move.FB_WallRare_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallRare_Attack.FB_WallRare_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallRare_Hit.FB_WallRare_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallRare_Death.FB_WallRare_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_WallEpic.T_Anim_WallEpic",
+      "/Game/Art/StorybookV1/V084/Animations/SP_WallEpic_00.SP_WallEpic_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallEpic_Idle.FB_WallEpic_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallEpic_Move.FB_WallEpic_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallEpic_Attack.FB_WallEpic_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallEpic_Hit.FB_WallEpic_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallEpic_Death.FB_WallEpic_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_WallImperial.T_Anim_WallImperial",
+      "/Game/Art/StorybookV1/V084/Animations/SP_WallImperial_00.SP_WallImperial_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallImperial_Idle.FB_WallImperial_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallImperial_Move.FB_WallImperial_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallImperial_Attack.FB_WallImperial_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallImperial_Hit.FB_WallImperial_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_WallImperial_Death.FB_WallImperial_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_SiegeCart.T_Anim_SiegeCart",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_00.SP_SiegeCart_00",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_01.SP_SiegeCart_01",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_02.SP_SiegeCart_02",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_03.SP_SiegeCart_03",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_04.SP_SiegeCart_04",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_05.SP_SiegeCart_05",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_06.SP_SiegeCart_06",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_07.SP_SiegeCart_07",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_08.SP_SiegeCart_08",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_09.SP_SiegeCart_09",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_10.SP_SiegeCart_10",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_11.SP_SiegeCart_11",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_12.SP_SiegeCart_12",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_13.SP_SiegeCart_13",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_14.SP_SiegeCart_14",
+      "/Game/Art/StorybookV1/V084/Animations/SP_SiegeCart_15.SP_SiegeCart_15",
+      "/Game/Art/StorybookV1/V084/Animations/FB_SiegeCart_Idle.FB_SiegeCart_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_SiegeCart_Move.FB_SiegeCart_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_SiegeCart_Attack.FB_SiegeCart_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_SiegeCart_Hit.FB_SiegeCart_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_SiegeCart_Death.FB_SiegeCart_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_MageTower.T_Anim_MageTower",
+      "/Game/Art/StorybookV1/V084/Animations/SP_MageTower_00.SP_MageTower_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_MageTower_Idle.FB_MageTower_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_MageTower_Move.FB_MageTower_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_MageTower_Attack.FB_MageTower_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_MageTower_Hit.FB_MageTower_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_MageTower_Death.FB_MageTower_Death",
+      "/Game/Art/StorybookV1/V084/Animations/T_Anim_HealingStation.T_Anim_HealingStation",
+      "/Game/Art/StorybookV1/V084/Animations/SP_HealingStation_00.SP_HealingStation_00",
+      "/Game/Art/StorybookV1/V084/Animations/FB_HealingStation_Idle.FB_HealingStation_Idle",
+      "/Game/Art/StorybookV1/V084/Animations/FB_HealingStation_Move.FB_HealingStation_Move",
+      "/Game/Art/StorybookV1/V084/Animations/FB_HealingStation_Attack.FB_HealingStation_Attack",
+      "/Game/Art/StorybookV1/V084/Animations/FB_HealingStation_Hit.FB_HealingStation_Hit",
+      "/Game/Art/StorybookV1/V084/Animations/FB_HealingStation_Death.FB_HealingStation_Death",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_WallCommon.T_Card_WallCommon",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_WallRare.T_Card_WallRare",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_WallEpic.T_Card_WallEpic",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_WallImperial.T_Card_WallImperial",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_SiegeCart.T_Card_SiegeCart",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_MageTower.T_Card_MageTower",
+      "/Game/Art/StorybookV1/V084/Cards/T_Card_HealingStation.T_Card_HealingStation",
+      "/Game/Art/StorybookV1/V084/Audio/S_WallBuild.S_WallBuild",
+      "/Game/Art/StorybookV1/V084/Audio/S_WallRepair.S_WallRepair",
+      "/Game/Art/StorybookV1/V084/Audio/S_WallBreak.S_WallBreak",
+      "/Game/Art/StorybookV1/V084/Audio/S_WallReflect.S_WallReflect",
+      "/Game/Art/StorybookV1/V084/Audio/S_SiegeRam.S_SiegeRam",
+      "/Game/Art/StorybookV1/V084/Audio/S_TowerShelter.S_TowerShelter",
+      "/Game/Art/StorybookV1/V084/Audio/S_HealingStation.S_HealingStation"
+    ]
+  },
+  "uassets": [
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_HealingStation_Attack.uasset",
+      "sha256": "ff8d8f83c61d36f605da2d9f57c843534645ac2734aa605c11ee6556bcaaeb37",
+      "bytes": 1685
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_HealingStation_Death.uasset",
+      "sha256": "b94041762601b552a8a322062f57d7d22c2a339ae46f8d49b052ab6479f0f7ed",
+      "bytes": 1681
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_HealingStation_Hit.uasset",
+      "sha256": "0017a4a1fef9ef55b0650a547db495d0df6d83a7fa28def4ac1013492a68c971",
+      "bytes": 1673
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_HealingStation_Idle.uasset",
+      "sha256": "a3f818f5a10b9dc8d41eaed26b76aa38522e4de6f6d8fa7771932f5167b0bfe7",
+      "bytes": 1677
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_HealingStation_Move.uasset",
+      "sha256": "1f4cf6f4c96c50ae56df09066ccf87fd41c1b6eab7cf092878fc90ca3d3eafdf",
+      "bytes": 1677
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_MageTower_Attack.uasset",
+      "sha256": "08754dd6054543b71716b2d712f80d4e2cac3e9d4d63ba745406b55cda6c640f",
+      "bytes": 1655
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_MageTower_Death.uasset",
+      "sha256": "af486f51cc5bdb856f04e27b14a12335e23890a07172ac3a1246d15df6a72823",
+      "bytes": 1651
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_MageTower_Hit.uasset",
+      "sha256": "3593756052647ecc40ef8672b244607e3a50bd7c727508f74247b130d837655b",
+      "bytes": 1643
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_MageTower_Idle.uasset",
+      "sha256": "cfb1aa20f6926a4fcb24431402fa037bcff33ae7efa0f6e1ad4cdae2c33c3be2",
+      "bytes": 1647
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_MageTower_Move.uasset",
+      "sha256": "72e599d3fcce194d2c4f240853398bca7f67f944732b739a03ec38740eb45173",
+      "bytes": 1647
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_SiegeCart_Attack.uasset",
+      "sha256": "70b933722400076ef51c619aa70b0ffefd79117ed6c0a3d3e308549f9c0edc77",
+      "bytes": 2259
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_SiegeCart_Death.uasset",
+      "sha256": "c8fa7c3a16364bbeff68066d6b5d2426f8d1aa7202cf3e18fba24905e2db83e2",
+      "bytes": 1791
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_SiegeCart_Hit.uasset",
+      "sha256": "ef0c5a87ab757f842954f694e3f7dd3ccc0fbd5fd75bfcf4bd2810ceb0fbfd74",
+      "bytes": 1783
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_SiegeCart_Idle.uasset",
+      "sha256": "7dd1e5a535867bda08131ffaf6c8db96e65535c2b121cd68b36a46a5f54e13d2",
+      "bytes": 2343
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_SiegeCart_Move.uasset",
+      "sha256": "b772977724cdc2a1720f0b5b050c810f530e8e574cd321e8390a15b9a6b45e23",
+      "bytes": 2343
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallCommon_Attack.uasset",
+      "sha256": "7bb976b74e5432ed4c9693afa51ee01e09ea39df50293e24cef882c48442efae",
+      "bytes": 1661
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallCommon_Death.uasset",
+      "sha256": "7ea59a6d63067ba11ed2ebfe32131e90b4ed878cfdec87cbcdbbe4d46f6fa7bf",
+      "bytes": 1657
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallCommon_Hit.uasset",
+      "sha256": "be7f0590e591a1a2aa8d549554ca542e024374190ac88f314595dbb685c337a1",
+      "bytes": 1649
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallCommon_Idle.uasset",
+      "sha256": "6b2e72b4ea372ba75c76231f95fcfb6105b15bc0ae19abceabdb64e6a586961b",
+      "bytes": 1653
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallCommon_Move.uasset",
+      "sha256": "557250138c0f8c46fec584d5211e3e46692373b5bcbeb040d50b9220ee86d311",
+      "bytes": 1653
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallEpic_Attack.uasset",
+      "sha256": "c075ccbc7bbf8794f8a1d23ba1229a29a1a5f5c5d91000a07ab4946984bf92e9",
+      "bytes": 1649
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallEpic_Death.uasset",
+      "sha256": "6323e6dbc74089b1ea0b6febc01b7a15cf9346ef9811f9c9b6a976f60cdf1897",
+      "bytes": 1645
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallEpic_Hit.uasset",
+      "sha256": "2eb3b74cc537b6e62868a946ccd97590333c57a07859801d646a63391f1fc703",
+      "bytes": 1637
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallEpic_Idle.uasset",
+      "sha256": "9b4eb4adc0d3c09813552f3ea12ce18c73f0418451e557e382676de4bc790ef1",
+      "bytes": 1641
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallEpic_Move.uasset",
+      "sha256": "a1338d27824e5501005236ccefd7af192dc1149c66d665d0e0b0569adcdbbe35",
+      "bytes": 1641
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallImperial_Attack.uasset",
+      "sha256": "56b66a5f7f7be7b1662f753dc7f290b69d7bca47bdb8b595233c84c5483503c2",
+      "bytes": 1673
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallImperial_Death.uasset",
+      "sha256": "937227c247122357e2077900a4ec93cc327cffb1f24d572cb53318b6c6d31204",
+      "bytes": 1669
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallImperial_Hit.uasset",
+      "sha256": "6b798d72e9108eacd9037ba14a792c7c612d37cbb1fbd76bb1fa4e224047da54",
+      "bytes": 1661
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallImperial_Idle.uasset",
+      "sha256": "48fae260ab1c03cbf3659eb0b5d9d0a55cc640f8b225d6838867495956aab3ed",
+      "bytes": 1665
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallImperial_Move.uasset",
+      "sha256": "8ba7fa15252122fa09915eae6e8e2fcf26214b5d10a4da118b1179fb548bf1c5",
+      "bytes": 1665
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallRare_Attack.uasset",
+      "sha256": "3305074c08354ccafbe999096c94e88b0584d1d46b99201b9fae3362cf6af218",
+      "bytes": 1649
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallRare_Death.uasset",
+      "sha256": "8c7fb30074ad7946d1c0df55c4e5b0199274784c1d14d1a6e3baebeeaf7c6f4e",
+      "bytes": 1645
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallRare_Hit.uasset",
+      "sha256": "faeff2e1fe3809fb3ef4ac225d44b2423dc0ae7da9030cc3343cc2b713ab91a9",
+      "bytes": 1637
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallRare_Idle.uasset",
+      "sha256": "b6c3600538ad6c1a5c9ce355580f22efc6d2bf6e7712e29f15e7fed4dde8a09d",
+      "bytes": 1641
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/FB_WallRare_Move.uasset",
+      "sha256": "7d0a8a500535b3934c6806d2add5d1bc90c7e6625422bf05cc4b2b9ba210b7a5",
+      "bytes": 1641
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_HealingStation_00.uasset",
+      "sha256": "b45d786a955a0ac74f7aa9d98e125de200f045584b651dc790cd259879d011d2",
+      "bytes": 3939
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_MageTower_00.uasset",
+      "sha256": "d8d495f9400246ae548f5d8591f4c832aff8c2be6bbafe4a9362cfa82a2aabff",
+      "bytes": 3898
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_00.uasset",
+      "sha256": "827693a405ef6574f81ca610bf2a90333cd95af7960963e89f6bed799f18d359",
+      "bytes": 3895
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_01.uasset",
+      "sha256": "06e1abf201fe11a5d36110067a778e66af9ba207dea8a2a766ef7317c5d2ff3c",
+      "bytes": 3897
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_02.uasset",
+      "sha256": "9d6b41bcd371e2d6fedc53be449bde5373ab8cd6b44cdca206813093ae675c56",
+      "bytes": 3897
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_03.uasset",
+      "sha256": "c723b7c0d74edd526abdd2cd9181570710f7e47dfe31ac8b25ddf9f7530bcec1",
+      "bytes": 3897
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_04.uasset",
+      "sha256": "cb07ce8be954ce84ec81c3bc9274e40d8e851e761d9a52de5f18d80ed75cd8db",
+      "bytes": 3896
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_05.uasset",
+      "sha256": "540d0a9d4d38cab30be0c2bca5425841322a2a9b18aeec2d2b4530e9b0b165b2",
+      "bytes": 3898
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_06.uasset",
+      "sha256": "7e5523759af46a22f35bc5fd9818dce03ca064b8a9a9cf45441ce5b2fa6c6b20",
+      "bytes": 3898
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_07.uasset",
+      "sha256": "8a2f0f5b62174aece484d25b8759526cd0cc92db9fd24df1a8077ee664c931d3",
+      "bytes": 3898
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_08.uasset",
+      "sha256": "bbeb4bd4fa7fa52c83d62caaa808c6bb9fedf51dafd0fd8f2caaf458f10e82fc",
+      "bytes": 3896
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_09.uasset",
+      "sha256": "677d8bb984ba1db382584c794eff4aa0a9ac98bb6ebe987075b2a9f4addfc1b4",
+      "bytes": 3898
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_10.uasset",
+      "sha256": "63cb31bc8a49f50e31f3dff3aaa1c1a01b3ee88d17381c1fbb7268174c68868e",
+      "bytes": 3892
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_11.uasset",
+      "sha256": "f0c39dc957301bd4e5da9eebea38394c059adfcc203d3e04acb369baadb50c81",
+      "bytes": 3892
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_12.uasset",
+      "sha256": "51ec9a838506a0b84c05ca1eab74f9e33a9be1fc03052c398b4d0bd46eb169e7",
+      "bytes": 3890
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_13.uasset",
+      "sha256": "cdf6c8c05537775c1415e33aeee62c09ca95e92dc240e3a61154acf1c3923d34",
+      "bytes": 3892
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_14.uasset",
+      "sha256": "1a72b5383456ccfd32cf7b323e0f493da3dd9f9a1d8926806312b4075d96d692",
+      "bytes": 3892
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_SiegeCart_15.uasset",
+      "sha256": "53e9cb97536b2df73eabf059bf5422c23a1890167cf539b72c033d0eeb9513ed",
+      "bytes": 3893
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_WallCommon_00.uasset",
+      "sha256": "01639d3da830d8cda5867a209139b2ff0a35b72448c26289fbfbaf1b738efa48",
+      "bytes": 3906
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_WallEpic_00.uasset",
+      "sha256": "15d9f8a613c7b0fb6596cbb1d362669eddeb495645d5d19d8de294018ddbf25e",
+      "bytes": 3890
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_WallImperial_00.uasset",
+      "sha256": "81dbeb247f1b82f614edad7b6c85cb53dac22535087a31538a4c386ab171760e",
+      "bytes": 3922
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/SP_WallRare_00.uasset",
+      "sha256": "e54076dce54d6d155f60feb49d1c07ce14bff72dd3d5b4d17e3a4f42c410554a",
+      "bytes": 3891
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_HealingStation.uasset",
+      "sha256": "ab65a1851935c1a0e9b8e5493222a3ce151d37993f3c887c4aacee07cf055652",
+      "bytes": 1879127
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_MageTower.uasset",
+      "sha256": "42c92d2d51ac3905f89f39d8f439edd81f9bcd13d067234c0da12b7215ac835d",
+      "bytes": 1376245
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_SiegeCart.uasset",
+      "sha256": "9652fd6caca0fe84c46705a39641b136073b25b56df1d3b6f228534782274934",
+      "bytes": 2695330
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_WallCommon.uasset",
+      "sha256": "653362c3868f3eb85f133baf202c0a63ea1e3c24f8f60e5f33f8b652ad63a0a3",
+      "bytes": 816914
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_WallEpic.uasset",
+      "sha256": "cd664e8eddc068674941f8ad5d333c58425b1933379260cb9a6d2567cd393b0c",
+      "bytes": 1439155
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_WallImperial.uasset",
+      "sha256": "9b5f404d99e92814062dfd561ad4804743a6a56f16ece72be514048d39ae7cfe",
+      "bytes": 1037836
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Animations/T_Anim_WallRare.uasset",
+      "sha256": "ade44ce8dfdae230e36841f1afc7026b463a81bddbc1c8009874897071cef6d3",
+      "bytes": 1139934
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_HealingStation.uasset",
+      "sha256": "910c391bedfc5e658cb16358b73b48bfe832a65ec3e793be318ee5bbd922b930",
+      "bytes": 46223
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_SiegeRam.uasset",
+      "sha256": "4287f595f5b201d820003906def4ae902f8770d28edb91b60175ded00c3ba2fe",
+      "bytes": 24775
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_TowerShelter.uasset",
+      "sha256": "b6fd24e4cf5a6fd06eaa0d6b4c0636abcb56d0904099b42334885dc83d3af62a",
+      "bytes": 44536
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_WallBreak.uasset",
+      "sha256": "9ddcf327b435b3666093cd8dc693deebb3f50d022165bce3b01e5fdf230e0f0f",
+      "bytes": 40643
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_WallBuild.uasset",
+      "sha256": "a23bd788b752d1a117b802bbf09d6e11a5f1301925d8547e9db29d47e4caa8ef",
+      "bytes": 26197
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_WallReflect.uasset",
+      "sha256": "06714bea067adceb18538151b6eca7d18a60f2bf32f6c2aa98218717ecf3dc51",
+      "bytes": 13878
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Audio/S_WallRepair.uasset",
+      "sha256": "a80d07f29904e4dee10e2adcf4b6bb2f9b0f336c830759384e963b648d66ccd7",
+      "bytes": 23424
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_HealingStation.uasset",
+      "sha256": "dad3ddbee4f09a82a4066feec4e4900e235287552ebaee051613b21e3c765928",
+      "bytes": 1879102
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_MageTower.uasset",
+      "sha256": "e8f47ede052b6822e9c0d9c730e6ed744a719bc0dae3c69a5ba4219759257086",
+      "bytes": 1376220
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_SiegeCart.uasset",
+      "sha256": "8bfc9b462e8065fbedc93614a81713ec685262562887cefcb00eceb0865a69ef",
+      "bytes": 1911347
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_WallCommon.uasset",
+      "sha256": "a7eabff7cc59b972ed894576171fa3d8b74642e84833daccb0fee83e2ca5b3e7",
+      "bytes": 816889
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_WallEpic.uasset",
+      "sha256": "bf1170b95d64392ccaa0e604549bb26faf48f7ad07dd8a80aa490cefcc0468f0",
+      "bytes": 1439130
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_WallImperial.uasset",
+      "sha256": "8d53b14578cf2de99ad5b847cbb73ef14ab2771f6234ac1c672b30e2c538f971",
+      "bytes": 1037811
+    },
+    {
+      "path": "Content/Art/StorybookV1/V084/Cards/T_Card_WallRare.uasset",
+      "sha256": "3da71ba21f845f2996f45c1913f5ee22765e91209dee19b9501a07fd3facb63d",
+      "bytes": 1139909
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "ArtSource/StorybookV1/V084/Animations/T_Anim_SiegeCart.png",
+      "sha256": "0088cf5eb9922e0fd27793d7a6cd8af54e50e85a69795b17ecab55a9fb4dced9",
+      "bytes": 2791640
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/manifest.json",
+      "sha256": "8f53b5995d4d5af6056a043a8d25c1ba84b7d1da8ba63471ccbb478df204858c",
+      "bytes": 4524
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_HealingStation.wav",
+      "sha256": "f05226588f47f080a56660c6d64db69f2f2bf7d77eaacca2a370d778cae6b8d4",
+      "bytes": 113324
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_SiegeRam.wav",
+      "sha256": "2e081958313a7fba17af741c0b4ad4daf93b1a6cc9473904ad64cdfa7f268f88",
+      "bytes": 81644
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_TowerShelter.wav",
+      "sha256": "7b36277c2e4e2799fafcfc3519d3e7ad1023381a351daba67a0b70c9b7c71963",
+      "bytes": 100844
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_WallBreak.wav",
+      "sha256": "6b52cfae6904e4690cbf24c3d9b1ae72c9e8bd34b34b9625c9ddef323a9aa2c0",
+      "bytes": 107564
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_WallBuild.wav",
+      "sha256": "5bde188a7b2ff79f594205704b9a5a27d65d6d47024667fd161ec87b5a6e926d",
+      "bytes": 74924
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_WallReflect.wav",
+      "sha256": "cf9c44aa22d0839ffe2298594a30d61764dbc7465b36a06fe5cc704b52ded195",
+      "bytes": 36524
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Audio/S_WallRepair.wav",
+      "sha256": "df870d52deedf16c1cc76d5512684082d91f2e88921927525c1b0fbbe2221ff3",
+      "bytes": 69164
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/frames.json",
+      "sha256": "977252934ff9e84e1548f69ba268b881b2e6ddb8dc2a7f0f1049c4c4252ab1bb",
+      "bytes": 10082
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/generation.json",
+      "sha256": "6ab94b15e9e1d18e3c18c69d99b7e66498e24c9dbadf8f238fcb4148267b9a12",
+      "bytes": 12914
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_HealingStation.png",
+      "sha256": "0075c0c39e0fec74dee56be4abf3753746bad0b933e83f23454066f10bb7ee4b",
+      "bytes": 1933012
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_MageTower.png",
+      "sha256": "30f01b5b9fd81e7e55bc1f5d1fa4d177378169837691ac07480941407ee27842",
+      "bytes": 1394109
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_SiegeCart.png",
+      "sha256": "bb8cbefc02312a530922b917a758ae84cd4a1726aa4f91be608201a3236c4f55",
+      "bytes": 2007591
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_WallCommon.png",
+      "sha256": "78b6a76a4fd4a50cc134b801acf31b001743613a6c51d1aceab8c5038492fe57",
+      "bytes": 842787
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_WallEpic.png",
+      "sha256": "9c96b975b7a6a0e17e49d26d5467adfb9390437bae15c8d093b76c063cc426de",
+      "bytes": 1472935
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_WallImperial.png",
+      "sha256": "eb8fe664f5ccf7b59ca29266458e8c56b53fe1df24ae611c964bd1d3939524f7",
+      "bytes": 1050765
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/Images/T_WallRare.png",
+      "sha256": "8f5db8b2bb269d1ad80b3ce5bdb887e52aa7908ec8c8a422493c708cb952f425",
+      "bytes": 1156628
+    },
+    {
+      "path": "ArtSource/StorybookV1/V084/manifest.json",
+      "sha256": "df0bcdec2c989488cacd6a20b2982f8ae68d3478553107be3b17229d4cf64a6b",
+      "bytes": 33334
+    }
+  ],
+  "previews": [
+    {
+      "path": "Saved/Logs/V084Preview02.log",
+      "sha256": "8c1d15edcad6640d1e59a853afc72a2096d6c4d91d61d5b82d2d0dea98fde081",
+      "bytes": 197920,
+      "result": "V084_PREVIEW_OK screenshots=21",
+      "errors": 0
+    },
+    {
+      "path": "Saved/Logs/V084Preview03.log",
+      "sha256": "4f92f551bcf25eaba4d8fb0a4f7758589acf6a97f28746943c62c515611662d9",
+      "bytes": 198355,
+      "result": "V084_PREVIEW_OK screenshots=21",
+      "errors": 0
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "Saved/Screenshots/V084/BuildingCards_1080.png",
+      "sha256": "bf20217e4dddb9d85f34ca5e258dc05f87d933ac3a0c0a61967e1cbdbebd0cf6",
+      "bytes": 740738
+    },
+    {
+      "path": "Saved/Screenshots/V084/BuildingCards_720.png",
+      "sha256": "90aa2bc9d09984927c7722e8f60b189edea38c2d523d9642b024f290ac4962f5",
+      "bytes": 382518
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_00_1080.png",
+      "sha256": "8ef093e5a2370f9a985e66598d9a69a03f00b62c4991b0c900c15bfbc9490c8d",
+      "bytes": 2891342
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_00_720.png",
+      "sha256": "4269291ce53d4662ab5686cd4c510363c7a1c0526a1e849f07e3690b5b89d5f2",
+      "bytes": 1383920
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_01_1080.png",
+      "sha256": "f19a5920a1d5eca3544cbe615f1774f64172236be1b9d6db42042b3a28543fa1",
+      "bytes": 2895246
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_01_720.png",
+      "sha256": "a090d6be3cc0812c1aa1f3e238329cad10ac7934ee3d2d042c1ec1c8e360b64f",
+      "bytes": 1381978
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_02_1080.png",
+      "sha256": "d636cc3a799c5e75a1e959eb283fef7c1b7d75a08238d7bf4c02e6db03dee2fa",
+      "bytes": 2892424
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_02_720.png",
+      "sha256": "200ddae12b70cbf0478f6ef4c8435018ec350a7922e85914bf8641ac0e22b721",
+      "bytes": 1380218
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_03_1080.png",
+      "sha256": "09a4f9ded8a58a52e20174148ae5ee1f2c8875b2c681daa4002d87539f9b1cc4",
+      "bytes": 2892453
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_03_720.png",
+      "sha256": "f7e96ad166806a6b692f9ab5699a752d1900175d2c799dfc9bc3d6e578893c1c",
+      "bytes": 1379230
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_04_1080.png",
+      "sha256": "bf52bbdc75cb43d7820d6a1bd89bf3ad510fc7b0b2b52fae6a4d29ba1dbda1d3",
+      "bytes": 2890918
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_04_720.png",
+      "sha256": "67943481f4ef8d6ee20ea3446e909f6bc4b113d49d05ea2b43358e4634a52a64",
+      "bytes": 1384013
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_05_1080.png",
+      "sha256": "5b5a4100df74a30b772b513204b4d4a887bed7746e299fc489139caaaadc2f30",
+      "bytes": 2893112
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_05_720.png",
+      "sha256": "eccacf0e0d22422ad973dbbb442666e4b9ea49b222a386e81b15b5328fea22d1",
+      "bytes": 1381445
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_06_1080.png",
+      "sha256": "6c06599f09ead71aa2dc8065ecee7e27c686f666ab7b17a907c1d2133af00b75",
+      "bytes": 2892567
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_06_720.png",
+      "sha256": "fe71a6a7abc77297a5af42027654a36135aab0e4f26b7c9906d7b400d2713616",
+      "bytes": 1383744
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_07_1080.png",
+      "sha256": "7191058753dc2d3e2fd8cc6dc50b9225e27b87dbfba615516c0955e48b252a1e",
+      "bytes": 2890338
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_07_720.png",
+      "sha256": "20e7121e157d89f6cd0855bea808b006d3be01b412eebe2181fb4de398fe22fa",
+      "bytes": 1379063
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_08_1080.png",
+      "sha256": "8cfdb476c6210a39ff3af9986b213df61b8084e3851d601fe939dccba7bd276f",
+      "bytes": 2895723
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_08_720.png",
+      "sha256": "5f5086fbedf8ec99d5a7b16709a5c45aebb8a92ce89e8d941b0dedbc51c09597",
+      "bytes": 1379261
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_09_1080.png",
+      "sha256": "a8afe7ba3f4006b27cda1d64f97033b9478b3ea6118cd1ac2362b06cf6d277b1",
+      "bytes": 2893849
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_09_720.png",
+      "sha256": "3e358756fad1efc1acfdc9fcac51b689a4bfcb400d68191a9778e59e54b784ca",
+      "bytes": 1384556
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_10_1080.png",
+      "sha256": "59217037474fe787c4d5cfb68cc5925541da95fd40f86733b0e081b7d03c455d",
+      "bytes": 2895150
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_10_720.png",
+      "sha256": "8eaa40954221078966faa6ad2eaaaa7bee251581b2b66f96006b1bb4992414ff",
+      "bytes": 1383929
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_11_1080.png",
+      "sha256": "8b34987df985189bfe00b259aa5113ebdf0663a2aa75e3945ace4c1a4f970612",
+      "bytes": 2892068
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_11_720.png",
+      "sha256": "d37a2ae286051c0195b3d950a552a7bc51c64d76a217d3cbe063a4133949c18b",
+      "bytes": 1380283
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_12_1080.png",
+      "sha256": "2d22057de0cfdafc066d776bbc63a1f3565a0aae33c0ad79025a98c7fda51107",
+      "bytes": 2895505
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_12_720.png",
+      "sha256": "0f1a6d81ef01734a118a6723c6b3b2cfb0ca70b55f808e23ed4a91ae9dcc7d11",
+      "bytes": 1383056
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_13_1080.png",
+      "sha256": "abc77716faddc9a3d4eee5922d92ad32579abfe235faa3f3f2fe06091ea99f43",
+      "bytes": 2892081
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_13_720.png",
+      "sha256": "1ec7cefe5d963a84aaa6829460fbc5b53b29a753ea9644d4b58d810124583a4d",
+      "bytes": 1379601
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_14_1080.png",
+      "sha256": "495d05ab663e0799aac3518e6aa293a026733e05d545428f360aee94e823bc2b",
+      "bytes": 2891627
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_14_720.png",
+      "sha256": "1935b99ad8b9320508255afbec571baaf9874cdfff6af0b9ff7ab1c5163322c7",
+      "bytes": 1379536
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_15_1080.png",
+      "sha256": "793dce3445bf5056c053667a3bb1f91c78626640dbb2e0f244466a2d34798d6b",
+      "bytes": 2887207
+    },
+    {
+      "path": "Saved/Screenshots/V084/CartPose_15_720.png",
+      "sha256": "425d76f924277e82415e7a061abcc979f0eabc15b7e80faf4dfd9a4bd5b5864c",
+      "bytes": 1380175
+    },
+    {
+      "path": "Saved/Screenshots/V084/Completed_1080.png",
+      "sha256": "df8bc45db979f39e09ec234298f84fe9bc3915c8bba7b12469b6c48c4a3da9e1",
+      "bytes": 2886716
+    },
+    {
+      "path": "Saved/Screenshots/V084/Completed_720.png",
+      "sha256": "ff41701701fb59ce349738b358310fb649d3cfd544ad69dacf00695594762aba",
+      "bytes": 1385982
+    },
+    {
+      "path": "Saved/Screenshots/V084/Construction_1080.png",
+      "sha256": "85825923de95840349fe8af840abb42723e74941fa1901cf02a5f52eb4df70a8",
+      "bytes": 2846789
+    },
+    {
+      "path": "Saved/Screenshots/V084/Construction_720.png",
+      "sha256": "fafbb9f9ab9ca7e34df736f713480a8c94d4a0fbab2b7d09ae39fb84e51a963d",
+      "bytes": 1384521
+    },
+    {
+      "path": "Saved/Screenshots/V084/NativeHUD_1080.png",
+      "sha256": "f86534d6a6d0f57dd05e856e4d57c12e6bb8df873fb415c44303c16b3bf7b745",
+      "bytes": 2825330
+    },
+    {
+      "path": "Saved/Screenshots/V084/NativeHUD_720.png",
+      "sha256": "9285efe43fb0826be5bb7949dd610c1e29e198c3096bcd398bbedbfad390c619",
+      "bytes": 1349606
+    },
+    {
+      "path": "Saved/Screenshots/V084/StaffedBuildings_1080.png",
+      "sha256": "ee4bc3f180d957ea1714c918963911ed4e54491715a85aad9abb7ef784993e34",
+      "bytes": 2908782
+    },
+    {
+      "path": "Saved/Screenshots/V084/StaffedBuildings_720.png",
+      "sha256": "7c597b2ac27aae3f4b21610368a144931a6c6ee5e36741fb8822cb3ae20e64d8",
+      "bytes": 1388771
+    }
+  ],
+  "visualReview": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "capturesPerResolution": 21,
+    "coverage": [
+      "construction and completion",
+      "seven card illustrations and stats",
+      "16 siege cart poses",
+      "native four-card HUD and wall placement",
+      "mage and priest residents plus patient"
+    ],
+    "limit": "Isolated presentation scenes do not measure live balance, subjective audio quality, packaged builds or hardware compatibility."
+  },
+  "existingSaveIntegrity": [
+    {
+      "path": "Saved/SaveGames/LittleKing_BalanceMig_Cards_8513C71046B0FFD771099894A9255333.sav",
+      "sha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "bytes": 93955,
+      "beforeSha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+      "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "bytes": 3608,
+      "beforeSha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+      "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "bytes": 3608,
+      "beforeSha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+      "sha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "bytes": 3736,
+      "beforeSha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+      "sha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "bytes": 3821,
+      "beforeSha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "unchanged": true
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+      "sha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "bytes": 199893,
+      "beforeSha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "unchanged": true
+    }
+  ],
+  "codeAndConfig": [
+    {
+      "path": "Config/DefaultGame.ini",
+      "sha256": "ba33f1b64cd121080f39d94475235dafe7d924ebd9a745bc8db46ab3f9674411",
+      "bytes": 374
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "eff5226e024a830d80a72f351e1dded1980babe1aabf25ebbc31a26d0587003f",
+      "bytes": 12226
+    },
+    {
+      "path": "README.md",
+      "sha256": "bcbe80ef80f9e521bc9f25899d751c5d5dc7963bd80050891b7dc3f34b7c0e11",
+      "bytes": 10244
+    },
+    {
+      "path": "Scripts/AuditV084Assets.py",
+      "sha256": "d870c6c93a9540f81554e2428a116deb704cc731df51b97f3229f74c0de90f22",
+      "bytes": 4635
+    },
+    {
+      "path": "Scripts/ImportV084Assets.py",
+      "sha256": "2b0f06992328711e423e2c36a3f58129de0b03159a130ce07530f540c5cff94d",
+      "bytes": 4776
+    },
+    {
+      "path": "Scripts/PrepareV084Audio.py",
+      "sha256": "1936a108f4781e9e930c9e970c10b5f420616eddb8b6e77d7de42aa9b031afb4",
+      "bytes": 4228
+    },
+    {
+      "path": "Scripts/PrepareV084Frames.py",
+      "sha256": "753087f56609d583faa2b38fb462263a74a8904e1109145601f4400eab63f627",
+      "bytes": 4754
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.cpp",
+      "sha256": "246cca28a926b15ab56381e3888eca65468f7def4ffb75513456e0c3ff6170e3",
+      "bytes": 57621
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.h",
+      "sha256": "12d08432e8c7177f855dc15a0a43a2e40d75f6da36fca751189333ce341d3093",
+      "bytes": 18491
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.cpp",
+      "sha256": "71461fbe4c2599bcb917cf578cc364de1a9f66329c3c0ce2c2c2bae3e81da2c4",
+      "bytes": 15836
+    },
+    {
+      "path": "Source/little_king/ALKPlayerController.h",
+      "sha256": "bb49dde2a4b029fab21821ddf4d1fdfb64cb90413695d304e806b8c5ef776021",
+      "bytes": 4555
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.cpp",
+      "sha256": "b008cdf32cf99df5ab0460d8a11cd28c4ab8d6f56dce333637d26e7a4c504d0c",
+      "bytes": 22737
+    },
+    {
+      "path": "Source/little_king/ALKProjectile.cpp",
+      "sha256": "add642fc51369b8711fc9b830c8d8cb9021bdd8876d7c18356a93071b3455dfc",
+      "bytes": 7773
+    },
+    {
+      "path": "Source/little_king/ALKSpellField.cpp",
+      "sha256": "f9f89647f2a180a0dcbeeeb1c149ec9620514a95b25fb0aa8e7a5b934aa07cb8",
+      "bytes": 8912
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.cpp",
+      "sha256": "5dbd5d5b795c7d4a91a3760bbf93d486392ca440736206637342932f9d40667a",
+      "bytes": 47833
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.h",
+      "sha256": "72d1558faef4aa7a437e2289ca9176af95758c4b52105659869d2094506ab1da",
+      "bytes": 16051
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase_Buildings.cpp",
+      "sha256": "06e89e50dab2f0219c1cb948f273745a30b6d7e345d96077cb81b817596705de",
+      "bytes": 6821
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.cpp",
+      "sha256": "bbbcea5b10eaa112b81c674accbf87481f5f4e0d8fff68c8a86a86140750641c",
+      "bytes": 14584
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.h",
+      "sha256": "32c8fc515082eef867eb6203541a20fd26d88c9c27e44bd3824d008c49dbacf0",
+      "bytes": 3068
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.cpp",
+      "sha256": "4cd48062b6b66b02b545eabed1630d73408281a1741618035a3091bb3a7f2940",
+      "bytes": 8516
+    },
+    {
+      "path": "Source/little_king/ALKUnitHero.h",
+      "sha256": "b67fecabea6ea0951eba8e14ea1707eb8d0e8db18cf7f55c8e8e8b85a7887566",
+      "bytes": 3019
+    },
+    {
+      "path": "Source/little_king/LKBattleArt.cpp",
+      "sha256": "187bfc6f85f0158c42ab6811c7721206d3f6c96eb386283dce7e6940db6b428c",
+      "bytes": 1946
+    },
+    {
+      "path": "Source/little_king/LKBattleArtPreview.cpp",
+      "sha256": "2cfc78799889dbdead851fc10796e96479da413f42cbcefc308cb2c4315a54e6",
+      "bytes": 9180
+    },
+    {
+      "path": "Source/little_king/LKBuildingGeometry.cpp",
+      "sha256": "ed67fbb99239ea5621d1cbc8916595376843be8d09e83d98769f2191197e019c",
+      "bytes": 5555
+    },
+    {
+      "path": "Source/little_king/LKBuildingGeometry.h",
+      "sha256": "bf14735cd65419befe0dfca04c3095b5f805b1ad31d45cc1e897208e7a02cbf7",
+      "bytes": 1254
+    },
+    {
+      "path": "Source/little_king/LKCardPresentation.cpp",
+      "sha256": "583699d35414245594898360cc25b51d2a70d42a14212a64807fc047ac2a9c24",
+      "bytes": 11560
+    },
+    {
+      "path": "Source/little_king/LKDataTypes.h",
+      "sha256": "78c0598f5952a190ca568e94d515474a78281f4b96dd5e618ec15cd7b8a86fb8",
+      "bytes": 15444
+    },
+    {
+      "path": "Source/little_king/LKExpeditionMercenaryContent.cpp",
+      "sha256": "92721c67445983ef4db764df67596ad758db8ec84acc8381267b715e9bf91ba5",
+      "bytes": 7940
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.cpp",
+      "sha256": "6d352c5bea2b06292d510b2c2c419090a6b4f0f7bc9dcbc2f556bec9cac15654",
+      "bytes": 11326
+    },
+    {
+      "path": "Source/little_king/LKNavigation.cpp",
+      "sha256": "0f67d5d4a0b3238ff9223e66cf616676be9f5672574bfa97fd9d8910bc59ee49",
+      "bytes": 14129
+    },
+    {
+      "path": "Source/little_king/LKNavigation.h",
+      "sha256": "e04e01ded41c2c49fb4ffd39cb6e4a8198298732a9e87dcc3aa91b300eb1ebae",
+      "bytes": 1400
+    },
+    {
+      "path": "Source/little_king/LKPolishArt.cpp",
+      "sha256": "fe9bb4880261a025be426a36dc66c2824b2a2f497f4a9cd7a8e723e4efd12a2c",
+      "bytes": 2835
+    },
+    {
+      "path": "Source/little_king/LKResearchContent.cpp",
+      "sha256": "5f9ea195468f0001574a8455798bae37f688369deca9a4f5c8d1f081a1adf4bd",
+      "bytes": 8830
+    },
+    {
+      "path": "Source/little_king/LKSkeletonCircle.cpp",
+      "sha256": "c9dbdfbdcc32d470b4f8bb8cdd36e848827adfd17d8b392860ca796d10ba3124",
+      "bytes": 11220
+    },
+    {
+      "path": "Source/little_king/LKSpellExecutor.cpp",
+      "sha256": "934f4afb51a0a54afc5346cbdf907b2f3cdc03faca13e3f0491cda90fa6e3081",
+      "bytes": 9654
+    },
+    {
+      "path": "Source/little_king/LKTypes.h",
+      "sha256": "b17834c606ad9b5dac6b90b48e4133aea4505cf81faaec883cec50022467c16b",
+      "bytes": 8372
+    },
+    {
+      "path": "Source/little_king/LKUnitContent.cpp",
+      "sha256": "0cb153bc6e22b8190926aa576577efa1f5bbf1402f1236f06958242229ac52ac",
+      "bytes": 7012
+    },
+    {
+      "path": "Source/little_king/LKUnitContent.h",
+      "sha256": "e13deb1edcdc40cae84e1b7aaf55dc3cfd3b2aed22a31873db23584ccffaffb3",
+      "bytes": 778
+    },
+    {
+      "path": "Source/little_king/LKV084Art.cpp",
+      "sha256": "61c3d0142410bd17c0592a7f6c3bc394418aced7c3b3d92d0665912773c55839",
+      "bytes": 2606
+    },
+    {
+      "path": "Source/little_king/LKV084Art.h",
+      "sha256": "26cd9a6fdbc478790e1f6e784221902b2db10627aa9b11382ffd6ede418facf7",
+      "bytes": 601
+    },
+    {
+      "path": "Source/little_king/LKV084Content.cpp",
+      "sha256": "f055cdd58a4d7bb5d4ced19bd473aee67c540325cc97ee33de83c4099daf9f5f",
+      "bytes": 7104
+    },
+    {
+      "path": "Source/little_king/LKV084Content.h",
+      "sha256": "4c9fb2cb440c2a6ee16a213c5213edb6b8b0462604635ee8d18ac72b25cc4f3d",
+      "bytes": 539
+    },
+    {
+      "path": "Source/little_king/LKV084Preview.cpp",
+      "sha256": "157466759bcab4c77210607add17dde54a19bd082f07f0fea37e2d0966a57d61",
+      "bytes": 10853
+    },
+    {
+      "path": "Source/little_king/LKV084Preview.h",
+      "sha256": "403d30e9db41ac10cd0c616b4a728e5c365fd3f465125a352a1b392344e4c88f",
+      "bytes": 125
+    },
+    {
+      "path": "Source/little_king/Tests/LKBattleArtTests.cpp",
+      "sha256": "ba68c1554fa097d1009da79012cedaa0d102a31e9a0e90e315d0c72eba75b733",
+      "bytes": 8010
+    },
+    {
+      "path": "Source/little_king/Tests/LKContentTestHelpers.h",
+      "sha256": "55324db993ca30aab723c566baed30608298ea7724abc1da56e4daffb9c49532",
+      "bytes": 1297
+    },
+    {
+      "path": "Source/little_king/Tests/LKPolishArtTests.cpp",
+      "sha256": "b692aa159b6944725a621c87b3cca1f373cab8fe5fe52d930bf279248eb20ae2",
+      "bytes": 13337
+    },
+    {
+      "path": "Source/little_king/Tests/LKPresentationAssetsTests.cpp",
+      "sha256": "380bf372e646f166eb32076965a3a9c7bb05d86a822dd49c4832355c3900c948",
+      "bytes": 4078
+    },
+    {
+      "path": "Source/little_king/Tests/LKV084ArtTests.cpp",
+      "sha256": "58c940efc2642bc2b91fd02fc02a11bdcff3ec747866348a03fb5ebb9979abe7",
+      "bytes": 5108
+    },
+    {
+      "path": "Source/little_king/Tests/LKV084BuildingRuntimeTests.cpp",
+      "sha256": "04394c3fa222713f9b32316cc59876561ce533982ab3c248b8c4ba96d4705066",
+      "bytes": 29020
+    },
+    {
+      "path": "Source/little_king/Tests/LKV084ContentTests.cpp",
+      "sha256": "6686abade60defde60858ccb53251d49fff52077adff85270e11be5cd8b83335",
+      "bytes": 13329
+    },
+    {
+      "path": "Source/little_king/Tests/LKV084WallTests.cpp",
+      "sha256": "973652da926a4051e3f1a540d9337a249fb66458a68e3910a4e1c79701d4e606",
+      "bytes": 33204
+    },
+    {
+      "path": "Source/little_king/ULKGameData.cpp",
+      "sha256": "27e9d7268cff5229131813d8e6e47d7d6358f6e320c699f13a6e3361e5601eb0",
+      "bytes": 9524
+    },
+    {
+      "path": "Source/little_king/ULKPresentationSubsystem.cpp",
+      "sha256": "b83a9548ecc9f8f1a803911ecee2afeb0ad62411d592364ac54242fddf86b729",
+      "bytes": 12664
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.cpp",
+      "sha256": "472fb6ba069a2153a53d0c8be28473eed33b80e0306936288fcf5671401b0993",
+      "bytes": 14607
+    },
+    {
+      "path": "Source/little_king/ULKUnitAnimationComponent.cpp",
+      "sha256": "716fc8925e41e54c9616c5b730fea42e0291ad21b39248f826f0219133076077",
+      "bytes": 6673
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.cpp",
+      "sha256": "c60fc4609b1f1fac4abe574dd34cbfc40b22b3b937e5ae7c5dc876b256a142c3",
+      "bytes": 11440
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.h",
+      "sha256": "04df402c39827a16d8c31c5c41e6d56076fb583890c3da9e037f8f2ba91ee151",
+      "bytes": 3213
+    },
+    {
+      "path": "Source/little_king/ULKUnitStatusComponent.cpp",
+      "sha256": "842a82d121221afa4e10fa98e8d9238282e729acaa597ed0212926d058e46498",
+      "bytes": 11535
+    }
+  ],
+  "compatibility": {
+    "runSchema": 10,
+    "profileSchema": 2,
+    "units": 46,
+    "cards": 48,
+    "spellResearch": 16,
+    "blueprintResearch": 8
+  }
+}

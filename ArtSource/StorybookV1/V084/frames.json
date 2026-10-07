@@ -1,0 +1,581 @@
+[
+  {
+    "id": "WallCommon",
+    "unitIds": [
+      "Unit_WallCommon"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_WallCommon.png",
+    "importName": "T_Anim_WallCommon",
+    "sha256": "78b6a76a4fd4a50cc134b801acf31b001743613a6c51d1aceab8c5038492fe57",
+    "width": 1254,
+    "height": 1254,
+    "ppu": 3.8433333333333333,
+    "transparentFraction": 0.7578269473887707,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          51,
+          465
+        ],
+        "size": [
+          1153,
+          350
+        ],
+        "pivot": [
+          627.5,
+          640.0
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": 300
+  },
+  {
+    "id": "WallRare",
+    "unitIds": [
+      "Unit_WallRare"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_WallRare.png",
+    "importName": "T_Anim_WallRare",
+    "sha256": "8f5db8b2bb269d1ad80b3ce5bdb887e52aa7908ec8c8a422493c708cb952f425",
+    "width": 1774,
+    "height": 887,
+    "ppu": 5.216666666666667,
+    "transparentFraction": 0.6574884114651187,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          105,
+          259
+        ],
+        "size": [
+          1565,
+          370
+        ],
+        "pivot": [
+          887.5,
+          444.0
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": 300
+  },
+  {
+    "id": "WallEpic",
+    "unitIds": [
+      "Unit_WallEpic"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_WallEpic.png",
+    "importName": "T_Anim_WallEpic",
+    "sha256": "9c96b975b7a6a0e17e49d26d5467adfb9390437bae15c8d093b76c063cc426de",
+    "width": 1774,
+    "height": 887,
+    "ppu": 5.426666666666667,
+    "transparentFraction": 0.5474243392914566,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          73,
+          156
+        ],
+        "size": [
+          1628,
+          521
+        ],
+        "pivot": [
+          887.0,
+          416.5
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": 300
+  },
+  {
+    "id": "WallImperial",
+    "unitIds": [
+      "Unit_WallImperial"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_WallImperial.png",
+    "importName": "T_Anim_WallImperial",
+    "sha256": "eb8fe664f5ccf7b59ca29266458e8c56b53fe1df24ae611c964bd1d3939524f7",
+    "width": 1254,
+    "height": 1254,
+    "ppu": 3.993333333333333,
+    "transparentFraction": 0.6966517351810729,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          28,
+          412
+        ],
+        "size": [
+          1198,
+          453
+        ],
+        "pivot": [
+          627.0,
+          638.5
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": 300
+  },
+  {
+    "id": "SiegeCart",
+    "unitIds": [
+      "Unit_SiegeCart"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Animations/T_Anim_SiegeCart.png",
+    "importName": "T_Anim_SiegeCart",
+    "sha256": "0088cf5eb9922e0fd27793d7a6cd8af54e50e85a69795b17ecab55a9fb4dced9",
+    "width": 1254,
+    "height": 1254,
+    "ppu": 1.1391304347826088,
+    "transparentFraction": 0.35105588750766287,
+    "states": {
+      "Idle": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "Move": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "Attack": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "Hit": [
+        12,
+        13
+      ],
+      "Death": [
+        14,
+        15
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          5,
+          44
+        ],
+        "size": [
+          317,
+          262
+        ],
+        "pivot": [
+          137.94,
+          227.39999999999998
+        ]
+      },
+      {
+        "index": 1,
+        "uv": [
+          317,
+          44
+        ],
+        "size": [
+          313,
+          262
+        ],
+        "pivot": [
+          451.44,
+          227.39999999999998
+        ]
+      },
+      {
+        "index": 2,
+        "uv": [
+          628,
+          50
+        ],
+        "size": [
+          313,
+          255
+        ],
+        "pivot": [
+          764.94,
+          226.39999999999998
+        ]
+      },
+      {
+        "index": 3,
+        "uv": [
+          942,
+          44
+        ],
+        "size": [
+          311,
+          262
+        ],
+        "pivot": [
+          1078.44,
+          227.39999999999998
+        ]
+      },
+      {
+        "index": 4,
+        "uv": [
+          6,
+          353
+        ],
+        "size": [
+          311,
+          260
+        ],
+        "pivot": [
+          137.94,
+          534.4
+        ]
+      },
+      {
+        "index": 5,
+        "uv": [
+          317,
+          352
+        ],
+        "size": [
+          314,
+          261
+        ],
+        "pivot": [
+          451.44,
+          534.4
+        ]
+      },
+      {
+        "index": 6,
+        "uv": [
+          630,
+          353
+        ],
+        "size": [
+          311,
+          260
+        ],
+        "pivot": [
+          764.94,
+          534.4
+        ]
+      },
+      {
+        "index": 7,
+        "uv": [
+          940,
+          353
+        ],
+        "size": [
+          311,
+          260
+        ],
+        "pivot": [
+          1078.44,
+          534.4
+        ]
+      },
+      {
+        "index": 8,
+        "uv": [
+          5,
+          660
+        ],
+        "size": [
+          296,
+          262
+        ],
+        "pivot": [
+          137.94,
+          843.4
+        ]
+      },
+      {
+        "index": 9,
+        "uv": [
+          316,
+          660
+        ],
+        "size": [
+          296,
+          262
+        ],
+        "pivot": [
+          451.44,
+          843.4
+        ]
+      },
+      {
+        "index": 10,
+        "uv": [
+          628,
+          660
+        ],
+        "size": [
+          332,
+          262
+        ],
+        "pivot": [
+          764.94,
+          843.4
+        ]
+      },
+      {
+        "index": 11,
+        "uv": [
+          941,
+          661
+        ],
+        "size": [
+          312,
+          262
+        ],
+        "pivot": [
+          1078.44,
+          844.4
+        ]
+      },
+      {
+        "index": 12,
+        "uv": [
+          6,
+          965
+        ],
+        "size": [
+          319,
+          259
+        ],
+        "pivot": [
+          137.94,
+          1145.4
+        ]
+      },
+      {
+        "index": 13,
+        "uv": [
+          318,
+          966
+        ],
+        "size": [
+          317,
+          258
+        ],
+        "pivot": [
+          451.44,
+          1145.4
+        ]
+      },
+      {
+        "index": 14,
+        "uv": [
+          632,
+          977
+        ],
+        "size": [
+          306,
+          244
+        ],
+        "pivot": [
+          764.94,
+          1142.4
+        ]
+      },
+      {
+        "index": 15,
+        "uv": [
+          942,
+          1023
+        ],
+        "size": [
+          305,
+          202
+        ],
+        "pivot": [
+          1078.44,
+          1146.4
+        ]
+      }
+    ],
+    "authoredPoseCount": 16,
+    "worldWidth": null
+  },
+  {
+    "id": "MageTower",
+    "unitIds": [
+      "Unit_MageTower"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_MageTower.png",
+    "importName": "T_Anim_MageTower",
+    "sha256": "30f01b5b9fd81e7e55bc1f5d1fa4d177378169837691ac07480941407ee27842",
+    "width": 1254,
+    "height": 1254,
+    "ppu": 3.3027777777777776,
+    "transparentFraction": 0.6230499403503684,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          225,
+          25
+        ],
+        "size": [
+          830,
+          1189
+        ],
+        "pivot": [
+          640.0,
+          857.3
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": null
+  },
+  {
+    "id": "HealingStation",
+    "unitIds": [
+      "Unit_HealingStation"
+    ],
+    "file": "ArtSource/StorybookV1/V084/Images/T_HealingStation.png",
+    "importName": "T_Anim_HealingStation",
+    "sha256": "0075c0c39e0fec74dee56be4abf3753746bad0b933e83f23454066f10bb7ee4b",
+    "width": 1254,
+    "height": 1254,
+    "ppu": 3.5387096774193547,
+    "transparentFraction": 0.500358660897568,
+    "states": {
+      "Idle": [
+        0
+      ],
+      "Move": [
+        0
+      ],
+      "Attack": [
+        0
+      ],
+      "Hit": [
+        0
+      ],
+      "Death": [
+        0
+      ]
+    },
+    "frames": [
+      {
+        "index": 0,
+        "uv": [
+          128,
+          58
+        ],
+        "size": [
+          1015,
+          1097
+        ],
+        "pivot": [
+          635.5,
+          825.9000000000001
+        ]
+      }
+    ],
+    "authoredPoseCount": 1,
+    "worldWidth": null
+  }
+]

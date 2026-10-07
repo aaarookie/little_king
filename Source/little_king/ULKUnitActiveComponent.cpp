@@ -3,6 +3,7 @@
 #include "ALKBattleGameMode.h"
 #include "LKCardRules.h"
 #include "LKGameplayHelpers.h"
+#include "LKBuildingGeometry.h"
 #include "ULKCardDefinition.h"
 #include "LKSpellExecutor.h"
 #include "ULKDeckState.h"
@@ -70,7 +71,8 @@ bool ULKUnitActiveComponent::TickAbility(float DeltaSeconds)
     ALKUnitBase* Unit = Cast<ALKUnitBase>(GetOwner());
     if (!Unit || !Unit->IsAlive() || !Unit->IsCombatEnabled() || Ability == ELKActiveAbility::None) { return false; }
     if (DeltaSeconds < 0.f || !FMath::IsFinite(DeltaSeconds)) { return IsDashing(); }
-    CooldownRemaining = FMath::Max(0.f, CooldownRemaining - DeltaSeconds);
+    CooldownRemaining = FMath::Max(0.f, CooldownRemaining - DeltaSeconds * Unit->GetSkillCooldownRate());
+    if (Unit->IsBuildingServiceMoving()) { InterruptMovement(); return false; }
     if (Unit->IsControlled()) { InterruptMovement(); return false; }
     if (IsDashing()) { TickDash(DeltaSeconds); return true; }
     if (CooldownRemaining <= 0.f) { TryActivate(); }
@@ -82,7 +84,7 @@ bool ULKUnitActiveComponent::TryActivate()
     ALKUnitBase* Unit = Cast<ALKUnitBase>(GetOwner());
     ALKBattleGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<ALKBattleGameMode>() : nullptr;
     if (!Unit || !Unit->IsAlive() || !Unit->IsCombatEnabled() || !GM || GM->GetPhase() != ELKGamePhase::Battle
-        || Unit->IsManualMoving() || Unit->IsControlled() || CooldownRemaining > 0.f || IsDashing() || Ability == ELKActiveAbility::None) { return false; }
+        || Unit->IsManualMoving() || Unit->IsControlled() || Unit->IsBuildingServiceMoving() || CooldownRemaining > 0.f || IsDashing() || Ability == ELKActiveAbility::None) { return false; }
     // Set before damage: a kill from the skill itself can reset this cooldown synchronously.
     CooldownRemaining = Cooldown;
     bool bCast = false;
@@ -249,16 +251,17 @@ void ULKUnitActiveComponent::TickDash(float DeltaSeconds)
     GM->BeginCombatBatch();
     for (ALKUnitBase* Target : LivingUnits(GetWorld()))
     {
-        if (Target->GetTeam() == Unit->GetTeam() || DashHits.Contains(Target)) { continue; }
+        if (Target->GetTeam() == Unit->GetTeam() || Target->IsSheltered() || DashHits.Contains(Target)) { continue; }
         const FVector Closest = FMath::ClosestPointOnSegment(Target->GetActorLocation(), Start, End);
         if (FVector::DistSquared2D(Closest, Target->GetActorLocation()) > FMath::Square(HitRadius + Target->GetBodyRadius())) { continue; }
         // The hit radius must not reach through a different building or camp.
         bool bBlocked = false;
         for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
         {
-            if (*It == Target || *It == Unit || !It->IsAlive() || !It->IsBuilding()) { continue; }
-            const FVector Projection = FMath::ClosestPointOnSegment(It->GetActorLocation(), Closest, Target->GetActorLocation());
-            if (FVector::DistSquared2D(Projection, It->GetActorLocation()) < FMath::Square(It->GetBodyRadius())) { bBlocked = true; break; }
+            if (*It == Target || *It == Unit || !LKBuildingGeometry::BlocksMovement(*It)) { continue; }
+            const FVector Direction = (Target->GetActorLocation() - Closest).GetSafeNormal2D();
+            if (LKBuildingGeometry::RayHit(Closest, Direction, FVector::Dist2D(Closest, Target->GetActorLocation()), LKBuildingGeometry::Shape(*It)) >= 0.f)
+            { bBlocked = true; break; }
         }
         if (bBlocked) { continue; }
         DashHits.Add(Target);

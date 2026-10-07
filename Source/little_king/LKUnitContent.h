@@ -10,8 +10,9 @@
  */
 namespace LKUnitContent
 {
-    /** 三名玩家英雄、三名佣兵、两座建筑和五种亡灵。 */
+    /** 汇总核心、亡灵、临时佣兵、召唤单位与研究建筑目录。 */
     const TMap<FName, FLKUnitRow>& Units();
+    /** 支持已登记建筑卡的 Card_* → Unit_* 显式别名，不会猜测未知卡。 */
     const FLKUnitRow* Find(FName UnitId);
 
     /** 将作者数据的可调字段与代码规则合并；Canonical 必须来自 Units。 */

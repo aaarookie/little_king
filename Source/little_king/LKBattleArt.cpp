@@ -1,5 +1,6 @@
 #include "LKBattleArt.h"
 #include "LKV083Art.h"
+#include "LKV084Art.h"
 #include "PaperSprite.h"
 #include "Engine/Texture2D.h"
 
@@ -15,12 +16,14 @@ const TArray<FName>& UnitIds()
         "Unit_TrollKing", "Unit_TwoHeadedDragon", "Building_SiegeCatapult", "Unit_Colossus"
         };
         Result.Append(LKV083Art::UnitIds());
+        Result.Append(LKV084Art::UnitIds());
         return Result;
     }();
     return Ids;
 }
 TSoftObjectPtr<UPaperSprite> Sprite(FName UnitId)
 {
+    if (LKV084Art::UnitIds().Contains(UnitId)) { return LKV084Art::Sprite(UnitId); }
     if (LKV083Art::UnitIds().Contains(UnitId)) { return LKV083Art::Sprite(UnitId); }
     if (!UnitIds().Contains(UnitId)) { return nullptr; }
     const FString Name = TEXT("SP_") + UnitId.ToString();
@@ -28,6 +31,7 @@ TSoftObjectPtr<UPaperSprite> Sprite(FName UnitId)
 }
 TSoftObjectPtr<UTexture2D> CardIcon(FName CardId)
 {
+    if (const auto Icon=LKV084Art::CardIcon(CardId); !Icon.IsNull()) { return Icon; }
     if (LKV083Art::SpellIds().Contains(CardId)) { return LKV083Art::CardIcon(CardId); }
     if (LKV083Art::UnitIds().Contains(CardId)) { return nullptr; }
     if (!UnitIds().Contains(CardId) || CardId.ToString().StartsWith(TEXT("Hero_")) || CardId.ToString().StartsWith(TEXT("Boss_"))) { return nullptr; }

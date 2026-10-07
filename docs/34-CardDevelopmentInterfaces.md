@@ -169,3 +169,31 @@ if (Check == ELKPlayResult::Success)
 `LKV083Art::Sprite/Animation/CardIcon` 负责五套图集、九卡图的默认映射，`LKBattleArt` 与 `LKPolishArt` 统一分派。原有 `LKPolishArt::WalkingUnitIds` 只列历史 24 个 MovementFix 覆盖对象；天使移动使用自己的新图集，不必加入这份历史覆盖名单。39 单位共 528 个运行时独立姿态，三品质共享角色图集。
 
 新增声音使用 `LKV083Art::SoundIds/SoundPath/SoundInterval`，GameData 补缺省映射，Presentation 同时允许新旧声音 ID。明确自定义 Sprite/Icon/SoundMap、显式静音和关闭默认声音的选择仍优先。图片原始字节、完整提示词与六条声音参数归档到 `ArtSource/StorybookV1/V083`，引擎资源只写 `/Game/Art/StorybookV1/V083`。
+
+## v0.8.4 · 具有体积、朝向和服务关系的建筑
+
+本轮具体数值与修补规则见 [57](57-v0.8.4Changes.md)。`LKV084Content` 提供七种建筑的单位表、卡牌 ID、`UnitIdForCard` 显式映射与卡库注入。研究目录登记对应 `BuildingBlueprint`，而不是把建筑塞进临时佣兵池。`Card_WallCommon` 等卡牌与 `Unit_WallCommon` 等单位身份分离；`LKUnitContent::Find` 对已登记卡支持别名，以便既有 `LKCardRules::IsBuilding`、休息升级和家园颜色查询继续工作。不要对任何未知 `Card_` 字符串自动猜测单位 ID。
+
+`ELKBuildingBehavior` 追加 `Wall / SiegeCart / MageTower / HealingStation`。`FLKUnitRow` 增加施工秒数、墙长、墙厚、反弹值和墙光环范围。上述几何均为厘米；300 厘米即 3 米。品质和职业是稳定身份，合法数值仍由作者表行调整。普通墙没有反弹；高阶墙不因旧表新增字段漏填而意外丢失反弹。
+
+### 放置事务与共享几何
+
+`ValidateCardPlay` 和 `PlayCardForTeam` 新增可选参数 `PlacementYaw`。普通卡调用保持兼容；墙卡由控制器提供朝向。旋转、修补、替换必须走同一事务入口，不能在 UI 回调里先扣钱或销毁旧墙。
+
+```cpp
+const ELKPlayResult Result = GM->PlayCardForTeam(Team, HandIndex, Location, PlacementYaw);
+```
+
+`LKBuildingGeometry::WallShape` 将墙定义为胶囊形平面体积，半径为厚度的一半，中轴段长为总长减厚度；它与实际显示的 3 米墙长相符。`CanPlaceWall` 检查完整足迹而非中心点，`FindMatchingWall` 识别修补/替换目标，`RayHit` 检查整段弹道的首次命中。`LKNavigation::FObstacle::HalfSegment` 为零时保留原有圆障碍，非零时使用墙段胶囊；寻路、移动、弹丸与放置不得分别复制另一套近似圆半径逻辑。
+
+`SpawnUnitForTeam` 的来源卡用于本轮休息升级，放置朝向用于初始化墙体；`ReplacedWall` 只允许事务已验证的同阵营旧墙，替换不增加最终单位数量。先成功创建替换实体，才移除旧墙，失败保留旧墙和手牌。不要用死亡事件替换旧墙，否则会误触发死亡被动和奖励。
+
+`ULKUnitMovementComponent::FindBlockingEnemyWall` 为无法抵达的战斗目标找可接近的敌方墙段。能绕过去时仍绕路；封闭时先破墙；治疗者不能转为攻击墙体。施工结束由 `DisplaceOverlappingUnits` 将覆盖的可移动角色移到合法空位，不造成伤害。
+
+`LKNavigation::FindPath` 对最多 12 个障碍保留可见图，大于此数改用最多 8,192 节点的网格 A*，共享最近四份纯几何缓存。网格边仍检查真实胶囊，不可把“网格邻接”直接当作“无碰撞”。调用方无须更改旧接口；需要诊断时传可选 `FSearchStats*`，可得到访问节点数与精确碰撞次数。该缓存只在游戏线程使用，不持有场景对象。大型障碍场的窄通道可能因网格采样保守拒绝，设计可通行通道时应留足角色体积与采样余量。
+
+### 职业与建筑服务
+
+法师用 `bIsMage`，牧师用 `bBasicAttackHeals`。职业不会自动赋予英雄特性，例如学徒入住法师塔并不会让全队获得全图施法。驻守选择、患者关联与释放由 `ALKUnitBuilding` 和 `ALKUnitBase` 的服务接口共同管理；死亡、建筑损毁、结束战斗和移动失败时必须清除双方引用。主动冷却加速应只影响技能计时，不改变普通攻击速度。
+
+所有牧师普通攻击经共同治疗管线；新牧师只需登记职业、攻击力、间隔、射程等数值，不应再写一套“对敌伤害后改成加血”的例外。治疗站额外倍率通过实际治疗结算入口应用，仍遵守存活、最大生命和治疗被动的规则。生命低于 50% 是开始接诊条件，已经进入治疗的患者直到满血才释放。

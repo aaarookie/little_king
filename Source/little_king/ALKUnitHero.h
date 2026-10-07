@@ -22,6 +22,7 @@ class ALKUnitHero : public ALKUnitBase
 {
 	GENERATED_BODY()
 	friend struct FLKD2TestAccess;
+    friend struct FLKV084RuntimeTestAccess;
 
 public:
 	ALKUnitHero();
@@ -42,6 +43,7 @@ public:
 	float GetSkillCooldownRemaining() const { return SkillCooldownRemaining; }
 	void SetCamp(ALKHeroCamp* Camp, float Radius);
 	UFUNCTION(BlueprintCallable, Category = "LK|Hero") bool CommandMove(const FVector& Destination);
+	virtual void CancelManualMove() override;
 	UFUNCTION(BlueprintPure, Category = "LK|Hero") FVector GetCampCenter() const { return CampCenter; }
 	UFUNCTION(BlueprintPure, Category = "LK|Hero") float GetCampMoveRadius() const { return CampMoveRadius; }
 	ALKHeroCamp* GetCamp() const;

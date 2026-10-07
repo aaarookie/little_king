@@ -53,7 +53,11 @@ enum class ELKBuildingBehavior : uint8
 {
 	None		UMETA(DisplayName = "无"),
 	Turret		UMETA(DisplayName = "哨塔（自动攻击）"),
-	Barracks	UMETA(DisplayName = "兵营（周期出兵）")
+	Barracks	UMETA(DisplayName = "兵营（周期出兵）"),
+    Wall        UMETA(DisplayName = "防御墙"),
+    SiegeCart   UMETA(DisplayName = "攻城车"),
+    MageTower   UMETA(DisplayName = "法师塔"),
+    HealingStation UMETA(DisplayName = "牧师治疗站")
 };
 
 /** 单位状态机 */

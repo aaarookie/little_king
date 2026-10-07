@@ -1,0 +1,237 @@
+{
+  "version": "0.8.4",
+  "date": "2026-10-08",
+  "sourceImages": [
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallCommon.png",
+      "sha256": "78b6a76a4fd4a50cc134b801acf31b001743613a6c51d1aceab8c5038492fe57",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.7578269473887707,
+      "poses": 1,
+      "groundAnchorWorldOffset": 45.533391153512575,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallRare.png",
+      "sha256": "8f5db8b2bb269d1ad80b3ce5bdb887e52aa7908ec8c8a422493c708cb952f425",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "transparentFraction": 0.6574884114651187,
+      "poses": 1,
+      "groundAnchorWorldOffset": 35.46325878594249,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallEpic.png",
+      "sha256": "9c96b975b7a6a0e17e49d26d5467adfb9390437bae15c8d093b76c063cc426de",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "transparentFraction": 0.5474243392914566,
+      "poses": 1,
+      "groundAnchorWorldOffset": 48.0036855036855,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallImperial.png",
+      "sha256": "eb8fe664f5ccf7b59ca29266458e8c56b53fe1df24ae611c964bd1d3939524f7",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.6966517351810729,
+      "poses": 1,
+      "groundAnchorWorldOffset": 56.7195325542571,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Animations/T_Anim_SiegeCart.png",
+      "sha256": "0088cf5eb9922e0fd27793d7a6cd8af54e50e85a69795b17ecab55a9fb4dced9",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.35105588750766287,
+      "poses": 16,
+      "groundAnchorWorldOffset": 69.00000000000001,
+      "groundAnchorSpread": 9.947598300641403e-14,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_MageTower.png",
+      "sha256": "30f01b5b9fd81e7e55bc1f5d1fa4d177378169837691ac07480941407ee27842",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.6230499403503684,
+      "poses": 1,
+      "groundAnchorWorldOffset": 108.00000000000001,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_HealingStation.png",
+      "sha256": "0075c0c39e0fec74dee56be4abf3753746bad0b933e83f23454066f10bb7ee4b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparentFraction": 0.500358660897568,
+      "poses": 1,
+      "groundAnchorWorldOffset": 92.99999999999997,
+      "groundAnchorSpread": 0.0,
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallCommon.png",
+      "sha256": "78b6a76a4fd4a50cc134b801acf31b001743613a6c51d1aceab8c5038492fe57",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallRare.png",
+      "sha256": "8f5db8b2bb269d1ad80b3ce5bdb887e52aa7908ec8c8a422493c708cb952f425",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA"
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallEpic.png",
+      "sha256": "9c96b975b7a6a0e17e49d26d5467adfb9390437bae15c8d093b76c063cc426de",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA"
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_WallImperial.png",
+      "sha256": "eb8fe664f5ccf7b59ca29266458e8c56b53fe1df24ae611c964bd1d3939524f7",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_SiegeCart.png",
+      "sha256": "bb8cbefc02312a530922b917a758ae84cd4a1726aa4f91be608201a3236c4f55",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "matchesOriginalGenerationBytes": true
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_MageTower.png",
+      "sha256": "30f01b5b9fd81e7e55bc1f5d1fa4d177378169837691ac07480941407ee27842",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "file": "ArtSource/StorybookV1/V084/Images/T_HealingStation.png",
+      "sha256": "0075c0c39e0fec74dee56be4abf3753746bad0b933e83f23454066f10bb7ee4b",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    }
+  ],
+  "sounds": [
+    {
+      "key": "WallBuild",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_WallBuild.wav",
+      "sha256": "5bde188a7b2ff79f594205704b9a5a27d65d6d47024667fd161ec87b5a6e926d",
+      "seconds": 0.78,
+      "peakDbFS": -24.001924090288217,
+      "rmsDbFS": -40.516387486555146,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "WallRepair",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_WallRepair.wav",
+      "sha256": "df870d52deedf16c1cc76d5512684082d91f2e88921927525c1b0fbbe2221ff3",
+      "seconds": 0.72,
+      "peakDbFS": -24.001924090288217,
+      "rmsDbFS": -41.903989132076624,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "WallBreak",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_WallBreak.wav",
+      "sha256": "6b52cfae6904e4690cbf24c3d9b1ae72c9e8bd34b34b9625c9ddef323a9aa2c0",
+      "seconds": 1.12,
+      "peakDbFS": -22.998973925015985,
+      "rmsDbFS": -41.78889129155878,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "WallReflect",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_WallReflect.wav",
+      "sha256": "cf9c44aa22d0839ffe2298594a30d61764dbc7465b36a06fe5cc704b52ded195",
+      "seconds": 0.38,
+      "peakDbFS": -28.003181794915953,
+      "rmsDbFS": -43.48039979500256,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "SiegeRam",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_SiegeRam.wav",
+      "sha256": "2e081958313a7fba17af741c0b4ad4daf93b1a6cc9473904ad64cdfa7f268f88",
+      "seconds": 0.85,
+      "peakDbFS": -21.999250260649266,
+      "rmsDbFS": -40.64138598025676,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "TowerShelter",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_TowerShelter.wav",
+      "sha256": "7b36277c2e4e2799fafcfc3519d3e7ad1023381a351daba67a0b70c9b7c71963",
+      "seconds": 1.05,
+      "peakDbFS": -24.998226918452502,
+      "rmsDbFS": -38.42624301804041,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    },
+    {
+      "key": "HealingStation",
+      "file": "ArtSource/StorybookV1/V084/Audio/S_HealingStation.wav",
+      "sha256": "f05226588f47f080a56660c6d64db69f2f2bf7d77eaacca2a370d778cae6b8d4",
+      "seconds": 1.18,
+      "peakDbFS": -26.00127056716554,
+      "rmsDbFS": -39.08287939768237,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bits": 16,
+      "noClipping": true,
+      "endpointsFaded": true
+    }
+  ],
+  "frameCount": 22,
+  "unitCount": 7,
+  "status": "passed",
+  "scope": "source byte hashes, image alpha/frame rectangles, complete prompts and PCM format/levels; no subjective listening claim"
+}

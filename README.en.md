@@ -2,9 +2,19 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**. Current version: **v0.8.3** (`ProjectVersion=0.8.3`). The game UI and detailed design documents are in Simplified Chinese.
+A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**. Current version: **v0.8.4** (`ProjectVersion=0.8.4`). The game UI and detailed design documents are in Simplified Chinese.
 
 Prepare three heroes and a deck at home, depart through the gate, and follow randomized routes across fixed regions. Deploy every hero before combat, command camps, and cycle cards. Bring gold and research materials home to develop the settlement.
+
+## v0.8.4: walls, siege and garrisons
+
+- Four tiers of 3-meter walls support Q/E rotation, partial overlap, construction, repair and replacement. Completed walls affect navigation and projectile hits; enclosed targets require a breach.
+- Epic and legendary walls reflect damage with separate cooldowns per attacker. Imperial walls grant stacking attack and healing areas extending 3 meters in front and behind.
+- Slow siege carts seek the nearest enemy building and attack every 3 seconds for 10% of its maximum health, doubled against walls. They idle without a valid building target.
+- Mage towers shelter resident mages and halve skill cooldowns. Priest stations take one wounded ally at a time, healing at 1.5 times the resident's normal amount until full. All priests use healing-only basic attacks.
+- All seven buildings require blueprint research at home. Matching storybook artwork, original sound effects, asset prompts, and an isolated sandbox are included.
+
+See the [change record](docs/57-v0.8.4Changes.md), [asset provenance](docs/58-v0.8.4Assets.md), [UE 5.8 guide](docs/59-v0.8.4Guide.md), and [release validation](docs/60-v0.8.4ReleaseNotes.md).
 
 ## v0.8.3: researched spells and angel reinforcements
 

@@ -1,4 +1,5 @@
 #include "ALKProjectile.h"
+#include "LKBuildingGeometry.h"
 
 #include "Components/SphereComponent.h"
 #include "Engine/World.h"
@@ -144,14 +145,9 @@ void ALKProjectile::Tick(float DeltaSeconds)
     {
         ALKUnitBase* Unit = *It;
         if (bSiegeShot || bHealingShot || !Unit->IsTargetable() || Unit->GetTeam() == Team) { continue; }
-        FVector Offset = Unit->GetActorLocation() - Start; Offset.Z = 0.f;
-        const float Radius = Unit->GetBodyRadius() + 12.f;
-        const float Along = FVector::DotProduct(Offset, Direction);
-        const float PerpendicularSq = Offset.SizeSquared() - Along * Along;
-        if (PerpendicularSq > Radius * Radius) { continue; }
-        const float Root = FMath::Sqrt(FMath::Max(0.f, Radius * Radius - PerpendicularSq));
-        const float Enter = FMath::Max(0.f, Along - Root);
-        if (Along + Root >= 0.f && Enter <= Travel && Enter < ClosestDistance) { Closest = Unit; ClosestDistance = Enter; }
+        if (Unit->IsSheltered()) { continue; }
+        const float Enter=LKBuildingGeometry::RayHit(Start,Direction,Travel,LKBuildingGeometry::Shape(Unit,12.f));
+        if (Enter>=0.f && Enter<ClosestDistance) { Closest=Unit; ClosestDistance=Enter; }
     }
     if (Closest)
     {

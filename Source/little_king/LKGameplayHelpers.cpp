@@ -120,10 +120,14 @@ namespace LKGameplay
     {
         ALKUnitBase* Unit = Cast<ALKUnitBase>(Target);
         if (!IsValid(Unit) || !Unit->IsTargetable() || !FMath::IsFinite(Amount) || Amount <= 0.f) { return 0.f; }
+        const FLKCombatSource EffectiveSource = SourceOverride ? *SourceOverride : MakeSource(Instigator);
+        // Occupants do not add a second hit to area attacks on their tower. Target selection attacks the shelter itself.
+        if (Unit->IsSheltered() && EffectiveSource.Kind != ELKCombatSourceKind::HealthCost
+            && EffectiveSource.Kind != ELKCombatSourceKind::Overtime) { return 0.f; }
         ALKBattleGameMode* GM = Unit->GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
         if (GM && GM->GetPhase() != ELKGamePhase::Battle) { return 0.f; }
         FLKCombatEvent Event;
-        Event.Source = SourceOverride ? *SourceOverride : MakeSource(Instigator);
+        Event.Source = EffectiveSource;
         Event.TargetTeam = Unit->GetTeam(); Event.TargetUnitId = Unit->GetUnitId(); Event.TargetInstanceId = Unit->GetFName();
         Event.Location = Unit->GetActorLocation(); Event.RequestedAmount = Amount; Event.HealthBefore = Unit->GetHealth();
         if (GM) { GM->BeginCombatBatch(); }
@@ -140,6 +144,7 @@ namespace LKGameplay
         {
             Unit->TriggerHitFlash();
             PlayOneShot(Unit->GetWorld(), GM ? GM->GetGameData() : nullptr, TEXT("HitTaken"), Event.Location, 0.5f);
+            Unit->OnDamageReceived(Instigator, Event.ActualAmount, Event.Source);
         }
         if (GM) { GM->RecordCombatEvent(Event); GM->EndCombatBatch(); }
         return Event.ActualAmount;

@@ -1,6 +1,8 @@
 #include "ULKUnitMovementComponent.h"
 #include "ALKUnitBase.h"
 #include "ALKUnitHero.h"
+#include "ALKUnitBuilding.h"
+#include "LKBuildingGeometry.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "ULKPresentationSubsystem.h"
@@ -19,11 +21,37 @@ void ULKUnitMovementComponent::CollectNavigation(TArray<LKNavigation::FObstacle>
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         const ALKUnitBase* Other = *It;
-        if (Other != Self && Other->IsAlive() && Other->IsBuilding())
+        if (Other != Self && LKBuildingGeometry::BlocksMovement(Other))
         {
-            Obstacles.Add({Other->GetActorLocation(), Other->GetBodyRadius() + SeparationRadius + 1.f});
+            Obstacles.Add(LKBuildingGeometry::Shape(Other, SeparationRadius + 1.f));
         }
     }
+}
+
+ALKUnitBuilding* ULKUnitMovementComponent::FindBlockingEnemyWall(const FVector& Target)
+{
+    ALKUnitBase* Self=Cast<ALKUnitBase>(GetOwner());
+    if (!Self || !GetWorld() || Self->BasicAttackHeals()) { return nullptr; }
+    const float Now=GetWorld()->GetTimeSeconds();
+    if (Now<BreachRetryTime && FVector::DistSquared2D(Target,BreachDestination)<FMath::Square(80.f))
+    { return BreachWall.IsValid() && BreachWall->IsAlive() ? BreachWall.Get() : nullptr; }
+    BreachRetryTime=Now+.4f; BreachDestination=Target; BreachWall.Reset();
+    if (CanReach(Target)) { return nullptr; }
+    TArray<ALKUnitBuilding*> Candidates;
+    for(TActorIterator<ALKUnitBuilding> It(GetWorld());It;++It)
+    {
+        if (It->IsAlive() && It->IsWall() && It->IsConstructionComplete() && It->GetTeam()!=Self->GetTeam()) { Candidates.Add(*It); }
+    }
+    Candidates.Sort([&](const ALKUnitBuilding& A,const ALKUnitBuilding& B)
+    { return LKBuildingGeometry::SurfaceDistance(Self->GetActorLocation(),&A)<LKBuildingGeometry::SurfaceDistance(Self->GetActorLocation(),&B); });
+    // Reachable perimeter, not nearest center: an inner wall must not hide the outer wall that can be broken.
+    for(ALKUnitBuilding* Wall:Candidates)
+    {
+        const FVector Approach=Self->GetChaseDestination(Wall);
+        if (LKBuildingGeometry::SurfaceDistance(Self->GetActorLocation(),Wall)<=Self->GetAttackRange() || CanReach(Approach))
+        { BreachWall=Wall; return Wall; }
+    }
+    return nullptr;
 }
 
 bool ULKUnitMovementComponent::CanReach(const FVector& Target) const
@@ -34,6 +62,26 @@ bool ULKUnitMovementComponent::CanReach(const FVector& Target) const
     CollectNavigation(Obstacles, Bounds);
     TArray<FVector> TestPath;
     return LKNavigation::FindPath(GetOwner()->GetActorLocation(), FVector(Target.X, Target.Y, 0.f), Obstacles, Bounds, TestPath);
+}
+
+bool ULKUnitMovementComponent::HasClearMeleePath(const ALKUnitBase* Target) const
+{
+    if (!Target || !GetOwner()) { return false; }
+    const FVector Start=GetOwner()->GetActorLocation();
+    FVector HitPoint=Target->GetActorLocation();
+    if (const auto* Wall=Cast<ALKUnitBuilding>(Target); Wall && Wall->IsWall())
+    {
+        const FVector Direction=(HitPoint-Start).GetSafeNormal2D();
+        const float Enter=LKBuildingGeometry::RayHit(Start,Direction,FVector::Dist2D(Start,HitPoint),LKBuildingGeometry::Shape(Wall));
+        if (Enter>=0.f) { HitPoint=Start+Direction*Enter; }
+    }
+    TArray<LKNavigation::FObstacle> Obstacles;
+    for(TActorIterator<ALKUnitBuilding> It(GetWorld());It;++It)
+    {
+        if (*It!=Target && *It!=GetOwner() && It->IsWall() && LKBuildingGeometry::BlocksMovement(*It))
+        { Obstacles.Add(LKBuildingGeometry::Shape(*It)); }
+    }
+    return LKNavigation::IsSegmentClear(Start,HitPoint,Obstacles);
 }
 
 bool ULKUnitMovementComponent::CanStandAt(const FVector& Location, bool bIncludeUnits) const
@@ -47,7 +95,8 @@ bool ULKUnitMovementComponent::CanStandAt(const FVector& Location, bool bInclude
     {
         for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
         {
-            if (*It != GetOwner() && It->IsAlive() && FVector::Dist2D(Location, It->GetActorLocation()) < SeparationRadius + It->GetBodyRadius() + 1.f) { return false; }
+            if (*It != GetOwner() && It->IsAlive() && !It->IsSheltered()
+                && LKBuildingGeometry::Overlaps({FVector(Location.X,Location.Y,0.f),SeparationRadius+1.f},LKBuildingGeometry::Shape(*It))) { return false; }
         }
     }
     return true;
@@ -64,7 +113,7 @@ bool ULKUnitMovementComponent::TeleportToFreePoint(const FVector& Location)
 FVector ULKUnitMovementComponent::MoveSkillDelta(const FVector& Delta)
 {
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
-    if (!Self || !Self->IsAlive() || Self->IsBuilding() || Delta.ContainsNaN()) { return Self ? Self->GetActorLocation() : FVector::ZeroVector; }
+    if (!Self || !Self->IsAlive() || (Self->IsBuilding() && !Self->IsMobileBuilding()) || Self->IsSheltered() || Delta.ContainsNaN()) { return Self ? Self->GetActorLocation() : FVector::ZeroVector; }
     Stop(); Path.Reset(); RepathTimer = 0.f;
     TArray<LKNavigation::FObstacle> Obstacles;
     LKNavigation::FBounds Bounds;
@@ -115,7 +164,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     VisualTravel = FVector::ZeroVector;
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
     if (Self && (Self->IsSkillMoving() || Self->IsControlled())) { return; }
-    if (!Self || !Self->IsAlive() || Self->IsBuilding() || DeltaTime <= 0.f
+    if (!Self || !Self->IsAlive() || (Self->IsBuilding() && !Self->IsMobileBuilding()) || Self->IsSheltered() || DeltaTime <= 0.f
         || (!Self->IsCombatEnabled() && !Self->IsManualMoving())) { return; }
     RepathTimer -= DeltaTime;
     if (bMoving && Speed > 0.f && !Self->GetStatusComponent()->IsWindDriven())
@@ -165,7 +214,7 @@ void ULKUnitMovementComponent::ApplySeparation(float DeltaTime)
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         ALKUnitBase* Other = *It;
-        if (Other == Self || !Other->IsAlive() || Other->IsBuilding()) { continue; }
+        if (Other == Self || !Other->IsAlive() || Other->IsBuilding() || Other->IsSheltered()) { continue; }
         FVector Delta = Self->GetActorLocation() - Other->GetActorLocation(); Delta.Z = 0.f;
         const float Distance = Delta.Size();
         const float Minimum = Self->GetBodyRadius() + Other->GetBodyRadius();

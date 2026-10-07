@@ -98,10 +98,33 @@ FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow, int32 Up
     }
     else if (const FLKUnitRow* Row = TunedRow ? TunedRow : LKUnitContent::Find(Card.CardType == ELKCardType::Building ? Card.BuildingUnitId : Card.SpawnUnitId))
     {
-        const FString RangeText = Row->bTargetsBuildingsOnly ? TEXT("全图") : FString::Printf(TEXT("%.0f"), Row->AttackRange);
-        Text += FString::Printf(TEXT("\n%s · %s\n基础生命 %.0f · %s %.0f\n间隔 %.1f 秒 · 射程 %s"),
-            *RaceName(Row->Race).ToString(), Row->AttackType == ELKAttackType::Melee ? TEXT("近战") : TEXT("远程"),
-            Row->BaseHealth*Scale, Row->bBasicAttackHeals?TEXT("治疗"):TEXT("攻击"), Row->AttackDamage*Scale, Row->AttackInterval, *RangeText);
+        if (Row->BuildingBehavior == ELKBuildingBehavior::Wall)
+        {
+            Text += FString::Printf(TEXT("\n防御墙 · 生命 %.0f\n墙长 %.1f 米 · 施工 %.0f 秒\nQ / E 旋转 · 允许部分重叠"),
+                Row->BaseHealth*Scale, Row->WallLength/100.f, Row->ConstructionSeconds);
+            if (Row->ReflectDamage > 0.f)
+            { Text += FString::Printf(TEXT("\n反弹 %.0f 伤害 · 每个来源冷却 0.5 秒"), Row->ReflectDamage); }
+            if (Row->Quality == ELKQuality::Legendary)
+            { Text += FString::Printf(TEXT("\n前后范围 %.1f 米 · 前方攻击 +10%% · 后方每秒恢复 1%% 最大生命"), Row->WallAuraRange/100.f); }
+        }
+        else if (Row->BuildingBehavior == ELKBuildingBehavior::SiegeCart)
+        {
+            Text += FString::Printf(TEXT("\n可移动建筑 · 生命 %.0f\n移速 %.1f 米/秒 · 攻击间隔 %.1f 秒\n优先最近敌方建筑，进入 %.1f 米内攻击\n伤害：目标最大生命 10%%，防御墙 20%%"),
+                Row->BaseHealth*Scale, Row->MoveSpeed/100.f, Row->AttackInterval, Row->AttackRange/100.f);
+        }
+        else if (Row->BuildingBehavior == ELKBuildingBehavior::MageTower || Row->BuildingBehavior == ELKBuildingBehavior::HealingStation)
+        {
+            Text += FString::Printf(TEXT("\n庇护建筑 · 生命 %.0f\n%s"), Row->BaseHealth*Scale,
+                Row->BuildingBehavior == ELKBuildingBehavior::MageTower ? TEXT("驻塔法师主动技能冷却缩短 50%") : TEXT("驻站牧师治疗量 ×1.5 · 低于 50% 生命开始接诊，满血归队"));
+        }
+        else
+        {
+            const FString RangeText = Row->bTargetsBuildingsOnly ? TEXT("全图") : FString::Printf(TEXT("%.0f"), Row->AttackRange);
+            Text += FString::Printf(TEXT("\n%s · %s\n基础生命 %.0f · %s %.0f\n间隔 %.1f 秒 · 射程 %s"),
+                *RaceName(Row->Race).ToString(), Row->AttackType == ELKAttackType::Melee ? TEXT("近战") : TEXT("远程"),
+                Row->BaseHealth*Scale, Row->bBasicAttackHeals?TEXT("治疗"):TEXT("攻击"), Row->AttackDamage*Scale, Row->AttackInterval, *RangeText);
+        }
+        if (Row->bBasicAttackHeals) { Text += TEXT("\n牧师普攻仅治疗己方，不攻击敌人"); }
         switch (Row->PassiveAbility)
         {
         case ELKPassiveAbility::AttackRenewal:
@@ -131,7 +154,7 @@ FText Detail(const ULKCardDefinition& Card, const FLKUnitRow* TunedRow, int32 Up
             SkillText = FString::Printf(TEXT("俺寻思这个魔法厉害！（%.0f秒）：强化自身和最近友方巨魔，优先巨魔王，持续 %.0f 秒。移速 +%.0f%%、攻击间隔缩短 %.0f%%、受到伤害 -20%%。每次出手为自身积累 25%% 眩晕值，满值眩晕 2 秒并清零。巨魔王免疫眩晕。"),
                 Row->SkillCooldown, Row->EmpowerDuration, (Row->EmpowerMoveMultiplier - 1.f) * 100.f, (1.f - Row->EmpowerIntervalMultiplier) * 100.f);
         }
-        if (Row->bTargetsBuildingsOnly) { Text += TEXT("\n攻击范围：全图 · 仅敌方建筑"); }
+        if (Row->bTargetsBuildingsOnly && Row->BuildingBehavior != ELKBuildingBehavior::SiegeCart) { Text += TEXT("\n攻击范围：全图 · 仅敌方建筑"); }
     }
     if (SkillText.IsEmpty()) { SkillText = Card.Description.ToString(); }
     if (!SkillText.IsEmpty()) { Text += TEXT("\n\n") + SkillText; }

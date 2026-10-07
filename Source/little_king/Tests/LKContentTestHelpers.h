@@ -5,6 +5,7 @@
 #include "../LKExpeditionMercenaryContent.h"
 #include "../LKResearchContent.h"
 #include "../LKV083Content.h"
+#include "../LKV084Content.h"
 
 namespace LKContentTest
 {
@@ -15,6 +16,7 @@ inline TSet<FName> UnitIds()
     for (const auto& Pair : LKUndeadContent::Units()) { Ids.Add(Pair.Key); }
     for (const auto& D : LKExpeditionMercenaryContent::All()) { Ids.Add(D.Unit.UnitId); }
     for (const auto& Pair : LKV083Content::Units()) { Ids.Add(Pair.Key); }
+    for (const auto& Pair : LKV084Content::Units()) { Ids.Add(Pair.Key); }
     return Ids;
 }
 inline TSet<FName> CardIds()

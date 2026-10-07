@@ -3,6 +3,7 @@
 #include "LKUndeadContent.h"
 #include "LKExpeditionMercenaryContent.h"
 #include "LKV083Content.h"
+#include "LKV084Content.h"
 #include "LKBattleArt.h"
 
 namespace LKUnitContent
@@ -73,11 +74,14 @@ const TMap<FName, FLKUnitRow>& Units()
             if (Row.UnitClass == ELKUnitClass::Hero) { Row.Quality = bUndead ? ELKQuality::Rare : ELKQuality::Epic; }
             if (Row.UnitClass == ELKUnitClass::Boss) { Row.Quality = ELKQuality::Epic; }
             if (Pair.Key == "Unit_Shieldbearer" || Pair.Key == "Building_Barracks") { Row.Quality = ELKQuality::Uncommon; }
+            if (Pair.Key == "Hero_Necromancer") { Row.bIsMage = true; }
         }
         for (const FLKTemporaryMercenaryDefinition& Definition : LKExpeditionMercenaryContent::All())
         { Result.Add(Definition.Unit.UnitId, Definition.Unit); }
         // 天使只有单位定义，没有单位卡牌；研究只解锁其召唤法术。
         for (const TPair<FName, FLKUnitRow>& Pair : LKV083Content::Units())
+        { Result.Add(Pair.Key, Pair.Value); }
+        for (const TPair<FName, FLKUnitRow>& Pair : LKV084Content::Units())
         { Result.Add(Pair.Key, Pair.Value); }
         for (TPair<FName, FLKUnitRow>& Pair : Result)
         { Pair.Value.Sprite = LKBattleArt::Sprite(Pair.Key); }
@@ -88,7 +92,8 @@ const TMap<FName, FLKUnitRow>& Units()
 
 const FLKUnitRow* Find(FName UnitId)
 {
-    return Units().Find(UnitId);
+    const FName CardUnitId = LKV084Content::UnitIdForCard(UnitId);
+    return Units().Find(CardUnitId.IsNone() ? UnitId : CardUnitId);
 }
 
 FLKUnitRow MergeAuthoredTuning(const FLKUnitRow& Canonical, const FLKUnitRow* Authored)
@@ -119,6 +124,17 @@ FLKUnitRow MergeAuthoredTuning(const FLKUnitRow& Canonical, const FLKUnitRow* Au
     Result.bIsMage = Canonical.bIsMage;
     Result.BuildingBehavior = Canonical.BuildingBehavior;
     Result.SpawnUnitId = Canonical.SpawnUnitId;
+    // 新增可调字段不能把旧表中未填写的零值或无穷值带入几何/施工计算。
+    if (Canonical.BuildingBehavior == ELKBuildingBehavior::Wall)
+    {
+        auto Positive = [](float Value, float Default) { return FMath::IsFinite(Value) && Value > 0.f ? Value : Default; };
+        Result.ConstructionSeconds = Positive(Result.ConstructionSeconds, Canonical.ConstructionSeconds);
+        Result.WallLength = Positive(Result.WallLength, Canonical.WallLength);
+        Result.WallThickness = Positive(Result.WallThickness, Canonical.WallThickness);
+        Result.WallAuraRange = Positive(Result.WallAuraRange, Canonical.WallAuraRange);
+        if (Canonical.ReflectDamage > 0.f) { Result.ReflectDamage = Positive(Result.ReflectDamage, Canonical.ReflectDamage); }
+        else { Result.ReflectDamage = 0.f; }
+    }
     return Result;
 }
 }

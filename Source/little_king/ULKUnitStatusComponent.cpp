@@ -91,7 +91,8 @@ void ULKUnitStatusComponent::RemoveConcealment(FName SourceId)
 void ULKUnitStatusComponent::ApplyWind(FName SourceId, float Seconds)
 {
     ALKUnitBase* Owner = Unit();
-    if (SourceId.IsNone() || !Owner || !Owner->IsTargetable() || Owner->IsBuilding() || !Owner->IsCombatEnabled()
+    if (SourceId.IsNone() || !Owner || !Owner->IsTargetable() || (Owner->IsBuilding() && !Owner->IsMobileBuilding())
+        || Owner->IsSheltered() || !Owner->IsCombatEnabled()
         || !FMath::IsFinite(Seconds) || Seconds <= 0.f) { return; }
     float& Remaining = WindRemaining.FindOrAdd(SourceId);
     Remaining = FMath::Max(Remaining, Seconds);

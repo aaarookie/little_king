@@ -17,6 +17,8 @@
 #include "PaperSpriteComponent.h"
 
 #include "ALKProjectile.h"
+#include "ALKUnitBuilding.h"
+#include "LKBuildingGeometry.h"
 #include "ALKBattleGameMode.h"
 #include "LKDataTypes.h"
 #include "LKGameplayHelpers.h"
@@ -97,6 +99,7 @@ UAbilitySystemComponent* ALKUnitBase::GetAbilitySystemComponent() const
 
 void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName FallbackUnitId)
 {
+    ClearBuildingService();
     StatusComponent->Clear();
     MovementComponent->ResetVisualTravel();
 	GameDataCached = InGameData;
@@ -138,7 +141,7 @@ void ALKUnitBase::InitUnit(const FLKUnitRow& Row, ULKGameData* InGameData, FName
 	// 索敌范围：行内值优先，0 表示用全局默认（DA_GameData.UnitAcquireRadius）。
 	AcquireRadius = Row.AcquireRadius > 0.f ? Row.AcquireRadius
 		: (InGameData ? InGameData->UnitAcquireRadius : 900.f);
-    if (bTargetsBuildingsOnly) { AcquireRadius = GetAttackRange(); }
+    if (bTargetsBuildingsOnly) { AcquireRadius = 100000.f; }
 	BodyCollision->SetSphereRadius(BodyRadius);
 	MovementComponent->SetSeparationRadius(BodyRadius);
 	if (InGameData)
@@ -217,6 +220,7 @@ bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
 
 void ALKUnitBase::ResetTransientRoomState()
 {
+    ClearBuildingService();
     AnimationComponent->ResetPresentation();
     MovementComponent->ResetVisualTravel();
     StatusComponent->Clear();
@@ -351,6 +355,7 @@ void ALKUnitBase::RemoveAuraTauntSource(ALKUnitBase* Source)
 
 void ALKUnitBase::EndPlay(const EEndPlayReason::Type Reason)
 {
+    ClearBuildingService();
     TraitAuraComponent->ResetAuras();
     ULKUnitStatusComponent::RefreshTeamSupport(GetWorld());
     Super::EndPlay(Reason);
@@ -442,6 +447,7 @@ void ALKUnitBase::Tick(float DeltaSeconds)
     if (ActiveComponent->TickAbility(DeltaSeconds)) { State = ELKUnitState::Casting; return; }
     if (IsControlled()) { MovementComponent->Stop(); CancelAttackWindup(); State = ELKUnitState::Idle; return; }
     if (IsDead()) { return; }
+    if (TickBuildingService(DeltaSeconds)) { return; }
     UpdateStateMachine(DeltaSeconds);
 }
 
@@ -505,9 +511,24 @@ void ALKUnitBase::TriggerHitFlash()
 
 void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
 {
-    if (IsBuilding()) { return; }
+    if (IsBuilding() && !IsMobileBuilding()) { return; }
+    bool bKeepBreach=NavigationBreachTarget.IsValid() && NavigationBreachTarget->IsAlive()
+        && NavigationBreachTarget.Get()==TargetActor.Get() && NavigationBreachGoal.IsValid() && NavigationBreachGoal->IsAlive()
+        && CanPursueTarget(NavigationBreachTarget.Get());
+    if (bKeepBreach)
+    {
+        NavigationBreachCheck-=DeltaSeconds;
+        if (NavigationBreachCheck<=0.f)
+        {
+            NavigationBreachCheck=.4f;
+            bKeepBreach=!MovementComponent->CanReach(GetChaseDestination(NavigationBreachGoal.Get()));
+            if (const auto* Taunter=Cast<ALKUnitBase>(FindNearestEnemy(true)); Taunter && Taunter!=NavigationBreachGoal.Get()
+                && MovementComponent->CanReach(GetChaseDestination(Taunter))) { bKeepBreach=false; }
+        }
+    }
+    if (!bKeepBreach) { NavigationBreachTarget.Reset(); NavigationBreachGoal.Reset(); }
     TargetRetryTimer -= DeltaSeconds;
-    if (TargetRetryTimer <= 0.f) { AcquireTarget(); TargetRetryTimer = 0.15f; }
+    if (!bKeepBreach && TargetRetryTimer <= 0.f) { AcquireTarget(); TargetRetryTimer = 0.15f; }
     ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
     if (Target && ShouldReleaseTarget(Target))
     {
@@ -521,22 +542,35 @@ void ALKUnitBase::UpdateStateMachine(float DeltaSeconds)
         ChangeTarget(nullptr);
         // 无目标：非英雄单位向"全图最近敌人"行军（保证双方仍会接触），
         // 英雄保持由玩家指挥/回到集结点（子类处理）。
-        if (!IsHero() && IsCombatEnabled())
+        if (!IsHero() && !IsSheltered() && IsCombatEnabled())
         {
             if (AActor* FarEnemy = bBasicAttackHeals ? FindInjuredAlly(true) : FindNearestEnemy(false, true))
             {
-                State = ELKUnitState::Moving;
-                MovementComponent->MoveToward(FarEnemy->GetActorLocation(), GetMoveSpeed());
-                return;
+                const FVector Destination=GetChaseDestination(CastChecked<ALKUnitBase>(FarEnemy));
+                if (ALKUnitBuilding* Wall=MovementComponent->FindBlockingEnemyWall(Destination); Wall && CanPursueTarget(Wall))
+                { NavigationBreachGoal=Cast<ALKUnitBase>(FarEnemy); Target=Wall; NavigationBreachTarget=Wall; NavigationBreachCheck=.4f; ChangeTarget(Wall); }
+                else
+                {
+                    State = ELKUnitState::Moving;
+                    MovementComponent->MoveToward(Destination, GetMoveSpeed());
+                    return;
+                }
             }
         }
-        State = ELKUnitState::Idle;
-        MovementComponent->Stop();
-        return;
+        if (!Target || !Target->IsTargetable() || !CanPursueTarget(Target))
+        { State = ELKUnitState::Idle; MovementComponent->Stop(); return; }
     }
-    if (DistanceTo2D(Target) > GetAttackRange())
+    bool bBlockedMelee=AttackType==ELKAttackType::Melee && !bBasicAttackHeals && !MovementComponent->HasClearMeleePath(Target);
+    if (!bKeepBreach && !IsSheltered() && !bBasicAttackHeals && (DistanceTo2D(Target)>GetAttackRange() || bBlockedMelee))
+    {
+        if (ALKUnitBuilding* Wall=MovementComponent->FindBlockingEnemyWall(GetChaseDestination(Target)); Wall && CanPursueTarget(Wall))
+        { NavigationBreachGoal=Target; Target=Wall; NavigationBreachTarget=Wall; NavigationBreachCheck=.4f; ChangeTarget(Wall); }
+    }
+    bBlockedMelee=AttackType==ELKAttackType::Melee && !bBasicAttackHeals && !MovementComponent->HasClearMeleePath(Target);
+    if (DistanceTo2D(Target) > GetAttackRange() || bBlockedMelee)
     {
         CancelAttackWindup();
+        if (IsSheltered()) { ChangeTarget(nullptr); MovementComponent->Stop(); State = ELKUnitState::Idle; return; }
         State = ELKUnitState::Moving;
         MovementComponent->MoveToward(GetChaseDestination(Target), GetMoveSpeed());
     }
@@ -573,12 +607,13 @@ bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
             ? Target->GetTeam() == Team && Target->GetHealth() < Target->GetMaxHealth() - .01f
             : Target->GetTeam() != Team)
         && (!bTargetsBuildingsOnly || Target->IsBuilding())
-        && (!IsBuilding() || DistanceTo2D(Target) <= GetAttackRange());
+        && ((!IsBuilding() || IsMobileBuilding()) && !IsSheltered() || DistanceTo2D(Target) <= GetAttackRange());
 }
 
 bool ALKUnitBase::CanDiscoverTarget(const ALKUnitBase* Target) const
 {
     return IsAlive() && Target && Target->IsTargetable()
+        && (Target->GetTeam() == Team || !Target->IsSheltered())
         && (Target == this || !Target->GetStatusComponent()->IsConcealed());
 }
 
@@ -600,15 +635,42 @@ void ALKUnitBase::RefreshDiscoveredTarget()
 
 FVector ALKUnitBase::ApplyWindDisplacement(const FVector& Delta)
 {
-    if (!IsTargetable() || IsBuilding() || !IsCombatEnabled() || Delta.ContainsNaN()) { return GetActorLocation(); }
+    if (!IsTargetable() || (IsBuilding() && !IsMobileBuilding()) || IsSheltered() || !IsCombatEnabled() || Delta.ContainsNaN()) { return GetActorLocation(); }
     // Wind is displacement, not stun: a valid attack windup or ranged shot can continue.
     return MovementComponent->MoveWindDelta(Delta);
 }
 
 FVector ALKUnitBase::GetChaseDestination(const ALKUnitBase* Target) const
 {
-    const FVector ToSelf = (GetActorLocation() - Target->GetActorLocation()).GetSafeNormal2D();
-    return Target->GetActorLocation() + ToSelf * FMath::Max(GetAttackRange() * 0.85f, GetBodyRadius() + Target->GetBodyRadius() + 2.f);
+    if (const ALKUnitBuilding* Wall = Cast<ALKUnitBuilding>(Target); Wall && Wall->IsWall())
+    {
+        const auto Shape = LKBuildingGeometry::Shape(Wall);
+        const FVector Nearest = FMath::ClosestPointOnSegment(GetActorLocation(), Shape.Center - Shape.HalfSegment, Shape.Center + Shape.HalfSegment);
+        const FVector Out = (GetActorLocation() - Nearest).GetSafeNormal2D(SMALL_NUMBER, Wall->GetWallFront());
+        return Nearest + Out * (Shape.Radius + FMath::Max(GetAttackRange() * .85f, GetBodyRadius() + 3.f));
+    }
+    const FVector ToSelf = (GetActorLocation() - Target->GetActorLocation()).GetSafeNormal2D(SMALL_NUMBER,FVector(0,-1,0));
+    const float Radius=FMath::Max(GetAttackRange() * .85f,GetBodyRadius()+Target->GetBodyRadius()+2.f);
+    const FVector Preferred=Target->GetActorLocation()+ToSelf*Radius;
+    // The near side of a target may be inside a wall. Try other attack positions before declaring an enclosure.
+    TArray<LKNavigation::FObstacle> Walls;
+    if (AttackType==ELKAttackType::Melee && !bBasicAttackHeals)
+    {
+        for(TActorIterator<ALKUnitBuilding> It(GetWorld());It;++It)
+        { if (*It!=Target && *It!=this && It->IsWall() && LKBuildingGeometry::BlocksMovement(*It)) { Walls.Add(LKBuildingGeometry::Shape(*It)); } }
+    }
+    auto Clear=[&](const FVector& Point)
+    { return MovementComponent->CanStandAt(Point) && LKNavigation::IsSegmentClear(Point,Target->GetActorLocation(),Walls); };
+    if (Clear(Preferred)) { return Preferred; }
+    for(int32 Step=1;Step<=12;++Step)
+    {
+        for(float Sign:{-1.f,1.f})
+        {
+            const FVector Candidate=Target->GetActorLocation()+ToSelf.RotateAngleAxis(Step*15.f*Sign,FVector::UpVector)*Radius;
+            if (Clear(Candidate) && MovementComponent->CanReach(Candidate)) { return Candidate; }
+        }
+    }
+    return Preferred;
 }
 
 void ALKUnitBase::CancelAttackWindup() { bWindupActive = false; WindupTarget = nullptr; WindupRemaining = 0.f; }
@@ -620,6 +682,8 @@ void ALKUnitBase::ChangeTarget(AActor* NewTarget)
 
 void ALKUnitBase::SetTarget(AActor* NewTarget)
 {
+    if (ALKUnitBase* Unit = Cast<ALKUnitBase>(NewTarget); Unit && Unit->GetTeam() != Team && Unit->IsSheltered())
+    { NewTarget = Unit->GetShelterBuilding(); }
     if (bBasicAttackHeals)
     { ChangeTarget(CanPursueTarget(Cast<ALKUnitBase>(NewTarget)) ? NewTarget : FindInjuredAlly()); return; }
     if (ALKUnitBase* Locked = ActiveComponent->GetLockedTarget()) { ChangeTarget(Locked); return; }
@@ -666,13 +730,24 @@ AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRan
     if (bBasicAttackHeals) { return nullptr; }
     if (bTauntersOnly && PassiveComponent->GetAbility() == ELKPassiveAbility::TauntImmunity) { return nullptr; }
     AActor* Best = nullptr;
+    AActor* WallFallback = nullptr;
+    float WallDistance=TNumericLimits<float>::Max();
+    bool bHasNonWallEnemy=false;
     float BestDistance = TNumericLimits<float>::Max();
     if (!GetWorld()) { return nullptr; }
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
         ALKUnitBase* Other = *It;
+        if (Other->GetTeam() != Team && Other->IsSheltered()) { Other = Other->GetShelterBuilding(); }
         if (!CanPursueTarget(Other)) { continue; }
         const float Distance = DistanceTo2D(Other);
+        const auto* Wall=Cast<ALKUnitBuilding>(Other);
+        if (!bTauntersOnly && !bTargetsBuildingsOnly && Wall && Wall->IsWall())
+        {
+            if ((bIgnoreAcquireRange || Distance<=AcquireRadius) && Distance<WallDistance) { WallFallback=Other;WallDistance=Distance; }
+            continue;
+        }
+        bHasNonWallEnemy=true;
         if (bTauntersOnly)
         {
             // 嘲讽吸引半径单独配置（TauntAcquireRadius）。
@@ -685,7 +760,8 @@ AActor* ALKUnitBase::FindNearestEnemy(bool bTauntersOnly, bool bIgnoreAcquireRan
         }
         if (Distance < BestDistance) { BestDistance = Distance; Best = Other; }
     }
-    return Best;
+    // Ordinary troops seek opponents around a wall; siege specialists deliberately attack the closest building.
+    return Best ? Best : (!bHasNonWallEnemy ? WallFallback : nullptr);
 }
 
 AActor* ALKUnitBase::FindInjuredAlly(bool bIgnoreAcquireRange) const
@@ -711,9 +787,11 @@ AActor* ALKUnitBase::FindInjuredAlly(bool bIgnoreAcquireRange) const
 void ALKUnitBase::TryAttack(float DeltaSeconds)
 {
     if (IsControlled()) { CancelAttackWindup(); return; }
-    if (!bBasicAttackHeals) { if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); } }
+    if (!bBasicAttackHeals && NavigationBreachTarget.Get()!=TargetActor.Get())
+    { if (AActor* Taunter = FindNearestEnemy(true)) { ChangeTarget(Taunter); } }
     ALKUnitBase* Target = Cast<ALKUnitBase>(TargetActor.Get());
-    if (!Target || !CanPursueTarget(Target) || DistanceTo2D(Target) > GetAttackRange() || IsManualMoving())
+    if (!Target || !CanPursueTarget(Target) || DistanceTo2D(Target) > GetAttackRange() || IsManualMoving()
+        || (AttackType==ELKAttackType::Melee && !bBasicAttackHeals && !MovementComponent->HasClearMeleePath(Target)))
     {
         CancelAttackWindup(); return;
     }
@@ -747,7 +825,7 @@ void ALKUnitBase::PerformAttack(AActor* Target)
     AttackPulseRemaining = .15f; HitStopRemaining = .06f;
     AnimationComponent->Impact();
     const bool bKingStrike = StatusComponent->BeginAttack();
-    const float Damage = GetAttackDamage() * (bKingStrike ? 1.5f : 1.f);
+    const float Damage = GetAttackDamage() * (bKingStrike ? 1.5f : 1.f) * (bBasicAttackHeals ? GetStationHealingMultiplier(Victim) : 1.f);
     ALKBattleGameMode* GM = GetWorld()->GetAuthGameMode<ALKBattleGameMode>();
     if (GM) { GM->BeginCombatBatch(); }
     if (bBasicAttackHeals)
@@ -761,7 +839,7 @@ void ALKUnitBase::PerformAttack(AActor* Target)
             if (!GM) { Projectile->Init(Damage, Team, this, Direction); }
             Projectile->SetHealingPayload(Victim);
         }
-        ULKPresentationSubsystem::Sound(GetWorld(), "MagicShot", GetActorLocation());
+        ULKPresentationSubsystem::Sound(GetWorld(), GetStationHealingMultiplier(Victim)>1.f ? "HealingStation" : "MagicShot", GetActorLocation());
         StatusComponent->AfterAttack();
         if (GM) { GM->EndCombatBatch(); }
         return;
@@ -814,6 +892,8 @@ float ALKUnitBase::DistanceTo2D(const AActor* Other) const
 	{
 		return TNumericLimits<float>::Max();
 	}
+    if (const ALKUnitBuilding* Wall = Cast<ALKUnitBuilding>(Other); Wall && Wall->IsWall())
+    { return LKBuildingGeometry::SurfaceDistance(GetActorLocation(), Wall); }
 	return FVector::Dist2D(GetActorLocation(), Other->GetActorLocation());
 }
 
@@ -834,12 +914,14 @@ float ALKUnitBase::GetBaseMaxHealth() const
 
 float ALKUnitBase::GetAttackDamage() const
 {
-	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackDamageAttribute(), 0.f) * StatusComponent->AttackMultiplier();
+    float WallBonus = 0.f;
+    if (GetWorld()) { for (TActorIterator<ALKUnitBuilding> It(GetWorld()); It; ++It) { WallBonus += It->GetFrontAttackBonus(this); } }
+	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackDamageAttribute(), 0.f) * StatusComponent->AttackMultiplier() * (1.f + WallBonus);
 }
 
 float ALKUnitBase::GetAttackRange() const
 {
-    if (bTargetsBuildingsOnly)
+    if (bTargetsBuildingsOnly && !IsMobileBuilding())
     { return GameDataCached ? FVector2D(GameDataCached->FieldHalfWidth, GameDataCached->FieldHalfHeight).Size() * 2.f + 200.f : 100000.f; }
 	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetAttackRangeAttribute(), 0.f);
 }
@@ -948,7 +1030,9 @@ void ALKUnitBase::Die()
 	// 音效：单位死亡
 	if (UWorld* World = GetWorld())
 	{
-		LKGameplay::PlayOneShot(World, GameDataCached, TEXT("UnitDied"), GetActorLocation(), 1.f);
+        if (const auto* Wall=Cast<ALKUnitBuilding>(this); Wall && Wall->IsWall())
+        { ULKPresentationSubsystem::Sound(World,"WallBreak",GetActorLocation()); }
+        else { LKGameplay::PlayOneShot(World, GameDataCached, TEXT("UnitDied"), GetActorLocation(), 1.f); }
         ULKPresentationSubsystem::Emit(World, ELKVisualCue::Death, GetActorLocation());
 	}
 
@@ -1018,6 +1102,7 @@ void ALKUnitBase::DrawDebugShape() const
 
 void ALKUnitBase::SetCombatEnabled(bool bEnabled)
 {
+    if (!bEnabled) { ClearBuildingService(); }
     if (!bEnabled && MovementComponent) { MovementComponent->ResetVisualTravel(); }
     if (!bEnabled && ActiveComponent) { ActiveComponent->Stop(); }
     if (!bEnabled && StatusComponent) { StatusComponent->Clear(); }

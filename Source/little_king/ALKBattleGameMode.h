@@ -111,7 +111,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LK|Encounter") bool ConfigureEnemyEncounter(FName EncounterId);
 	UFUNCTION(BlueprintPure, Category = "LK|Encounter") TArray<FName> GetEnemyHeroIds() const { return EnemyHeroIds; }
 	UFUNCTION(BlueprintPure, Category = "LK|Encounter") FLKEncounterRow GetCurrentEncounter() const { return CurrentEncounter; }
-	ELKPlayResult ValidateCardPlay(ELKTeam Team, int32 HandIndex, const FVector& Location) const;
+	ELKPlayResult ValidateCardPlay(ELKTeam Team, int32 HandIndex, const FVector& Location, float PlacementYaw = 0.f) const;
 	void BeginCombatBatch() { ++CombatBatchDepth; }
 	void EndCombatBatch();
 	void RecordCombatEvent(const FLKCombatEvent& Event);
@@ -160,13 +160,13 @@ public:
 	float GetBattleElapsed() const { return BattleElapsed; }
 
 	// ---------- 出牌 / 部署（玩家与敌方 AI 共用入口） ----------
-	ELKPlayResult PlayCardForTeam(ELKTeam Team, int32 HandIndex, const FVector& Location);
+	ELKPlayResult PlayCardForTeam(ELKTeam Team, int32 HandIndex, const FVector& Location, float PlacementYaw = 0.f);
 	ELKPlayResult DeployHero(ELKTeam Team, FName HeroUnitId, const FVector& Location);
 	ELKPlayResult ValidateHeroDeployment(ELKTeam Team, FName HeroUnitId, const FVector& Location, FVector* OutHeroPosition = nullptr) const;
 
 	// ---------- 单位 ----------
 	/** SourceCardId：玩家出牌生成单位时的来源卡（D3 卡升级放大依据）；波次/兵营/部署/召唤不传 */
-	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier, FName SourceCardId = NAME_None);
+	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier, FName SourceCardId = NAME_None, float PlacementYaw = 0.f, ALKUnitBase* ReplacedWall = nullptr);
 	/**
 	 * 在 Preferred 周围 SearchRadius 内均匀采样圆盘，返回一个不越界、不与任何存活实体/营地/建筑重叠的空位。
 	 * 法阵召唤与波次落点共用；采样用调用方提供的确定性随机流，不使用全局随机。
@@ -318,7 +318,7 @@ protected:
 	void EndMatch(ELKTeam Winner);
 	UFUNCTION()
 	void HandleUnitDied(ALKUnitBase* Unit);
-	bool ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location);
+	bool ResolveCard(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location, float PlacementYaw = 0.f);
 	bool CastSpell(ULKCardDefinition* Card, ELKTeam Team, const FVector& Location);
 	void DrawFieldBounds() const;
 };

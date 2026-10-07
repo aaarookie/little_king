@@ -15,6 +15,7 @@
 #include "Blueprint/UserWidget.h"
 #include "../LKPolishArt.h"
 #include "../LKUnitContent.h"
+#include "../LKV084Content.h"
 #include "../ALKUnitBase.h"
 #include "../ALKHomeBuildingActor.h"
 #include "../ALKBattleGameMode.h"
@@ -32,7 +33,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKPolishCatalogueTest,"LittleKing.Presentation
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FLKPolishCatalogueTest::RunTest(const FString& Parameters)
 {
-    TestEqual(TEXT("All battle entities animated"),LKPolishArt::UnitIds().Num(),39);
+    TestEqual(TEXT("All battle entities have presentation clips"),LKPolishArt::UnitIds().Num(),46);
     TSet<UPaperSprite*> Sprites;
     for(FName Id:LKPolishArt::UnitIds())
     {
@@ -40,7 +41,8 @@ bool FLKPolishCatalogueTest::RunTest(const FString& Parameters)
         {
             auto* Clip=LKPolishArt::Animation(Id,State);
             if(!TestNotNull(*(Id.ToString()+State.ToString()),Clip)){continue;}
-            const int Count=(State=="Hit"||State=="Death")?2:4;
+            const bool bStaticBuilding=LKV084Content::Units().Contains(Id) && Id!="Unit_SiegeCart";
+            const int Count=bStaticBuilding?1:((State=="Hit"||State=="Death")?2:4);
             TestEqual(TEXT("Expected unique frame count"),Clip->GetNumKeyFrames(),Count);
             TestEqual(TEXT("Visual clips have no collision"),Clip->GetCollisionSource(),EFlipbookCollisionMode::NoCollision);
             for(int I=0;I<Count;++I)
@@ -60,7 +62,7 @@ bool FLKPolishCatalogueTest::RunTest(const FString& Parameters)
             }
         }
     }
-    TestEqual(TEXT("448 previous poses and 80 shared angel poses"),Sprites.Num(),528);
+    TestEqual(TEXT("Previous 528 poses, sixteen cart poses and six fixed building sprites"),Sprites.Num(),550);
     TestNull(TEXT("Unknown entities keep fallback"),LKPolishArt::Animation("Unknown","Idle"));
     for(bool Title:{false,true})
     {
