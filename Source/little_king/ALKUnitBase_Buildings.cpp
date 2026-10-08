@@ -34,7 +34,7 @@ float ALKUnitBase::GetStationHealingMultiplier(const ALKUnitBase* Target) const
 
 bool ALKUnitBase::ReserveBuildingService(ALKUnitBuilding* Building, bool bAsPatient, const FVector& Approach)
 {
-    if (!Building || !Building->IsAlive() || !IsAlive() || IsBuilding() || ServiceBuilding.IsValid() || PatientStation.IsValid()) { return false; }
+    if (!Building || !Building->IsAlive() || !IsAlive() || IsBuilding() || IsHighlandResident() || ServiceBuilding.IsValid() || PatientStation.IsValid()) { return false; }
     CancelManualMove();
     CancelAttackWindup();
     ChangeTarget(nullptr);

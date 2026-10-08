@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-08T23:25:09+08:00",
+  "scope": "Battle Designer v2, terrain rules, scripted enemy waves, configurable enemy card economy, standalone UE JSON layout loader",
+  "release": "Included in v0.8.5; see v0.8.5-Release.json and git tag v0.8.5. Development validation completed before release metadata changes.",
+  "build": {
+    "engine": "UE 5.8.1",
+    "result": "Success",
+    "target": "little_kingEditor Win64 Development"
+  },
+  "ueFullRegression": {
+    "notRun": 0,
+    "succeededWithWarnings": 79,
+    "failed": 0,
+    "succeeded": 90,
+    "report": "Saved/Automation/TerrainDesigner/index.json",
+    "filter": "LittleKing"
+  },
+  "ueFinalRegression": {
+    "notRun": 0,
+    "succeededWithWarnings": 5,
+    "failed": 0,
+    "succeeded": 3,
+    "report": "Saved/Automation/TerrainDesigner-Final/index.json",
+    "filter": "LittleKing.Scenario"
+  },
+  "javascript": {
+    "command": "node --test Tools/BattleDesigner/model.test.cjs",
+    "passed": 35,
+    "failed": 0,
+    "syntaxCheck": "node --check Tools/BattleDesigner/app.js"
+  },
+  "browser": {
+    "url": "http://127.0.0.1:18184/",
+    "screenshot": "docs/images/BattleDesignerV2.jpg",
+    "fileProtocol": "Not browser-tested; HTTP tested. Classic scripts and local assets have no network dependencies.",
+    "checks": [
+      "wave position editing and undo",
+      "enemy card selection and undo",
+      "silver rate update and input precision validation",
+      "downloaded JSON verified on disk",
+      "v2 exported JSON imported again with three waves retained"
+    ]
+  },
+  "renderedPlay": {
+    "battle": "docs/images/TerrainBattle.png",
+    "checks": [
+      "four terrain types present",
+      "brush enemies hidden",
+      "highland archers visible and stationary",
+      "deployment zone outlined",
+      "timed wave at 15.0s spawned five skeletons within available-capacity retry window",
+      "paid cards spend silver",
+      "SkeletonCircle from enemy deck activates"
+    ],
+    "deployment": "docs/images/TerrainDeployment.png",
+    "logs": [
+      "Saved/Logs/TerrainPreview-final.log",
+      "Saved/Logs/TerrainBattle-final.log"
+    ],
+    "layout": "Tools/BattleDesigner/examples/terrain-ambush.json"
+  },
+  "saves": {
+    "comparison": "SHA-256 before and after automation and both rendered sessions",
+    "existingCount": 6,
+    "currentCount": 6,
+    "changedExistingCount": 0
+  },
+  "limitations": [
+    "Standalone authored battle loading; automatic assignment to expedition nodes is not included",
+    "Geometry/SVG terrain is functional placeholder art",
+    "Campfire is decoration with collision only",
+    "Highlands have no climb paths",
+    "Unspawnable reinforcements retry for three seconds then drop with a log",
+    "Full battle balance and subjective route experience need further playtesting"
+  ],
+  "artifacts": [
+    "docs/61-BattleLevelDesignWorkflow.md",
+    "docs/62-TerrainAndEncounterDesigner.md",
+    "Scripts/PlayBattleLayout.ps1"
+  ]
+}

@@ -1,4 +1,5 @@
 #include "ALKUnitBase.h"
+#include "ALKBattleTerrain.h"
 #include "LKBalanceRules.h"
 
 #include "AbilitySystemComponent.h"
@@ -220,6 +221,7 @@ bool ALKUnitBase::ApplyRunHeroState(const FLKRunHeroState& RunState)
 
 void ALKUnitBase::ResetTransientRoomState()
 {
+    BrushExposedUntil = 0.f;
     ClearBuildingService();
     AnimationComponent->ResetPresentation();
     MovementComponent->ResetVisualTravel();
@@ -381,6 +383,7 @@ void ALKUnitBase::ApplyRowAttributes(const FLKUnitRow& Row)
 
 void ALKUnitBase::Tick(float DeltaSeconds)
 {
+    if (SpriteComponent && !IsSheltered()) { SpriteComponent->SetVisibility(ALKBattleTerrain::IsVisibleToTeam(this, ELKTeam::Player)); }
 	Super::Tick(DeltaSeconds);
 
 	if (bDead)
@@ -607,15 +610,29 @@ bool ALKUnitBase::CanPursueTarget(const ALKUnitBase* Target) const
             ? Target->GetTeam() == Team && Target->GetHealth() < Target->GetMaxHealth() - .01f
             : Target->GetTeam() != Team)
         && (!bTargetsBuildingsOnly || Target->IsBuilding())
-        && ((!IsBuilding() || IsMobileBuilding()) && !IsSheltered() || DistanceTo2D(Target) <= GetAttackRange());
+        && (bBasicAttackHeals || AttackType==ELKAttackType::Ranged || !Target->IsHighlandResident()
+            || ALKBattleTerrain::HighlandAt(this)==ALKBattleTerrain::HighlandAt(Target))
+        && ((!IsBuilding() || IsMobileBuilding()) && !IsSheltered() && !IsHighlandResident() || DistanceTo2D(Target) <= GetAttackRange());
 }
 
 bool ALKUnitBase::CanDiscoverTarget(const ALKUnitBase* Target) const
 {
     return IsAlive() && Target && Target->IsTargetable()
         && (Target->GetTeam() == Team || !Target->IsSheltered())
-        && (Target == this || !Target->GetStatusComponent()->IsConcealed());
+        && (Target == this || !Target->GetStatusComponent()->IsConcealed())
+        && ALKBattleTerrain::CanSeeTarget(this,Target);
 }
+
+void ALKUnitBase::RevealFromBrush(float Duration)
+{
+    if (GetWorld() && FMath::IsFinite(Duration) && Duration>0.f)
+    { BrushExposedUntil=FMath::Max(BrushExposedUntil,GetWorld()->GetTimeSeconds()+Duration); }
+}
+bool ALKUnitBase::IsBrushExposed() const
+{ return GetWorld() && BrushExposedUntil>GetWorld()->GetTimeSeconds(); }
+bool ALKUnitBase::IsHighlandResident() const { return ALKBattleTerrain::HighlandAt(this)!=nullptr; }
+void ALKUnitBase::SetSwampMovementMultiplier(float Multiplier)
+{ if(FMath::IsFinite(Multiplier)) { SwampMovementMultiplier=FMath::Clamp(Multiplier,0.f,5.f); } }
 
 void ALKUnitBase::RefreshDiscoveredTarget()
 {
@@ -822,6 +839,7 @@ void ALKUnitBase::PerformAttack(AActor* Target)
 {
     ALKUnitBase* Victim = Cast<ALKUnitBase>(Target);
     if (!CanPursueTarget(Victim) || IsControlled() || !IsAlive() || !IsCombatEnabled()) { return; }
+    if (!bBasicAttackHeals) { ALKBattleTerrain::NotifyHostileAction(this,Victim); }
     AttackPulseRemaining = .15f; HitStopRemaining = .06f;
     AnimationComponent->Impact();
     const bool bKingStrike = StatusComponent->BeginAttack();
@@ -933,7 +951,8 @@ float ALKUnitBase::GetAttackInterval() const
 
 float ALKUnitBase::GetMoveSpeed() const
 {
-	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMoveSpeedAttribute(), 0.f) * StatusComponent->MoveMultiplier();
+	return LKGameplay::GetAttributeValue(this, ULKUnitAttributeSet::GetMoveSpeedAttribute(), 0.f) * StatusComponent->MoveMultiplier()
+        * (ALKBattleTerrain::IsInSwamp(this) ? SwampMovementMultiplier : 1.f);
 }
 
 void ALKUnitBase::SetInvulnerable(float DurationSeconds)
@@ -1046,6 +1065,7 @@ void ALKUnitBase::Die()
 
 void ALKUnitBase::DrawDebugShape() const
 {
+	if (!ALKBattleTerrain::IsVisibleToTeam(this,ELKTeam::Player)) { return; }
 	if (!GameDataCached)
 	{
 		return;

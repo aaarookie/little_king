@@ -30,6 +30,8 @@ public:
     float GetWallThickness() const { return WallThickness; }
     float GetWallYaw() const { return WallYaw; }
     void SetWallYaw(float Yaw);
+    /** Authored prebuilt walls are complete before combat; card construction is unchanged. */
+    void CompleteAuthoredConstruction() { ConstructionRemaining = 0.f; }
     float GetWallAuraRange() const { return WallAuraRange; }
     FVector GetWallFront() const;
     bool IsInWallAura(const ALKUnitBase* Unit, bool bFront) const;

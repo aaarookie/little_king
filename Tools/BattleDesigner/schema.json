@@ -1,0 +1,622 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Little King Battle Layout v2",
+  "description": "Offline battle layout and encounter configuration. v1 is migrated on import by model.js.",
+  "$comment": "model.js additionally enforces a 2 MiB UTF-8 file limit, unique object IDs, finite numbers, prototype-field rejection, and complete rotated footprints inside field bounds. These cross-field checks are mandatory even after JSON Schema validation. v2 also checks wave hero references, unique wave IDs, canonical card IDs and startingSilver <= silverCap.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "meta",
+    "field",
+    "settings",
+    "objects",
+    "enemy",
+    "waves"
+  ],
+  "properties": {
+    "format": {
+      "const": "little-king.battle-layout"
+    },
+    "version": {
+      "const": 2
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4000
+        },
+        "createdAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+        },
+        "updatedAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+        }
+      }
+    },
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "grid"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 100
+        },
+        "height": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 100
+        },
+        "grid": {
+          "enum": [
+            0.25,
+            0.5,
+            1,
+            2
+          ]
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "encounterId",
+        "seed",
+        "battleTimeLimit"
+      ],
+      "properties": {
+        "encounterId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "battleTimeLimit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "moduleId",
+          "label",
+          "x",
+          "y",
+          "width",
+          "height",
+          "rotation",
+          "team",
+          "count",
+          "spawnAtSeconds",
+          "note"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "moduleId": {
+            "enum": [
+              "grass",
+              "brush",
+              "swamp",
+              "campfire",
+              "mountain",
+              "road",
+              "water",
+              "rock",
+              "tree",
+              "flowers",
+              "player-zone",
+              "enemy-zone",
+              "knight",
+              "mage",
+              "ranger",
+              "swordsman",
+              "archer",
+              "skeleton",
+              "skeleton-archer",
+              "necromancer",
+              "skeleton-giant",
+              "skeleton-king",
+              "wall-common",
+              "wall-rare",
+              "wall-epic",
+              "wall-imperial",
+              "mage-tower",
+              "healing-station",
+              "siege-cart",
+              "arrow-tower",
+              "barracks",
+              "note"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "x": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "y": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "width": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 100
+          },
+          "height": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 100
+          },
+          "rotation": {
+            "type": "number",
+            "minimum": -3600,
+            "maximum": 3600
+          },
+          "team": {
+            "enum": [
+              "player",
+              "enemy",
+              "neutral"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "spawnAtSeconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 300
+          },
+          "note": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 4000
+          }
+        },
+        "description": "Coordinates are center anchors in meters, origin at the field top-left. Rotation is clockwise degrees in this display coordinate system.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "moduleId": {
+                  "enum": [
+                    "skeleton",
+                    "skeleton-archer",
+                    "necromancer",
+                    "skeleton-giant",
+                    "skeleton-king",
+                    "enemy-zone"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "team": {
+                  "const": "enemy"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "moduleId": {
+                  "const": "player-zone"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "team": {
+                  "const": "player"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "moduleId": {
+                  "enum": [
+                    "knight",
+                    "mage",
+                    "ranger",
+                    "swordsman",
+                    "archer",
+                    "skeleton",
+                    "skeleton-archer",
+                    "necromancer",
+                    "skeleton-giant",
+                    "skeleton-king",
+                    "wall-common",
+                    "wall-rare",
+                    "wall-epic",
+                    "wall-imperial",
+                    "mage-tower",
+                    "healing-station",
+                    "siege-cart",
+                    "arrow-tower",
+                    "barracks"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "team": {
+                  "enum": [
+                    "player",
+                    "enemy"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "moduleId": {
+                  "enum": [
+                    "knight",
+                    "mage",
+                    "ranger",
+                    "necromancer",
+                    "skeleton-giant",
+                    "skeleton-king"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "count": {
+                  "const": 1
+                },
+                "spawnAtSeconds": {
+                  "const": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "team": {
+                  "const": "player"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "spawnAtSeconds": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "enemy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usesCards",
+        "cards",
+        "silverPerSecond",
+        "silverCap",
+        "startingSilver"
+      ],
+      "properties": {
+        "usesCards": {
+          "type": "boolean"
+        },
+        "cards": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 48,
+          "items": {
+            "enum": [
+              "Unit_Swordsman",
+              "Unit_Archer",
+              "Unit_Shieldbearer",
+              "Spell_Fireball",
+              "Spell_HealWave",
+              "Building_ArrowTower",
+              "Building_Barracks",
+              "Unit_Skeleton",
+              "Unit_SkeletonArcher",
+              "Spell_SkeletonCircle",
+              "Unit_ElfArcher",
+              "Unit_ElfWarrior",
+              "Unit_ElfGuard",
+              "Unit_ElfPriest",
+              "Unit_GoblinRogue",
+              "Unit_Thief",
+              "Unit_ApprenticeMage",
+              "Unit_GoblinBlade",
+              "Unit_TrollWarrior",
+              "Unit_TrollSpearman",
+              "Unit_TrollMage",
+              "Unit_TrollKing",
+              "Unit_TwoHeadedDragon",
+              "Building_SiegeCatapult",
+              "Unit_Colossus",
+              "Spell_ResearchFireball_N2",
+              "Spell_ResearchFireball_M1",
+              "Spell_ResearchFireball_A1",
+              "Spell_ResearchFireball_D1",
+              "Spell_ResearchHeal_M1",
+              "Spell_ResearchHeal_A1",
+              "Spell_ResearchHeal_D1",
+              "Card_WallCommon",
+              "Card_WallRare",
+              "Card_WallEpic",
+              "Card_WallImperial",
+              "Card_SiegeCart",
+              "Card_MageTower",
+              "Card_HealingStation",
+              "Spell_Freeze",
+              "Spell_MariaNovice",
+              "Spell_MariaIntermediate",
+              "Spell_MariaAdvanced",
+              "Spell_MariaDivine",
+              "Spell_BlackCloud",
+              "Spell_Lightning",
+              "Spell_Hurricane",
+              "Spell_DivineBlessing"
+            ]
+          }
+        },
+        "silverPerSecond": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "silverCap": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "startingSilver": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "usesCards": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "cards": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "waves": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "trigger",
+          "time",
+          "targetId",
+          "healthThreshold",
+          "unitId",
+          "count",
+          "x",
+          "y",
+          "radius"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "trigger": {
+            "enum": [
+              "time",
+              "hero-health-below",
+              "hero-first-death"
+            ]
+          },
+          "time": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3600
+          },
+          "targetId": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "healthThreshold": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 0.99
+          },
+          "unitId": {
+            "enum": [
+              "Hero_Knight",
+              "Hero_Mage",
+              "Hero_Ranger",
+              "Unit_Swordsman",
+              "Unit_Archer",
+              "Unit_Shieldbearer",
+              "Building_ArrowTower",
+              "Building_Barracks",
+              "Unit_Skeleton",
+              "Unit_SkeletonArcher",
+              "Hero_Necromancer",
+              "Hero_SkeletonGiant",
+              "Boss_SkeletonKing",
+              "Unit_ElfArcher",
+              "Unit_ElfWarrior",
+              "Unit_ElfGuard",
+              "Unit_ElfPriest",
+              "Unit_GoblinRogue",
+              "Unit_Thief",
+              "Unit_ApprenticeMage",
+              "Unit_GoblinBlade",
+              "Unit_TrollWarrior",
+              "Unit_TrollSpearman",
+              "Unit_TrollMage",
+              "Unit_TrollKing",
+              "Unit_TwoHeadedDragon",
+              "Building_SiegeCatapult",
+              "Unit_Colossus",
+              "Unit_AngelWarrior_Uncommon",
+              "Unit_AngelArcher_Uncommon",
+              "Unit_AngelPriest_Uncommon",
+              "Unit_AngelWarrior_Rare",
+              "Unit_AngelArcher_Rare",
+              "Unit_AngelPriest_Rare",
+              "Unit_AngelWarrior_Epic",
+              "Unit_AngelArcher_Epic",
+              "Unit_AngelPriest_Epic",
+              "Unit_DivineJudge",
+              "Unit_ChosenHighPriest",
+              "Unit_WallCommon",
+              "Unit_WallRare",
+              "Unit_WallEpic",
+              "Unit_WallImperial",
+              "Unit_SiegeCart",
+              "Unit_MageTower",
+              "Unit_HealingStation"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "x": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "y": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "trigger": {
+                  "const": "time"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "targetId": {
+                  "const": ""
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "targetId": {
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

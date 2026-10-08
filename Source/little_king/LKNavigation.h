@@ -5,8 +5,18 @@
 namespace LKNavigation
 {
     /** Circle, or capsule when HalfSegment is nonzero. Radius already includes mover clearance. */
-	struct FObstacle { FVector Center; float Radius; FVector HalfSegment = FVector::ZeroVector; };
+	struct FObstacle
+    {
+        FVector Center;
+        float Radius;
+        FVector HalfSegment = FVector::ZeroVector;
+        /** Optional oriented box. Radius is extra clearance; existing capsule callers remain unchanged. */
+        FVector2D BoxHalfExtent = FVector2D::ZeroVector;
+        float BoxYaw = 0.f;
+        bool IsBox() const { return BoxHalfExtent.X > 0.f && BoxHalfExtent.Y > 0.f; }
+    };
     float PointDistance(const FVector& Point, const FObstacle& Obstacle);
+    bool SegmentHitsObstacle(const FVector& A, const FVector& B, const FObstacle& Obstacle);
 	struct FBounds
 	{
 		FVector2D HalfExtent = FVector2D(1200.f, 2000.f);

@@ -41,6 +41,13 @@ public:
 	const TArray<struct FLKWaveEntry>& GetWaves() const { return Waves; }
 	/** 结束战斗/换房：清空波次队列、重试队列与战术法术计时。 */
 	void ResetBattleState();
+	/** 先记录事件，胜负检查前统一解析，避免伤害同帧回血/英雄立即复活漏触发。 */
+	void NotifyUnitHealthEvent(ALKUnitBase* Unit, float NewHealth, float MaxHealth, float BattleElapsed);
+	void NotifyUnitFirstDeath(ALKUnitBase* Unit, float BattleElapsed);
+	void ResolvePendingScenarioEvents(float BattleElapsed);
+	bool HasPendingScenarioReinforcements() const;
+	/** 自定义战场清场规则：未来时间波与已锁存条件波需要等待；从未发生的条件不阻塞。 */
+	bool HasOutstandingScenarioWaves() const;
 	/** 统计：因满员/落点失败超过延后窗口而丢弃的增援数；已成功施放的战术法术数。 */
 	int32 GetDroppedReinforcements() const { return DroppedReinforcements; }
 	int32 GetTacticalSpellCasts() const { return TacticalSpellCasts; }
@@ -62,7 +69,14 @@ private:
 	TWeakObjectPtr<ALKBattleGameMode> GameMode;
 
 	TArray<struct FLKWaveEntry> Waves;
-	int32 WaveIndex = 0;
+	struct FWaveRuntime
+	{
+		float TriggeredAt = -1.f;
+		bool bQueued = false;
+	};
+	TArray<FWaveRuntime> WaveRuntime;
+	void ResetWaveRuntime();
+	bool bResolvingWaves = false;
 	bool bCanPlayCards = true;
 	FLKEncounterAISettings AISettings;
 
@@ -73,6 +87,10 @@ private:
 		FName UnitId;
 		int32 Remaining = 0;
 		float Deadline = 0.f;
+		bool bFromCondition = false;
+		bool bUseSpawnLocation = false;
+		FVector SpawnLocation = FVector::ZeroVector;
+		float SpawnRadius = 200.f;
 	};
 	TArray<FPendingReinforcement> PendingReinforcements;
 	int32 DroppedReinforcements = 0;
@@ -102,7 +120,7 @@ private:
 	void LoadWaves();
 	void ProcessWaves(float BattleElapsed);
 	/** 把一条到期波次排入重试队列（首次尝试失败时）。 */
-	void QueueReinforcement(FName UnitId, int32 Count, float BattleElapsed);
+	void QueueReinforcement(const FLKWaveEntry& Entry, float DueTime);
 	void ThinkAndPlay();
 	/** 独立敌方战术施法通道：与有限波次并行，共用敌方银币组件（波次不扣费）。 */
 	void TickTacticalSpell(float DeltaTime, float BattleElapsed);

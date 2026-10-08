@@ -27,6 +27,8 @@ public:
 
 	/** 去重后仅开局洗牌一次；不足槽数 + 1 时返回 false，保留原状态。 */
 	bool InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimit, int32 Seed = 1);
+	/** 敌方小牌组：1 张允许原槽循环；其余采用 min(MaxHandSize, N-1)。玩家入口保持原约束。 */
+	bool InitEnemyDeck(const TArray<FName>& DeckCards, int32 MaxHandSize = 4, int32 Seed = 1);
 
 	/** 兼容旧调试调用；有效牌组始终满手，额外抽牌不改变队列。 */
 	bool DrawCard();
@@ -56,7 +58,7 @@ public:
 	FName GetNextCard() const;
 
 	UFUNCTION(BlueprintPure, Category = "LK|Deck")
-	bool IsReady() const { return Hand.Num() == HandSizeLimit && !DrawPile.IsEmpty(); }
+	bool IsReady() const { return Hand.Num() == HandSizeLimit && (!DrawPile.IsEmpty() || bEnemySingleCardCycle); }
 
 	TArray<FName> GetAllCards() const;
 
@@ -77,6 +79,7 @@ private:
 	TArray<FName> Hand;
     TMap<FName, float> DrawCooldownRemaining;
 	int32 HandSizeLimit = 4;
+	bool bEnemySingleCardCycle = false;
     int32 FindDrawableIndex() const;
 	bool ContainsCard(FName CardId) const { return Hand.Contains(CardId) || DrawPile.Contains(CardId); }
 	void BroadcastHandChanged();

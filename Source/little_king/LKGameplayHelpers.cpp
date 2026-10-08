@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "ALKUnitBase.h"
+#include "ALKBattleTerrain.h"
 #include "ALKBattleGameMode.h"
 #include "ULKGameData.h"
 #include "ULKUnitAttributeSet.h"
@@ -121,6 +122,10 @@ namespace LKGameplay
         ALKUnitBase* Unit = Cast<ALKUnitBase>(Target);
         if (!IsValid(Unit) || !Unit->IsTargetable() || !FMath::IsFinite(Amount) || Amount <= 0.f) { return 0.f; }
         const FLKCombatSource EffectiveSource = SourceOverride ? *SourceOverride : MakeSource(Instigator);
+        ALKUnitBase* Attacker=Cast<ALKUnitBase>(Instigator);
+        if(!ALKBattleTerrain::AllowsDamage(Unit,Attacker,EffectiveSource)) { return 0.f; }
+        if(EffectiveSource.Kind!=ELKCombatSourceKind::HealthCost && EffectiveSource.Kind!=ELKCombatSourceKind::Overtime)
+        { ALKBattleTerrain::NotifyHostileAction(Attacker,Unit); }
         // Occupants do not add a second hit to area attacks on their tower. Target selection attacks the shelter itself.
         if (Unit->IsSheltered() && EffectiveSource.Kind != ELKCombatSourceKind::HealthCost
             && EffectiveSource.Kind != ELKCombatSourceKind::Overtime) { return 0.f; }

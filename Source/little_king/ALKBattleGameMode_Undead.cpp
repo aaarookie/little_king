@@ -134,11 +134,11 @@ bool ALKBattleGameMode::ApplyEnemyEncounter(const FLKEncounterRow& Source)
 	for (const FLKWaveEntry& Wave : Encounter.Waves)
 	{
 		const FLKUnitRow* Row = GetUnitRow(Wave.UnitId);
-		if (!Row || Row->UnitClass == ELKUnitClass::Hero || Row->UnitClass == ELKUnitClass::Boss) { return false; }
+		if (!Row) { return false; }
 	}
 	if (Encounter.bEnemyUsesCards)
 	{
-		if (Encounter.EnemyCards.Num() < GameData->HandSize + 1) { return false; }
+		if (Encounter.EnemyCards.IsEmpty()) { return false; }
 		for (FName CardId : Encounter.EnemyCards) { if (!FindCard(CardId)) { return false; } }
 	}
     // 仅清理当前部署阶段的敌方预览；不发死亡事件、不触发被动或战后恢复。

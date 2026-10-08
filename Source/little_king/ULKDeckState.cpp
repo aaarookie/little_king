@@ -15,11 +15,31 @@ bool ULKDeckState::InitDeck(const TArray<FName>& DeckCards, int32 InHandSizeLimi
     FRandomStream Random(Seed);
     for (int32 i = Cards.Num() - 1; i > 0; --i) { Cards.Swap(i, Random.RandRange(0, i)); }
     HandSizeLimit = Slots;
+    bEnemySingleCardCycle = false;
     Hand.Reset(Slots);
     for (int32 i = 0; i < Slots; ++i) { Hand.Add(Cards[i]); }
     Cards.RemoveAt(0, Slots);
     DrawPile = MoveTemp(Cards);
     DrawCooldownRemaining.Reset();
+    BroadcastHandChanged();
+    return true;
+}
+
+bool ULKDeckState::InitEnemyDeck(const TArray<FName>& DeckCards, int32 MaxHandSize, int32 Seed)
+{
+    TArray<FName> Unique;
+    for (FName Id : DeckCards)
+    {
+        if (Id.IsNone() || Unique.Contains(Id) || (CardAllowed && !CardAllowed(Id))) { return false; }
+        Unique.Add(Id);
+    }
+    if (Unique.IsEmpty()) { return false; }
+    if (Unique.Num() > 1) { return InitDeck(Unique, FMath::Min(FMath::Max(1, MaxHandSize), Unique.Num() - 1), Seed); }
+    Hand = MoveTemp(Unique);
+    HandSizeLimit = 1;
+    DrawPile.Reset();
+    DrawCooldownRemaining.Reset();
+    bEnemySingleCardCycle = true;
     BroadcastHandChanged();
     return true;
 }
@@ -49,6 +69,8 @@ bool ULKDeckState::CanPlayWithCooldown(int32 HandIndex, float DrawCooldownSecond
 {
     if (!IsReady() || !Hand.IsValidIndex(HandIndex) || !FMath::IsFinite(DrawCooldownSeconds)
         || DrawCooldownSeconds < 0.f || GetCooldownRemaining(Hand[HandIndex]) > 0.f) { return false; }
+    // 单卡敌军的卡片保留在槽位但冷却期间不可再次施放；从不影响玩家补牌规则。
+    if (bEnemySingleCardCycle) { return true; }
     int32 UsableKinds = 0;
     const FName Played = Hand[HandIndex];
     for (FName CardId : GetAllCards())

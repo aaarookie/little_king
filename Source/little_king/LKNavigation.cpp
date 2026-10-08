@@ -29,7 +29,8 @@ struct FNavigationGrid
         for (int32 I = 0; I < Other.Num(); ++I)
         {
             if (Obstacles[I].Center != Other[I].Center || Obstacles[I].HalfSegment != Other[I].HalfSegment
-                || Obstacles[I].Radius != Other[I].Radius) { return false; }
+                || Obstacles[I].Radius != Other[I].Radius || Obstacles[I].BoxHalfExtent != Other[I].BoxHalfExtent
+                || Obstacles[I].BoxYaw != Other[I].BoxYaw) { return false; }
         }
         return true;
     }
@@ -57,7 +58,9 @@ struct FNavigationGrid
         for (int32 I = 0; I < Obstacles.Num(); ++I)
         {
             const auto& O = Obstacles[I];
-            const FVector Extent = O.HalfSegment.GetAbs() + FVector(O.Radius, O.Radius, 0.f);
+            const FVector BoxX = FRotator(0,O.BoxYaw,0).RotateVector(FVector(O.BoxHalfExtent.X+O.Radius,0,0));
+            const FVector BoxY = FRotator(0,O.BoxYaw,0).RotateVector(FVector(0,O.BoxHalfExtent.Y+O.Radius,0));
+            const FVector Extent = O.IsBox() ? BoxX.GetAbs()+BoxY.GetAbs() : O.HalfSegment.GetAbs() + FVector(O.Radius, O.Radius, 0.f);
             for (int32 Y = YAt(O.Center.Y - Extent.Y); Y <= YAt(O.Center.Y + Extent.Y); ++Y)
             { for (int32 X = XAt(O.Center.X - Extent.X); X <= XAt(O.Center.X + Extent.X); ++X) { Buckets[Y * Columns + X].Add(I); } }
         }
@@ -81,11 +84,9 @@ struct FNavigationGrid
                 {
                     if (ObstacleStamps[Index] == QueryStamp) { continue; }
                     ObstacleStamps[Index] = QueryStamp;
-                    const auto& O = Obstacles[Index]; FVector PA, PB;
+                    const auto& O = Obstacles[Index];
                     if (Stats) { ++Stats->ExactSegmentTests; }
-                    FMath::SegmentDistToSegmentSafe(FVector(A.X, A.Y, 0.f), FVector(B.X, B.Y, 0.f),
-                        O.Center - O.HalfSegment, O.Center + O.HalfSegment, PA, PB);
-                    if (FVector::DistSquared2D(PA, PB) < FMath::Square(O.Radius)) { return false; }
+                    if (LKNavigation::SegmentHitsObstacle(A,B,O)) { return false; }
                 }
             }
         }
@@ -204,6 +205,12 @@ bool FindGridPath(const FVector& Start, const FVector& Goal, const TArray<LKNavi
 float LKNavigation::PointDistance(const FVector& Point, const FObstacle& Obstacle)
 {
     const FVector Flat(Point.X, Point.Y, 0.f);
+    if (Obstacle.IsBox())
+    {
+        const FVector Local = FRotator(0,-Obstacle.BoxYaw,0).RotateVector(Flat-Obstacle.Center);
+        // Signed L-infinity distance gives an exact oriented rectangle with conservative square clearance.
+        return FMath::Max(FMath::Abs(Local.X)-Obstacle.BoxHalfExtent.X,FMath::Abs(Local.Y)-Obstacle.BoxHalfExtent.Y);
+    }
     return FVector::Dist2D(Flat, FMath::ClosestPointOnSegment(Flat,
         Obstacle.Center - Obstacle.HalfSegment, Obstacle.Center + Obstacle.HalfSegment));
 }
@@ -219,14 +226,35 @@ bool LKNavigation::IsPointValid(const FVector& Point, const TArray<FObstacle>& O
 	return true;
 }
 
+bool LKNavigation::SegmentHitsObstacle(const FVector& A, const FVector& B, const FObstacle& Obstacle)
+{
+    if (!Obstacle.IsBox())
+    {
+        FVector PA,PB;
+        FMath::SegmentDistToSegmentSafe(FVector(A.X,A.Y,0),FVector(B.X,B.Y,0),
+            Obstacle.Center-Obstacle.HalfSegment,Obstacle.Center+Obstacle.HalfSegment,PA,PB);
+        return FVector::DistSquared2D(PA,PB)<FMath::Square(Obstacle.Radius);
+    }
+    const FRotator Rotation(0,-Obstacle.BoxYaw,0);
+    const FVector P=Rotation.RotateVector(A-Obstacle.Center), D=Rotation.RotateVector(B-A);
+    const FVector2D Extent=Obstacle.BoxHalfExtent+FVector2D(Obstacle.Radius);
+    double Enter=0.,Exit=1.;
+    for (int32 Axis=0;Axis<2;++Axis)
+    {
+        const double Half=Extent[Axis]-.001;
+        if (FMath::Abs(D[Axis])<1.e-8) { if (FMath::Abs(P[Axis])>=Half) { return false; } continue; }
+        const double T0=(-Half-P[Axis])/D[Axis],T1=(Half-P[Axis])/D[Axis];
+        Enter=FMath::Max(Enter,FMath::Min(T0,T1)); Exit=FMath::Min(Exit,FMath::Max(T0,T1));
+        if (Enter>Exit) { return false; }
+    }
+    return Exit>=0. && Enter<=1.;
+}
+
 bool LKNavigation::IsSegmentClear(const FVector& A, const FVector& B, const TArray<FObstacle>& Obstacles)
 {
 	for (const FObstacle& Obstacle : Obstacles)
 	{
-        FVector NearestA, NearestB;
-        FMath::SegmentDistToSegmentSafe(FVector(A.X,A.Y,0), FVector(B.X,B.Y,0),
-            Obstacle.Center - Obstacle.HalfSegment, Obstacle.Center + Obstacle.HalfSegment, NearestA, NearestB);
-        if (FVector::DistSquared2D(NearestA, NearestB) < FMath::Square(Obstacle.Radius)) { return false; }
+        if (SegmentHitsObstacle(A,B,Obstacle)) { return false; }
 	}
 	return true;
 }
@@ -239,7 +267,8 @@ bool LKNavigation::FindPath(const FVector& Start, const FVector& Goal, const TAr
     if (Bounds.HalfExtent.ContainsNaN() || Bounds.HalfExtent.X <= 0.f || Bounds.HalfExtent.Y <= 0.f
         || Bounds.LeashCenter.ContainsNaN() || !FMath::IsFinite(Bounds.LeashRadius)) { return false; }
     for (const FObstacle& O : Obstacles)
-    { if (O.Center.ContainsNaN() || O.HalfSegment.ContainsNaN() || !FMath::IsFinite(O.Radius) || O.Radius < 0.f) { return false; } }
+    { if (O.Center.ContainsNaN() || O.HalfSegment.ContainsNaN() || !FMath::IsFinite(O.Radius) || O.Radius < 0.f
+        || O.BoxHalfExtent.ContainsNaN() || O.BoxHalfExtent.X<0.f || O.BoxHalfExtent.Y<0.f || !FMath::IsFinite(O.BoxYaw)) { return false; } }
 	if (!IsPointValid(Start, Obstacles, Bounds) || !IsPointValid(Goal, Obstacles, Bounds)) { return false; }
 	if (IsSegmentClear(Start, Goal, Obstacles)) { OutPath.Add(Goal); return true; }
     if (Obstacles.Num() > VisibilityObstacleLimit) { return FindGridPath(Start, Goal, Obstacles, Bounds, OutPath, OutStats); }
@@ -247,6 +276,16 @@ bool LKNavigation::FindPath(const FVector& Start, const FVector& Goal, const TAr
 	constexpr int32 Sides = 16;
 	for (const FObstacle& Obstacle : Obstacles)
 	{
+        if (Obstacle.IsBox())
+        {
+            const FVector2D Extent=Obstacle.BoxHalfExtent+FVector2D(Obstacle.Radius+2.f);
+            for (int32 X : {-1,1}) { for (int32 Y : {-1,1})
+            {
+                const FVector Point=Obstacle.Center+FRotator(0,Obstacle.BoxYaw,0).RotateVector(FVector(X*Extent.X,Y*Extent.Y,0));
+                if (IsPointValid(Point,Obstacles,Bounds)) { Nodes.Add(Point); }
+            } }
+            continue;
+        }
 		const float Radius = (Obstacle.Radius + 2.f) / FMath::Cos(PI / Sides);
 		for (int32 i = 0; i < Sides; ++i)
 		{

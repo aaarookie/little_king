@@ -126,16 +126,16 @@ bool ALKBattleGameMode::ApplyExpeditionContext(const FLKBattleContext& Context)
 	for (const FLKWaveEntry& Wave : Encounter.Waves)
 	{
 		const FLKUnitRow* Row = GetUnitRow(Wave.UnitId);
-		if (!Row || Row->UnitClass == ELKUnitClass::Hero || Row->UnitClass == ELKUnitClass::Boss)
+		if (!Row)
 		{
-			UE_LOG(LogLKBattle, Error, TEXT("[Encounter] %s 的波次单位 %s 不存在或不是佣兵/建筑"),
+			UE_LOG(LogLKBattle, Error, TEXT("[Encounter] %s 的波次单位 %s 不存在"),
 				*Encounter.EncounterId.ToString(), *Wave.UnitId.ToString());
 			return false;
 		}
 	}
 	if (Encounter.bEnemyUsesCards)
 	{
-		if (Encounter.EnemyCards.Num() < GameData->HandSize + 1) { return false; }
+		if (Encounter.EnemyCards.IsEmpty()) { return false; }
 		for (FName CardId : Encounter.EnemyCards) { if (!FindCard(CardId)) { return false; } }
 	}
     BattleContext = Context;

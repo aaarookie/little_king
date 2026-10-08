@@ -1,5 +1,6 @@
 #include "ULKUnitMovementComponent.h"
 #include "ALKUnitBase.h"
+#include "ALKBattleTerrain.h"
 #include "ALKUnitHero.h"
 #include "ALKUnitBuilding.h"
 #include "LKBuildingGeometry.h"
@@ -17,6 +18,7 @@ void ULKUnitMovementComponent::CollectNavigation(TArray<LKNavigation::FObstacle>
 {
     const ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
     Bounds.HalfExtent = FieldHalfExtent - FVector2D(SeparationRadius + 1.f);
+    ALKBattleTerrain::AppendNavigationObstacles(GetWorld(),Obstacles,SeparationRadius+1.f);
     // 营地圈不再作为移动拴绳（英雄活动不限距离；圈仅作显示与未来营地 buff 范围）。
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {
@@ -81,6 +83,11 @@ bool ULKUnitMovementComponent::HasClearMeleePath(const ALKUnitBase* Target) cons
         if (*It!=Target && *It!=GetOwner() && It->IsWall() && LKBuildingGeometry::BlocksMovement(*It))
         { Obstacles.Add(LKBuildingGeometry::Shape(*It)); }
     }
+    const ALKUnitBase* Self=Cast<ALKUnitBase>(GetOwner());
+    const ALKBattleTerrain* SharedHighland=Self ? ALKBattleTerrain::HighlandAt(Self) : nullptr;
+    if(SharedHighland!=ALKBattleTerrain::HighlandAt(Target)) { SharedHighland=nullptr; }
+    for(TActorIterator<ALKBattleTerrain> It(GetWorld());It;++It)
+    { if(It->IsBlocking() && *It!=SharedHighland) { Obstacles.Add(It->Shape()); } }
     return LKNavigation::IsSegmentClear(Start,HitPoint,Obstacles);
 }
 
@@ -104,7 +111,8 @@ bool ULKUnitMovementComponent::CanStandAt(const FVector& Location, bool bInclude
 
 bool ULKUnitMovementComponent::TeleportToFreePoint(const FVector& Location)
 {
-    if (!CanStandAt(Location, true)) { return false; }
+    const auto* Self=Cast<ALKUnitBase>(GetOwner());
+    if (!Self || Self->IsHighlandResident() || !CanStandAt(Location, true)) { return false; }
     Stop(); Path.Reset(); RepathTimer = 0.f;
     GetOwner()->SetActorLocation(FVector(Location.X, Location.Y, 0.f));
     return true;
@@ -113,7 +121,7 @@ bool ULKUnitMovementComponent::TeleportToFreePoint(const FVector& Location)
 FVector ULKUnitMovementComponent::MoveSkillDelta(const FVector& Delta)
 {
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
-    if (!Self || !Self->IsAlive() || (Self->IsBuilding() && !Self->IsMobileBuilding()) || Self->IsSheltered() || Delta.ContainsNaN()) { return Self ? Self->GetActorLocation() : FVector::ZeroVector; }
+    if (!Self || !Self->IsAlive() || (Self->IsBuilding() && !Self->IsMobileBuilding()) || Self->IsSheltered() || Self->IsHighlandResident() || Delta.ContainsNaN()) { return Self ? Self->GetActorLocation() : FVector::ZeroVector; }
     Stop(); Path.Reset(); RepathTimer = 0.f;
     TArray<LKNavigation::FObstacle> Obstacles;
     LKNavigation::FBounds Bounds;
@@ -143,6 +151,7 @@ FVector ULKUnitMovementComponent::MoveSkillDelta(const FVector& Delta)
 
 void ULKUnitMovementComponent::MoveToward(const FVector& InDestination, float InSpeed)
 {
+    if(const auto* Self=Cast<ALKUnitBase>(GetOwner()); Self && Self->IsHighlandResident()) { Stop(); return; }
     if (!bMoving || FVector::DistSquared2D(InDestination, Destination) > FMath::Square(25.f)) { RepathTimer = 0.f; }
     bMoving = true;
     Destination = FVector(InDestination.X, InDestination.Y, 0.f);
@@ -163,6 +172,7 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     VisualTravel = FVector::ZeroVector;
     ALKUnitBase* Self = Cast<ALKUnitBase>(GetOwner());
+    if (Self && Self->IsHighlandResident()) { Stop(); return; }
     if (Self && (Self->IsSkillMoving() || Self->IsControlled())) { return; }
     if (!Self || !Self->IsAlive() || (Self->IsBuilding() && !Self->IsMobileBuilding()) || Self->IsSheltered() || DeltaTime <= 0.f
         || (!Self->IsCombatEnabled() && !Self->IsManualMoving())) { return; }

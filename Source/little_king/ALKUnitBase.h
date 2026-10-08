@@ -88,6 +88,13 @@ public:
 	virtual bool CanPursueTarget(const ALKUnitBase* Target) const;
     /** Discovery is separate from targetability: ground effects still affect hidden units. */
     bool CanDiscoverTarget(const ALKUnitBase* Target) const;
+    /** Brush exposure never clears Black Cloud's independent concealment. */
+    void RevealFromBrush(float Duration=3.f);
+    bool IsBrushExposed() const;
+    bool IsHighlandResident() const;
+    /** 0.7 default, 1 immunity, >1 swamp affinity; immediately applied on entering/leaving. */
+    UFUNCTION(BlueprintCallable, Category="LK|Terrain") void SetSwampMovementMultiplier(float Multiplier);
+    UFUNCTION(BlueprintPure, Category="LK|Terrain") float GetSwampMovementMultiplier() const { return SwampMovementMultiplier; }
     void RefreshDiscoveredTarget();
     bool BasicAttackHeals() const { return bBasicAttackHeals; }
     /** Forced wind movement uses field/static-body geometry, even while controlled. */
@@ -266,6 +273,8 @@ protected:
 	float AttackCooldownRemaining = 0.f;
 	bool bDead = false;
 	bool bCombatEnabled = false;
+	float BrushExposedUntil = 0.f;
+	float SwampMovementMultiplier = .7f;
 	float BodyRadius = 50.f;
 
 	/** 无敌：>0 = 剩余秒数；<0 = 永久（不倒数）；0 = 不在无敌 */

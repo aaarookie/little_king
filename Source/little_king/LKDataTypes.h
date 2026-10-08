@@ -179,6 +179,15 @@ struct FLKTraitRow : public FTableRowBase
 	TArray<FLKTraitModifier> Modifiers;
 };
 
+/** 条件仅锁存第一次发生；Time 对时间波是开战秒数，对事件波是触发后的延迟。 */
+UENUM(BlueprintType)
+enum class ELKWaveTrigger : uint8
+{
+	Time,
+	HeroHealthBelow,
+	HeroFirstDeath
+};
+
 /** DT_Waves 行：敌方波次表 */
 USTRUCT(BlueprintType)
 struct FLKWaveRow : public FTableRowBase
@@ -193,6 +202,12 @@ struct FLKWaveRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1"))
 	int32 Count = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) ELKWaveTrigger Trigger = ELKWaveTrigger::Time;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName TriggerTargetTag;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float HealthThreshold = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) bool bUseSpawnLocation = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FVector SpawnLocation = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) float SpawnRadius = 200.f;
 };
 
 /** 运行时波次条目（从 DT_Waves 读出或使用内置示例） */
@@ -209,6 +224,14 @@ struct FLKWaveEntry
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Count = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) ELKWaveTrigger Trigger = ELKWaveTrigger::Time;
+	/** 布局对象 ID，对应目标英雄 Actor.Tags；不按兵种 ID 匹配同名英雄。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName TriggerTargetTag;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "1.0")) float HealthThreshold = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) bool bUseSpawnLocation = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FVector SpawnLocation = FVector::ZeroVector;
+	/** UE 厘米，0 表示仅指定点；满员/无合法点最多重试 3 秒。 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0")) float SpawnRadius = 200.f;
 };
 
 /** 单场遭遇的 AI 节奏。卡牌开关关闭时，反制/爆发参数保留但不会运行。 */

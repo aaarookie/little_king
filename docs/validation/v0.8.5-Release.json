@@ -1,0 +1,421 @@
+{
+  "releaseDate": "2026-10-09",
+  "validationDate": "2026-10-08",
+  "version": "v0.8.5",
+  "projectVersion": "0.8.5",
+  "branch": "main",
+  "tag": "v0.8.5",
+  "baseline": "3c266880fcfc8da9f7220cb62188d1bdfaefb4f4",
+  "primaryFeature": "Battle Designer",
+  "validationReuse": "Release metadata and documentation changed after the recorded build and tests; no gameplay code changes during release preparation.",
+  "developmentRecord": "docs/validation/TerrainDesigner-Validation.json",
+  "build": {
+    "engine": "UE 5.8.1",
+    "result": "Success",
+    "target": "little_kingEditor Win64 Development"
+  },
+  "ueFullRegression": {
+    "notRun": 0,
+    "succeededWithWarnings": 79,
+    "failed": 0,
+    "succeeded": 90,
+    "report": "Saved/Automation/TerrainDesigner/index.json",
+    "filter": "LittleKing"
+  },
+  "ueFinalRegression": {
+    "notRun": 0,
+    "succeededWithWarnings": 5,
+    "failed": 0,
+    "succeeded": 3,
+    "report": "Saved/Automation/TerrainDesigner-Final/index.json",
+    "filter": "LittleKing.Scenario"
+  },
+  "javascript": {
+    "command": "node --test Tools/BattleDesigner/model.test.cjs",
+    "passed": 35,
+    "failed": 0,
+    "syntaxCheck": "node --check Tools/BattleDesigner/app.js"
+  },
+  "browser": {
+    "url": "http://127.0.0.1:18184/",
+    "screenshot": "docs/images/BattleDesignerV2.jpg",
+    "fileProtocol": "Not browser-tested; HTTP tested. Classic scripts and local assets have no network dependencies.",
+    "checks": [
+      "wave position editing and undo",
+      "enemy card selection and undo",
+      "silver rate update and input precision validation",
+      "downloaded JSON verified on disk",
+      "v2 exported JSON imported again with three waves retained"
+    ]
+  },
+  "renderedPlay": {
+    "battle": "docs/images/TerrainBattle.png",
+    "checks": [
+      "four terrain types present",
+      "brush enemies hidden",
+      "highland archers visible and stationary",
+      "deployment zone outlined",
+      "timed wave at 15.0s spawned five skeletons within available-capacity retry window",
+      "paid cards spend silver",
+      "SkeletonCircle from enemy deck activates"
+    ],
+    "deployment": "docs/images/TerrainDeployment.png",
+    "logs": [
+      "Saved/Logs/TerrainPreview-final.log",
+      "Saved/Logs/TerrainBattle-final.log"
+    ],
+    "layout": "Tools/BattleDesigner/examples/terrain-ambush.json"
+  },
+  "compatibility": {
+    "units": 46,
+    "blueprintResearch": 8,
+    "spellResearch": 16,
+    "profileSchema": 2,
+    "cards": 48,
+    "layoutSchema": 2,
+    "runSchema": 10
+  },
+  "limitations": [
+    "Standalone authored battle loading; automatic assignment to expedition nodes is not included",
+    "Geometry/SVG terrain is functional placeholder art",
+    "Campfire is decoration with collision only",
+    "Highlands have no climb paths",
+    "Unspawnable reinforcements retry for three seconds then drop with a log",
+    "Full battle balance and subjective route experience need further playtesting"
+  ],
+  "existingSaveIntegrity": [
+    {
+      "path": "Saved/SaveGames/LittleKing_BalanceMig_Cards_8513C71046B0FFD771099894A9255333.sav",
+      "unchanged": true,
+      "sha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a"
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_A.sav",
+      "unchanged": true,
+      "sha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448"
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Profile_B.sav",
+      "unchanged": true,
+      "sha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379"
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_A.sav",
+      "unchanged": true,
+      "sha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791"
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Profile_B.sav",
+      "unchanged": true,
+      "sha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c"
+    },
+    {
+      "path": "Saved/SaveGames/LittleKing_Save02_Run.sav",
+      "unchanged": true,
+      "sha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f"
+    }
+  ],
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f339acf2aaa670a2ebcafd517aebd0373a4363c3526b42c060b0eee48e9bc375",
+      "bytes": 1734
+    },
+    {
+      "path": "Config/DefaultGame.ini",
+      "sha256": "e6133f77d4b9922d45eb1c1a88f38267c8d3173704bb307f16cc9685605bce84",
+      "bytes": 374
+    },
+    {
+      "path": "docs/01-GDD.md",
+      "sha256": "54f00932d28bdcc893f9c0e1f6ddbcea72df85470364cf2467b255aae5947f15",
+      "bytes": 23963
+    },
+    {
+      "path": "docs/36-ArtAudioSources.md",
+      "sha256": "0c5ae5030b6b4d9c8c8ddcb12cca4ff79baabf617b06ffdaa737bc7849954b84",
+      "bytes": 27556
+    },
+    {
+      "path": "docs/61-BattleLevelDesignWorkflow.md",
+      "sha256": "f81d6320b16f652d62aa80b638b9aa7704c7a4e5431d7f4f2f534872dbfac249",
+      "bytes": 8543
+    },
+    {
+      "path": "docs/62-TerrainAndEncounterDesigner.md",
+      "sha256": "0a6577acad7c8b93658066167e26069c6283f360285ab366dac9cb8da2785de3",
+      "bytes": 16118
+    },
+    {
+      "path": "docs/63-v0.8.5ReleaseNotes.md",
+      "sha256": "ad0ea1d2c9183819df8a7ac7d76771ef0c294bffd7c9803019b84d13bf434dcd",
+      "bytes": 4114
+    },
+    {
+      "path": "docs/64-ProjectHandoff.md",
+      "sha256": "7b5648b322fa13cd8a6e1989f451524e35409321235fcf3d5bbaacd1ee4a4b2d",
+      "bytes": 10025
+    },
+    {
+      "path": "docs/images/BattleDesigner.jpg",
+      "sha256": "b25fd5f696e61b10129e40ba56ea07c7e63f282155750871f6ef703d1aa3f727",
+      "bytes": 94144
+    },
+    {
+      "path": "docs/images/BattleDesignerV2.jpg",
+      "sha256": "ca624d7ed48c778702a71f18e21f4487f98c87b2417759786e7120d823fca42a",
+      "bytes": 89396
+    },
+    {
+      "path": "docs/images/TerrainBattle.png",
+      "sha256": "2f1031ed735488944834e7e0eaff20465c31150fc4ec557d50df1f797f878852",
+      "bytes": 1542735
+    },
+    {
+      "path": "docs/images/TerrainDeployment.png",
+      "sha256": "1cf0933a86c7b815ee4d882d43f11436a41d7247473a63895b405f31492b0692",
+      "bytes": 1397873
+    },
+    {
+      "path": "docs/validation/TerrainDesigner-Validation.json",
+      "sha256": "3fcca7bad3f0af97dede27664fde40b7908b52bda057c7d1e34740b2299efd34",
+      "bytes": 3040
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "f6d24647463f4e14defa4e9cd613b2bff96c86b9501ba85294b60808325ff3f3",
+      "bytes": 13385
+    },
+    {
+      "path": "README.md",
+      "sha256": "812454f64a77e7a3959a32e5f43f52f62cf846823d027ad292158e8372c4c76c",
+      "bytes": 11357
+    },
+    {
+      "path": "Scripts/PlayBattleLayout.ps1",
+      "sha256": "122ae03245440511931e3072db9e1ee5dd3c503881ee0db99297344350fff41c",
+      "bytes": 1405
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode_Layout.cpp",
+      "sha256": "75cd2468a7ad9751e2c45a73df8f71a00e5ba07a537f3a38f522fb116f44d654",
+      "bytes": 10204
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode_Run.cpp",
+      "sha256": "584b468e65c25f3f0a26c8daf782b6541f4ddded3d657b018f254a684c567c4d",
+      "bytes": 30225
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode_Undead.cpp",
+      "sha256": "11ecf18a956ef55eb8f0ff40baaa93ca5c001f57bc717ed39ae62482d73a89d5",
+      "bytes": 8416
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.cpp",
+      "sha256": "535e8253295cb9ffb57ee5633e36957c0e0cc17a9ee3e947c0931f2b66c89468",
+      "bytes": 59981
+    },
+    {
+      "path": "Source/little_king/ALKBattleGameMode.h",
+      "sha256": "1fc67b56dc44c9ae816aa877331afef07342c2035cfb46ddb9dd751e481611eb",
+      "bytes": 19621
+    },
+    {
+      "path": "Source/little_king/ALKBattleTerrain.cpp",
+      "sha256": "4642da52975dafd0fcdcb434dd57b09025263ce8ad599673836268026b945066",
+      "bytes": 14724
+    },
+    {
+      "path": "Source/little_king/ALKBattleTerrain.h",
+      "sha256": "c97291e3cdae4369d9865cf1b308b76833ec369717a2130dd760cbf367ff37d3",
+      "bytes": 2572
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.cpp",
+      "sha256": "fd5da7fe13026697141862e3d616b67641549c88fabe9381c1c46d4b1248570e",
+      "bytes": 24231
+    },
+    {
+      "path": "Source/little_king/ALKOpponentBrain.h",
+      "sha256": "f9ece42c779c5a7a6d72d8db66aabc94d1181463a38aeb413f7e1c3ae6664a88",
+      "bytes": 5548
+    },
+    {
+      "path": "Source/little_king/ALKPresentationHUD.cpp",
+      "sha256": "06b1b72d92d5113ba6918035c81ca25deae4899f52409c9e2a4898accca25360",
+      "bytes": 24000
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase_Buildings.cpp",
+      "sha256": "26e1a462b082ba3d0c569dc2d73cbbacc4c2cf34d3b4d7eb44c30503dc3c508d",
+      "bytes": 6845
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.cpp",
+      "sha256": "6607220660a439b82021d1c1f62475c233a4873d1d1897517d2642ae0c7a2796",
+      "bytes": 49286
+    },
+    {
+      "path": "Source/little_king/ALKUnitBase.h",
+      "sha256": "8fd069ddf6f85858651fdc590a07e9dac3c15548def7f7d300a3daae0025f256",
+      "bytes": 16647
+    },
+    {
+      "path": "Source/little_king/ALKUnitBuilding.h",
+      "sha256": "6dd13c51c21f5eb43bd3a32656528977c0dccd8f5a0514f1b6c54130aaa334d4",
+      "bytes": 3236
+    },
+    {
+      "path": "Source/little_king/little_king.Build.cs",
+      "sha256": "d2e351d537c3a3d8e9e34b2628e309c4d4bec65f654ecbe5f6cf007b17fb08d6",
+      "bytes": 992
+    },
+    {
+      "path": "Source/little_king/LKBattleLayout.cpp",
+      "sha256": "6c89b6336e25575be58ff7d4b9987daeb831b4ff51c5121d28c6e125645c9947",
+      "bytes": 13694
+    },
+    {
+      "path": "Source/little_king/LKBattleLayout.h",
+      "sha256": "6e3e1139094e6c7767b424e3bcafd9f53f698a6083c45b14b3822b9728a67293",
+      "bytes": 1034
+    },
+    {
+      "path": "Source/little_king/LKBuildingGeometry.cpp",
+      "sha256": "ae2f187b8e9265a3ee933262a77e0209a2bdc8882de0a8a93bbf4c7c0a4774b2",
+      "bytes": 5659
+    },
+    {
+      "path": "Source/little_king/LKDataTypes.h",
+      "sha256": "9696590dc19acc413a0de5c48c5c107409565c08dbe70e8a24c6f34aba4eff33",
+      "bytes": 16848
+    },
+    {
+      "path": "Source/little_king/LKEncounterContent.cpp",
+      "sha256": "92707ad44adebab3fb5f4d39cb3be72619de6b8f5271609c334895b6027f0973",
+      "bytes": 15083
+    },
+    {
+      "path": "Source/little_king/LKGameplayHelpers.cpp",
+      "sha256": "7fe7a87c967c5185b2783d999a657d3b87c02e7fcc9924c82466358477aba215",
+      "bytes": 11975
+    },
+    {
+      "path": "Source/little_king/LKNavigation.cpp",
+      "sha256": "684cc6a33465490526f23553b19ceb446089608b6a37ff60fcea947ef1260f0f",
+      "bytes": 16399
+    },
+    {
+      "path": "Source/little_king/LKNavigation.h",
+      "sha256": "dbda1147532eda0daacc45afb559468a51c114624a3cdd3c182c3c7a8be6f302",
+      "bytes": 1804
+    },
+    {
+      "path": "Source/little_king/LKSpellExecutor.cpp",
+      "sha256": "6a04bd7702f91d7432d9afd4ecfa4e62e8be4bb4416308bfaf70e7ccf09d4d7a",
+      "bytes": 11463
+    },
+    {
+      "path": "Source/little_king/Tests/LKBattleLayoutTests.cpp",
+      "sha256": "004bac00ed9c7ff9818ebdd491a30dcd523a938d6b266bd88900a8b09101b857",
+      "bytes": 13454
+    },
+    {
+      "path": "Source/little_king/Tests/LKScenarioWaveTests.cpp",
+      "sha256": "110d0484f5a95d9cd4ffe90f2956b12da7f3d754d3f446e05caf516d93012ce2",
+      "bytes": 13770
+    },
+    {
+      "path": "Source/little_king/Tests/LKTerrainTests.cpp",
+      "sha256": "54404106f79342af6e117c90ca2ddd414740bda4d18fe0e294123b98c6db1b69",
+      "bytes": 9865
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.cpp",
+      "sha256": "c6b93dba47cc54d9518116b6de9499ecaee4ea3bd1e404a4e9060bdd31e75046",
+      "bytes": 6548
+    },
+    {
+      "path": "Source/little_king/ULKDeckState.h",
+      "sha256": "45f2bb15cbb00aa32127786d62c9f6826f5ddc752d05800c24176d9d6a26f2cd",
+      "bytes": 3566
+    },
+    {
+      "path": "Source/little_king/ULKUnitActiveComponent.cpp",
+      "sha256": "36ab46796fc16306be6c1527d4f4fdc874a0e20a7b5525f3cd44ca40c41da4d2",
+      "bytes": 14657
+    },
+    {
+      "path": "Source/little_king/ULKUnitMovementComponent.cpp",
+      "sha256": "7e449c21945e4cd8cb9fda4e2aa03d2ca8f1cebd0ec072f5222bb6ff8096b8b7",
+      "bytes": 12505
+    },
+    {
+      "path": "Tools/BattleDesigner/app.js",
+      "sha256": "e50a129d92a954a9282c39b5ea3f5be47b9488a1014f6804368b6711a600ed3b",
+      "bytes": 65168
+    },
+    {
+      "path": "Tools/BattleDesigner/catalog.js",
+      "sha256": "42af5b29659f1fe5ac2e9d3a1a03b0971c2cac5ce3e60c2dd4398577703c9377",
+      "bytes": 4662
+    },
+    {
+      "path": "Tools/BattleDesigner/examples/forest-pass.json",
+      "sha256": "23905ea050f38d2f039a892b0d49c9eb4b767a043f74cd9289ad5ddb6e5c3bb2",
+      "bytes": 5705
+    },
+    {
+      "path": "Tools/BattleDesigner/examples/terrain-ambush.json",
+      "sha256": "459726eb70d60f5663efc78cca78f7d3e9feb2d10fed7c2ec7a931ebccfaf2e0",
+      "bytes": 4799
+    },
+    {
+      "path": "Tools/BattleDesigner/index.html",
+      "sha256": "19df9c415e37a33fb0b168de444d1faa7b69aa95c5887a97783a614d02ea35ac",
+      "bytes": 10460
+    },
+    {
+      "path": "Tools/BattleDesigner/model.js",
+      "sha256": "600f40b24439cc902f0f0822930ddfd924759f4cc68adaac23f17229ee89574a",
+      "bytes": 30506
+    },
+    {
+      "path": "Tools/BattleDesigner/model.test.cjs",
+      "sha256": "1a7006dd1b575d6cfc69e9431472742484aae7cdab71656a6aad610fb1233dc0",
+      "bytes": 20882
+    },
+    {
+      "path": "Tools/BattleDesigner/paper-template.html",
+      "sha256": "c5ceaffb0bb60ee73cd87cd0d078124fe43b68b1d12138bd93bfcec54ece45fd",
+      "bytes": 4167
+    },
+    {
+      "path": "Tools/BattleDesigner/schema.json",
+      "sha256": "85face45795e937bd36b5582d818e18dbaa519c438a28720c67e6beaa0aa65c5",
+      "bytes": 15769
+    },
+    {
+      "path": "Tools/BattleDesigner/style.css",
+      "sha256": "347a2a6c6907030290ce4be91420b9d61e13082bbb88b0f909846eb3cd33866a",
+      "bytes": 23366
+    },
+    {
+      "path": "Tools/BattleDesigner/units.js",
+      "sha256": "6515f27262d370f2f741c9ebdabf793879bd7331106f2a6babfd3b8c6c25b0b3",
+      "bytes": 3531
+    }
+  ],
+  "gitDelivery": {
+    "note": "This record describes the release payload before commit; remote delivery is checked after push. The commit cannot embed its own hash.",
+    "remote": "origin",
+    "repository": "https://github.com/aaarookie/little_king",
+    "proxy": "http://127.0.0.1:18081",
+    "refs": [
+      "refs/heads/main",
+      "refs/tags/v0.8.5"
+    ],
+    "commitLookup": "git rev-parse 'v0.8.5^{commit}'"
+  }
+}

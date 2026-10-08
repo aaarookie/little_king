@@ -2,9 +2,15 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**. Current version: **v0.8.4** (`ProjectVersion=0.8.4`). The game UI and detailed design documents are in Simplified Chinese.
+A single-player PvE auto-battler prototype built with **Unreal Engine 5.8, C++, Paper2D, GAS, and UMG**. Current version: **v0.8.5** (`ProjectVersion=0.8.5`). The game UI and detailed design documents are in Simplified Chinese.
 
 Prepare three heroes and a deck at home, depart through the gate, and follow randomized routes across fixed regions. Deploy every hero before combat, command camps, and cycle cards. Bring gold and research materials home to develop the settlement.
+
+## v0.8.5: Battle Workshop and terrain
+
+Open [Battle Workshop](Tools/BattleDesigner/index.html) locally to place brush, swamps, campfires, highlands, enemies, and buildings. Configure timed/first-health-threshold/first-death reinforcements alongside an enemy deck and silver economy. Export the design JSON and launch a standalone playable battlefield with [PlayBattleLayout.ps1](Scripts/PlayBattleLayout.ps1); the bundled Highland Ambush example is the default and does not write expedition progress. See [terrain and encounter authoring](docs/62-TerrainAndEncounterDesigner.md) and the [paper design workflow](docs/61-BattleLevelDesignWorkflow.md) (Chinese).
+
+**v0.8.5** introduces the workshop with 32 modules, 46 reinforcement unit types, 48 enemy card choices, rotation, duplication, undo, drafts, and JSON roundtrips. Terrain supports brush concealment/reveal, swamp slow, campfire obstacles, and stationary highland defenders. Authored layouts are not automatically assigned to expedition nodes. See the [release notes](docs/63-v0.8.5ReleaseNotes.md) and [project handoff](docs/64-ProjectHandoff.md) for the current scope and contributor entry point.
 
 ## v0.8.4: walls, siege and garrisons
 
@@ -47,7 +53,7 @@ Five regions have fixed boundaries, entrances, and exits. Nodes and forward-only
 
 All three heroes must be deployed before combat; deployment has no timer. Camps have volume but cannot be attacked. Click a camp and a reachable location to issue a movement order; the hero stops attacking until arrival or a stuck timeout. The Mage enables full-field spell placement; without that trait, spells remain usable in the friendly half. Knight taunt takes priority over focus fire. Combat units have overhead health bars, attack-building placement previews show ranges, and a yellow line divides battlefield halves.
 
-Characters/buildings have five qualities and spells fourteen tiers. The current catalog contains 39 units and 41 registered cards: eleven units are summon-only; three cards are enemy-only, fourteen are temporary expedition mercenaries, and twenty-four are starter/research cards. Detailed values and abilities are in the [catalog](docs/19-ContentCatalog.md), [balance guide](docs/32-CharacterQualityAndBalance.md), [card interfaces](docs/34-CardDevelopmentInterfaces.md), and [troll/siege guide](docs/35-TrollAndSiegeCards.md).
+Characters/buildings have five qualities and spells fourteen tiers. The current catalog contains 46 units and 48 registered cards: eleven units are summon-only; three cards are enemy-only, fourteen are temporary expedition mercenaries, and thirty-one are starter/research cards. Research includes sixteen spells and eight building blueprints. Detailed values and abilities are in the [catalog](docs/19-ContentCatalog.md), [balance guide](docs/32-CharacterQualityAndBalance.md), [card interfaces](docs/34-CardDevelopmentInterfaces.md), and [troll/siege guide](docs/35-TrollAndSiegeCards.md).
 
 ## Build and play
 
@@ -70,7 +76,7 @@ The console command `show me the money` adds 100 home gold; `show me the money 5
 
 ## Validation and saves
 
-The UE 5.8.1 editor build succeeded and all **129/129** `LittleKing` automation tests passed, including twenty v0.8.3 tests. Real 720p and 1080p captures cover five character pose sets, walking in both directions, nine card icons, area spells, and the native UMG Blessing countdown. Tests use isolated storage; six existing save files (five player files and one historical fixture) remain byte-identical. Results, warning review, and screenshot hashes are in the [v0.8.3 validation](docs/validation/v0.8.3-Release.json); previous records remain historical.
+The UE 5.8.1 editor build succeeded; **169/169** `LittleKing` tests passed, followed by **8/8** focused tests after final layout changes. The workshop has **35/35** passing Node tests. Browser editing/JSON roundtrips and actual 1280×720 deployment/combat captures confirm terrain, timed waves, and paid enemy cards. Six existing save files remain byte-identical. See [v0.8.5 validation](docs/validation/v0.8.5-Release.json) for evidence and limits; previous dual-resolution art checks remain historical records.
 
 Run schema 10 and profile schema 2 migrate compatible old saves. Existing maps remain frozen, settled receipts retain their amounts, and invalid files are preserved with an error. Old five/six-card loadouts can be read but must reach seven cards for the next departure. Balance V1 and v0.8.2 Heal Wave measurements remain historical baselines; long-term balance with the new spells and healing mercenaries still needs playtesting.
 
@@ -87,7 +93,7 @@ Packaging and hardware acceptance remain deferred; Sprint 6 stays skipped. Histo
 | `ArtSource/StorybookV1` | Original assets, receipts, prompts, and licenses |
 | `Saved` | Local logs, screenshots, and player saves; excluded from Git |
 
-Built-in identities, skills, and behaviors have C++ defaults; tables tune values and presentation. Custom unit IDs remain supported. v0.8.2 updated authored unit/encounter tables, GameData, and Heal Wave. v0.8.3 adds native content and private runtime copies, with new resources under `Art/StorybookV1/V083`; shared maps, Blueprints, and data assets are not rewritten. See the [collaboration file index](docs/53-v0.8.3Changes.md).
+Built-in identities, skills, and behaviors have C++ defaults; tables tune values and presentation. Custom unit IDs remain supported. v0.8.5 adds the offline editor, terrain, and a JSON layout bridge using private runtime copies; shared maps, Blueprints, and data assets are not rewritten. See the [collaboration file index](docs/62-TerrainAndEncounterDesigner.md) and [project handoff](docs/64-ProjectHandoff.md).
 
 Useful references: [design](docs/01-GDD.md), [architecture](docs/02-BattlePrototypeDesign.md), [dungeon D0–D5](docs/18-DungeonChangeLog.md), [home H0–H5](docs/27-HomeChangeLog.md), [optimization log](docs/29-OptimizationChangeLog.md), [asset inventory](docs/12-AssetRequest.md), and [asset provenance](docs/36-ArtAudioSources.md).
 

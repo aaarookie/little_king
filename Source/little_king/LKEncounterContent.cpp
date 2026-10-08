@@ -116,14 +116,25 @@ bool NormalizeAndValidate(FName RowName, const FLKEncounterRow& Source, FLKEncou
 		if (HeroId.IsNone() || Heroes.Contains(HeroId)) { OutError = TEXT("EnemyHeroIds 包含空值或重复 ID"); return false; }
 		Heroes.Add(HeroId);
 	}
-	if (OutRow.Waves.IsEmpty() || OutRow.Waves.Num() > MaxWaveCount) { OutError = TEXT("Waves 数量必须在 1～64"); return false; }
+	if (OutRow.Waves.Num() > MaxWaveCount) { OutError = TEXT("Waves 数量必须在 0～64"); return false; }
 	for (const FLKWaveEntry& Entry : OutRow.Waves)
 	{
 		if (!IsFiniteNonNegative(Entry.Time) || Entry.UnitId.IsNone() || Entry.Count < 1 || Entry.Count > MaxUnitsPerWave)
 		{ OutError = TEXT("Waves 含非法时间、单位 ID 或数量（单波 1～50）"); return false; }
+		if (Entry.Trigger != ELKWaveTrigger::Time && Entry.Trigger != ELKWaveTrigger::HeroHealthBelow
+			&& Entry.Trigger != ELKWaveTrigger::HeroFirstDeath)
+		{ OutError = TEXT("Waves 含未知触发类型"); return false; }
+		if (Entry.Trigger != ELKWaveTrigger::Time && Entry.TriggerTargetTag.IsNone())
+		{ OutError = TEXT("事件波次必须指定目标英雄的布局对象 ID"); return false; }
+		if (!FMath::IsFinite(Entry.HealthThreshold) || Entry.HealthThreshold <= 0.f || Entry.HealthThreshold > 1.f
+			|| !IsFiniteNonNegative(Entry.SpawnRadius) || Entry.SpawnRadius > 10000.f
+			|| Entry.SpawnLocation.ContainsNaN() || !FMath::IsFinite(Entry.SpawnLocation.X)
+			|| !FMath::IsFinite(Entry.SpawnLocation.Y) || !FMath::IsFinite(Entry.SpawnLocation.Z))
+		{ OutError = TEXT("波次血量阈值或出生位置/半径非法"); return false; }
 	}
 	OutRow.Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
 	TSet<FName> Cards;
+	if (OutRow.EnemyCards.Num() > 64) { OutError = TEXT("EnemyCards 最多 64 张"); return false; }
 	for (FName CardId : OutRow.EnemyCards)
 	{
 		if (CardId.IsNone() || Cards.Contains(CardId)) { OutError = TEXT("EnemyCards 包含空值或重复 CardId"); return false; }
@@ -230,19 +241,13 @@ bool BuildValidatedCatalog(const ULKGameData* Data,
 		for (const FLKWaveEntry& Wave : Encounter.Waves)
 		{
 			const FLKUnitRow* Row = ResolveUnitRow(Wave.UnitId);
-			if (!Row || Row->UnitClass == ELKUnitClass::Hero || Row->UnitClass == ELKUnitClass::Boss)
+			if (!Row)
 			{
 				OutError = FString::Printf(TEXT("遭遇 %s 的波次单位 %s 不存在或类别错误"),
 					*Encounter.EncounterId.ToString(), *Wave.UnitId.ToString());
 				OutRows.Reset();
 				return false;
 			}
-		}
-		if (Encounter.bEnemyUsesCards && Encounter.EnemyCards.Num() < Data->HandSize + 1)
-		{
-			OutError = FString::Printf(TEXT("遭遇 %s 的敌方牌组少于 HandSize + 1"), *Encounter.EncounterId.ToString());
-			OutRows.Reset();
-			return false;
 		}
 		for (FName CardId : Encounter.EnemyCards)
 		{

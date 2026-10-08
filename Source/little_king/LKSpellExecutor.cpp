@@ -1,6 +1,8 @@
 #include "LKSpellExecutor.h"
 #include "ALKBattleGameMode.h"
 #include "ALKSpellField.h"
+#include "LKSkeletonCircle.h"
+#include "LKCardRules.h"
 #include "ALKUnitBase.h"
 #include "ULKCardDefinition.h"
 #include "ULKGameData.h"
@@ -58,9 +60,24 @@ ELKPlayResult LKSpellExecutor::Validate(const ALKBattleGameMode* GM, const ULKCa
 {
     if (!GM || !GM->GetGameData() || !GM->GetWorld() || !C || C->CardType != ELKCardType::Spell || (C->SpellEffect != ELKSpellEffect::DivineBlessing && !Positive(C->SpellRadius)) || !FMath::IsFinite(C->DrawCooldown) || C->DrawCooldown < 0.f) { return ELKPlayResult::InvalidCardData; }
     if (!GM->IsInsideField(P)) { return ELKPlayResult::InvalidLocation; }
-    if (!bIgnorePlacement && !C->bGlobalPlacement && !GM->CanPlaceSpellAt(Team, P)) { return ELKPlayResult::SpellLocked; }
+    if (!bIgnorePlacement && C->SpellEffect != ELKSpellEffect::SummonZone && !C->bGlobalPlacement && !GM->CanPlaceSpellAt(Team, P)) { return ELKPlayResult::SpellLocked; }
     switch (C->SpellEffect)
     {
+    case ELKSpellEffect::SummonZone:
+    {
+        const FLKSkeletonCircleParams& Circle = C->Circle;
+        const FLKUnitRow* Summon = GM->GetUnitRow(Circle.SummonUnitId);
+        if (Team != ELKTeam::Enemy || LKCardRules::IsPlayerObtainable(C->CardId)
+            || !FMath::IsFinite(Circle.WarnSeconds) || Circle.WarnSeconds < 0.f
+            || !Positive(Circle.Duration) || !Positive(Circle.Radius) || !Positive(Circle.SummonInterval)
+            || !Positive(Circle.MoveMultiplier) || !Positive(Circle.AttackSpeedMultiplier)
+            || Circle.MaxSummons < 1 || Circle.MaxSummons > 12 || Circle.PlacementAttempts < 1
+            || Circle.PlacementAttempts > 64 || !Summon || Summon->UnitClass != ELKUnitClass::Soldier)
+        { return ELKPlayResult::InvalidCardData; }
+        if (GM->GetActiveTacticalCircleCount() >= 1 || GM->CountTargetsInRadius(Team, P, Circle.Radius) < 1)
+        { return ELKPlayResult::InvalidLocation; }
+        return ELKPlayResult::Success;
+    }
     case ELKSpellEffect::Damage: case ELKSpellEffect::Heal:
         return Positive(C->SpellValue) && Fraction(C->HeroHealPercent) ? ELKPlayResult::Success : ELKPlayResult::InvalidCardData;
     case ELKSpellEffect::Freeze: case ELKSpellEffect::BlackCloud:
@@ -86,6 +103,20 @@ bool LKSpellExecutor::Execute(ALKBattleGameMode* GM, const ULKCardDefinition* C,
     FLKCombatSource Source = LKGameplay::MakeSource(Instigator, Instigator ? ELKCombatSourceKind::Skill : ELKCombatSourceKind::Spell, C->CardId);
     Source.bHasTeam = true; Source.Team = Team; Source.bRangedSource = true;
     const float Scale = GM->GetCardUpgradeScale(C->CardId, Team);
+    if (C->SpellEffect == ELKSpellEffect::SummonZone)
+    {
+        FActorSpawnParameters Params;
+        Params.Owner = GM;
+        Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+        ALKSkeletonCircle* Circle = GM->GetWorld()->SpawnActor<ALKSkeletonCircle>(
+            ALKSkeletonCircle::StaticClass(), P, FRotator::ZeroRotator, Params);
+        if (!Circle) { return false; }
+        if (!Circle->InitializeCircle(GM, Team, P, C->Circle, GM->GetNextTacticalSpellSeed(), C->CardId))
+        { Circle->Destroy(); return false; }
+        // Payment and card rotation belong to PlayCardForTeam, exactly once.
+        GM->RegisterTacticalCircle(Circle);
+        return true;
+    }
     if (C->SpellEffect == ELKSpellEffect::BlackCloud || C->SpellEffect == ELKSpellEffect::Hurricane || C->SpellEffect == ELKSpellEffect::Lightning)
     {
         auto* Field = GM->GetWorld()->SpawnActor<ALKSpellField>();

@@ -1,4 +1,7 @@
 #include "ALKBattleGameMode.h"
+#include "ALKBattleTerrain.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "LKBuildingGeometry.h"
 #include "ULKUnitPassiveComponent.h"
 #include "ALKHeroCamp.h"
@@ -60,14 +63,17 @@ ALKBattleGameMode::ALKBattleGameMode()
 void ALKBattleGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+    FParse::Value(FCommandLine::Get(),TEXT("LKLayout="),BattleLayoutFile);
+    const bool bLayoutRequested=!BattleLayoutFile.IsEmpty();
 #if WITH_EDITOR
     if (LKBattleArtPreview::Enabled()) { LKBattleArtPreview::Prepare(this, GameData); }
     else
 #endif
-	if (ULKSaveSlotSubsystem::RouteInitialPlayToMenu(GetWorld())) { SetActorTickEnabled(false); return; }
+	if (!bLayoutRequested && ULKSaveSlotSubsystem::RouteInitialPlayToMenu(GetWorld())) { SetActorTickEnabled(false); return; }
 
 	const bool bHasAuthoredGameData = IsValid(GameData);
 	EnsureGameData();
+    if (bLayoutRequested) { GameData->bEnableExpeditionFlow=false; }
 	if (!InitializeExpeditionContext(bHasAuthoredGameData && GameData->bEnableExpeditionFlow))
 	{
 		// H3 修复（用户报告"继续远征后双方面对面不攻击"）：
@@ -84,7 +90,6 @@ void ALKBattleGameMode::BeginPlay()
 		}
 	}
 	SetPhase(ELKGamePhase::Deployment);
-    GetWorld()->GetSubsystem<ULKPresentationSubsystem>()->SetupBattlefield(this);
 
 	// 生成敌方 AI
 	FActorSpawnParameters Params;
@@ -97,7 +102,12 @@ void ALKBattleGameMode::BeginPlay()
 
 	// 敌方默认英雄就位（否则玩家没有可击败的目标，胜负永不触发）。
 	// D5：恢复中枢/终态世界不部署敌人、不进入战斗准备（只展示恢复面板）。
-	if (!bRecoveredJunction && !bRecoveredTerminal)
+    if(bLayoutRequested)
+    {
+        if(!LoadBattleLayoutFile(BattleLayoutFile,LayoutLoadError))
+        { UE_LOG(LogLKBattle,Error,TEXT("[Layout] %s"),*LayoutLoadError); }
+    }
+	else if (!bRecoveredJunction && !bRecoveredTerminal)
 	{
 		if (GameData->EnemyEncounterId.IsNone()) { AutoDeployDefaultHeroes(ELKTeam::Enemy); }
 		else if (!(bExpeditionBattle ? ApplyEnemyEncounter(CurrentEncounter) : ConfigureEnemyEncounter(GameData->EnemyEncounterId)))
@@ -105,6 +115,7 @@ void ALKBattleGameMode::BeginPlay()
 			UE_LOG(LogLKBattle, Error, TEXT("[Encounter] 无效 EnemyEncounterId %s"), *GameData->EnemyEncounterId.ToString());
 		}
 	}
+    GetWorld()->GetSubsystem<ULKPresentationSubsystem>()->SetupBattlefield(this);
 
 	// S5 弹道对象池预生成（命中/超时回收复用，避免每箭 New/Delete）
 	InitProjectilePool();
@@ -297,6 +308,7 @@ void ALKBattleGameMode::EnsureGameData()
 void ALKBattleGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+    TickLayoutPreview(DeltaSeconds);
 #if WITH_EDITOR
     if (LKBattleArtPreview::Enabled())
     { TryInitPlayerState(); LKBattleArtPreview::Tick(this); if (!LKBattleArtPreview::RunsBattle()) { return; } }
@@ -393,6 +405,8 @@ void ALKBattleGameMode::TickBattle(float DeltaSeconds)
 	{
 		OpponentBrain->TickBrain(DeltaSeconds, BattleElapsed);
 	}
+    if (AuthoredLayout) { bPendingVictoryCheck=true; }
+    CheckVictoryAfterBatch();
 
 	if (Phase != ELKGamePhase::Battle) { return; }
 
@@ -541,7 +555,7 @@ float ALKBattleGameMode::GetBuildingPlacementAttackRange(FName CardId) const
 bool ALKBattleGameMode::CanStartBattle() const
 {
     if (const ULKRunSubsystem* Run = GetRunSubsystem(); Run && Run->NeedsDeckReduction()) { return false; }
-    if (Phase != ELKGamePhase::Deployment || !bPlayerStateReady || AvailableHeroes.IsEmpty() || !HasValidDecks()) { return false; }
+    if (Phase != ELKGamePhase::Deployment || !LayoutLoadError.IsEmpty() || !bPlayerStateReady || AvailableHeroes.IsEmpty() || !HasValidDecks()) { return false; }
     for (int32 Side = 0; Side < 2; ++Side)
     {
         const TArray<FName>& Roster = Side == 0 ? AvailableHeroes : EnemyHeroIds;
@@ -625,6 +639,7 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 void ALKBattleGameMode::HandleUnitDied(ALKUnitBase* Unit)
 {
     if (!Unit || Unit->IsCamp()) { return; }
+    if (OpponentBrain && Phase==ELKGamePhase::Battle) { OpponentBrain->NotifyUnitFirstDeath(Unit,BattleElapsed); }
     const int32 Side = int32(Unit->GetTeam());
     if (Unit->IsHero())
     {
@@ -651,6 +666,10 @@ void ALKBattleGameMode::EndCombatBatch()
 void ALKBattleGameMode::CheckVictoryAfterBatch()
 {
     if (!bPendingVictoryCheck || Phase != ELKGamePhase::Battle) { return; }
+    if (OpponentBrain) { OpponentBrain->ResolvePendingScenarioEvents(BattleElapsed); }
+    if (AuthoredLayout && HeroCounts[0]>0 && HeroCounts[1]<=0
+        && (CountAliveUnits(ELKTeam::Enemy)>0 || (OpponentBrain && OpponentBrain->HasOutstandingScenarioWaves()))) { return; }
+    if (!AuthoredLayout && HeroCounts[0]>0 && OpponentBrain && OpponentBrain->HasPendingScenarioReinforcements()) { return; }
     bPendingVictoryCheck = false;
     if (HeroCounts[0] > 0 && HeroCounts[1] > 0) { return; }
     if (HeroCounts[0] <= 0 && HeroCounts[1] <= 0)
@@ -665,6 +684,14 @@ void ALKBattleGameMode::CheckVictoryAfterBatch()
 void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
 {
     if (Phase == ELKGamePhase::Result) { return; }
+    if(OpponentBrain && Phase==ELKGamePhase::Battle)
+    {
+        for(TActorIterator<ALKUnitBase> It(GetWorld());It;++It)
+        {
+            if(It->GetFName()==Event.TargetInstanceId)
+            { OpponentBrain->NotifyUnitHealthEvent(*It,Event.HealthAfter,It->GetMaxHealth(),BattleElapsed); break; }
+        }
+    }
     if (Event.ActualAmount > 0.f)
     {
         if (Event.bIsHeal)
@@ -749,6 +776,7 @@ ELKPlayResult ALKBattleGameMode::ValidateCardPlay(ELKTeam Team, int32 HandIndex,
         {
             const FVector Center=Existing ? Existing->GetActorLocation() : Location;
             const float Yaw=Existing ? Existing->GetWallYaw() : PlacementYaw;
+            if(Team==ELKTeam::Player && !IsInsideLayoutDeploymentZone(Center)) { return ELKPlayResult::InvalidLocation; }
             if (!LKBuildingGeometry::CanPlaceWall(GetWorld(),Team,*Row,Center,Yaw,
                 FVector2D(GameData->FieldHalfWidth,GameData->FieldHalfHeight),Existing)) { return ELKPlayResult::InvalidLocation; }
             const bool bAddsType=!Existing || (int32(Row->Quality)>int32(Existing->GetQuality()) && Existing->GetUnitId()!=UnitId);
@@ -853,7 +881,7 @@ ELKPlayResult ALKBattleGameMode::DeployHero(ELKTeam Team, FName HeroUnitId, cons
     return ELKPlayResult::Success;
 }
 
-ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass, FName SourceCardId, float PlacementYaw, ALKUnitBase* ReplacedWall)
+ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass, FName SourceCardId, float PlacementYaw, ALKUnitBase* ReplacedWall, bool bAllowHighland)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -875,12 +903,14 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
     const FLKUnitRow* Row = GetUnitRow(UnitId);
     if (!Row || !IsInsideField(Location) || !FMath::IsFinite(PlacementYaw)) { UE_LOG(LogLKUnit, Warning, TEXT("[Spawn] 无效单位或位置 %s"), *UnitId.ToString()); return nullptr; }
     FLKUnitRow Data = *Row; // 本地副本：D3 卡升级在副本上放大数值，不改共享行/资产
+    if(Data.BuildingBehavior!=ELKBuildingBehavior::Wall && ALKBattleTerrain::IsLocationBlocked(World,Location,GameData->UnitBodyRadius,bAllowHighland)) { return nullptr; }
     if (Data.BuildingBehavior==ELKBuildingBehavior::Wall)
     {
         if (!FMath::IsFinite(Data.WallLength) || Data.WallLength<=0.f || !FMath::IsFinite(Data.WallThickness)
             || Data.WallThickness<=0.f || Data.WallThickness>Data.WallLength || !FMath::IsFinite(Data.ConstructionSeconds)
             || Data.ConstructionSeconds<0.f) { return nullptr; }
         const auto Footprint=LKBuildingGeometry::WallShape(Location,PlacementYaw,Data.WallLength,Data.WallThickness);
+        if(ALKBattleTerrain::IsObstacleBlocked(World,Footprint)) { return nullptr; }
         const FVector Extent=Footprint.HalfSegment.GetAbs()+FVector(Footprint.Radius,Footprint.Radius,0.f);
         if (FMath::Abs(Location.X)+Extent.X>=GameData->FieldHalfWidth || FMath::Abs(Location.Y)+Extent.Y>=GameData->FieldHalfHeight) { return nullptr; }
     }
@@ -987,9 +1017,10 @@ ALKUnitBase* ALKBattleGameMode::SpawnUnitForTeam(FName UnitId, ELKTeam Team, con
 	return Unit;
 }
 
-bool ALKBattleGameMode::IsSpawnPointFree(const FVector& Location, float BodyRadius) const
+bool ALKBattleGameMode::IsSpawnPointFree(const FVector& Location, float BodyRadius, bool bAllowHighland) const
 {
 	if (!GameData || !IsInsideField(Location) || Location.ContainsNaN()) { return false; }
+    if(ALKBattleTerrain::IsLocationBlocked(GetWorld(),Location,BodyRadius,bAllowHighland)) { return false; }
 	if (FMath::Abs(Location.X) + BodyRadius >= GameData->FieldHalfWidth
 		|| FMath::Abs(Location.Y) + BodyRadius >= GameData->FieldHalfHeight) { return false; }
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
@@ -1002,7 +1033,7 @@ bool ALKBattleGameMode::IsSpawnPointFree(const FVector& Location, float BodyRadi
 }
 
 bool ALKBattleGameMode::FindFreeSpawnLocation(const FVector& Preferred, float SearchRadius, FVector& OutLocation,
-	FRandomStream& Stream, int32 MaxAttempts) const
+	FRandomStream& Stream, int32 MaxAttempts, bool bAllowHighland) const
 {
 	if (!GameData || !FMath::IsFinite(SearchRadius) || SearchRadius <= 0.f) { return false; }
 	const float BodyRadius = GameData->UnitBodyRadius;
@@ -1014,7 +1045,8 @@ bool ALKBattleGameMode::FindFreeSpawnLocation(const FVector& Preferred, float Se
 		const float Radius = SearchRadius * FMath::Sqrt(U);
 		const float Angle = 2.f * PI * V;
 		const FVector Candidate(Preferred.X + Radius * FMath::Cos(Angle), Preferred.Y + Radius * FMath::Sin(Angle), 0.f);
-		if (!IsSpawnPointFree(Candidate, BodyRadius)) { continue; }
+        if(bAllowHighland && ALKBattleTerrain::HighlandAt(GetWorld(),Candidate)!=ALKBattleTerrain::HighlandAt(GetWorld(),Preferred)) { continue; }
+		if (!IsSpawnPointFree(Candidate, BodyRadius,bAllowHighland)) { continue; }
 		OutLocation = Candidate;
 		return true;
 	}
@@ -1301,6 +1333,8 @@ bool ALKBattleGameMode::IsPlacementValid(const FVector& Location, ELKTeam Team, 
 {
     if (!IsInsideField(Location) || (Team == ELKTeam::Player ? Location.Y > 0.f : Location.Y < 0.f)) { return false; }
     const float Radius = GameData->UnitBodyRadius;
+    if(ALKBattleTerrain::IsLocationBlocked(GetWorld(),Location,Radius)) { return false; }
+    if(Team==ELKTeam::Player && !IsInsideLayoutDeploymentZone(Location)) { return false; }
     if (FMath::Abs(Location.X) + Radius >= GameData->FieldHalfWidth || FMath::Abs(Location.Y) + Radius >= GameData->FieldHalfHeight) { return false; }
     for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
     {

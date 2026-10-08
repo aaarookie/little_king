@@ -215,6 +215,7 @@ bool ULKUnitActiveComponent::MimicSpell()
 bool ULKUnitActiveComponent::StartDash()
 {
     ALKUnitBase* Unit = CastChecked<ALKUnitBase>(GetOwner());
+    if(Unit->IsHighlandResident()) { return false; }
     ALKUnitBase* Target = Cast<ALKUnitBase>(Unit->GetTarget());
     if (!Unit->CanPursueTarget(Target))
     {

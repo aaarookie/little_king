@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>小小国王 · 战场工坊</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="catalog.js"></script>
+  <script defer src="units.js"></script>
+  <script defer src="model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">♜</span><div><h1>战场工坊 <span>小小国王</span></h1><p>把想法搭成一张地图</p></div></div>
+      <div class="file-actions" aria-label="文件操作">
+        <button id="new-project" class="quiet">新建</button><button id="load-example" class="quiet">伏击示例</button>
+        <button id="import-project" class="quiet">导入 JSON</button>
+        <span class="action-divider"></span>
+        <button id="export-png" class="quiet">导出图片</button>
+        <button id="export-project" class="primary"><span aria-hidden="true">↓</span> 下载设计 JSON</button>
+        <button id="show-help" class="help-button" aria-label="使用帮助">?</button>
+      </div>
+    </header>
+    <div id="draft-alert" class="draft-alert" hidden><span>发现无法读取的旧草稿，已保留原文，当前操作不会覆盖它。</span><button id="download-broken-draft">下载旧草稿原文</button><button id="discard-broken-draft">清除旧草稿并保存当前设计</button></div>
+    <main class="workspace">
+      <aside class="palette-panel panel" aria-label="模块库">
+        <div class="panel-heading"><div><p class="eyebrow">01 · 选择模块</p><h2>积木库</h2></div><span id="module-count" class="count-badge"></span></div>
+        <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="module-search" type="search" placeholder="搜索名称、单位…" aria-label="搜索模块"></div>
+        <div id="category-tabs" class="category-tabs" aria-label="模块分类"></div>
+        <div id="module-library" class="module-library"></div>
+        <div class="palette-foot"><span class="tip-icon" aria-hidden="true">↗</span><p>拖到战场，或先点积木，再点地图。<br><span>◇ 敌方区域和文字仅作标注。</span></p></div>
+      </aside>
+      <section class="canvas-panel" aria-label="地图编辑画布">
+        <div class="canvas-titlebar"><div><p class="eyebrow">02 · 布置战场</p><h2 id="canvas-title">未命名战场</h2></div><span class="preview-badge"><span></span>设计预览 · 非游戏运行</span></div>
+        <div class="canvas-toolbar">
+          <div class="toolbar-group"><button id="tool-select" class="tool-button active" title="选择 / 移动（V）"><span aria-hidden="true">↖</span> 选择</button><span id="placement-status" class="placement-status">拖动积木调整位置</span></div>
+          <div class="toolbar-group"><button id="undo" class="icon-button" title="撤销（Ctrl+Z）" aria-label="撤销">↶</button><button id="redo" class="icon-button" title="重做（Ctrl+Shift+Z）" aria-label="重做">↷</button><span class="action-divider"></span><label class="snap-toggle"><input id="snap-grid" type="checkbox" checked> 吸附网格</label></div>
+        </div>
+        <div id="canvas-stage" class="canvas-stage">
+          <svg id="battle-canvas" xmlns="http://www.w3.org/2000/svg" tabindex="0" role="img" aria-label="战场设计画布：左侧玩家，右侧敌方"></svg>
+          <div class="canvas-legend"><span><i class="legend-player"></i>玩家半场</span><span><i class="legend-enemy"></i>敌方半场</span><span class="legend-unit">1 格 = <b id="grid-label">1</b> 米</span></div>
+          <div class="zoom-controls" aria-label="画布缩放"><button id="zoom-out" aria-label="缩小" title="缩小">−</button><button id="zoom-reset" title="适应画布">100%</button><button id="zoom-in" aria-label="放大" title="放大">＋</button></div>
+          <div id="empty-hint" class="empty-hint" hidden><strong>从左边挑一块积木</strong><span>拖进地图，开始你的第一场战斗。</span></div>
+        </div>
+        <div class="canvas-footer"><span id="cursor-position">40 × 24 米</span><span>Q / E 旋转 · Delete 删除 · 空格拖动画布</span><span id="object-count">0 个积木</span></div>
+        <div class="handoff-strip"><span class="handoff-icon" aria-hidden="true">◇</span><p><strong>下载 JSON，即可交给试玩脚本。</strong><span>地形、波次和敌方牌组一起保存，也可发给协作者继续设计。</span></p><button id="show-help-bottom" class="text-button">如何试玩 →</button></div>
+      </section>
+      <aside class="inspector-panel panel" aria-label="属性和检查">
+        <div class="panel-heading"><div><p class="eyebrow">03 · 调整细节</p><h2 id="inspector-heading">战场设置</h2></div><span id="selection-badge" class="selection-badge">全局</span></div>
+        <div class="inspector-tabs" aria-label="编辑内容"><button id="tab-layout" aria-pressed="true">布局</button><button id="tab-waves" aria-pressed="false">增援波次</button><button id="tab-enemy" aria-pressed="false">敌方牌组</button></div>
+        <div id="inspector" class="inspector"></div>
+        <section class="validation-panel"><div class="validation-heading"><h3>设计检查</h3><span id="validation-count" class="check-badge">检查中</span></div><div id="validation-list" class="validation-list"></div></section>
+      </aside>
+    </main>
+    <footer class="app-status"><span id="save-status" role="status">正在打开设计…</span><span>离线工作 · 数据留在本机浏览器 <span class="status-separator">|</span> Battle Designer 2.0</span></footer>
+  </div>
+  <input id="import-file" type="file" accept=".json,application/json" hidden>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <dialog id="help-dialog" class="help-dialog"><div class="dialog-top"><div><p class="eyebrow">从想法到可试玩地图</p><h2>你的战场，三步搭好</h2></div><button id="close-help" class="icon-button" aria-label="关闭帮助">×</button></div><div class="help-content">
+    <ol class="help-steps"><li><strong>摆积木，确定空间</strong><p>左边选择地形、障碍、单位或建筑，拖进画布。左侧是玩家半场，右侧是敌方半场；位置与尺寸都以米记录。至少放置一名开局敌方英雄或首领。</p></li><li><strong>设置敌军与规则</strong><p>用右侧三个页签编辑布局、一次性增援和敌方银币牌组。敌方区域和文字仅作标注；草地、道路、水域、花丛只有静态装饰效果，树木和岩石会阻挡移动。</p></li><li><strong>下载 JSON，进入游戏试玩</strong><p>JSON 是可再次编辑的完整设计。图片只用于讨论，不能替代 JSON。UE 5.8 项目编译完成后，在项目目录打开 PowerShell，执行下方脚本；浏览器不会直接启动引擎。</p><pre class="launch-command">.\Scripts\PlayBattleLayout.ps1 -Layout "C:\路径\我的战场.json"</pre><p>直接运行 <code>.\Scripts\PlayBattleLayout.ps1</code> 会打开高地伏击示例。默认 UE 路径为 <code>E:\epic\UE_5.8</code>，可用 <code>-EngineRoot</code> 指定其他安装位置。普通试玩先部署英雄；<code>-AutoStart</code> 供自动开战测试使用。此入口运行独立战场，不创建远征或家园存档。</p></li></ol>
+    <div class="help-note"><h3>纸上草图也可以</h3><p>正上方拍照，写清起点、敌人、障碍、路径与特殊规则；用编号把密集说明写在旁边。标一条参照长度（例如“这面墙 3 米”），字迹尽量清楚。照片中不明确的地方会先核对，再转成同样的模块化布局。</p><a class="paper-template-link" href="paper-template.html" target="_blank" rel="noopener">打开可打印的战场草图模板 ↗</a></div>
+    <h3>两种敌军来源</h3><p>右侧“增援波次”可指定开战时间，或指定地图英雄首次低于某生命百分比、首次死亡后的延迟；每条波次只触发一次。设定兵种、数量、分散半径后，可以点击“在地图选落点”。条件英雄必须开局出现且数量为 1，删英雄前请先改动引用它的波次。</p><p>“敌方牌组”独立设置可用卡牌、初始银币、每秒银币和上限。两种来源可以同时开启，事件增援不消耗银币。旧版 JSON 和草稿会自动迁移，默认关闭敌方主动出牌，保留原来地图对象的出现时间。</p>
+    <h3>四种战场地形</h3><p>草丛使其中单位对外隐身，同一连通片内可见；向外攻击会暴露自身与 2 米内友方草丛单位 3 秒。沼泽减速 30%。军营篝火为不可攻击实体装饰，需绕行。高山为无法上下攀爬的固定高台，放置在上方的驻军只能被远程与法术攻击。</p>
+    <h3>常用操作</h3><dl class="shortcut-list"><div><dt>选择 / 放置</dt><dd>V / 点左侧积木</dd></div><div><dt>旋转选中积木</dt><dd>Q / E，每次 15°</dd></div><div><dt>复制 / 删除</dt><dd>Ctrl+D / Delete</dd></div><div><dt>撤销 / 重做</dt><dd>Ctrl+Z / Ctrl+Shift+Z</dd></div><div><dt>平移 / 缩放</dt><dd>空格拖动 / 右下角按钮</dd></div><div><dt>取消选择 / 放置</dt><dd>Esc</dd></div></dl>
+    <p class="help-muted">自动草稿只保存在当前浏览器。换设备或发给协作者前，请下载 JSON。该工具是关卡设计器，不运行战斗，也不会直接修改游戏存档。</p>
+    <details class="advanced-export"><summary>高级：导出 Unreal 坐标对照</summary><p>供开发时对照坐标使用，不能替代设计 JSON，也不是直接导入引擎的关卡资产。</p><button id="export-unreal" class="secondary">下载坐标对照 JSON</button></details>
+  </div></dialog>
+  <dialog id="confirm-dialog" class="confirm-dialog"><h2 id="confirm-title">替换当前设计？</h2><p id="confirm-message"></p><div class="confirm-actions"><button id="confirm-cancel" class="secondary">取消</button><button id="confirm-download" class="secondary">先下载当前设计</button><button id="confirm-proceed" class="primary">继续</button></div></dialog>
+  <noscript>战场工坊需要启用浏览器 JavaScript。所有功能均在本地执行，无需联网。</noscript>
+</body>
+</html>

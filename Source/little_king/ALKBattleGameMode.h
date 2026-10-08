@@ -6,6 +6,7 @@
 #include "LKDataTypes.h"
 #include "LKRunTypes.h"
 #include "ULKCardDefinition.h"
+#include "LKBattleLayout.h"
 #include "ALKBattleGameMode.generated.h"
 
 class ULKGameData;
@@ -40,6 +41,18 @@ class ALKBattleGameMode : public AGameModeBase
 
 public:
 	ALKBattleGameMode();
+
+    /** Optional standalone authored battlefield; ignored unless explicitly set or -LKLayout= supplied. */
+    UPROPERTY(EditDefaultsOnly, Category="LK|Layout") FString BattleLayoutFile;
+    bool LoadBattleLayoutFile(const FString& Path, FString& Error);
+    bool ApplyBattleLayout(const FLKBattleLayout& Layout, FString& Error);
+    bool IsAuthoredLayout() const { return AuthoredLayout.IsValid(); }
+    FString GetLayoutTitle() const { return AuthoredLayout ? AuthoredLayout->Title : FString(); }
+    const FLKBattleLayout* GetAuthoredLayout() const { return AuthoredLayout.Get(); }
+    FString GetLayoutError() const { return LayoutLoadError; }
+    bool IsInsideLayoutDeploymentZone(const FVector& Location) const;
+    void RegisterTacticalCircle(ALKSkeletonCircle* Circle);
+    int32 GetNextTacticalSpellSeed();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
@@ -166,15 +179,15 @@ public:
 
 	// ---------- 单位 ----------
 	/** SourceCardId：玩家出牌生成单位时的来源卡（D3 卡升级放大依据）；波次/兵营/部署/召唤不传 */
-	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier, FName SourceCardId = NAME_None, float PlacementYaw = 0.f, ALKUnitBase* ReplacedWall = nullptr);
+	ALKUnitBase* SpawnUnitForTeam(FName UnitId, ELKTeam Team, const FVector& Location, ELKUnitClass FallbackClass = ELKUnitClass::Soldier, FName SourceCardId = NAME_None, float PlacementYaw = 0.f, ALKUnitBase* ReplacedWall = nullptr, bool bAllowHighland = false);
 	/**
 	 * 在 Preferred 周围 SearchRadius 内均匀采样圆盘，返回一个不越界、不与任何存活实体/营地/建筑重叠的空位。
 	 * 法阵召唤与波次落点共用；采样用调用方提供的确定性随机流，不使用全局随机。
 	 */
 	bool FindFreeSpawnLocation(const FVector& Preferred, float SearchRadius, FVector& OutLocation,
-		FRandomStream& Stream, int32 MaxAttempts = 12) const;
+		FRandomStream& Stream, int32 MaxAttempts = 12, bool bAllowHighland = false) const;
 	/** 某点是否可落单位（场地内 + 不与存活实体/营地重叠）。 */
-	bool IsSpawnPointFree(const FVector& Location, float BodyRadius) const;
+	bool IsSpawnPointFree(const FVector& Location, float BodyRadius, bool bAllowHighland = false) const;
 
 	// ---------- 敌方战术法术（独立通道，不影响玩家半场施法规则） ----------
 	/** 按 CardId 驱动统一校验（阵营=敌方专属、区域召唤、余额、场地、活动上限）并扣费生成法阵。 */
@@ -231,6 +244,11 @@ public:
 	TSubclassOf<ULKBattleHUDWidget> HUDWidgetClass;
 
 protected:
+    TSharedPtr<FLKBattleLayout> AuthoredLayout;
+    FString LayoutLoadError;
+    void TickLayoutPreview(float DeltaSeconds);
+    float LayoutPreviewElapsed = 0.f;
+    bool bLayoutScreenshotTaken = false;
 	UPROPERTY(EditDefaultsOnly, Category = "LK|Config")
 	TObjectPtr<ULKGameData> GameData;
 

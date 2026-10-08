@@ -1,4 +1,5 @@
 #include "LKBuildingGeometry.h"
+#include "ALKBattleTerrain.h"
 #include "ALKUnitBuilding.h"
 #include "LKDataTypes.h"
 #include "ULKUnitMovementComponent.h"
@@ -63,6 +64,7 @@ bool LKBuildingGeometry::CanPlaceWall(UWorld* World, ELKTeam Team, const FLKUnit
     if (!World || Center.ContainsNaN() || !FMath::IsFinite(Yaw) || !FMath::IsFinite(Row.WallLength)
         || Row.WallLength<=0.f || !FMath::IsFinite(Row.WallThickness) || Row.WallThickness<=0.f || Row.WallThickness>Row.WallLength) { return false; }
     const auto Wall=WallShape(Center,Yaw,Row.WallLength,Row.WallThickness);
+    if(ALKBattleTerrain::IsObstacleBlocked(World,Wall)) { return false; }
     const FVector Extent=Wall.HalfSegment.GetAbs()+FVector(Wall.Radius,Wall.Radius,0.f);
     if (FMath::Abs(Center.X)+Extent.X>=HalfExtent.X || FMath::Abs(Center.Y)+Extent.Y>=HalfExtent.Y
         || (Team==ELKTeam::Player ? Center.Y+Extent.Y>0.f : Center.Y-Extent.Y<0.f)) { return false; }

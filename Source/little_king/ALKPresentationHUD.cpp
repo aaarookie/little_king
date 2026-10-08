@@ -1,4 +1,5 @@
 #include "ALKPresentationHUD.h"
+#include "ALKBattleTerrain.h"
 #include "ALKUnitBuilding.h"
 #include "LKBuildingGeometry.h"
 #include "ULKUnitAnimationComponent.h"
@@ -55,6 +56,23 @@ void ALKPresentationHUD::DrawHUD()
 		bBound = true;
 	}
 	const float Scale = FMath::Clamp(Canvas->ClipX / 1920.f, 0.75f, 1.5f);
+    for(TActorIterator<ALKBattleTerrain> It(GetWorld());It;++It) { It->Draw(this); }
+    if(!GM->GetLayoutError().IsEmpty())
+    { DrawText(TEXT("地图加载失败：")+GM->GetLayoutError(),FLinearColor::Red,30,100,LKPolishArt::Font(false),Scale); }
+    else if(GM->IsAuthoredLayout())
+    { DrawText(TEXT("工坊试玩 · ")+GM->GetLayoutTitle(),LKPresentationStyle::Gold(),Canvas->ClipX*.30f,50,LKPolishArt::Font(false),1.5f*Scale); }
+    if(const auto* Layout=GM->GetAuthoredLayout();Layout && (GM->GetPhase()==ELKGamePhase::Deployment || PC->IsPlacing()))
+    {
+        for(const auto& Zone:Layout->Objects)
+        {
+            if(Zone.ModuleId!="player-zone") continue;
+            const FVector Axis=FRotator(0,Zone.Yaw,0).Vector(),Other(-Axis.Y,Axis.X,0);
+            const FVector A=Axis*Zone.Size.X*.5f,B=Other*Zone.Size.Y*.5f;
+            const FVector Corners[]={Zone.Center-A-B,Zone.Center+A-B,Zone.Center+A+B,Zone.Center-A+B};
+            for(int32 I=0;I<4;++I)
+            { FVector2D P,Q; if(ProjectPoint(Corners[I],P) && ProjectPoint(Corners[(I+1)%4],Q)) DrawLine(P.X,P.Y,Q.X,Q.Y,FLinearColor(.4f,.8f,.75f),2.f*Scale); }
+        }
+    }
     ULKPresentationSubsystem* Presentation = GetWorld()->GetSubsystem<ULKPresentationSubsystem>();
     if (GM->GetPhase() == ELKGamePhase::Result) { Presentation->ClearEffects(); }
     else { Presentation->Draw(this); }
@@ -98,6 +116,7 @@ void ALKPresentationHUD::DrawHUD()
 	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
 	{
 		ALKUnitBase* Unit = *It;
+		if (!ALKBattleTerrain::IsVisibleToTeam(Unit,ELKTeam::Player)) { continue; }
 		if (Unit->IsSheltered()) { continue; }
 		if (!Unit->IsAlive() && !Unit->IsHero()) { continue; }
 		FVector2D Screen;

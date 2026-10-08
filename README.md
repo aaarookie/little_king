@@ -2,9 +2,15 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-UE 5.8 · C++ / Paper2D / GAS / UMG · 单机 PvE 自动战斗原型。当前版本 **v0.8.4**，工程版本 `0.8.4`。
+UE 5.8 · C++ / Paper2D / GAS / UMG · 单机 PvE 自动战斗原型。当前版本 **v0.8.5**，工程版本 `0.8.5`。
 
 在家园配置三名英雄与牌组，从大门出征。战斗前布置全部英雄，战斗中指挥营地、循环出牌；在随机路线中选择战斗、市场或休息，带回金币及研究材料发展家园。
+
+## v0.8.5：战场编辑器与地形
+
+在本地浏览器打开 [战场工坊](Tools/BattleDesigner/index.html)，摆放草丛、沼泽、篝火、高山及敌军建筑，编辑定时／首次半血／首次死亡增援、敌方牌组与银币经济。导出的 JSON 可用 [PlayBattleLayout.ps1](Scripts/PlayBattleLayout.ps1) 启动独立可玩战场；默认载入“高地伏击”示例，不写入远征进度。地形规则、操作教程与协作记录见 [62](docs/62-TerrainAndEncounterDesigner.md)，纸笔设计流程见 [61](docs/61-BattleLevelDesignWorkflow.md)。
+
+工坊提供 32 种积木、46 种增援单位与 48 张敌方牌组选项，支持旋转、复制、撤销、草稿和 JSON 回读。草丛隐身与攻击暴露、沼泽减速、篝火绕行、高台驻守已接入战斗。自定义战场目前通过独立入口试玩，尚未自动分配到远征节点。发布范围和验证见 [63](docs/63-v0.8.5ReleaseNotes.md)；新协作者或新对话请先读 [项目交接](docs/64-ProjectHandoff.md)。
 
 ## v0.8.4：城防、攻城与驻守
 
@@ -47,7 +53,7 @@ UE 5.8 · C++ / Paper2D / GAS / UMG · 单机 PvE 自动战斗原型。当前版
 
 英雄开战前必须全部部署且不限时。营地有实体体积、不可攻击；点营地后点任意可达地点下达移动指令，移动期间停止自动攻击，到达或卡住超时后恢复。法师提供全场施法，失能后只能在己方半场放法术；骑士赋予附近己方近战佣兵嘲讽，优先级高于集火。战斗实体拥有头顶血条，营地无血条；攻击建筑部署时显示射程，半场黄色中线常驻。
 
-角色／建筑分普通、优秀、稀有、史诗、传说；法术分十四个阶位。当前目录有 39 个单位、41 张注册卡，其中十一种单位只能召唤、三张卡敌方专属、十四张卡为远征临时佣兵；其他为初始或研究解锁内容。图鉴见 [19](docs/19-ContentCatalog.md)，技能和新卡接口见 [32](docs/32-CharacterQualityAndBalance.md) / [34](docs/34-CardDevelopmentInterfaces.md) / [35](docs/35-TrollAndSiegeCards.md)。
+角色／建筑分普通、优秀、稀有、史诗、传说；法术分十四个阶位。当前目录有 46 个单位、48 张注册卡，其中十一种单位只能召唤、三张卡敌方专属、十四张卡为远征临时佣兵；其他为初始或研究解锁内容，研究池包含十六种法术与八种建筑图纸。图鉴见 [19](docs/19-ContentCatalog.md)，技能和新卡接口见 [32](docs/32-CharacterQualityAndBalance.md) / [34](docs/34-CardDevelopmentInterfaces.md) / [35](docs/35-TrollAndSiegeCards.md)。
 
 ## 构建与试玩
 
@@ -68,7 +74,7 @@ UE 5.8 · C++ / Paper2D / GAS / UMG · 单机 PvE 自动战斗原型。当前版
 
 ## 验证与兼容
 
-UE 5.8.1 编辑器构建成功，全量 `LittleKing` **129/129** 自动化通过，含二十项 v0.8.3 专项。720p、1080p 实际渲染覆盖五角色姿态、双向步态、九卡图、区域法术和原生 UMG 祝福倒计时。六个既有存档文件（五个玩家档及一份历史测试档）哈希不变，测试使用隔离存储。结果、警告说明与截图哈希见 [v0.8.3 验证](docs/validation/v0.8.3-Release.json)；旧版本验证保留为历史记录。
+UE 5.8.1 编辑器构建成功，全量 `LittleKing` **169/169** 自动化通过；最终布局调整后的相关回归 **8/8**，工坊 Node 测试 **35/35**。已检查浏览器编辑与 JSON 回读，并在实际 1280×720 战斗中确认四地形、定时增援及付费出牌。六个既有存档文件（五个玩家档及一份历史测试档）哈希不变。结果与边界见 [v0.8.5 验证](docs/validation/v0.8.5-Release.json)；旧版本的双分辨率美术验收保留为历史记录。
 
 Run Schema 10、Profile Schema 2 支持旧档迁移；旧地图不重抽，已有结算回执不改价，非法档保留并提示。旧五／六卡战备仍能读取，下一次出征须补至七张。Balance V1 和 v0.8.2 治疗波时长采样为历史基线；新法术与治疗佣兵的长期平衡仍需试玩反馈。
 
@@ -78,7 +84,7 @@ Sprint 6 已跳过，打包及硬件验收仍后置。历史发布：[v0.8.1 显
 
 `Source/little_king` 为代码及原生界面，`Content` 为地图／蓝图／数据资产，`Scripts` 为资产同步与审计工具，`docs` 为设计／协作记录／教程／验证，`ArtSource/StorybookV1` 归档原图、声音、提示词与许可，`Saved` 是不提交的本地日志及玩家档。
 
-内置单位身份、技能和行为由 C++ 保证，数据表用于数值及表现调节；自定义 UnitId 仍支持。v0.8.2 修改了单位／遭遇表、GameData 和治疗波资产；v0.8.3 通过原生内容和私有副本扩展，新增资源集中于 `Art/StorybookV1/V083`。本轮没有写回共享地图、蓝图和数据资产，协作者文件清单见 [53](docs/53-v0.8.3Changes.md)。
+内置单位身份、技能和行为由 C++ 保证，数据表用于数值及表现调节；自定义 UnitId 仍支持。v0.8.5 增加离线工具、地形和 JSON 关卡加载桥，沿用私有运行时副本，没有写回共享地图、蓝图和数据资产。协作者文件清单见 [62](docs/62-TerrainAndEncounterDesigner.md)，当前约束与易错点见 [项目交接](docs/64-ProjectHandoff.md)。
 
 主要资料：[GDD](docs/01-GDD.md)、[技术设计](docs/02-BattlePrototypeDesign.md)、[地牢 D0–D5](docs/18-DungeonChangeLog.md)、[家园 H0–H5](docs/27-HomeChangeLog.md)、[优化记录](docs/29-OptimizationChangeLog.md)、[素材清单](docs/12-AssetRequest.md)、[素材来源](docs/36-ArtAudioSources.md)。详细中文文档由英文 README 提供导航。
 
