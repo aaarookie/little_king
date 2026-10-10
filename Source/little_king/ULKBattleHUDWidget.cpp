@@ -613,7 +613,7 @@ void ULKBattleHUDWidget::RefreshNodeSelectPanel()
 	if (bShouldShow)
 	{
 		if (!NodeSelectWidget) { ShowNodeSelectPanel(); }
-		else { NodeSelectWidget->RefreshNodeSelect(); }
+		else { NodeSelectWidget->RefreshNodeSelectIfChanged(); }
 	}
 	else if (NodeSelectWidget)
 	{

@@ -351,3 +351,71 @@ test('legacy timed objects share the 64-wave budget and game IDs are case insens
   p.waves.push(M.createWave(30,12));fails(p);
   const q=M.createProject();q.objects=[M.createObject('skeleton',30,12),M.createObject('skeleton',31,12)];q.objects[0].id='Guard-A';q.objects[1].id='guard-a';fails(q);
 });
+
+test('portable import mutations match C++ strict fields, IDs, time waves and timestamps without changing the document', () => {
+  const base = fs.readFileSync(path.join(__dirname,'examples/terrain-ambush.json'),'utf8');
+  const reject = mutate => {
+    const p=JSON.parse(base); mutate(p); const before=JSON.stringify(p);
+    assert.ok(M.validate(p).errors.length); assert.equal(JSON.stringify(p),before);
+    assert.throws(()=>M.parseProject(before)); assert.equal(JSON.stringify(p),before);
+  };
+  for (const container of ['root','meta','field','settings','enemy','object','wave']) {
+    reject(p=>{ const v=container==='root'?p:container==='object'?p.objects[0]:container==='wave'?p.waves[0]:p[container];v.unknownField=1; });
+  }
+  for (const id of ['None','nOnE','_leading','-leading','角色','space id']) {
+    reject(p=>{p.meta.id=id;}); reject(p=>{p.objects[0].id=id;}); reject(p=>{p.waves[0].id=id;});
+  }
+  for (const date of ['2026-02-30T00:00:00Z','2026-10-10','2026-10-10T12:00:00Zjunk','2026-10-10T24:00:00Z','0000-01-01T00:00:00Z','2026-10-10T12:00:00+25:00']) {
+    reject(p=>{p.meta.createdAt=date;});
+  }
+  reject(p=>{p.enemy.cards=['Card_Unknown'];});
+  reject(p=>{p.objects[0].moduleId='Brush';});
+  reject(p=>{p.format='Little-King.Battle-Layout';});
+  reject(p=>{p.settings.encounterId='patrol';});
+  reject(p=>{p.enemy.cards=['unit_skeleton'];});
+  reject(p=>{p.waves[0].unitId='unit_skeleton';});
+  reject(p=>{p.objects[0].team='Neutral';});
+  reject(p=>{p.waves[0].trigger='Time';});
+  reject(p=>{p.meta.Title='Wrong case';});
+  reject(p=>{p.version='2';});
+  reject(p=>{p.field.width='40';});
+  reject(p=>{p.field.grid=true;});
+  reject(p=>{p.settings.seed='2026';});
+  reject(p=>{p.objects[6].spawnAtSeconds=true;});
+  reject(p=>{p.waves[0].count='2';});
+  reject(p=>{p.waves[0].time=false;});
+  reject(p=>{p.enemy.usesCards='false';});
+  reject(p=>{p.enemy.usesCards=1;});
+  reject(p=>{p.meta.id=123;});
+  reject(p=>{p.meta.title=123;});
+  reject(p=>{p.meta.description=false;});
+  reject(p=>{p.waves[0].label=123;});
+  reject(p=>{p.enemy.cards=[123];});
+  reject(p=>{p.meta.createdAt='2026-10-10T12:00:00Z\n';});
+  reject(p=>{delete p.waves[0].label;});
+  reject(p=>{p.waves[0].id=p.objects[0].id.toUpperCase();});
+  reject(p=>{p.waves[0].targetId='unrelated';});
+  reject(p=>{p.field.grid=.75;});
+  reject(p=>{p.objects[6].spawnAtSeconds=301;});
+  reject(p=>{p.settings.encounterId='Unknown';});
+  for (const date of ['2024-02-29T12:30:59Z','2026-10-10T12:30:59.123456789+08:00','0001-01-01T00:00:00Z']) {
+    const p=JSON.parse(base);p.meta.createdAt=date;assert.deepEqual(M.validate(p).errors,[]);
+  }
+  const p=JSON.parse(base);p.waves[1].targetId=p.waves[1].targetId.toUpperCase();assert.deepEqual(M.validate(p).errors,[]);
+});
+
+test('schema exposes the shared portable identifier and timestamp restrictions', () => {
+  const s=JSON.parse(fs.readFileSync(path.join(__dirname,'schema.json'),'utf8'));
+  for (const node of [s.properties.meta.properties.id,s.properties.objects.items.properties.id,s.properties.waves.items.properties.id]) {
+    assert.ok(new RegExp(node.pattern).test('Object-1.name'));
+    assert.ok(!new RegExp(node.pattern).test('_leading'));
+    assert.ok(new RegExp(node.not.pattern).test('nOnE'));
+  }
+  assert.deepEqual(s.properties.settings.properties.encounterId.enum,['Patrol','Elite','Boss','Encounter_UndeadPatrol','Encounter_UndeadElite','Encounter_SkeletonKing']);
+  for (const key of ['createdAt','updatedAt']) {
+    const n=s.properties.meta.properties[key];
+    assert.ok(new RegExp(n.pattern).test('2026-10-10T00:00:00Z'));
+    assert.ok(!new RegExp(n.pattern).test('2026-10-10T24:00:00Z'));
+    assert.ok(new RegExp(n.not.pattern).test('0000-01-01T00:00:00Z'));
+  }
+});

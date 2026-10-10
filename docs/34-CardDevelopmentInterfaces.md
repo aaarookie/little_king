@@ -1,199 +1,122 @@
-# 新增卡牌：代码入口、接口与接入顺序
+# 卡牌与战斗扩展接口
 
-2026-10-02 v0.8.3：新增九研究法术、十一召唤单位、统一法术执行器、按来源的黑云与飓风状态、治疗职业普攻以及施放后不可抽取的冷却接口。当前完整目录为 41 卡、39 单位；天使只注册单位，不注册佣兵卡。新增接口见本页末尾，变更记录见 [53](53-v0.8.3Changes.md)，素材与教程见 [54](54-v0.8.3Assets.md) / [55](55-v0.8.3Guide.md)。
+基线：v0.8.5，46 单位、48 卡。现行数值、品质与技能结算边界集中在 [内容图鉴](19-ContentCatalog.md)，全局生命周期见 [技术设计](02-BattlePrototypeDesign.md)，工坊格式和运行桥见 [62](62-TerrainAndEncounterDesigner.md)。
 
-2026-09-28 新接口：敌方专属卡必须登记 `LKCardRules::FactionOf/IsPlayerObtainable`，不能只从奖励 UI 隐藏。`ULKDeckState::CardAllowed` 保护玩家牌组初始化/添加/转换，GameMode 还执行最终权限校验。持续召唤区用 `ELKSpellEffect::SummonZone`、`FLKSkeletonCircleParams`、`ALKSkeletonCircle`，敌方通过 `CastEnemyTacticalSpell` 扣费，不走普通手牌入口。减速使用 `ApplyAreaSlow/RemoveAreaSlow` 按来源清理；敌方生成倍率由 `LKBalanceRules::InstanceScalesFor` 统一应用一次。完整协作记录和资产同步步骤见 [49](49-BalanceV1Implementation.md)。
+## 身份、目录与作者数据
 
-日期：2026-09-16。先于本轮七张新卡实施编写。适用 UE 5.8；沿用“原生代码保证身份，数据表调整数值，缺美术使用色块文字”。本轮具体规则与数值见 [35](35-TrollAndSiegeCards.md)，实施结果归入 [29](29-OptimizationChangeLog.md)。
+运行链为 `原生目录 → ULKGameData::EnsureCardLibrary → 获取／牌组 → GameMode 出牌事务 → LKUnitContent 合并 DT_Units → ALKUnitBase::InitUnit → 战斗组件 → 事件与结算`。
 
-## 1. 从卡牌到战斗单位
+| 入口 | 契约 |
+| --- | --- |
+| `LKUnitContent::Units/Find/MergeAuthoredTuning` | 全部内置单位的统一注册与身份校正；合法作者数值保留，未注册 UnitId 可完全数据驱动 |
+| `LKUndeadContent` | 亡灵单位与被动默认值 |
+| `LKExpeditionMercenaryContent::All` | 十四临时佣兵及历史同目录的攻城投石炮定义；投石炮当前走永久研究，不能单凭所在目录判断获取资格 |
+| `LKV083Content::Units/ConfigureCard` | 十一天使单位、九法术身份；天使不注册独立佣兵卡 |
+| `LKV084Content::UnitIdForCard/EnsureCards` | 七建筑及显式 CardId → UnitId 映射，未知 CardId 不推断名称 |
+| `LKResearchContent::All/Find/EnsureCards` | 十六法术书与八图纸的材料类型、阶位、门槛、价格、权重及默认卡牌 |
+| `LKHomeContent` | 初始／永久解锁和战备资格，注册目录不等于玩家已解锁 |
+| `LKCardPresentation` | 名称、品质、种族、治疗／攻击、费用、占格及技能详情的统一显示模型 |
 
-2026-09-20 补充：现有角色已完成 B 批单帧/卡面接入，见 [38](38-BattleArtIntegration.md)。新增素材可登记 `LKBattleArt::Sprite/CardIcon` 的默认映射；数据表 Sprite、卡牌 Icon 非空时优先使用自定义图。制作后保存完整提示词、参考图与哈希，运行 `Scripts/ImportBattleArt.py` 导入；新增目录项时同步更新脚本校验数量和测试，不能只放源 PNG。精灵组件抬高 8cm 防地面遮挡，逻辑根与碰撞留在 Z=0。
+`FLKUnitRow` 的 UnitId、类别、品质、种族、职业、技能类型、占格、建筑行为、产出单位等属于内置身份。基础生命、攻击、射程、间隔／前摇、移速、主动冷却、产兵间隔、部分技能参数和 Sprite／SpriteScale 由作者配置。品质参考系数只用于设计，不在运行时再次乘算。
 
-`原生内容目录 → ULKGameData::EnsureCardLibrary → 奖励/卡组 → GameMode 出牌 → LKUnitContent 合并 DT_Units → ALKUnitBase::InitUnit → 战斗组件 → 伤害事件 → 结算/存档`。
+`DeckSlots` 和 `bTargetsBuildingsOnly` 由原生目录保证；未知 CardId 默认占一格。`EmpowerDuration/EmpowerMoveMultiplier/EmpowerIntervalMultiplier` 等为可调参数。墙的合法施工／几何／反弹／范围数值保留，无效值回退对应代码基线；普通墙无反弹，高阶墙不能因旧表漏字段丢失能力。
 
-| 需求 | 文件与接口 | 责任与注意事项 |
-| --- | --- | --- |
-| 新单位/建筑的默认数值、名字、技能 | `LKExpeditionMercenaryContent::All`，`FLKTemporaryMercenaryDefinition`、`FLKUnitRow` | 当前远征临时卡统一注册在此；CardId 与 UnitId 相同。建筑须明确 UnitClass 与 BuildingBehavior，不能只在名字里写建筑。 |
-| 普通永久单位或敌人 | `LKUnitContent`、`LKUndeadContent` | 注册单位不等于解锁卡牌。是否进入家园解锁由 `LKHomeContent` 另行控制。 |
-| 新规则类型 | `LKTypes.h` | 品质、种族、主动/被动类型等反射枚举。新增值只追加，避免改变已有序号损坏旧档。 |
-| 可调参数 | `LKDataTypes.h` 的 `FLKUnitRow` | 基础生命、攻击、间隔、射程、移速、冷却；为新技能增加必要参数。默认值必须支持没有数据表行。 |
-| 内置身份兜底 | `LKUnitContent::MergeAuthoredTuning` | 合并后恢复品质/种族/技能/建筑行为等身份字段，保留表内合法调参数值。不要让复制错的表行改变一个内置角色。 |
-| 卡牌定义 | `ULKCardDefinition`、`ULKGameData::EnsureCardLibrary` | 单位/建筑/法术类型、银币、图标、法术等级、临时标记。现有资产先复制到运行时再补全身份，不修改共享资产。 |
-| 新卡获取 | `ALKBattleGameMode::BuildRunRewardOffers` | 从临时目录生成候选，排除已持有 ID，使用远征种子、冻结候选。新增卡不必再逐个硬编码奖励。 |
-| 部队容量 | `LKCardRules::Slots/Used` | 按 CardId 查询占格数、求总占格。8 是部队容量，4 是手牌数量；不能把所有 `Cards.Num()` 都简单替换。 |
-| 领取和替换 | `ULKRunSubsystem::ChooseReward/ChooseRewardReplacingCards` | 校验占格、唯一性和至少五种卡；先构造完整新牌组，保存成功才发布。失败恢复原卡组、强化和奖励批次。 |
-| 手牌过牌 | `ULKDeckState::InitDeck/PlayCard/AddCardToDeck/TransformCard` | 四槽一牌一格不变；增加/转换卡牌也须校验部队容量。卡组保留第五种卡用于循环，始终四槽满且无同类重复。 |
-| 普通攻击 | `ALKUnitBase::PerformAttack` | 攻击次数型技能在实际出手时结算，前摇被打断不计次；弹丸附带攻击快照，命中时处理效果。 |
-| 冷却主动技能 | `ULKUnitActiveComponent::Initialize/TickAbility/TryActivate` | 只在战斗中推进，不在部署自动施法；检查死亡、控制、营地移动、冷却。新增一个类型和明确执行函数。 |
-| 事件被动 | `ULKUnitPassiveComponent::ObserveCombatEvent/ObserveDefeat` | 普攻命中、实际治疗、死亡等事件。区分每次出手与每次命中，避免技能/持续伤害递归触发普攻。 |
-| 本轮通用状态 | 新增 `ULKUnitStatusComponent` | 眩晕、冰冻、强化、灼烧、目标上的冰火历史。统一计时、清理、查询，不让各张卡分别写一套状态。 |
-| 伤害/治疗 | `LKGameplay::ApplyDamage/ApplyHeal` | 统一无敌、减伤、实际数值、击杀、事件批次。最大生命按比例变更不是治疗，不能走 ApplyHeal。 |
-| 弹丸命中 | `ALKProjectile::ApplyLaunchParams/Tick/DeactivateToPool` | 新冰火类型在发射时随机并快照，命中目标保存历史。池化回收必须清空所有新状态，不能污染下一发。 |
-| 索敌限制 | `ALKUnitBase::CanPursueTarget/FindNearestEnemy/SetTarget` | 只能打建筑应作为统一资格过滤，嘲讽、集火和弹丸拦截也不得绕过。营地始终不可攻击。 |
-| 位移 | `ULKUnitMovementComponent::MoveSkillDelta` | 世界单位厘米；3 米等于 300。击退不能推动建筑，不能穿过建筑、营地或场地边界。 |
-| UI 文字、分类与详情 | `LKCardPresentation` | 统一中文品质、种族、费用、占格和技能说明。可调技能参数从合并后的单位行读取。 |
-| 领取 UI | `ULKRunRewardWidget`、`ULKBattleHUDWidget`、`ALKBattleGameMode_Run` | 超额时选择一张或多张旧卡，显示释放容量和最终容量，最后一次性确认；返回不消费奖励。 |
-| 家园与地图 | `ALKHomeGameMode`、`LKHomeContent`、`ULKRunNodeSelectWidget` | 展示“容量 x/8”和卡牌张数；临时卡仍不变成永久解锁。 |
-| 存档 | `LKRunTypes`、`ULKRunSubsystem::ValidateStoredRun/MigrateStoredRun/SaveExpeditionToSlot` | 卡组存稳定 ID 与强化。新增内容规则版本应显式迁移，旧档超额让玩家裁减，不能静默删除。战斗临时状态不跨房保存。 |
+GameData 与已有卡牌 DataAsset 先复制为运行时私有定义再补身份，不能写回共享资产。CardId 和 UnitId 分别管理：早期佣兵恰好相同，新建筑使用 `Card_* → Unit_*`；`LKUnitContent::Find` 只支持明确登记的卡别名。工坊 `catalog.js`（48 CardId）与 `units.js`（46 UnitId）在注册内容变化时同步。
 
-## 2. 最小接入流程
+`LKTypes.h` 反射枚举仅在尾部追加，保持旧序号。存档保存稳定 ID 与本轮等级，临时战斗状态不写档；新增内容不会自动解锁旧档或重抽旧商品。
 
-1. 写明卡牌身份、数值档位、银币、占格、获取途径、技能边界。
-2. 在内容目录新增稳定 ID，必要时扩展枚举与行字段；确认原生注册和身份合并。
-3. 接入卡库并校验类型，确认无需任何 `.uasset` 就能生成。
-4. 优先复用公共战斗接口；新技能至少明确触发时间、目标、死亡/控制/结算清理、伤害来源和是否触发其他被动。
-5. 统一更新卡牌详情、手牌提示、奖励与容量校验，确认有路径实际获得和部署。
-6. 测试边界与原流程回归，记录修改文件、存档影响、验证报告和新手操作。不得把未执行的测试写为通过。
+## 获取、容量与保存事务
 
-## 3. 本轮特别容易遗漏的点
+敌方专属卡必须通过 `LKCardRules::FactionOf/IsPlayerObtainable` 登记。`ULKDeckState::CardAllowed` 保护玩家初始化／添加／转换，GameMode 再校验权限；仅在 UI 隐藏不构成限制。`IsTemporaryMercenary` 同时检查单位类别和临时目录，新卡奖励只允许十四佣兵集合。
 
-- 多格是卡组预算，不是在四张手牌里复制同一张牌。入队或替换必须按总占格计算；多卡删除须原子提交。
-- 巨魔王支援效果按“是否至少存在一位存活友方对应单位”判断，不按数量叠加；最后一位死亡才移除。
-- 生命上限变化前保存百分比，再同时更新最大生命和当前生命；不触发治疗、伤害、共沐春色或战斗统计。
-- 眩晕/冰冻同时阻止 FSM 移动、移动组件、普攻和主动技能；英雄 GAS 自动施法入口也必须检查。
-- 双头龙的上次头部类型存放在受击目标，不能放在某一条龙身上。其他普通伤害不清空冰火历史；新 Actor 无历史。
-- 巨像费用必须有可达到的银币上限，UI 应明确当前上限不足。全图炮的射程、索敌和弹道都应能到达目标。
-- 所有战斗临时效果在死亡/房间重置/战斗结束时清理；不能让结算界面继续掉血。
+`BuildRunRewardOffers` 根据远征种子生成冻结候选。`ChooseRewardReplacingCards` 一次提交完整弃牌 ID 清单，旧单卡 `ChooseReward` 转入同一实现；`ULKRunRewardWidget::ConfirmReplacements` 是确认入口，勾选只改 UI 草稿。保存失败恢复牌组、强化与奖励批次，新卡不继承旧卡等级。
 
-## 4. 如何验证
+`LKCardRules::Slots/Used` 计算占格；`DeckCapacityMinimum/Maximum` 从出征快照读取，默认 8/8。`ValidateReplacement` 用按释放格数／张数的动态规划选择固定上限的最少必要方案；动态区间只检验最终区间与五种卡底线。正式出征至少七种。`SetDeckCapacityRule` 可在安全点更新规则，UI 与读档不硬编码八格。
 
-自动化放在 `Source/little_king/Tests`，使用独立测试存档。至少覆盖目录与类型、加权容量及多卡失败回滚、强化计时/控制/免疫、生命比例、六次攻击、共享冰火历史/灼烧刷新叠加、仅建筑索敌和最大距离命中。完整引擎构建后运行 `Automation RunTests LittleKing`；界面另外使用渲染模式检查 720p/1080p。测试不替代长期数值平衡试玩。
+`LKMarketContent::Generate` 为新 Gen2 市场按三类商品生成独立随机流；旧 `LKResearchContent::GenerateMarket` 只服务兼容路径。新店首次进入时按冻结的银币成本／上限、出征时永久研究排除集、当前携带材料和牌组过滤；类别候选耗尽不制造重复商品。`ValidateMarketPurchase` 提供 UI 与提交共用的只读原因；`PurchaseMarketOffer` 原子更新金币、售出回执及牌组／材料／道具，保存失败不发布。
 
-## 5. 本轮可复用接口
+`ULKProfileSubsystem::ResearchCard` 消耗材料并永久解锁，失败回滚。`UpgradeAtRest` 要求当前未消费休息节点、已持有合法法术／建筑和预期等级，成功后关闭回血选项。`UpgradeMultiplier` 为 `1.1^Lv`；战斗奖励只升级佣兵，效果升级字段见下表。
 
-```cpp
-// 预算根据稳定 CardId 的原生定义查询；不是手牌槽数。
-const int32 CostInSlots = LKCardRules::Slots(TEXT("Unit_Colossus")); // 3
-const int32 UsedSlots = LKCardRules::Used(Run->GetRunState().Cards);
+## 普攻、主动技能与状态
 
-// 替换界面仅维护选中的 ID；确认时一次提交完整清单。
-const TArray<FName> ReplacedIds = { TEXT("Unit_Swordsman"), TEXT("Unit_Archer") };
-const bool bSaved = Run->ChooseRewardReplacingCards(RewardIndex, ReplacedIds);
+| 接口 | 执行边界 |
+| --- | --- |
+| `ALKUnitBase::PerformAttack` | 实际出手才计次数，前摇取消不计；命中类效果等待真实命中事件 |
+| `ULKUnitActiveComponent::Initialize/TickAbility/TryActivate` | 背刺、模仿、冲刺、巨魔强化统一调度；检查阶段、死亡、控制、手动／服务移动和冷却 |
+| `ULKUnitPassiveComponent::ObserveCombatEvent/ObserveDefeat` | 消费实际正数变化与批次死亡，区分出手、命中、技能与持续伤害 |
+| `ULKUnitStatusComponent` | 眩晕、冰冻、强化、灼烧、巨魔支援及目标冰火历史；单位 Tick 推进、统一 `Clear` |
+| `LKGameplay::ApplyDamage/ApplyHeal` | 统一来源、减伤、无敌、实际变化、事件批次与击杀，禁止以直接改 Health 代替 |
+| `ALKProjectile::ApplyLaunchParams/DeactivateToPool` | 发射快照和池化回收；附加效果不得污染下一发 |
+| `ALKUnitBase::CanPursueTarget/CanDiscoverTarget/SetTarget` | 统一阵营、建筑限定、隐藏及目标合法性，嘲讽／集火不得绕过 |
+| `ULKUnitMovementComponent::MoveSkillDelta/MoveWindDelta` | 冲刺、击退、风移共享障碍与边界；固定建筑和高台驻军不被强制推移 |
 
-// 状态由单位拥有，受战斗时钟推进，并在死亡/结算/重置时统一清理。
-Target->GetStatusComponent()->Stun(2.f);
-Target->GetStatusComponent()->Freeze(1.f);
-Caster->GetStatusComponent()->Empower(8.f, 1.3f, .75f);
-```
+眩晕／冻结同时阻止自主移动、普攻与主动技能，英雄 GAS 入口也检查控制。巨魔王只免疫眩晕，冰冻仍有效。`BeginAttack/AfterAttack` 记录王的第六击与强化副作用，取消前摇不能积累次数。巨魔支援按存活种类存在性，不按个数叠加；最大生命修饰前保存当前百分比，再同步新最大／当前生命，不触发治疗或伤害。
 
-以上是调用示意，调用方需先取得有效的 `Run`、`Target`、`Caster` 和当前奖励索引。`ChooseReward` 的旧单卡签名保留并转入新实现；多卡界面调用新接口。`ULKRunRewardWidget::ConfirmReplacements` 是确认按钮入口，勾选本身不修改远征状态。
+`ReceiveBreath/Ignite` 把上次冰火头与点燃保存在受击目标；所有双头龙共享该历史，其他伤害不清空。冰火类型在发射时使用战斗随机流并快照，发射者死亡不改变在途弹丸。点燃刷新时保留每秒跳伤进度，持续伤害不再触发吐息。死亡、结算、换房及对象池回收分别清理所属状态。
 
-`DeckSlots` 与 `bTargetsBuildingsOnly` 属于代码保证的身份字段；表内同名字段不会覆盖内置规则。未注册的新 CardId 默认占 1 格，需要多格时先注册到原生目录。`EmpowerDuration/EmpowerMoveMultiplier/EmpowerIntervalMultiplier` 则是可由数据表调整的技能参数。实际实现已完成，验证与接手说明见 [35](35-TrollAndSiegeCards.md)。
+精灵恢复只监听自身普攻／弹丸实际伤害。共沐春色按精灵实际治疗量复制，`Skill_SharedSpring` ActionId 阻止递归；并列最低血比英雄按稳定实例排序。大盗背刺锁定是目标优先级特例，但隐藏等发现资格仍可解除锁定。
 
-## 6. C 批后的表现接口
+## 公共法术与职业治疗
 
-新增卡牌的技能表现复用 `ULKPresentationSubsystem::Emit(World, Type, Location, Radius, Origin)` 和 `Sound(World, Id, Location)`；伤害、治疗、眩晕等仍由原战斗接口执行，不能从特效计时反向触发伤害。通用治疗、退场、控制状态已在底层生效处接好，不要在每张新卡里重复播放。新专属声音先加入 `LKWorldArt::SoundIds/SoundInterval` 及导入源目录，再由 GameData 的默认映射补齐；资源覆盖/显式静音继续通过 SoundMap 配置。
+`LKSpellExecutor::Validate` 返回 `ELKPlayResult`，检查位置、权限、参数及召唤容量。`PlanSummons` 确定性规划整组不重叠位置，考虑建筑、营地、单位和边界；任一成员失败拒绝整组，验证不消耗战斗 RNG。
 
-表现实例不写入远征存档，不消耗 `GetBattleRandom()`。队列自动限额和过期清理，火球震动仍由 GameMode 的既有释放入口控制。营地/地图/FX 路径、实际绑定表与素材来源见 [40](40-WorldSkillsArtIntegration.md)。
+`Execute` 执行效果，普通卡与学徒模仿共用；真正手牌施放仍经 `PlayCardForTeam` 做费用、权限、过牌和冷却事务。执行器自身不扣费或改手牌；模仿作为单位技能，不给原卡施加抽牌冷却。`bIgnorePlacement` 仅用于明确授权的内部技能／隔离测试，不能绕过普通出牌权限。
 
-## v0.8.2：获取来源、研究和休息升级接口
+| `ULKCardDefinition` 字段 | 含义与本轮升级 |
+| --- | --- |
+| `SpellValue`、`HeroHealPercent` | 固定伤害／治疗与英雄附加比例乘升级系数；祝福英雄比例封顶 100%，非英雄固定全额恢复 |
+| `EffectDuration` | 冰冻／黑云持续时间随升级增加；飓风固定 5 秒 |
+| `SpellRadius`、`SpellHalfExtents` | 圆形半径／飓风矩形半边长，厘米，范围不随升级变化；祝福全场允许半径为零 |
+| `ForceMoveSpeed` | 飓风世界 +Y（画面右侧）速度，随升级增加 |
+| `DrawCooldown` | 成功施放后禁止抽取秒数，祝福固定 150 秒 |
+| `MaxHealthDamageFraction` | 雷电第一击固定最大生命 20% |
+| `SpellValue`、`SecondarySpellValue` | 雷电首击上限 200／次击 100，均乘升级系数 |
+| `SecondaryDelay` | 雷电延迟固定 0.2 秒，到期重新选择最低当前生命目标 |
+| `bGlobalPlacement` | 增援／祝福自身全场落点权限，由身份保证，不随升级变化 |
+| `SummonedUnitIds` | 整组单位清单；人数／品质不变，出生生命与攻击／治疗随升级放大 |
 
-v0.8.2 时注册目录为 32 卡，v0.8.3 扩展为 41 卡。`LKCardRules::IsTemporaryMercenary` 同时检查原生兵种与临时目录，远征新卡仅允许此集合；`IsPlayerObtainable` 拒绝三张敌方专属。攻城投石炮作为建筑不再进入临时佣兵掉落池。
+增援将法术 CardId 传给 `SpawnUnitForTeam` 的 `SourceCardId`，在出生属性副本中放大数值；不以出生后治疗／伤害修正，避免误触发被动和统计。雷电只选敌方存活非英雄，首领排除；黑云不拦地面效果。
 
-研究目录为 `LKResearchContent::All/Find/EnsureCards`：稳定 CardId、材料类别、法术阶位、价格、最早区域深度、权重、默认数值。运行时定义复制到 GameData 私有目录；既有法术图标被复用，阶位由代码保证，效果数值允许资产覆盖。新增图纸也须注册建筑定义。永久材料存于 Profile，购买后本轮携带于 Run，终态结算以同一 ID 幂等交付；`ULKProfileSubsystem::ResearchCard` 消耗材料并永久解锁，保存失败回滚。
+`ALKSpellField` 管理黑云、飓风与雷电延迟，只随战斗推进，结算／销毁／换房清理来源。`ApplyConcealment/RemoveConcealment`、`ApplyWind/RemoveWind` 以场效 Actor 名称分别登记，重叠场效只清自己的来源。`IsConcealed` 与 `IsTargetable` 分开，隐藏不等于死亡、无敌或无碰撞。
 
-`LKResearchContent::GenerateMarket` 按稳定 CRC + RunSeed 生成后冻结。`ULKRunSubsystem::PurchaseMarketOffer` 在一次存档事务中修改金币、售出回执和牌组／材料；禁止重复买、重复卡、未知材料。不要由 UI 直接修改钱包或材料。
+`IsWindDriven` 只抑制自主行走，不是眩晕／冻结。`ApplyWindDisplacement` 经移动组件检查真实障碍与边界，实际位移计入动画，不能用直接 SetActorLocation 穿墙；逆向自主走路不能抵消风。法阵用 `ELKSpellEffect::SummonZone`、`FLKSkeletonCircleParams`、`ALKSkeletonCircle`，敌方经 `CastEnemyTacticalSpell` 独立消费；`ApplyAreaSlow/RemoveAreaSlow` 按来源取最强减速，不叠乘成定身。
 
-`ULKRunSubsystem::UpgradeAtRest` 仅在未消费休息节点、已有合法法术／建筑、等级匹配时成功，关闭回血选项；`LKCardRules::UpgradeMultiplier` 数值为 `1.1^Lv`。战斗奖励只允许佣兵升级。`HeroHealPercent` 是英雄最大生命的附加治疗比例，普通与英雄的固定治疗项都应用升级系数；学徒模仿沿用被模仿卡的本轮等级。
+`bBasicAttackHeals` 是牧师职业身份，AttackDamage 为单次基础治疗，间隔、射程和前摇复用普攻。牧师选择可发现受伤友军，忽略敌方嘲讽；`ALKProjectile::SetHealingPayload` 固定友方目标，不拦截成敌人，也不触发伤害型普攻被动。实际回血仍走 `ApplyHeal`，不能救起失能英雄。
 
-容量来自冻结的 `DeckCapacityMinimum/Maximum`，默认 8/8；`SetDeckCapacityRule` 可在安全点改变未来规则。`ValidateReplacement` 使用按释放格数／张数的动态规划求固定上限的最小必要方案，区间规则仅检验最终区间和五种牌底线。正式出征至少七种，UI 同步读取当前动态上限。跨房保存和重新加载不回到硬编码八格。
+## 抽牌冷却
 
-新增技能或界面前先阅读 [50](50-v0.8.2ExpeditionChanges.md)，验证获取权限、回滚、旧档、暂停、等级展示和素材归档，不从旧教程恢复建筑奖励或临时回家入口。
+`CanPlayWithCooldown` 在消费前保证冷却后仍有四种可用手牌；执行成功才 `PlayCard(HandIndex, DrawCooldownSeconds)`，首个未冷却项补原槽。失败不能扣费、改队列或提前设冷却。
 
-## v0.8.3 法术与召唤单位接口
+`GetCooldownRemaining` 查询当场剩余时间，`AdvanceCooldowns` 由战斗 Tick 推进，暂停停止。`GetNextCard` 跳过冷却项，冷却牌仍在原队列位置，到期恢复 FIFO 资格。换房 `InitDeck` 清空冷却，退出重试沿用战前状态。
 
-`LKV083Content::Units` 登记天使的角色身份和默认数值，`ConfigureCard` 登记九法术的规则身份。法术的阶位、书价、市场权重和数值仍通过 `LKResearchContent::All/EnsureCards` 接入研究流程。已有资产先复制成 GameData 私有定义，再恢复规则字段；身份不能因为调表而从治疗职业变成伤害单位，也不能把增援天使放进佣兵奖励池。
+兼容的五卡组若一张冷却，剩余四种可用卡打出后可立即重抽自身，以维持四槽唯一；再施放冷却牌会不足四种时拒绝。`TransformCard` 保留剩余冷却，不能靠转换绕过限制。
 
-`ELKSpellEffect` 追加 `Freeze / Reinforcements / BlackCloud / Lightning / Hurricane / DivineBlessing`，旧枚举序号保持不变。`ELKRace::Angel` 也是末尾追加。新增法术无需生成 DataAsset 才能运行，原生默认可用；研究资格仍由永久档校验，不能把“目录存在”等同于“玩家已解锁”。
+## 建筑几何、事务与服务
 
-| 卡牌字段 | 用途与单位 | 升级行为 |
-| --- | --- | --- |
-| `EffectDuration` | 冰冻、黑云、飓风持续秒数 | 冰冻和黑云随本轮等级放大；飓风维持五秒 |
-| `SpellHalfExtents` | 飓风矩形半边长，厘米，X/Y 对应世界轴 | 范围不随本轮等级扩大 |
-| `ForceMoveSpeed` | 飓风朝画面右侧推移速度，厘米/秒 | 乘本轮升级系数 |
-| `DrawCooldown` | 施放成功后禁止再次抽取的战斗秒数 | 神圣祝福维持 150 秒，不随升级缩短 |
-| `SecondarySpellValue` | 雷电第二击的固定伤害 | 乘本轮升级系数 |
-| `MaxHealthDamageFraction` | 雷电第一击目标最大生命比例 | 保持 20%，不能随本轮等级扩大 |
-| `SpellValue` | 原伤害/治疗数值；雷电第一击伤害上限 | 雷电上限 200 随升级放大；实际伤害为比例项与上限的较小值 |
-| `SecondaryDelay` | 雷电第二击延迟秒数 | 保持 0.2 秒 |
-| `bGlobalPlacement` | 法术自身允许全场落点，与法师存活独立 | 增援与祝福由原生身份保证；不允许数值升级改变施法权限 |
-| `SummonedUnitIds` | 增援一次召唤的完整稳定 UnitId 清单 | 品质和角色清单不变；出生生命与攻击/治疗量受升级影响 |
-| `HeroHealPercent` | 治疗波的英雄附加项；神圣祝福的英雄恢复比例 | 祝福为 20% 乘系数、封顶 100%；非英雄始终恢复 100% 最大生命 |
+`ELKBuildingBehavior` 包括 `Wall/SiegeCart/MageTower/HealingStation`，`FLKUnitRow` 的 `ConstructionSeconds/WallLength/WallThickness/ReflectDamage/WallAuraRange` 是秒或厘米数值。具体品质、数值、修补距离与服务规则见图鉴。
 
-`SpellRadius` 继续服务圆形范围。祝福是全场效果，允许半径为零，不能被统一的“半径必须正数”校验拒绝。雷电最高和最低按当前绝对生命选择，延迟第二击必须重新选择目标；两击只选敌方非英雄，不因为黑云而禁止地面效果命中。
+`ValidateCardPlay/PlayCardForTeam` 的可选 `PlacementYaw` 接收朝向。`SpawnUnitForTeam` 接收来源卡、朝向和经事务校验的同阵营 `ReplacedWall`；先成功创建新实体，再移除旧墙，失败保留旧墙与手牌。替换不增加最终单位数量，不以死亡事件移除旧墙，避免误触发被动／奖励。修补按品质决定，保持旧中心与正反朝向。
 
-### 统一施法入口
+`LKBuildingGeometry::WallShape` 是平面胶囊：半径为厚度一半、中轴段长为总长减厚度。`CanPlaceWall` 校验完整足迹，`FindMatchingWall` 找修补对象，`RayHit` 返回连续弹道最早命中。`LKNavigation::FObstacle::HalfSegment=0` 表示圆，非零表示墙段；各管线复用这套形状。
 
-`LKSpellExecutor::Validate` 返回明确的 `ELKPlayResult`，先检查合法位置、权限、参数与召唤容量。`PlanSummons` 使用确定性的环形候选，在建筑、营地、单位体积与战场边界之外，为完整队伍规划不重叠的位置；验证与失败不消耗战斗随机流。任何一个位置无法找到时拒绝整次召唤，不只生成部分角色。
+`FindBlockingEnemyWall` 为无法抵达的战斗目标选择可接近敌墙，能绕行则仍绕行，治疗者不能变为打墙。施工完成的 `DisplaceOverlappingUnits` 只搬到合法空位，不制造伤害。
 
-`LKSpellExecutor::Execute` 负责法术的实际效果，GameMode 普通出牌与学徒法师模仿共用它。真正的手牌施放由 `PlayCardForTeam` 执行权限与费用事务；执行器自身不扣费、不改变手牌。模仿没有手牌出牌事务，也不会给被模仿的卡施加抽取冷却。调用方必须清楚自己是在施放卡牌还是释放单位技能，不能直接绕过外层权限。
+障碍 ≤12 时使用每圆／胶囊周围 16 候选点的可见图；更多障碍改网格 A*，目标约 6000 点、绝对上限 8192，每点最多扩展一次，最低采样间距 40 厘米，路径收直最多额外检查 512 条线段。网格候选点、八向边、起终点连接及收直仍检查精确几何，不得斜穿墙角；大量障碍下窄通道可能被保守拒绝。
 
-`ALKSpellField` 承担黑云、飓风与雷电延迟的世界生命周期。场效只在战斗阶段推进，结算、销毁或换房清理来源状态，不留下跨房定时器。当前黑云作用于双方单位，离开区域即恢复可发现；飓风作用于双方可移动角色，建筑和营地保持固定。飓风方向为世界 `+Y`，与当前相机的画面右侧一致。
+最近四份纯数值几何网格缓存只在游戏线程使用，不持 Actor／World 引用；施工、移动、旋转、损毁或碰撞间隙变化导致几何不一致时切换缓存。可选 `LKNavigation::FSearchStats` 输出网格／缓存使用、节点和精确碰撞次数，不依赖硬时间阈值证明功能。
 
-```cpp
-// 普通卡牌从 GameMode 的事务入口施放，验证失败不会扣费或过牌。
-const ELKPlayResult Result = GM->PlayCardForTeam(ELKTeam::Player, HandIndex, Location);
+`ALKUnitBuilding` 与 `ALKUnitBase_Buildings` 管理驻守者／患者双向预约、移动、进入、释放。死亡、建筑损毁、结束战斗和无可达入口清理双方引用。法师 `bIsMage` 与牧师 `bBasicAttackHeals` 只定义职业，不授予英雄特性；塔只加速主动冷却。治疗站在实际治疗入口加倍率，患者生命低于 50% 才接诊，入站后治到满血。
 
-// 场效或单位技能执行器调用示意；GM、Card、Instigator 均需有效。
-// bIgnorePlacement=true 仅供明确授权的内部技能与隔离测试使用。
-const ELKPlayResult Check = LKSpellExecutor::Validate(GM, Card, Team, Location);
-if (Check == ELKPlayResult::Success)
-{
-    LKSpellExecutor::Execute(GM, Card, Team, Location, Instigator);
-}
-```
+## 表现与验证边界
 
-增援生成时把对应法术 ID 传入 `SpawnUnitForTeam` 的 `SourceCardId`，在出生属性副本中应用本轮强化。不要先用普通数值出生、再通过伤害或治疗事件“补成升级值”，否则会误触发被动和统计。
+`ULKPresentationSubsystem::Emit/Sound` 接收视觉／声音事件，通用治疗、退场和控制在底层生效处播放，专属卡不要重复触发。表现不保存、不消耗战斗 RNG，自动限额及过期清理；火球震动仍由 GameMode 释放入口控制。
 
-### 新状态与治疗普攻
+`LKBattleArt/LKPolishArt/LKV083Art/LKV084Art` 提供默认 Sprite、Animation、CardIcon 与声音映射；明确作者素材、显式静音和关闭默认声音优先。历史 `WalkingUnitIds` 只表示 MovementFix 覆盖集合，不是完整单位目录。原图、提示词、声音参数与许可集中于 [素材来源](36-ArtAudioSources.md)。
 
-黑云使用 `ULKUnitStatusComponent::ApplyConcealment/RemoveConcealment`，飓风使用 `ApplyWind/RemoveWind`，每个场效 Actor 的名称作为独立来源 ID。同类场效重叠时只清自己的来源，不能清除另一个仍在生效的场效。`Clear` 和来源过期统一解除状态。
+相关自动化在 `Source/little_king/Tests`，按行为修改覆盖身份／权限、获取回滚、容量、实际出手／命中、状态清理、生命周期、隐藏／治疗、召唤整体失败、墙几何及服务关系。界面像素与主观音量另需实际渲染／听感，自动化不能证明长期平衡。当前已执行的发布证据见 [62](62-TerrainAndEncounterDesigner.md)，历史结果见 [开发历史](DevelopmentHistory.md)。
 
-`IsConcealed` 与 `IsTargetable` 分离：隐藏单位仍然存活，也仍能被地面法术影响。单位索敌使用 `CanDiscoverTarget` 与 `RefreshDiscoveredTarget`，常规目标过滤、嘲讽、集火、技能和弹丸追踪共同遵守可发现规则。不要把隐藏实现成无敌或删除碰撞。
+## 道具与市场接口
 
-`IsWindDriven` 只阻止自主走路，不等同于眩晕或冰冻。`ALKUnitBase::ApplyWindDisplacement` 经 `ULKUnitMovementComponent::MoveWindDelta` 检查建筑、营地与边界，将实际位移积入动画旅行量；原生朝向和步态跟随风的方向。强制风移不能与逆向自动移动抵消，也不能用直接 `SetActorLocation` 穿越建筑。
+`LKItemContent::All/Find` 注册道具稳定 ItemId、名称、用途、饰品／装备类别和占位标记。`FLKItemInstance` 用独立 GUID 与品质保存实例；不能复用 CardId 或 UnitId。初版 `Item_Accessory01`、`Item_Equipment01` 均无属性。替换正式内容时保持已存 ItemId 与实例语义；若改 ID 或增加属性，要实现迁移，不能删除旧定义令玩家库存失效。
 
-`FLKUnitRow::bBasicAttackHeals` 是代码保证的职业身份。牧师的 `AttackDamage` 表示单次基础治疗量，其他攻击间隔、射程、前摇仍使用公共普攻管线。治疗单位选择可发现的受伤友军，忽略敌方嘲讽；治疗弹丸用 `ALKProjectile::SetHealingPayload` 固定其友方目标，不拦截为敌人，也不触发普攻伤害类被动。真正恢复仍通过 `LKGameplay::ApplyHeal`，英雄失能后不能在战内救起。
-
-### 冷却与满手过牌
-
-出牌前调用 `ULKDeckState::CanPlayWithCooldown` 验证冷却施放后是否仍能维持四种可用手牌。成功执行法术后，通过 `PlayCard(HandIndex, DrawCooldownSeconds)` 开始冷却，并把第一个未冷却队列项补进原槽；失败不能先设冷却、扣银币或修改队列。
-
-`GetCooldownRemaining(CardId)` 只查询当前战斗的剩余冷却，`AdvanceCooldowns` 由 GameMode 战斗 Tick 推进，暂停不推进。`GetNextCard` 返回第一个未冷却项；暂不可抽的卡仍留在原队列，到期恢复正常 FIFO 资格，既不丢失也不重复。换房 `InitDeck` 清空冷却；退出重试仍从战斗前状态开始，不保存战中冷却。
-
-正式出征至少七种卡。旧兼容的五卡牌组若有一张冷却，仅余四种可用卡；此时打出非冷却卡后可以立即重抽同一张，保留四槽完整且唯一。如果再施放其他冷却卡会不足四种，预校验会拒绝。`TransformCard` 保留旧卡的剩余冷却，避免转化绕过冷却。
-
-### 新素材路径
-
-`LKV083Art::Sprite/Animation/CardIcon` 负责五套图集、九卡图的默认映射，`LKBattleArt` 与 `LKPolishArt` 统一分派。原有 `LKPolishArt::WalkingUnitIds` 只列历史 24 个 MovementFix 覆盖对象；天使移动使用自己的新图集，不必加入这份历史覆盖名单。39 单位共 528 个运行时独立姿态，三品质共享角色图集。
-
-新增声音使用 `LKV083Art::SoundIds/SoundPath/SoundInterval`，GameData 补缺省映射，Presentation 同时允许新旧声音 ID。明确自定义 Sprite/Icon/SoundMap、显式静音和关闭默认声音的选择仍优先。图片原始字节、完整提示词与六条声音参数归档到 `ArtSource/StorybookV1/V083`，引擎资源只写 `/Game/Art/StorybookV1/V083`。
-
-## v0.8.4 · 具有体积、朝向和服务关系的建筑
-
-本轮具体数值与修补规则见 [57](57-v0.8.4Changes.md)。`LKV084Content` 提供七种建筑的单位表、卡牌 ID、`UnitIdForCard` 显式映射与卡库注入。研究目录登记对应 `BuildingBlueprint`，而不是把建筑塞进临时佣兵池。`Card_WallCommon` 等卡牌与 `Unit_WallCommon` 等单位身份分离；`LKUnitContent::Find` 对已登记卡支持别名，以便既有 `LKCardRules::IsBuilding`、休息升级和家园颜色查询继续工作。不要对任何未知 `Card_` 字符串自动猜测单位 ID。
-
-`ELKBuildingBehavior` 追加 `Wall / SiegeCart / MageTower / HealingStation`。`FLKUnitRow` 增加施工秒数、墙长、墙厚、反弹值和墙光环范围。上述几何均为厘米；300 厘米即 3 米。品质和职业是稳定身份，合法数值仍由作者表行调整。普通墙没有反弹；高阶墙不因旧表新增字段漏填而意外丢失反弹。
-
-### 放置事务与共享几何
-
-`ValidateCardPlay` 和 `PlayCardForTeam` 新增可选参数 `PlacementYaw`。普通卡调用保持兼容；墙卡由控制器提供朝向。旋转、修补、替换必须走同一事务入口，不能在 UI 回调里先扣钱或销毁旧墙。
-
-```cpp
-const ELKPlayResult Result = GM->PlayCardForTeam(Team, HandIndex, Location, PlacementYaw);
-```
-
-`LKBuildingGeometry::WallShape` 将墙定义为胶囊形平面体积，半径为厚度的一半，中轴段长为总长减厚度；它与实际显示的 3 米墙长相符。`CanPlaceWall` 检查完整足迹而非中心点，`FindMatchingWall` 识别修补/替换目标，`RayHit` 检查整段弹道的首次命中。`LKNavigation::FObstacle::HalfSegment` 为零时保留原有圆障碍，非零时使用墙段胶囊；寻路、移动、弹丸与放置不得分别复制另一套近似圆半径逻辑。
-
-`SpawnUnitForTeam` 的来源卡用于本轮休息升级，放置朝向用于初始化墙体；`ReplacedWall` 只允许事务已验证的同阵营旧墙，替换不增加最终单位数量。先成功创建替换实体，才移除旧墙，失败保留旧墙和手牌。不要用死亡事件替换旧墙，否则会误触发死亡被动和奖励。
-
-`ULKUnitMovementComponent::FindBlockingEnemyWall` 为无法抵达的战斗目标找可接近的敌方墙段。能绕过去时仍绕路；封闭时先破墙；治疗者不能转为攻击墙体。施工结束由 `DisplaceOverlappingUnits` 将覆盖的可移动角色移到合法空位，不造成伤害。
-
-`LKNavigation::FindPath` 对最多 12 个障碍保留可见图，大于此数改用最多 8,192 节点的网格 A*，共享最近四份纯几何缓存。网格边仍检查真实胶囊，不可把“网格邻接”直接当作“无碰撞”。调用方无须更改旧接口；需要诊断时传可选 `FSearchStats*`，可得到访问节点数与精确碰撞次数。该缓存只在游戏线程使用，不持有场景对象。大型障碍场的窄通道可能因网格采样保守拒绝，设计可通行通道时应留足角色体积与采样余量。
-
-### 职业与建筑服务
-
-法师用 `bIsMage`，牧师用 `bBasicAttackHeals`。职业不会自动赋予英雄特性，例如学徒入住法师塔并不会让全队获得全图施法。驻守选择、患者关联与释放由 `ALKUnitBuilding` 和 `ALKUnitBase` 的服务接口共同管理；死亡、建筑损毁、结束战斗和移动失败时必须清除双方引用。主动冷却加速应只影响技能计时，不改变普通攻击速度。
-
-所有牧师普通攻击经共同治疗管线；新牧师只需登记职业、攻击力、间隔、射程等数值，不应再写一套“对敌伤害后改成加血”的例外。治疗站额外倍率通过实际治疗结算入口应用，仍遵守存活、最大生命和治疗被动的规则。生命低于 50% 是开始接诊条件，已经进入治疗的患者直到满血才释放。
+`FLKMarketOffer` 保留原枚举数值，新增临时法术、临时建筑、道具，卡牌与道具身份必须互斥。临时法术／建筑遵守当前牌组容量、最低五卡、重复卡限制和银币上限，结束后不写永久解锁。研究材料不立即加入牌组，也不受当前银币上限过滤。道具不装备、不占格，任何结局以冻结回执带回 Profile；必须验证实例 ID 唯一并保证重试不重复添加。

@@ -21,6 +21,8 @@ private:
 	UPROPERTY(Transient) TObjectPtr<ULKRunNodeSelectWidget> WorldMapPreviewWidget;
 #if WITH_EDITOR
 	void TickWorldMapPreview();
+	void TickMarketPreview();
+	bool bMarketPreview = false;
 	bool bWorldMapPreview = false;
 	bool bPreviewMode = false;
 	int32 PreviewFrame = 0;

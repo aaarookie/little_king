@@ -206,8 +206,6 @@ void ULKUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
         }
         VisualTravel = Self->GetActorLocation() - BeforeMovement;
         if (FVector::Dist2D(Self->GetActorLocation(), Destination) <= 2.f) { bMoving = false; }
-        if (Self->GetUnitId() == "Unit_Colossus" && FVector::DistSquared2D(BeforeMovement, Self->GetActorLocation()) > .01f)
-        { ULKPresentationSubsystem::Sound(GetWorld(), "Footstep", Self->GetActorLocation()); }
     }
     if (Self->IsCombatEnabled()) { ApplySeparation(DeltaTime); }
     ClampToFieldBounds();

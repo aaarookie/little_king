@@ -21,6 +21,8 @@ namespace LKCardRules
     bool ValidateReplacement(const TArray<FLKRunCardState>& Cards, FName Incoming,
         const TArray<FName>& Removed, int32 MinimumSlots, int32 MaximumSlots, FString& Error);
     bool IsTemporaryMercenary(FName CardId);
+    /** Explicitly registered mercenaries and player spells/buildings can be rented for one run. */
+    bool IsRunMarketCard(FName CardId);
     bool IsSpell(FName CardId);
     bool IsBuilding(FName CardId);
     float UpgradeMultiplier(int32 Level);

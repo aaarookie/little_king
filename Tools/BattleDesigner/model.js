@@ -168,7 +168,7 @@
       return true;
     }
     function identifier(value, label) {
-      if (string(value, label, 1, 80) && !/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(value)) errors.push(label + '只能包含英文字母、数字、下划线、点和连字符。');
+      if (string(value, label, 1, 80) && (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(value) || /^none$/i.test(value))) errors.push(label + '必须以英文字母或数字开头，仅含字母、数字、下划线、点和连字符，且不能为 None。');
     }
     function number(value, label, min, max, integer) {
       const valid = typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max && (!integer || Number.isInteger(value));
@@ -184,7 +184,11 @@
       string(project.meta.description, '地图说明', 0, 4000);
       ['createdAt', 'updatedAt'].forEach(function (key) {
         const value = project.meta[key];
-        if (typeof value !== 'string' || value.length > 40 || !/^\d{4}-\d{2}-\d{2}T/.test(value) || !Number.isFinite(Date.parse(value))) errors.push(key + '必须是 ISO 日期时间。');
+        const match = typeof value === 'string' && value.length <= 40 && /^([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]{1,9})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$/.exec(value);
+        const year = match ? Number(match[1]) : 0, month = match ? Number(match[2]) : 0, day = match ? Number(match[3]) : 0;
+        const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+        const days = [0,31,leap ? 29 : 28,31,30,31,30,31,31,30,31,30,31];
+        if (!match || year < 1 || day > days[month] || !Number.isFinite(Date.parse(value))) errors.push(key + '必须是带时区的有效 ISO 日期时间。');
       });
     }
     let fieldValid = false;
@@ -199,7 +203,7 @@
       identifier(project.settings.encounterId, '遭遇模板 ID');
       number(project.settings.seed, '随机种子', 0, 2147483647, true);
       number(project.settings.battleTimeLimit, '战斗时限', 1, 3600, true);
-      if (typeof project.settings.encounterId === 'string' && !['Patrol', 'Elite', 'Boss', 'Encounter_UndeadPatrol', 'Encounter_UndeadElite', 'Encounter_SkeletonKing'].includes(project.settings.encounterId)) warnings.push('遭遇模板 ID 不在内置清单中；落地前需确认项目中存在此模板。');
+      if (typeof project.settings.encounterId === 'string' && !['Patrol', 'Elite', 'Boss', 'Encounter_UndeadPatrol', 'Encounter_UndeadElite', 'Encounter_SkeletonKing'].includes(project.settings.encounterId)) errors.push('遭遇模板须使用内置普通、精英或首领模板。');
     }
     function array(value, label, max) {
       if (!Array.isArray(value) || value.length > max) { errors.push(label + '必须是最多 ' + max + ' 项的数组。'); return false; }
@@ -288,7 +292,8 @@
         string(wave.targetId, label + '目标 ID', 0, 80);
         if (wave.trigger === 'time' && wave.targetId !== '') errors.push(label + '定时波次的目标 ID 必须为空。');
         if (wave.trigger !== 'time') {
-          const target = project.objects.find(o => o && o.id === wave.targetId);
+          identifier(wave.targetId, label + '目标 ID');
+          const target = project.objects.find(o => o && typeof wave.targetId === 'string' && o.id.toLowerCase() === wave.targetId.toLowerCase());
           if (!target || !HERO_MODULES.has(target.moduleId) || target.count !== 1 || target.spawnAtSeconds !== 0) errors.push(label + '条件必须引用一名单独放置、开局出现的地图英雄。请先修改引用波次，再删除或改动该英雄。');
         }
         if (!WAVE_UNITS.some(u => u.id === wave.unitId)) errors.push(label + '兵种不在已登记角色清单内。');
@@ -297,7 +302,7 @@
         number(wave.y, label + 'Y', 0, fieldValid ? project.field.height : 100);
         number(wave.radius, label + '分散半径', 0, 10);
         if (fieldValid && (wave.x - wave.radius < 0 || wave.y - wave.radius < 0 || wave.x + wave.radius > project.field.width || wave.y + wave.radius > project.field.height)) warnings.push(label + '生成圆部分越界；运行时将在可用位置生成。');
-        if (wave.trigger === 'time' && wave.time >= project.settings.battleTimeLimit) warnings.push(label + '出现时间不早于战斗时限，通常无法执行。');
+        if (wave.trigger === 'time' && wave.time >= project.settings.battleTimeLimit) warnings.push(label + '出现时间已进入超时虚弱阶段；是否执行取决于当时战斗是否仍在进行。');
       });
       if (project.waves.reduce((sum, w) => sum + (w && Number.isFinite(w.count) ? w.count : 0), 0) + unitCount > 200) warnings.push('地图与波次累计超过 200 个单位；同时存活数量受运行时容量限制，拥挤区域可能无法放下全部增援。');
       const legacyWaves = project.objects.filter(o => o.spawnAtSeconds > 0 && ['unit','building'].includes(getModule(o.moduleId).role)).length;

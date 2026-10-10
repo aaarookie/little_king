@@ -395,7 +395,7 @@ void ALKPresentationHUD::HandleResult(ELKPlayResult Result)
 	case ELKPlayResult::NotEnoughSilver: Tip = TEXT("银币不足"); break;
 	case ELKPlayResult::AlreadyDeployed: Tip = TEXT("该英雄已部署，请点击营地指挥"); break;
 	case ELKPlayResult::UnitLimitReached: Tip = TEXT("单位数量达到上限"); break;
-	case ELKPlayResult::InvalidCardData: Tip = TEXT("数据配置无效，请查看日志和 Sprint 5 迁移教程"); break;
+	case ELKPlayResult::InvalidCardData: Tip = TEXT("数据配置无效，请查看日志"); break;
 	case ELKPlayResult::HandEmpty: Tip = TEXT("手牌尚未就绪，请检查牌库配置"); break;
 	case ELKPlayResult::WrongPhase: Tip = TEXT("当前阶段不能执行此操作"); break;
 	default: Tip = TEXT("不能放在这里：检查范围、占用或建筑上限"); break;

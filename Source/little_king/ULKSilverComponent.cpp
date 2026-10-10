@@ -6,18 +6,23 @@ void ULKSilverComponent::Init(float InPerSecond, float InCap)
 	PerSecond = FMath::Max(0.f, InPerSecond);
 	Cap = FMath::Max(1.f, InCap);
 	Silver = 0.f;
+	Overflow = AtCapSeconds = 0.f;
 	Broadcast(0.f);
 	UE_LOG(LogLKEconomy, Log, TEXT("[Silver] Init: %.1f/s, cap %.1f"), PerSecond, Cap);
 }
 
 void ULKSilverComponent::TickSilver(float DeltaTime)
 {
-	if (DeltaTime <= 0.f)
+	if (!FMath::IsFinite(DeltaTime) || DeltaTime <= 0.f)
 	{
 		return;
 	}
 
 	const float Before = Silver;
+	const float Lost = FMath::Max(0.f, Silver + PerSecond * DeltaTime - Cap);
+	Overflow += Lost;
+	if (PerSecond > 0.f) { AtCapSeconds += Lost / PerSecond; }
+	else if (Before >= Cap) { AtCapSeconds += DeltaTime; }
 	Silver = FMath::Min(Cap, Silver + PerSecond * DeltaTime);
 	if (!FMath::IsNearlyEqual(Before, Silver))
 	{

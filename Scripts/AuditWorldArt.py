@@ -45,8 +45,10 @@ for row in audio:
         rmsDbFS=float(20*np.log10(np.sqrt(np.mean(data**2)))),edgesZero=True))
 (ROOT/'Saved/WorldArtSourceAudit.json').write_text(json.dumps(dict(images=len(rows),audio=checks),indent=2),encoding='utf-8')
 
-doc = ['# C 批图片：实际生成提示词', '', f'{len(rows)} 张图片的原始文件均未进行像素后处理。实际尺寸、alpha 和 SHA-256 见 [manifest](../ArtSource/StorybookV1/World/manifest.json)。以下为工具实际输入的完整提示词；不是事后概括。音效为代码合成，参数与制作说明见 [脚本](../Scripts/PrepareWorldAudio.py)。', '']
+doc = ['# C 批图片：实际生成提示词', '', f'{len(rows)} 张图片的原始文件均未进行像素后处理。实际尺寸、alpha 和 SHA-256 见 [manifest](../../ArtSource/StorybookV1/World/manifest.json)。以下为工具实际输入的完整提示词；不是事后概括。音效为代码合成，参数与制作说明见 [脚本](../../Scripts/PrepareWorldAudio.py)。', '']
 for row in rows:
     doc += ['## '+row['id']+' · '+row['name'], '', f"实际尺寸：{row['width']}×{row['height']}；模式：{row['mode']}；日期：{row['generatedDate']}。", '', row['prompt'], '']
-(ROOT/'docs/41-WorldArtPrompts.md').write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
+prompt_export = ROOT/'Saved/Documentation/WorldArtPrompts.md'
+prompt_export.parent.mkdir(parents=True, exist_ok=True)
+prompt_export.write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
 print(json.dumps(dict(images=len(rows),sounds=len(checks),dimensions=sorted(set((r['width'],r['height']) for r in rows))),indent=2))

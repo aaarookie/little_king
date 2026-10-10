@@ -402,7 +402,7 @@ bool ALKBattleGameMode::ReturnToHome()
     const FName MapName = GetHomeMapName();
     if (!LKHomeContent::DoesMapExist(MapName))
     {
-        UE_LOG(LogLKBattle, Warning, TEXT("[Home] 找不到家园地图 %s：请按 docs/28 教程创建 L_Home；本次留在战斗结算界面"),
+        UE_LOG(LogLKBattle, Warning, TEXT("[Home] 找不到家园地图 %s：请检查家园地图资产与配置路径；本次留在战斗结算界面"),
             *MapName.ToString());
         return false;
     }

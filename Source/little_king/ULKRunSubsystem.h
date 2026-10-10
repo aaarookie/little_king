@@ -42,7 +42,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="LK|Run") bool HasServiceNode() const { return State.Phase == ELKRunPhase::ResolvingNode; }
 	UFUNCTION(BlueprintCallable, Category="LK|Run") bool ResolveServiceNode(FName ActionId);
 	TArray<FLKMarketOffer> GetMarketOffers() const;
+    UFUNCTION(BlueprintPure, Category="LK|Run") TArray<FLKItemInstance> GetCarriedItems() const { return State.CarriedItems; }
 	bool PurchaseMarketOffer(int32 Index,const TArray<FName>& Removed,FString& Error);
+    bool ValidateMarketPurchase(int32 Index,const TArray<FName>& Removed,FString& Error) const;
 	bool UpgradeAtRest(FName CardId,int32 ExpectedLevel,FString& Error);
 	bool SetDeckCapacityRule(int32 MinimumSlots,int32 MaximumSlots);
 	bool ValidateRewardReplacement(int32 Index,const TArray<FName>& Removed,FString& Error) const;
@@ -163,6 +165,8 @@ public:
     bool AbandonCurrentRun();
 
     UFUNCTION(BlueprintPure, Category = "LK|Run") FLKRunState GetRunState() const { return State; }
+    /** C++ observation only; do not retain across subsystem mutations. Blueprint callers keep value snapshots. */
+    const FLKRunState& GetRunStateView() const { return State; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") ELKRunPhase GetRunPhase() const { return State.Phase; }
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool HasRun() const { return State.RunId.IsValid(); }
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool HasRunInProgress() const;
@@ -177,7 +181,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "LK|Run") bool IsHomeRewardEligible() const { return State.bHomeRewardEligible; }
 
     /** Stage 3 content/capacity contract; version 9 adds the Balance V1 snapshot + one-shot migration. */
-    static constexpr int32 CurrentSchemaVersion = 10;
+    static constexpr int32 CurrentSchemaVersion = 11;
 
     /** 读档时发生过平衡迁移/禁用卡替换的提示（主菜单与恢复中枢显示；空 = 无）。 */
     UFUNCTION(BlueprintPure, Category = "LK|Run") FText GetMigrationNotice() const { return MigrationNotice; }

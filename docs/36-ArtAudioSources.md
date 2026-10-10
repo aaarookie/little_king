@@ -1,186 +1,99 @@
-# 美术与音频来源台账
+# 美术与音频：统一规范、来源与接口
 
-## 2026-10-01 至 10-02 v0.8.3 天使与法术
+整理日期：2026-10-10；当前基线 v0.8.5。本页合并原美术规范、素材需求、A～D 批整合记录、步行修复和 v0.8.3／v0.8.4 素材说明，保留现行约定与来源入口。完整实际提示词、生成回执、原图、音频、许可和哈希保存在 `ArtSource/StorybookV1`，不在文档中重复展开。阶段发布与验证摘要见 [开发历程](DevelopmentHistory.md)，玩法和内容身份见 [GDD](01-GDD.md)、[内容图鉴](19-ContentCatalog.md)。
 
-新增五张透明天使角色图集、九张法术卡图、六条原创合成声音。图片由本项目通过内置 `imagegen` 制作，原始 PNG 字节保留在 `ArtSource/StorybookV1/V083`；11 个天使单位共享五套图集，没有新增可获得的天使单位卡。图片完整提示词、实际生成返回路径、归档路径与 SHA-256 见 [54](54-v0.8.3Assets.md) 和 [V083 manifest](../ArtSource/StorybookV1/V083/manifest.json)。角色三阶品质、费用与名称由 UI 绘制，不在图片中烘焙。
+## 统一表现规范
 
-六声音 `FreezeSpell / HolySummon / BlackCloud / Lightning / Hurricane / DivineBlessing` 使用 NumPy 和标准库 wave 合成，没有第三方采样。48 kHz/16-bit/mono WAV、随机种子、时长、峰值上限、SHA-256 与制作说明归档在 [音频 manifest](../ArtSource/StorybookV1/V083/Audio/manifest.json)，源码为 `Scripts/PrepareV083Audio.py`。图片登记为项目生成，不标成 CC0；声音登记为项目原创合成。既有 Kenney 许可、Noto 字体和 Music3 音乐来源不变，本批没有新的外部下载。引擎资源、五状态绑定与试听方法见 [55](55-v0.8.3Guide.md)，自动审计与引擎资源验证不替代真实设备上的主观试听。
+温暖的手绘童话王国：水粉质感、克制的水彩颗粒、栗棕轮廓、松绿屋顶、奶油石墙与旧金装饰，上左方柔和暖光。小尺寸单位优先保证职业、武器和轮廓可辨；插画允许更多细节，正文和战场中心保持干净。新提示词以材质、光源、色板和构图统一风格，不以具体画师、工作室或已有作品角色作锚点。
 
-## 2026-09-28 骷髅法阵
-
-未新增外部或生成素材。目录临时图标复用项目已有 `T_Card_Unit_Skeleton`（沿用 B 批来源）；预警、生效范围与文字由 `ALKPresentationHUD` 的 Canvas 绘制，不新增图片、音效、震动或提示词。该卡为敌方专属，不出现在玩家手牌。
-
-更新：2026-09-23。A/B/C/D 素材与后续步行修复已整合，各批历史来源分别记录；Sprint 6 仍不恢复，打包与硬件验收不在本轮范围。需求与缺口见 [12](12-AssetRequest.md)，风格规范见 [07](07-ArtStyleGuide.md)。
-
-## v0.8 后续：步行显示修复
-
-2026-09-23 追加的战斗显示修复新增 24 张 RGBA 步行图，全部使用内置 `image_gen`，分别参考本项目对应的 D 批旧角色图集；没有外部图片、采样、音乐或音效新增。原输出 PNG 按字节复制留档，UE 只按元数据裁取四姿势和设置枢轴/显示比例。生成图按适用工具条款管理，不标为 CC0，不编造种子或工具未提供的模型版本。实际完整提示词见 [46](46-MovementFixPrompts.md)，逐项输入参考、原始输出路径、日期、哈希与裁取参数见 [MovementFix manifest](../ArtSource/StorybookV1/MovementFix/manifest.json)，144 个新增引擎资源及修复记录见 [45](45-BattlePresentationFixes.md)。以下 A～D 历史来源保留。
-
-## 制作批次 A：家园与声音基础
-
-本批先完成可独立验收的一条链：开始界面插画、七座家园建筑、统一 UI 色板与边框、八个既有战斗音效键和界面点击音。角色单帧、逐帧动画、五区域地面、技能特效和循环音乐另列制作进度，未完成项不标作已接入。
-
-生成图片使用内置 imagegen。每张资产分别保存完整提示词到 `ArtSource/StorybookV1/Prompts`，原始图片保存在 `Images`；新引擎资产放入 `/Game/Art/StorybookV1`，不覆盖旧图。AI 生成图不标成 CC0 或第三方开源素材。
-
-音效优先采用 Kenney 的 CC0 包，保留原包的许可证与下载 URL、源文件名、处理步骤和 SHA-256。首次来源核对日期为 2026-09-19。
-
-| 来源 | 作者 | 页面许可 | 本批实际采用 |
-| --- | --- | --- | --- |
-| [Interface Sounds](https://kenney.nl/assets/interface-sounds) | Kenney | CC0 | 1 条按钮点击 |
-| [RPG Audio](https://kenney.nl/assets/rpg-audio) | Kenney | CC0 | 3 条：发射暂用短挥动、倒下、出牌 |
-| [Impact Sounds](https://kenney.nl/assets/impact-sounds) | Kenney | CC0 | 2 条：近战与轻受击 |
-| [Music Jingles](https://kenney.nl/assets/music-jingles) | Kenney | CC0 | 已核对候选，本批未采用 |
-
-实际采用六个 Kenney 音效；Music Jingles 只下载核对，本轮未采用。开战/胜负三条使用下表的原创程序合成短句。
-
-## 旧资产
-
-`Content/Icons` 和 `Content/Sprites` 的既有图已由项目提供，保留使用；文件名中的 ChatGPT 标记只能说明命名，不能证明生成参数或原始参考图的授权。本轮未获得其原始提示词，因此记录为“项目既有，提示词未归档”，不伪造历史来源。标题插画、卡牌插画与战场小精灵允许不同细节密度，但应共享色板和材质。
-
-
-## A 批实际图片
-
-全部使用内置 imagegen，未提供第三方输入图；每张单独生成，原图未做后处理改绘。工具没有提供可核验的模型版本/随机种子，本台账不编造这些信息。图片不是开源包，不标为 CC0。菜单 RGB，七建筑均是真 RGBA，实际 alpha 最小值 0、最大值 255。
-
-| 图片 ID | 内容 | 引擎绑定 |
-| --- | --- | --- |
-| T_MenuKingdom | 暖光城堡庭院、石路与远山 | 开始界面 KingdomIllustration |
-| T_Home_Statue | 圣玛丽亚神龛、金环、灯与常春藤 | Home_StatueSaintMaria → SP_Home_Statue |
-| T_Home_Library | 绿顶书徽圆塔 | Home_Library |
-| T_Home_Gate | 开放的双塔大门 | Home_Gate |
-| T_Home_HeroHouse | 盾徽半木英雄之家 | Home_HeroHouse |
-| T_Home_Treasury | 钱币徽记金库 | Home_Treasury |
-| T_Home_Barracks | 剑盾徽记军营 | Home_Barracks |
-| T_Home_WarRoom | 地图桌与行囊帐篷 | Home_WarRoom |
-
-完整原样提示词见 [提示词归档](../ArtSource/StorybookV1/Prompts/prompts.json)，另在 [图片 manifest](../ArtSource/StorybookV1/Images/manifest.json) 与文件尺寸、alpha、SHA-256 一起登记。上面的中文是内容索引，不冒充当时输入给工具的提示词。
-
-### 每张实际提示词
-
-#### T_Home_Barracks
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A compact medieval barracks: low limestone and timber hall with moss-green tiled roof, crossed sword and shield emblem above the entrance, restrained muted terracotta banner, wooden practice dummy beside the wall. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_Gate
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A broad kingdom expedition gate: two short limestone watchtowers with moss-green roofs, large open arched gateway in the center, antique-gold crown emblem and restrained green banners. Gateway clearly OPEN with no opaque wall across the passage. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_HeroHouse
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A welcoming heroes' lodge: cream half-timber cottage, moss-green pitched roof, amber windows, a carved gold shield emblem over the doorway, small bench, climbing rose bush. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_Library
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A cozy round medieval library: squat round limestone tower with a steep moss-green conical roof, amber arched windows, a large carved open-book emblem above its wooden door, two small book crates. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_Statue
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A small shrine to Saint Maria: ivory robed female guardian statue with hands open in a gentle blessing, antique-gold halo, low octagonal limestone pedestal, two tiny amber lanterns and a little ivy. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_Treasury
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A sturdy little royal treasury: squat octagonal limestone vault, moss-green roof, heavy reinforced oak door with a gold coin crest, two small sealed coin chests by the entrance. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_Home_WarRoom
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. A small expedition supply and war-planning pavilion: moss-green canvas tent on a low wooden platform, cream cloth edging with tiny gold crown ornament, central open flap revealing a rolled map on a table, travel packs and two small crates. Recognizable complete isolated building prop. Square 1024 by 1024 canvas. Single centered object, full silhouette within 12 percent padding. Three-quarter front view with clearly visible roof, consistent mild raised viewing angle, front door facing viewer. True transparent RGBA background, transparent everywhere outside the isolated object, no painted checkerboard, no colored backdrop, no landscape, no ground plane, no cast shadow, no frame.
-
-#### T_MenuKingdom
-
-Use case: stylized-concept. Production art for Little King, a warm storybook fantasy strategy game. Hand painted gouache with restrained watercolor grain, confident chestnut outlines, simplified readable silhouettes, matte surfaces, gentle amber light from upper left. Unified palette: deep pine green #193A32, moss #778458, parchment #E7D7AE, antique gold #BE9650, warm limestone #C7BB99, muted terracotta #A76D50. Elegant modest leaf and crown ornaments. No named artist, no existing franchise characters, no text, no letters, no logo, no watermark, no photorealism, no 3D render, no pixel art. Landscape 3:2 illustration filling the canvas, a welcoming tiny medieval kingdom courtyard on a hillside, a cream limestone castle and moss-green roofs on the right, winding stone lane, flowering shrubs, golden pennants, distant mountains and a gentle dawn sky. Calm atmosphere, strong large shapes, readable depth. No people. This goes inside a menu illustration panel with text ABOVE it, so no typography or UI painted in. Detailed edges, quiet central path.
-
-## A 批实际音频
-
-采用的六个原始 OGG 位于 ArtSource/StorybookV1/Audio/Originals。来源作者均为 Kenney，原包随附 CC0 文本允许个人和商业项目使用；保留自愿署名与原文。下载包哈希及精确 URL 见 [downloads.json](../ArtSource/StorybookV1/Licenses/downloads.json)，导出 WAV 与源 OGG 哈希见 [音频清单](../ArtSource/StorybookV1/Audio/manifest.json)。
-
-| 事件 / WAV | 来源文件 / 制作方式 | 峰值目标 | 时长 |
-| --- | --- | ---: | ---: |
-| MeleeHit / S_MeleeHit.wav | Audio/impactPunch_medium_000.ogg | -17 dBFS | 0.4305 秒 |
-| RangedShoot / S_RangedShoot.wav | Audio/knifeSlice.ogg | -19 dBFS | 0.5995 秒 |
-| HitTaken / S_HitTaken.wav | Audio/impactSoft_medium_000.ogg | -23 dBFS | 0.118 秒 |
-| UnitDied / S_UnitDied.wav | Audio/dropLeather.ogg | -19 dBFS | 0.4151 秒 |
-| CardPlay / S_CardPlay.wav | Audio/bookPlace1.ogg | -16 dBFS | 0.2767 秒 |
-| UIClick / S_UIClick.wav | Audio/click_003.ogg | -20 dBFS | 0.01 秒 |
-| BattleStart / S_BattleStart.wav | 项目原创，五谐波拨弦合成 | -14 dBFS | 1.37 秒 |
-| Victory / S_Victory.wav | 项目原创，五谐波拨弦合成 | -14 dBFS | 2.05 秒 |
-| Defeat / S_Defeat.wav | 项目原创，五谐波拨弦合成 | -14 dBFS | 1.83 秒 |
-
-六个外部声音只做单声道合并、必要时 48kHz 升采样、去 DC、6ms 边缘淡化和分用途峰值归一化。RangedShoot 当前采用短刀挥动的轻嗖声，作为通用发射反馈；不声称它是专门录制的弓弦。
-
-原创三条并非 AI 音频模型生成，因此没有模型提示词。其制作说明为：“同一温暖、柔和的五谐波拨弦音色；开战短上行，胜利用 C 大调上行，失败用 A 小调下降；无长混响、无刺耳号角。”确切音高、起音时间、长度、包络与谐波参数保存在 [合成脚本](../Scripts/PrepareStorybookAudio.py) 和音频 manifest，可逐样本复现；未用外部旋律、录音或乐器采样。
-
-## 代码绘制资源
-
-UI 6px 圆角、旧金边框、按钮各状态和主题色为项目 C++ 原生绘制，入口 [LKPresentationStyle.h](../Source/little_king/LKPresentationStyle.h)。没有模型提示词；制作说明是“松绿深底、羊皮纸亮字、旧金细线，与建筑色板一致，禁用态可读，保留品质语义色”。家园地面/道路颜色也由代码设置，无额外贴图来源。
-
-## 商用来源管理与剩余项
-
-本批外部音效引用 [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds)、[RPG Audio](https://kenney.nl/assets/rpg-audio)、[Interface Sounds](https://kenney.nl/assets/interface-sounds)，均已保留各自原包许可。没有把“可免费下载”当作整站商业授权，也没有下载付费素材或使用账号凭证。
-
-生成图按适用工具条款管理，不标成开源/CC0，不声称独占。旧图原始提示词缺失仍待项目补档；本轮新增资产资料齐全，无须用户手动下载。后续实际采用项分别登记在下方 B/C/D 段，未采用候选不能当作已接入。
-
-实际改动、截图与测试见 [37](37-ArtAudioIntegration.md)。
-
-## B 批实际图片（2026-09-19～20）
-
-20 张透明战斗单帧、17 张卡面，均由本项目内置 image_gen 生成，合计 37 张，不新增第三方图片来源。单帧纯文字生成；卡图各以自己的单帧为参考保持身份一致。原图仅复制归档，未进行像素后处理。生成图不标为 CC0，也不编造模型版本或种子。
-
-完整实际提示词逐项列于 [39](39-BattleArtPrompts.md)；机器可读记录为 [精灵目录](../ArtSource/StorybookV1/Battle/catalog.json)、[卡面提示词](../ArtSource/StorybookV1/Battle/Prompts/cards.json)、[来源清单](../ArtSource/StorybookV1/Battle/manifest.json)。清单含 SHA-256、实际 1254×1254 尺寸、alpha、日期、输入参考及其哈希。实际接入 57 个引擎资产和旧精灵复核情况见 [38](38-BattleArtIntegration.md)。
-
-旧 8 个精灵与 7 张卡图仍按上面的“项目既有、历史提示词未归档”登记；兵营只调整引擎显示比例，没有改图。本批没有新增音效或音乐，声音来源仍为 A 批台账。
-
-## C 批实际图片与声音（2026-09-20～21）
-
-新增 16 PNG：五种地面、骑士/法师/游侠三帐篷、五类节点徽记、火球爆点/叶片/尘点三张透明零件。全部为内置 image_gen 的纯文字生成，没有外部参考图；原始 PNG 未做像素后处理。引擎仅缩放显示分辨率、运行时着色与叠加。生成图按适用工具条款管理，不标为 CC0、不声称独占，不编造模型版本或种子。
-
-完整实际提示词见 [41](41-WorldArtPrompts.md)；[catalog](../ArtSource/StorybookV1/World/catalog.json) 保存输入与用途，[manifest](../ArtSource/StorybookV1/World/manifest.json) 保存作者/工具、实际日期、1254×1254 尺寸、alpha、原文件路径与 SHA-256。图像生成时延续 A/B 的水粉、松绿、羊皮纸、旧金、栗棕轮廓约定。
-
-新增 28 WAV 全部为项目原创程序合成，不含第三方采样，不使用 AI 音频模型，因此没有模型提示词。实际制作说明为：“短、柔和的绘本拟音与魔法提示；用可复现的滤波噪声、拨弦谐波及钟声区分动作，不使用长噪声或刺耳高频。”确切音高、扫频、时长、包络、峰值、种子与节流参数见 [合成脚本](../Scripts/PrepareWorldAudio.py) 和 [音频来源清单](../ArtSource/StorybookV1/World/Audio/manifest.json)。每条均归档 WAV 与 SHA-256。
-
-| 音频组 | 稳定键 |
+| 用途 | sRGB 色值 |
 | --- | --- |
-| 发射/火球 | BowShot、SpearShot、MagicShot、FireballCast、FireballImpact |
-| 恢复/亡灵 | Heal、Summon、Sacrifice、Revive |
-| 技能/收益 | Backstab、Coin、Mimic、Dash、Empower、HeavyHit |
-| 控制/龙息 | Stun、Freeze、Burn、IceBreath、FireBreath |
-| 攻城/指令 | SiegeShot、SiegeImpact、Footstep、CampCommand |
-| 服务/家园 | NodeEnter、Rest、Market、Upgrade |
+| 松绿／苔绿 | `#193A32`／`#778458` |
+| 羊皮纸／旧金 | `#E7D7AE`／`#BE9650` |
+| 暖石灰／灰陶红 | `#C7BB99`／`#A76D50` |
+| UI 底色／面板 | `#162520`／`#1F362D` |
+| 按钮／悬停 | `#2D4336`／`#3F5743` |
+| 正文／次级字／金线 | `#F4E6C8`／`#BDC1A4`／`#D1B170` |
 
-BowShot 为合成拨弦发射声，不是现场录音。A 批通用 RangedShoot 资源仍保留，当前内置远程单位按武器改用 C 批细分类声音；嘲讽/集火共用 Empower/CampCommand，巨骨共用 Heal。未制作新外部下载项或循环 BGM。
+UI 入口为 [LKPresentationStyle.h](../Source/little_king/LKPresentationStyle.h)，颜色从 sRGB 转为线性；面板使用 6px 小圆角和细金线。品质白／绿／蓝／紫／橙、阵营、黄色中线、非法落点与血条保留功能色，并辅以文字或形状。名称、费用、品质、容量、冷却与研究状态由 UI 绘制，不烘焙进图片。
 
-C 批原生图形（斩弧、范围环、盾标、目标环、星标、薄冰、层数火点、箭矛石弹拖线、升级叶环的排列/运动）是项目代码创作，没有模型提示词。制作参数与生命周期保存在 [表现子系统](../Source/little_king/ULKPresentationSubsystem.cpp)、[战斗 HUD](../Source/little_king/ALKPresentationHUD.cpp)、[家园 HUD](../Source/little_king/ULKHomeHUDWidget.cpp)。它们使用上述三张生成零件及既有主题色，不引入其他素材来源。
+- 菜单与卡面等比显示。家园建筑采用略高的正面三分之四插画视角；战斗相机仍正俯视，精灵铺在 XY 平面，插画透视不改变相机与碰撞。
+- 默认角色图朝右，运行时镜像为左；上下移动保留最近一次左右朝向。当前只有左右两向，未制作四向／八向背面图。
+- 地面明度低于单位，背景不画虚假路线、节点或没有碰撞的阻挡物；地图节点与连接来自实际数据。战场固定曝光、关闭泛光和运动模糊，平面精灵不投影。
+- 原图按字节归档，透明素材核对真实 alpha，禁止假棋盘背景。切帧、枢轴和显示比例记入元数据；改变外观使用新版本素材并更新来源记录。
+- 音效短、轻、有材质感：木、皮革、柔和击打、拨弦与钟声；高频战斗声音克制，避免长混响和持续叠加。
 
-C 批 52 个引擎资产、测试、画面、UE 5.8 教程和协作文件归属见 [40](40-WorldSkillsArtIntegration.md)。
+## 制作阶段与源文件
 
+下表数字是各批新增数量，不代表当前全部内容数量。源档位于 `ArtSource/StorybookV1`，对应 UE 资产位于 `/Game/Art/StorybookV1` 的同名子目录。
 
-## D 批实际图片、音乐与字体（2026-09-21）
+| 阶段 | 已完成内容 | 原始来源与完整提示词 | 当期证据 |
+| --- | --- | --- | --- |
+| A：家园与声音基础，2026-09-19 | 菜单插画、七家园建筑、统一 UI；六条 Kenney 音效与三条原创短句；27 个 UE 资源 | [8 条图片提示词](../ArtSource/StorybookV1/Prompts/prompts.json)、[图片清单](../ArtSource/StorybookV1/Images/manifest.json)、[声音清单](../ArtSource/StorybookV1/Audio/manifest.json) | [StorybookAssets](validation/StorybookAssets-Validation.json) |
+| B：战斗识别，2026-09-19～20 | 20 个透明单帧、17 张独立卡面；保留八个旧精灵与七张旧卡图；57 个 UE 资源 | [单帧目录与提示词](../ArtSource/StorybookV1/Battle/catalog.json)、[卡面参考与提示词](../ArtSource/StorybookV1/Battle/Prompts/cards.json)、[清单](../ArtSource/StorybookV1/Battle/manifest.json) | [BattleArt](validation/BattleArt-Validation.json) |
+| C：世界与技能，2026-09-20～21 | 五区地面、三英雄营地、五节点徽记、三 FX 零件；28 条原创合成声；52 个 UE 资源 | [16 条图片提示词](../ArtSource/StorybookV1/World/catalog.json)、[图片清单](../ArtSource/StorybookV1/World/manifest.json)、[声音清单](../ArtSource/StorybookV1/World/Audio/manifest.json) | [WorldArt](validation/WorldArt-Validation.json) |
+| D：动画与细化，2026-09-21～22 | 28 套 4×4 图集、448 姿势／140 动作、七建筑等级图、四循环音乐、两字体及转场；639 个 UE 资源；A～D 共 775 个 | [图片目录与提示词](../ArtSource/StorybookV1/Polish/catalog.json)、[来源清单](../ArtSource/StorybookV1/Polish/manifest.json)、[动画逐项回执](../ArtSource/StorybookV1/Polish/Animations)、[建筑逐项回执](../ArtSource/StorybookV1/Polish/Buildings) | [PolishArt](validation/PolishArt-Validation.json) |
+| v0.8.1 步行修复，2026-09-22～23 | 24 张双足角色四帧图，替换 96 个旧 Move 姿势；144 个 UE 资源，旧图保留；双头龙沿用四足图 | [原图、参考、完整提示词与帧清单](../ArtSource/StorybookV1/MovementFix/manifest.json)；原始回执在同目录 | [MovementFix](validation/MovementFix-Validation.json) |
+| v0.8.3 天使与法术，2026-10-01～02 | 十一天使单位共享五套 16 姿态图集、九法术卡图、六原创声；125 个 UE 资源 | [14 次实际生成](../ArtSource/StorybookV1/V083/generation.json)、[素材清单](../ArtSource/StorybookV1/V083/manifest.json)、[声音清单](../ArtSource/StorybookV1/V083/Audio/manifest.json) | [V083Assets](validation/V083Assets-Validation.json)、[阶段记录](53-v0.8.3Changes.md) |
+| v0.8.4 城防与驻守，2026-10-08 | 七建筑主图、攻城车独立图集、七原创声；22 Sprite／35 Flipbook；78 个 UE 资源 | [8 次实际生成](../ArtSource/StorybookV1/V084/generation.json)、[素材清单](../ArtSource/StorybookV1/V084/manifest.json)、[声音清单](../ArtSource/StorybookV1/V084/Audio/manifest.json) | [V084Assets](validation/V084Assets-Validation.json)、[阶段记录](57-v0.8.4Changes.md) |
 
-新增 28 个透明 4×4 动画图集及七个建筑等级图，均由内置 image_gen 生成，以既有角色/建筑图作身份参考。35 个 PNG 保留原始字节；没有用 Python 调色、抠图或拼图。原型八图的历史来源缺口仍按上文登记，本次以其为参考并不补造原图历史提示词。
+A 批菜单为 1536×1024 RGB，七建筑为实际 1254×1254 RGBA；B／C 批实际图片为 1254×1254，五地面不透明，其余类别按清单记录 alpha。提示词请求尺寸不等于实际输出尺寸。D 与后续图集以各批 manifest、frames 元数据为准，不将请求的 2048 当作实际尺寸。
 
-[43](43-PolishArtPrompts.md) 逐项保存实际工具完整输入（含追加约束），对应 `Animations/*.receipt.json` 和 `Buildings/*.receipt.json`。原图、参考哈希、实际尺寸/日期、许可分类见 [manifest](../ArtSource/StorybookV1/Polish/manifest.json)；[frames.json](../ArtSource/StorybookV1/Polish/frames.json) 是 UE 切帧/整图枢轴元数据，不是像素编辑结果。生成图按适用工具条款管理，不标 CC0、不声称独占。
+B 批卡面参考对应的新单帧；D 批和步行修复参考既有角色／建筑；v0.8.4 攻城车动画参考本批主图。v0.8.4 七主图兼作卡图来源，因此审计中的十四个世界／卡图使用条目对应八个独立 PNG，不能解读为十四次生成。六种固定建筑使用静态 Sprite 和五个单帧状态；攻城车有待机 4、移动 4、攻击 4、受击 2、损毁 2 个真实姿态。
 
-| 来源 | 实际使用 | 许可归档与加工 |
-| --- | --- | --- |
-| [MiniMax-Music3 模型](https://huggingface.co/MiniMaxAI/MiniMax-Music3) | 本地生成 Home、Expedition、Battle、Boss 四首音乐 | [Community License 原文](../ArtSource/StorybookV1/Polish/Licenses/MiniMax-Music3-LICENSE.txt)，不是 CC0 |
-| [Noto CJK 官方仓库](https://github.com/notofonts/noto-cjk) | NotoSansCJKsc-Regular.otf，正文/数字 | [Sans OFL 1.1](../ArtSource/StorybookV1/Polish/Licenses/NotoSans-OFL.txt)，原 OTF 不改动 |
-| [Noto CJK 官方仓库](https://github.com/notofonts/noto-cjk) | NotoSerifCJKsc-SemiBold.otf，标题 | [Serif OFL 1.1](../ArtSource/StorybookV1/Polish/Licenses/NotoSerif-OFL.txt)，原 OTF 不改动 |
+v0.8.2 的研究、市场、暂停及骷髅法阵复用既有卡图、地图、字体与 UI：骷髅法阵沿用骷髅兵卡图，其范围和预警由 Canvas 绘制。v0.8.3 黑云复用 [FX_Dust](../ArtSource/StorybookV1/World/Images/T_FX_Dust.png)，运行时染色并叠加雾团。上述复用没有新增图片提示词。
 
-两个字体的直接下载地址、SHA-256 和许可哈希均在 manifest；作者记为 Noto CJK contributors。没有要求用户手动下载字体。UE 采用内嵌 FontFace/运行时组合字体，无系统字体依赖。
+v0.8.5 草丛、沼泽、篝火和高山采用项目代码绘制的初版几何／SVG：浏览器为 `Tools/BattleDesigner/app.js`，UE 为 `ALKBattleTerrain.cpp`，复用基础网格、占位材质和 Noto 字体，无新图片、音效或音乐。功能边界见 [地形与遭遇设计](62-TerrainAndEncounterDesigner.md)。
 
-音乐实际安装路径 `E:/minimax_music3/repo`；调用该目录原有 inference 与环境，不修改模型或依赖。完整 caption/lyrics、seed、steps、请求/实际长度和耗时见 [原始回执目录](../ArtSource/StorybookV1/Polish/Music/Originals)，[实际提示词](43-PolishArtPrompts.md) 可直接用于本地模型。原音均保留；去直流、边缘裁剪、1.5 秒余弦重叠循环、电平调整与 16bit PCM 输出见 [处理脚本](../Scripts/PreparePolishAudio.py) 和 [音频 manifest](../ArtSource/StorybookV1/Polish/Music/manifest.json)。最终循环长度依次为 32.300、25.350、20.675、46.554 秒。
+## 许可与可追溯来源
 
-MiniMax 原许可含商业软件界面署名和年度收入门槛条款，不能把模型或生成音频写成“无限制 CC0”。本项目仅整合生成音频，不分发模型/推理服务；开始页已显示“音乐：MiniMax-Music3 · AI 生成”。具体条款以归档与[官方许可](https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/main/LICENSE)为准，不作生成作品独占或绝对无权利风险的承诺。
+生成图片登记为“项目生成／内置 imagegen”，按适用工具条款管理，不标为 CC0，不声称独占，也不补造工具未提供的模型版本或随机种子。源文件清单记录实际提示词、工具返回路径、参考图、日期、尺寸与 SHA-256；原始路径用于追溯，项目内归档路径用于协作。
 
-D 批淡入、遮罩、等级映射和音乐交叉淡化为原生代码表现，没有模型提示词。639 资产、验证及协作教程见 [42](42-PolishArtIntegration.md)。技术验收包含音频格式/峰值/生命周期，未把波形检查冒称为主观试听。
+`Content/Icons`、`Content/Sprites` 的原型图片属于项目既有资产，历史提示词未归档。文件名中的 ChatGPT 标记不能证明生成参数或参考图授权；后续以它们作身份参考也不补造原图历史。
 
-## v0.8.2 素材复用（2026-09-30）
+| 外部来源 | 实际采用与归档 |
+| --- | --- |
+| Kenney Interface Sounds | `click_003.ogg` → `UIClick`；[原包 CC0 文本](../ArtSource/StorybookV1/Licenses/Kenney-interface-sounds-License.txt) |
+| Kenney RPG Audio | `knifeSlice.ogg` → `RangedShoot`，`dropLeather.ogg` → `UnitDied`，`bookPlace1.ogg` → `CardPlay`；[原包 CC0 文本](../ArtSource/StorybookV1/Licenses/Kenney-rpg-audio-License.txt) |
+| Kenney Impact Sounds | `impactPunch_medium_000.ogg` → `MeleeHit`，`impactSoft_medium_000.ogg` → `HitTaken`；[原包 CC0 文本](../ArtSource/StorybookV1/Licenses/Kenney-impact-sounds-License.txt) |
+| MiniMax-Music3 | 本地生成 Home／Expedition／Battle／Boss 四首；[Community License 原文](../ArtSource/StorybookV1/Polish/Licenses/MiniMax-Music3-LICENSE.txt)、[实际 Caption／Lyrics](../ArtSource/StorybookV1/Polish/Music/prompts.json)、[原音与调用回执](../ArtSource/StorybookV1/Polish/Music/Originals)、[处理清单](../ArtSource/StorybookV1/Polish/Music/manifest.json) |
+| Noto CJK contributors | 正文／数字 `NotoSansCJKsc-Regular.otf`、标题 `NotoSerifCJKsc-SemiBold.otf`；[Sans OFL 1.1](../ArtSource/StorybookV1/Polish/Licenses/NotoSans-OFL.txt)、[Serif OFL 1.1](../ArtSource/StorybookV1/Polish/Licenses/NotoSerif-OFL.txt)；原 OTF 不改动，下载地址与哈希在 Polish manifest |
 
-本版新增研究法术、市场／研究／暂停 UI 没有生成或下载新图片、声音、字体。七个研究法术复用项目已有 `Content/Icons/Spell_Fireball` 或 `Spell_HealWave`；攻城炮沿用既有 B 批卡面与精灵。局部地图／服务节点沿用 C 批地面与节点徽记，暂停及操作按钮由项目原生 UMG 采用共享 `LKPresentationStyle`、Noto 字体、松绿／羊皮纸／旧金配色。缺图时仍使用文字色块回退。
+Kenney 的精确下载 URL、包哈希与 2026-09-19 核对记录见 [downloads.json](../ArtSource/StorybookV1/Licenses/downloads.json)，采用的原 OGG 保存在 [Audio/Originals](../ArtSource/StorybookV1/Audio/Originals)。Music Jingles 只下载核对，未采用；其许可保留在 [Licenses](../ArtSource/StorybookV1/Licenses)。`RangedShoot` 是短挥动声复用，当前内置弓箭等改用 C 批细分类合成声，不描述为实录弓弦。
 
-此次复用没有新的模型提示词；已有图片和声音的原始来源、许可、提示词继续按上文 A/B/C/D 及步行修复台账管理。没有新增用户手动下载要求。实际 UI 验证图片见 [v0.8.2 协作记录](50-v0.8.2ExpeditionChanges.md)。
+Music3 归档许可包含界面署名与年度收入门槛条款，具体以原文为准；开始页保留“音乐：MiniMax-Music3 · AI 生成”。仓库只整合生成音频，不分发模型或推理服务。实际调用路径曾为 `E:/minimax_music3/repo`，再次使用前核实；`GeneratePolishMusic.py` 支持 `LK_MUSIC3_INSTALL`。四首请求均为 48 秒、30 steps、low VRAM，seed 为 210901～210904；实际循环长度依次为 32.300、25.350、20.675、46.554 秒。
 
-## 战场工坊与四种地形（2026-10-08）
+原创合成声音不含外部录音、人声或乐器采样，制作说明、种子、音高、包络、峰值与哈希保存在各批音频 manifest 和 `Prepare*Audio.py`。它们不是 AI 音乐模型输出，没有模型提示词。UI 边框、范围圈、弹道拖线、状态标记、地面换色、转场遮罩等原生图形由项目代码创作。
 
-草丛、沼泽、军营篝火、高山采用项目代码绘制的几何占位表现：浏览器 SVG 位于 `Tools/BattleDesigner/app.js`，游戏几何与区域标签位于 `Source/little_king/ALKBattleTerrain.cpp`。复用引擎基础网格、项目现有占位材质及 Noto 字体，配色沿用松绿、羊皮纸和旧金。没有新增第三方下载、图片生成、音效或音乐，因此没有新的模型提示词。它们是功能验证用的初版表现，后续可替换图像而保留相同地形规则。
+## 关键表现接口
 
-可编辑示例、协作修改记录、运行截图与验证结果见 [战场地形与敌军遭遇编辑](62-TerrainAndEncounterDesigner.md)。
+| 入口 | 现行约定 |
+| --- | --- |
+| [LKPresentationStyle](../Source/little_king/LKPresentationStyle.h) | 共享色板、字体、面板、按钮状态及按钮音；品质语义独立于主题 |
+| [LKBattleArt](../Source/little_king/LKBattleArt.cpp)、[LKWorldArt](../Source/little_king/LKWorldArt.cpp)、[LKPolishArt](../Source/little_king/LKPolishArt.cpp) | 单位、区域、营地、节点、FX、动画、等级图与字体的稳定映射；自定义 Sprite／Icon 优先，缺资源保留回退 |
+| [LKV083Art](../Source/little_king/LKV083Art.cpp)、[LKV084Art](../Source/little_king/LKV084Art.cpp) | 新单位、卡图、五状态与声音映射；区分 UnitId／CardId，例如 `Unit_WallCommon` 与 `Card_WallCommon` |
+| [ULKUnitAnimationComponent](../Source/little_king/ULKUnitAnimationComponent.cpp) | 优先级：退场 > 受击 > 攻击 > 移动 > 待机；在单位和移动更新后采样。位移驱动步态，停止保留步态进度；控制和复活按实际状态处理；动画不决定伤害、冷却或 RNG |
+| [ULKUnitMovementComponent](../Source/little_king/ULKUnitMovementComponent.cpp) | `ConsumeVisualTravel` 提供表现位移，普通软分离不累计步行；飓风位移另带 `bWindDriven`，受控时仍可更新风推朝向 |
+| [ALKUnitBase](../Source/little_king/ALKUnitBase.cpp) | `SetVisualFacingRight` 保留镜像符号；精灵按稳定脚底位置排序，仅改显示相对 Z，不抬高逻辑根节点，不改变碰撞半径 |
+| [ALKHomeBuildingActor](../Source/little_king/ALKHomeBuildingActor.cpp) | 按 BuildingId 绑定家园图；`Home_StatueSaintMaria` 映射到 `SP_Home_Statue`。神像 Lv2～4、金库 Lv2～5 用等级图，Lv1 沿用 A 图，超出级别取最高现有图 |
+| [ULKPresentationSubsystem](../Source/little_king/ULKPresentationSubsystem.cpp) | 短时效果队列、World／声音 ID 节流、场地与曝光；[ALKPresentationHUD](../Source/little_king/ALKPresentationHUD.cpp) 绘制范围、状态、弹道和血条。效果在实际生效处发出，火球仍是唯一小震动来源 |
+| [ULKGameData](../Source/little_king/ULKGameData.cpp) | `EnsurePresentationDefaults` 只补缺少的 SoundMap 键；已配置资源和显式空值均优先，空值表示静音。`bUseDefaultSoundSet=false` 停止补默认，不影响独立按钮音 |
+| [ULKJourneyPresentationSubsystem](../Source/little_king/ULKJourneyPresentationSubsystem.cpp) | GameInstance 内管理音乐、转场、字体引用；音乐默认音量 0.25、交叉淡化 1.2 秒、最多双声部；`SetMusicVolume(0～1)` 是设置接口，设置页仍为占位 |
+
+动画默认 4×4：0～3 待机、4～7 移动、8～11 攻击、12～13 受击、14～15 退场。24 个旧双足角色优先使用 `MovementFix/FB_Walk_<UnitId>` 四帧 Move，其他动作仍取原图集。动画仅绑定内置默认精灵；自定义精灵仍获得排序和左右镜像。帧定义见 [Polish/frames.json](../ArtSource/StorybookV1/Polish/frames.json)、[V083/frames.json](../ArtSource/StorybookV1/V083/frames.json)、[V084/frames.json](../ArtSource/StorybookV1/V084/frames.json)。UE `CustomPivotPoint` 使用整张纹理坐标，血条使用稳定待机边界，避免换行切帧或举武器造成跳动。
+
+本轮调研优化复用上述资源，没有新增外部动画或生成图集。`LKAnimationMetadata` 为不同角色提供步幅、帧时长权重与接触标记，组件使用私有解析副本；非法字段独立回退。脚步来自有效步态接触区间，风移／冲刺不触发普通行走脚步；动作开始、完成和取消具有独立实例身份，结束时销毁通过 `RegisterActionComponent` 显式登记的临时表现组件，并停止其中的音频组件；既有全局 FX 与一次性声音仍沿用各自生命周期。逻辑前摇中断同步取消表现，正常攻击提交保留同一实例并进入接触和收招；动画事件回调取消或重置后不再采样旧动作。真实伤害仍由游戏攻击管线决定，动画 `Impact()` 仅同步接触姿势；具体接口和验证见 [实施记录](OptimizationImplementation.md)。
+
+家园完整画布通常对应 500cm；战斗角色按各批元数据等比显示，不缩放 Actor 改变逻辑尺寸。墙按不透明轮廓宽度对应 300 UE 单位（3 米），旋转方向、施工进度和范围由代码提供，逻辑墙体用于寻路和受击。首版贴图以 sRGB、UI 组、双线性、无 mip 和 Paper2D 无光照遮罩材质为主，地面构建上限 1024、B／C 小图通常 512；这些是现有配置，未宣称完成最终内存或大缩放性能优化。
+
+效果队列最多 128 项；同类型、75ms 内、25cm 内重复效果合并，结算和世界销毁时清理。声音总并发沿用 `SC_Combat / SC_UI / SC_Signals = 12 / 3 / 2`，音乐另为 2；治疗、点燃、脚步等另按稳定 ID 限频。v0.8.3 六声为 `FreezeSpell / HolySummon / BlackCloud / Lightning / Hurricane / DivineBlessing`，v0.8.4 七声为 `WallBuild / WallRepair / WallBreak / WallReflect / SiegeRam / TowerShelter / HealingStation`，具体间隔见对应 Art 入口。声音节流不改变技能冷却或墙体反伤规则。
+
+## 维护与验证边界
+
+源文件处理脚本集中在 `Scripts`：`PrepareStorybookAudio`、`PrepareWorldAudio`、`PreparePolishAudio`、`PrepareV083Audio`、`PrepareV084Audio` 处理或合成声音；`PreparePolishFrames`、`PrepareMovementFix`、`PrepareV083Frames`、`PrepareV084Frames` 只读图片生成帧元数据。各批 `Import*` 脚本导入对应资源目录，`Audit*` 检查来源与格式；字体导入依赖编辑器 Slate。表现变更应同步素材清单、实际生成回执、映射与相关验证记录。提示词可读副本由相应脚本输出至忽略追踪的 `Saved/Documentation`；受版控的完整来源仍是上表 JSON 与逐项回执。
+
+声音为 48 kHz／16-bit／单声道 PCM WAV，短音首尾淡化、不循环；四首 BGM 为 44.1 kHz／16-bit／立体声。BGM 保留原音，处理包括去直流、边缘裁剪、1.5 秒余弦重叠循环与电平调整，峰值上限 −3 dBFS。峰值、格式、循环接缝和引擎生命周期检查不能替代真实耳机／扬声器的主观试听与最终混音。
+
+各批源文件审计、历史 UE 回归及真实 720p／1080p 画面证据保留在上表报告和 [images](images)；本机 `Saved` 原始日志不保证在其他克隆中存在。历史数字只表示当期验证，不能充当本次重跑结果。打包与硬件验收继续后置。
+
+前述文档归并阶段仅整理文档：旧文档中的 **142 条图片实际提示词、4 条音乐 Caption 与 4 条 Lyrics** 已逐项与现有 JSON 归档比对，忽略排版空白后全文一致，因此删除重复正文不会丢失实际输入。该阶段未修改原图、音频、许可、生成回执或历史验证报告，未重新运行 UE、素材导入或音频生成。后续代码优化的构建与回归单独记录在 [实施记录](OptimizationImplementation.md)。

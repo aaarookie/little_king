@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Little King Battle Layout v2",
   "description": "Offline battle layout and encounter configuration. v1 is migrated on import by model.js.",
-  "$comment": "model.js additionally enforces a 2 MiB UTF-8 file limit, unique object IDs, finite numbers, prototype-field rejection, and complete rotated footprints inside field bounds. These cross-field checks are mandatory even after JSON Schema validation. v2 also checks wave hero references, unique wave IDs, canonical card IDs and startingSilver <= silverCap.",
+  "$comment": "The schema describes v2 editor documents; v1 is migrated before validation. C++ and model.js also require 2 MiB UTF-8 input, ASCII case-insensitive IDs unique across objects/waves, valid calendar dates, referenced opening heroes, canonical IDs, startingSilver <= silverCap, a combined 64-wave budget and rotated footprints within the field (1e-7 metre tolerance). JSON Schema alone cannot enforce those cross-field rules. Empty/draft layouts are editable; UE launch additionally requires an opening enemy hero and actual spawn/collision/capacity checks. String limits in the runtime/model count UTF-16 code units.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -37,7 +37,10 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 80,
-          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "not": {
+            "pattern": "^[Nn][Oo][Nn][Ee]$"
+          }
         },
         "title": {
           "type": "string",
@@ -54,14 +57,20 @@
           "minLength": 1,
           "maxLength": 40,
           "format": "date-time",
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,9})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$",
+          "not": {
+            "pattern": "^0000-"
+          }
         },
         "updatedAt": {
           "type": "string",
           "minLength": 1,
           "maxLength": 40,
           "format": "date-time",
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,9})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$",
+          "not": {
+            "pattern": "^0000-"
+          }
         }
       }
     },
@@ -107,7 +116,15 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 80,
-          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "enum": [
+            "Patrol",
+            "Elite",
+            "Boss",
+            "Encounter_UndeadPatrol",
+            "Encounter_UndeadElite",
+            "Encounter_SkeletonKing"
+          ]
         },
         "seed": {
           "type": "integer",
@@ -146,7 +163,10 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 80,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+            "not": {
+              "pattern": "^[Nn][Oo][Nn][Ee]$"
+            }
           },
           "moduleId": {
             "enum": [
@@ -492,7 +512,10 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 80,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+            "not": {
+              "pattern": "^[Nn][Oo][Nn][Ee]$"
+            }
           },
           "label": {
             "type": "string",
@@ -610,7 +633,11 @@
             "else": {
               "properties": {
                 "targetId": {
-                  "minLength": 1
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+                  "not": {
+                    "pattern": "^[Nn][Oo][Nn][Ee]$"
+                  }
                 }
               }
             }

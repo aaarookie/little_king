@@ -36,7 +36,8 @@ void ALKStartMenuGameMode::BeginPlay()
 #if WITH_EDITOR
 	bPreviewMode = FParse::Param(FCommandLine::Get(), TEXT("StartMenuPreview"));
 	bWorldMapPreview = FParse::Param(FCommandLine::Get(), TEXT("WorldMapPreview"));
-	if (bPreviewMode || bWorldMapPreview || FParse::Param(FCommandLine::Get(),TEXT("PolishTravelPreview"))) { Saves->SetNamespaceForTest(TEXT("LittleKing_MenuPreview_") + FGuid::NewGuid().ToString(EGuidFormats::Digits)); }
+	bMarketPreview = FParse::Param(FCommandLine::Get(), TEXT("MarketPreview"));
+	if (bPreviewMode || bWorldMapPreview || bMarketPreview || FParse::Param(FCommandLine::Get(),TEXT("PolishTravelPreview"))) { Saves->SetNamespaceForTest(TEXT("LittleKing_MenuPreview_") + FGuid::NewGuid().ToString(EGuidFormats::Digits)); }
 #endif
 	TryCreateMenu();
 }
@@ -56,6 +57,7 @@ void ALKStartMenuGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	TryCreateMenu();
 #if WITH_EDITOR
+	if (bMarketPreview) { TickMarketPreview(); return; }
 	if (bWorldMapPreview) { TickWorldMapPreview(); return; }
 	if (bPreviewMode && MenuWidget)
 	{

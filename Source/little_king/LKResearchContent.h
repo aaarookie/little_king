@@ -24,6 +24,7 @@ namespace LKResearchContent
     const TArray<FLKResearchDefinition>& All();
     const FLKResearchDefinition* Find(FName CardId);
     void EnsureCards(ULKGameData& Data);
+    /** Compatibility generator for legacy runs only; current runs use LKMarketContent on first visit. */
     void GenerateMarket(FLKDungeonNode& Node, int32 RunSeed, int32 RegionDepth);
     bool ValidateMaterials(const TMap<FName,int32>& Materials);
 }

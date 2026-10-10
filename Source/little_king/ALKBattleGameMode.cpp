@@ -30,6 +30,7 @@
 #include "ALKUnitBuilding.h"
 #include "ALKUnitHero.h"
 #include "LKBalanceRules.h"
+#include "LKBalanceTelemetry.h"
 #include "LKCardRules.h"
 #include "LKDataTypes.h"
 #include "LKGameplayHelpers.h"
@@ -398,6 +399,11 @@ void ALKBattleGameMode::TickBattle(float DeltaSeconds)
 {
 	BattleElapsed += DeltaSeconds;
     for (ELKTeam Team : { ELKTeam::Player, ELKTeam::Enemy })
+    {
+        auto& Stats=Team==ELKTeam::Player?MatchStats.Player:MatchStats.Enemy;
+        Stats.PeakUnits=FMath::Max(Stats.PeakUnits,CountAliveUnits(Team));
+    }
+    for (ELKTeam Team : { ELKTeam::Player, ELKTeam::Enemy })
     { if (ULKDeckState* Deck = GetTeamDeck(Team)) { Deck->AdvanceCooldowns(DeltaSeconds); } }
 	TickPlayerSilver(DeltaSeconds);
 
@@ -591,6 +597,19 @@ void ALKBattleGameMode::EndMatch(ELKTeam Winner)
 	MatchStats.Duration = BattleElapsed;
     MatchStats.bOvertime = bOvertimeActive;
     MatchStats.Winner = Winner;
+    for (ELKTeam Team : { ELKTeam::Player, ELKTeam::Enemy })
+    {
+        auto& Stats=Team==ELKTeam::Player?MatchStats.Player:MatchStats.Enemy;
+        Stats.PeakUnits=FMath::Max(Stats.PeakUnits,CountAliveUnits(Team));
+        if (const auto* Silver=GetTeamSilver(Team))
+        { Stats.SilverOverflow=Silver->GetOverflow(); Stats.SilverAtCapSeconds=Silver->GetAtCapSeconds(); }
+    }
+    FString TelemetryError;
+    FLKBattleContext TelemetryContext=BattleContext;
+    TelemetryContext.EncounterId=CurrentEncounter.EncounterId;
+    if (!LKBalanceTelemetry::AppendMatch(MatchStats,TelemetryContext,
+        GIsAutomationTesting?TEXT("automation"):(bExpeditionBattle?TEXT("expedition"):(AuthoredLayout?TEXT("authored"):TEXT("standalone"))),TelemetryError))
+    { UE_LOG(LogLKBattle,Warning,TEXT("%s"),*TelemetryError); }
     Phase = ELKGamePhase::Result;
     GetWorld()->GetSubsystem<ULKPresentationSubsystem>()->ClearEffects();
     UE_LOG(LogLKBattle, Log, TEXT("[MatchStats] Seed=%d Winner=%d Duration=%.2f Kills=%d/%d Damage=%.1f/%.1f Healing=%.1f/%.1f Cards=%d/%d Overtime=%d Simultaneous=%d"),
@@ -717,6 +736,13 @@ void ALKBattleGameMode::RecordCombatEvent(const FLKCombatEvent& Event)
             if (Event.bKilled) { ++Stats.Kills; }
         }
     }
+    if (Event.bKilled && Phase==ELKGamePhase::Battle)
+    {
+        const auto* Row=GetUnitRow(Event.TargetUnitId);
+        auto& TargetStats=Event.TargetTeam==ELKTeam::Player?MatchStats.Player:MatchStats.Enemy;
+        if (Row && (Row->UnitClass==ELKUnitClass::Hero || Row->UnitClass==ELKUnitClass::Boss)
+            && TargetStats.FirstHeroDeathSeconds<0.f) { TargetStats.FirstHeroDeathSeconds=BattleElapsed; }
+    }
     OnCombatEvent.Broadcast(Event);
     // Snapshot and stable order: nested healing must not invalidate iteration or reorder equal-health picks.
     if (Event.ActualAmount > 0.f)
@@ -804,6 +830,7 @@ ELKPlayResult ALKBattleGameMode::PlayCardForTeam(ELKTeam Team, int32 HandIndex, 
     {
         Deck->PlayCard(HandIndex, Card->DrawCooldown);
         ++(Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy).CardsPlayed;
+        (Team == ELKTeam::Player ? MatchStats.Player : MatchStats.Enemy).SilverSpent+=Card->Cost;
         PlayLKOneShot(TEXT("CardPlay"), Location, 0.8f);
     }
     else if (bPaid) { Silver->AddSilver(Card->Cost); }
@@ -1105,6 +1132,7 @@ ALKSkeletonCircle* ALKBattleGameMode::CastEnemyTacticalSpell(FName CardId, const
 	ActiveSkeletonCircles.Add(Circle);
 	++TacticalSpellSerial;
 	++MatchStats.Enemy.CardsPlayed;
+	MatchStats.Enemy.SilverSpent+=Card->Cost;
 	UE_LOG(LogLKBattle, Log, TEXT("[Circle] 敌方战术法术 %s 在 %s 释放（银币 %.1f -> %.1f）"),
 		*CardId.ToString(), *Location.ToCompactString(), Silver->GetSilver() + Card->Cost, Silver->GetSilver());
 	return Circle;

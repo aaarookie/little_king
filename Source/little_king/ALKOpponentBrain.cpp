@@ -11,6 +11,11 @@
 #include "ULKDeckState.h"
 #include "ULKGameData.h"
 #include "ULKSilverComponent.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
 ALKOpponentBrain::ALKOpponentBrain()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -29,6 +34,7 @@ void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InG
 	{
 		return;
 	}
+	ResetDecisions();
 
 	Silver->Init(GameData->SilverPerSecond, GameData->SilverCap);
 	if (bCanPlayCards && !Deck->InitEnemyDeck(GameData->DefaultEnemyDeck, GameData->HandSize, GameData->BattleSeed + 2))
@@ -55,12 +61,97 @@ void ALKOpponentBrain::InitBrain(ULKGameData* InGameData, ALKBattleGameMode* InG
 	AISettings.PushReserveMaxSeconds = GameData->AIPushReserveMaxSeconds;
 
 	// 集火节奏：首轮随机落在配置区间内
-	FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
+	FocusTimer = DecisionRandom.FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
 	CounterTimer = AISettings.CounterCheckInterval;
-	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
+	PushCooldownTimer = DecisionRandom.FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
 
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 敌方 AI 就绪: 波次 %d, 牌库 %d 张（首轮集火 %.0f 秒后）"),
 		Waves.Num(), bCanPlayCards ? Deck->GetDeckSize() + Deck->GetHandSize() : 0, FocusTimer);
+}
+
+void ALKOpponentBrain::ResetDecisions()
+{
+    DecisionRandom.Initialize(int32(uint32(GameData ? GameData->BattleSeed : 0) ^ 0x41494231u));
+    Observation = FLKAIObservation(); ObservationTimer = 0.f; CurrentBattleTime = 0.f;
+    Intent = ELKAIIntent::Hold; IntentTarget = NAME_None; IntentRemaining = 0.f;
+    PlayerRangedCount = PlayerMeleeCount = 0;
+    DecisionHistory.Reset(); DecisionCount = 0; CandidateCursors.Reset();
+}
+
+void ALKOpponentBrain::RefreshObservation()
+{
+    Observation = LKAIObservation::Capture(GameMode.Get(), ELKTeam::Enemy, CurrentBattleTime, Observation.Revision + 1);
+    ObservationTimer = .25f;
+}
+
+void ALKOpponentBrain::UpdateIntent()
+{
+    // Two-second commitment prevents target oscillation. Missing/hidden/dead targets
+    // cancel immediately; this minimum never overrides discovery or attack eligibility.
+    if (Observation.FindEnemy(IntentTarget) && IntentRemaining > 0.f) { return; }
+    IntentTarget = LKAIDecision::ChooseIntentTarget(Observation, Intent);
+    IntentRemaining = IntentTarget.IsNone() ? 0.f : 2.f;
+}
+
+void ALKOpponentBrain::RecordDecision(FLKAIDecisionTrace Trace)
+{
+    Trace.ObservationRevision = Observation.Revision; Trace.BattleTime = CurrentBattleTime;
+    Trace.Intent = Intent; Trace.IntentTarget = IntentTarget;
+    DecisionHistory.Add(MoveTemp(Trace));
+    if (DecisionHistory.Num() > LKAIDecision::MaxTraceHistory) { DecisionHistory.RemoveAt(0); }
+    ++DecisionCount;
+    const auto& Last = DecisionHistory.Last();
+    UE_LOG(LogLKBattle, Verbose, TEXT("[AI] decision=%u observation=%u intent=%s card=%s score=%.2f checks=%d result=%s"),
+        DecisionCount, Last.ObservationRevision, LKAIDecision::IntentName(Intent), *Last.CardId.ToString(),
+        Last.Utility.Total(), Last.ValidationChecks, *Last.Result);
+    // Overwrite one bounded artifact every 32 decisions and at battle end; never per frame.
+    if (DecisionCount % 32 == 0) { ExportDecisionTelemetry(); }
+}
+
+bool ALKOpponentBrain::ExportDecisionTelemetry() const
+{
+    if (DecisionHistory.IsEmpty()) { return true; }
+    TSharedRef<FJsonObject> Root = MakeShared<FJsonObject>();
+    Root->SetStringField(TEXT("format"), TEXT("little-king.opponent-decisions.v1"));
+    Root->SetNumberField(TEXT("seed"), GameData ? GameData->BattleSeed : 0);
+    Root->SetNumberField(TEXT("totalDecisions"), DecisionCount);
+    Root->SetNumberField(TEXT("retainedLimit"), LKAIDecision::MaxTraceHistory);
+    auto ScoreJson = [](const FLKAIUtility& S)
+    {
+        TSharedRef<FJsonObject> J = MakeShared<FJsonObject>();
+        J->SetNumberField(TEXT("benefit"), S.Benefit); J->SetNumberField(TEXT("synergy"), S.Synergy);
+        J->SetNumberField(TEXT("cost"), S.Cost); J->SetNumberField(TEXT("risk"), S.Risk); J->SetNumberField(TEXT("total"), S.Total());
+        return J;
+    };
+    TArray<TSharedPtr<FJsonValue>> Rows;
+    for (const auto& T : DecisionHistory)
+    {
+        TSharedRef<FJsonObject> J = MakeShared<FJsonObject>();
+        J->SetNumberField(TEXT("observation"), T.ObservationRevision); J->SetNumberField(TEXT("time"), T.BattleTime);
+        J->SetStringField(TEXT("intent"), LKAIDecision::IntentName(T.Intent)); J->SetStringField(TEXT("target"), T.IntentTarget.ToString());
+        J->SetStringField(TEXT("card"), T.CardId.ToString()); J->SetStringField(TEXT("result"), T.Result);
+        J->SetNumberField(TEXT("x"), T.Location.X); J->SetNumberField(TEXT("y"), T.Location.Y);
+        J->SetObjectField(TEXT("utility"), ScoreJson(T.Utility)); J->SetNumberField(TEXT("candidates"), T.Candidates);
+        J->SetNumberField(TEXT("validationChecks"), T.ValidationChecks);
+        J->SetNumberField(TEXT("silverBefore"), T.SilverBefore); J->SetNumberField(TEXT("silverAfter"), T.SilverAfter);
+        TArray<TSharedPtr<FJsonValue>> Top;
+        for (const auto& C : T.Shortlist)
+        {
+            TSharedRef<FJsonObject> A = MakeShared<FJsonObject>();
+            A->SetStringField(TEXT("card"), C.CardId.ToString()); A->SetNumberField(TEXT("x"), C.Location.X);
+            A->SetNumberField(TEXT("y"), C.Location.Y); A->SetObjectField(TEXT("utility"), ScoreJson(C.Utility));
+            Top.Add(MakeShared<FJsonValueObject>(A));
+        }
+        J->SetArrayField(TEXT("top"), Top); Rows.Add(MakeShared<FJsonValueObject>(J));
+    }
+    Root->SetArrayField(TEXT("decisions"), Rows);
+    FString Json; const auto Writer = TJsonWriterFactory<>::Create(&Json);
+    if (!FJsonSerializer::Serialize(Root, Writer)) { return false; }
+    const FString Directory = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Telemetry"));
+    IFileManager::Get().MakeDirectory(*Directory, true);
+    // Automated worlds must not replace the player's last diagnostic history.
+    const TCHAR* Filename = GIsAutomationTesting ? TEXT("OpponentAI-Automation.json") : TEXT("OpponentAI.json");
+    return FFileHelper::SaveStringToFile(Json, *FPaths::Combine(Directory, Filename), FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 }
 
 void ALKOpponentBrain::LoadWaves()
@@ -115,6 +206,8 @@ void ALKOpponentBrain::LoadWaves()
 
 void ALKOpponentBrain::ResetBattleState()
 {
+	ExportDecisionTelemetry();
+	ResetDecisions();
 	Waves.Reset();
 	ResetWaveRuntime();
 	PendingReinforcements.Reset();
@@ -144,6 +237,7 @@ void ALKOpponentBrain::SetScriptedWaves(const TArray<FLKWaveEntry>& InWaves)
 bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
 {
 	if (!GameData || !GameMode.IsValid() || Encounter.EncounterId.IsNone()) { return false; }
+	ResetDecisions();
 	Waves = Encounter.Waves;
 	Waves.StableSort([](const FLKWaveEntry& A, const FLKWaveEntry& B) { return A.Time < B.Time; });
 	ResetWaveRuntime();
@@ -173,9 +267,9 @@ bool ALKOpponentBrain::ConfigureEncounter(const FLKEncounterRow& Encounter)
 		bCanPlayCards = false;
 		return false;
 	}
-	FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
+	FocusTimer = DecisionRandom.FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
 	CounterTimer = AISettings.CounterCheckInterval;
-	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
+	PushCooldownTimer = DecisionRandom.FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
 	UE_LOG(LogLKBattle, Log, TEXT("[Encounter] AI %s：波次%d 出牌=%d 集火=%d 反制=%d 爆发=%d 奖励档=%d 战术法术=%d(%s 冷却%.0f 首放%.0f 停%.0f)"),
 		*Encounter.EncounterId.ToString(), Waves.Num(), int32(bCanPlayCards), int32(AISettings.bEnableFocus),
 		int32(AISettings.bEnableCounter), int32(AISettings.bEnablePush), Encounter.RewardTier,
@@ -191,10 +285,15 @@ bool ALKOpponentBrain::IsFocusEnabled() const
 
 void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 {
-	if (!GameData || !GameMode.IsValid())
+	if (!GameData || !GameMode.IsValid() || GameMode->GetPhase() != ELKGamePhase::Battle
+		|| !FMath::IsFinite(DeltaTime) || DeltaTime < 0.f || !FMath::IsFinite(BattleElapsed))
 	{
 		return;
 	}
+	CurrentBattleTime = BattleElapsed;
+	ObservationTimer -= DeltaTime;
+	IntentRemaining = FMath::Max(0.f, IntentRemaining - DeltaTime);
+	if (ObservationTimer <= 0.f) { RefreshObservation(); UpdateIntent(); }
 
 	if (bCanPlayCards) { Silver->TickSilver(DeltaTime); }
 	// 战术法术经济独立于出牌：即使 bEnemyUsesCards=false 也照常产银币并施放。
@@ -209,11 +308,7 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
         FocusWarningTimer -= DeltaTime;
         if (FocusWarningTimer <= 0.f)
         {
-            if (PendingFocusTarget.IsValid() && PendingFocusTarget->IsTargetable())
-            {
-				GameMode->ForcedTargetAllUnits(ELKTeam::Enemy, PendingFocusTarget.Get(), AISettings.FocusDuration);
-            }
-            PendingFocusTarget = nullptr;
+            ResolveFocus();
         }
     }
 
@@ -222,7 +317,7 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 	if (AISettings.bEnableFocus && FocusTimer <= 0.f)
 	{
 		DoFocus();
-		FocusTimer = GameMode->GetBattleRandom().FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
+		FocusTimer = DecisionRandom.FRandRange(AISettings.FocusIntervalMin, AISettings.FocusIntervalMax);
 	}
 
 	if (bCanPlayCards && AISettings.bEnableCounter) { CounterTimer -= DeltaTime; }
@@ -238,7 +333,8 @@ void ALKOpponentBrain::TickBrain(float DeltaTime, float BattleElapsed)
 	if (bCanPlayCards) { ThinkTimer -= DeltaTime; }
 	if (bCanPlayCards && ThinkTimer <= 0.f)
 	{
-		ThinkTimer = ThinkInterval;
+		// At most one paid-card decision per update, even after a long frame.
+		ThinkTimer = FMath::Max(.25f, ThinkInterval);
 		ThinkAndPlay();
 	}
 }
@@ -387,13 +483,18 @@ bool ALKOpponentBrain::TryCastTacticalSpell(float BattleElapsed)
 	const ULKCardDefinition* Card = GM->FindCard(SpellSettings.SpellId);
 	if (!Card || Card->CardType != ELKCardType::Spell || Card->SpellEffect != ELKSpellEffect::SummonZone) { return false; }
 	if (!Silver || Silver->GetSilver() < Card->Cost) { return false; } // 余额不足：不扣费、不空放。
+	RefreshObservation(); UpdateIntent();
 
 	FVector Location = FVector::ZeroVector;
 	if (!FindTacticalSpellLocation(Card->Circle.Radius, SpellSettings.PreferredTargets, Location)) { return false; }
 	// 扣费与落点在 GameMode 事务里再次校验；失败不扣费、不进冷却。
+	const float Before = Silver->GetSilver();
 	if (!GM->CastEnemyTacticalSpell(SpellSettings.SpellId, Location)) { return false; }
 	SpellCooldownRemaining = FMath::Max(0.f, SpellSettings.Cooldown);
 	++TacticalSpellCasts;
+	FLKAIDecisionTrace Trace; Trace.CardId = SpellSettings.SpellId; Trace.Location = Location;
+	Trace.SilverBefore = Before; Trace.SilverAfter = Silver->GetSilver(); Trace.Result = TEXT("TacticalSpellSucceeded");
+	RecordDecision(MoveTemp(Trace));
 	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 战术法术 %s 于 t=%.1f 释放（第 %d 次，银币 %.1f，冷却 %.0f）"),
 		*SpellSettings.SpellId.ToString(), BattleElapsed, TacticalSpellCasts, Silver->GetSilver(), SpellSettings.Cooldown);
 	return true;
@@ -401,207 +502,205 @@ bool ALKOpponentBrain::TryCastTacticalSpell(float BattleElapsed)
 
 bool ALKOpponentBrain::FindTacticalSpellLocation(float Radius, int32 PreferredTargets, FVector& OutLocation) const
 {
-	ALKBattleGameMode* GM = GameMode.Get();
-	if (!GM || !FMath::IsFinite(Radius) || Radius <= 0.f) { return false; }
-
-	// 优先覆盖至少两名玩家战斗单位；没有这种点时才允许只覆盖单英雄。
-	int32 BestCount = 0;
-	FVector BestLocation = FVector::ZeroVector;
-	auto Consider = [&](const FVector& Candidate)
-	{
-		const int32 Count = GM->CountTargetsInRadius(ELKTeam::Enemy, Candidate, Radius);
-		if (Count > BestCount) { BestCount = Count; BestLocation = Candidate; }
-	};
-	for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
-	{
-		ALKUnitBase* Unit = *It;
-		if (!Unit || Unit->IsCamp() || !Unit->IsTargetable() || !Unit->IsCombatEnabled()) { continue; }
-		if (Unit->GetTeam() == ELKTeam::Enemy) { continue; }
-		Consider(Unit->GetActorLocation());
-	}
-	if (BestCount < FMath::Max(1, PreferredTargets))
-	{
-		// A lone surviving hero is still a useful target; lone ordinary troops are not.
-		for (TActorIterator<ALKUnitBase> It(GetWorld()); It; ++It)
-		{
-			if (It->IsHero() && It->IsTargetable() && It->IsCombatEnabled() && It->GetTeam() == ELKTeam::Player)
-			{ OutLocation = It->GetActorLocation(); return true; }
-		}
-		return false;
-	}
-	OutLocation = BestLocation;
-	return true;
+    if (!FMath::IsFinite(Radius) || Radius <= 0.f) { return false; }
+    int32 BestCount = 0; FVector Best = FVector::ZeroVector;
+    for (const auto& Candidate : Observation.Enemies)
+    {
+        int32 Count = 0;
+        for (const auto& Unit : Observation.Enemies)
+        { if (FVector::DistSquared2D(Candidate.Position, Unit.Position) <= FMath::Square(Radius)) { ++Count; } }
+        if (Count > BestCount) { BestCount = Count; Best = Candidate.Position; }
+    }
+    if (BestCount >= FMath::Max(1, PreferredTargets)) { OutLocation = Best; return true; }
+    for (const auto& Unit : Observation.Enemies)
+    { if (Unit.bHero) { OutLocation = Unit.Position; return true; } }
+    return false;
 }
 
 void ALKOpponentBrain::DoFocus()
 {
-	ALKBattleGameMode* GM = GameMode.Get();
-	if (!GM)
-	{
-		return;
-	}
+    RefreshObservation(); UpdateIntent();
+    const FLKAIUnitObservation* Target = Observation.FindEnemy(IntentTarget);
+    if (!Target || !Target->Actor.IsValid()) { return; }
+    PendingFocusTarget = Target->Actor;
+    FocusWarningTimer = FMath::Max(.01f, AISettings.FocusWarningSeconds);
+    PendingFocusTarget->SetFocusWarning(FocusWarningTimer);
+}
 
-	// 目标：玩家血量比例最低的存活英雄
-	ALKUnitBase* Weakest = GM->GetWeakestAliveHero(ELKTeam::Player);
-	if (!Weakest)
-	{
-		return; // 玩家已无英雄（对局即将结束），跳过
-	}
-
-	PendingFocusTarget = Weakest;
-	FocusWarningTimer = FMath::Max(0.01f, AISettings.FocusWarningSeconds);
-    Weakest->SetFocusWarning(FocusWarningTimer);
-	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 集火预警：即将转火玩家英雄 %s（集火持续 %.0f 秒）"),
-		*Weakest->GetUnitId().ToString(), AISettings.FocusDuration);
+void ALKOpponentBrain::ResolveFocus()
+{
+    ALKUnitBase* Target = PendingFocusTarget.Get();
+    PendingFocusTarget.Reset(); FocusWarningTimer = 0.f;
+    // Cached coordinates are never upgraded to hidden real coordinates at execution.
+    RefreshObservation(); UpdateIntent();
+    FLKAIDecisionTrace Trace; Trace.SilverBefore = Trace.SilverAfter = Silver ? Silver->GetSilver() : 0.f;
+    const auto* Seen = Target ? Observation.FindEnemy(Target->GetFName()) : nullptr;
+    if (!Seen || !LKAIObservation::CanTeamDiscover(GameMode.Get(), ELKTeam::Enemy, Target))
+    {
+        if (IsValid(Target)) { Target->SetFocusWarning(0.f); }
+        Trace.Result = TEXT("FocusCancelled:UndiscoveredOrDead"); RecordDecision(MoveTemp(Trace)); return;
+    }
+    struct FMember { ALKUnitBase* Unit; float Distance; };
+    TArray<FMember> Members;
+    for (const auto& Ally : Observation.Allies)
+    {
+        ALKUnitBase* Unit = Ally.Actor.Get();
+        if (!Unit || Ally.bHealer || Ally.bBuilding || Ally.bControlled || Ally.bBusyWithService
+            || !Unit->CanPursueTarget(Target)) { continue; }
+        Members.Add({ Unit, float(FVector::DistSquared2D(Ally.Position, Seen->Position)) });
+    }
+    Members.StableSort([](const FMember& A, const FMember& B) { return A.Distance < B.Distance; });
+    // Only this enemy intent is limited; player focus and unit taunt/backstab priorities
+    // are unchanged. Three attackers avoid ordering the whole army into one bottleneck.
+    const int32 Count = FMath::Min(3, Members.Num());
+    for (int32 I=0; I<Count; ++I) { Members[I].Unit->SetForcedTarget(Target, FMath::Min(4.f, AISettings.FocusDuration)); }
+    Target->SetFocusWarning(0.f);
+    Trace.Location = Seen->Position; Trace.Result = FString::Printf(TEXT("FocusSucceeded:Members=%d"), Count);
+    RecordDecision(MoveTemp(Trace));
 }
 
 void ALKOpponentBrain::RefreshCounter()
 {
-	ALKBattleGameMode* GM = GameMode.Get();
-	if (!GM)
-	{
-		return;
-	}
-
-	PlayerRangedCount = GM->CountCombatUnitsOfAttackType(ELKTeam::Player, ELKAttackType::Ranged);
-	PlayerMeleeCount = GM->CountCombatUnitsOfAttackType(ELKTeam::Player, ELKAttackType::Melee);
-	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 反制评估：玩家 近战 x%d / 远程 x%d"),
-		PlayerMeleeCount, PlayerRangedCount);
+    RefreshObservation();
+    PlayerRangedCount = PlayerMeleeCount = 0;
+    for (const auto& Unit : Observation.Enemies)
+    {
+        if (Unit.bBuilding) { continue; }
+        if (Unit.AttackType == ELKAttackType::Ranged) { ++PlayerRangedCount; }
+        else { ++PlayerMeleeCount; }
+    }
 }
 
 bool ALKOpponentBrain::TryEnterPush()
 {
-	if (PushCooldownTimer > 0.f || !Silver || !GameMode.IsValid())
-	{
-		return false;
-	}
-
-	// 银币达标 + 己方兵力不劣于玩家 → 一波流
-	if (!AISettings.bEnablePush || Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap()))
-	{
-		return false;
-	}
-	if (GameMode->CountAliveUnits(ELKTeam::Enemy) < GameMode->CountAliveUnits(ELKTeam::Player))
-	{
-		return false;
-	}
-
-	PushRemainingCards = AISettings.PushMaxCards;
-	PushCooldownTimer = GameMode->GetBattleRandom().FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
-	UE_LOG(LogLKBattle, Log, TEXT("[Brain] 爆发！银币 %.1f 兵力占优，一波连打 %d 张"),
-		Silver->GetSilver(), PushRemainingCards);
-	return true;
+    if (PushCooldownTimer > 0.f || !Silver || !AISettings.bEnablePush
+        || Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap())) { return false; }
+    RefreshObservation();
+    if (Observation.Enemies.IsEmpty()) { return false; }
+    auto Power = [](const TArray<FLKAIUnitObservation>& Units)
+    {
+        float Total = 0.f;
+        for (const auto& U : Units) { Total += FMath::Sqrt(FMath::Max(0.f,U.Health)) * FMath::Sqrt(FMath::Max(1.f,U.DPS())); }
+        return Total;
+    };
+    if (Power(Observation.Allies) < Power(Observation.Enemies)) { return false; }
+    PushRemainingCards = FMath::Clamp(AISettings.PushMaxCards, 1, 3);
+    PushCooldownTimer = DecisionRandom.FRandRange(AISettings.PushCooldownMin, AISettings.PushCooldownMax);
+    return true;
 }
 
 void ALKOpponentBrain::ThinkAndPlay()
 {
-    if (AISettings.bEnablePush && PushCooldownTimer <= 0.f && !bReserving)
-    {
-        bReserving = true;
-		ReserveRemaining = AISettings.PushReserveMaxSeconds;
-    }
+    if (AISettings.bEnablePush && PushCooldownTimer <= 0.f && !bReserving && PushRemainingCards <= 0)
+    { bReserving = true; ReserveRemaining = FMath::Min(3.f, AISettings.PushReserveMaxSeconds); }
     if (bReserving)
     {
-        if (TryEnterPush())
+        if (TryEnterPush()) { bReserving = false; }
+        else if (ReserveRemaining > 0.f && Intent != ELKAIIntent::Protect
+            && Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap()))
         {
-            bReserving = false;
-            while (PushRemainingCards-- > 0) { if (!TryPlayOneCard()) { break; } }
-            PushRemainingCards = 0;
-            return;
+            FLKAIDecisionTrace T; T.Result = TEXT("Wait:Reserve");
+            T.SilverBefore = T.SilverAfter = Silver->GetSilver(); RecordDecision(MoveTemp(T)); return;
         }
-		if (ReserveRemaining > 0.f && Silver->GetSilver() < FMath::Min(AISettings.PushSilverThreshold, Silver->GetCap())) { return; }
-        bReserving = false;
-		PushCooldownTimer = AISettings.PushCooldownMin;
+        else { bReserving = false; PushCooldownTimer = AISettings.PushCooldownMin; }
     }
-    TryPlayOneCard();
+    const bool bPlayed = TryPlayOneCard();
+    // Bursts are paced across decisions; no multiple expensive spawn transactions per frame.
+    if (PushRemainingCards > 0)
+    {
+        if (!bPlayed) { PushRemainingCards = 0; }
+        else { --PushRemainingCards; ThinkTimer = .25f; }
+    }
 }
 
 int32 ALKOpponentBrain::GetCounterBonus(const ULKCardDefinition* Def) const
 {
-	if (!Def)
-	{
-		return 0;
-	}
-
-	const FName& CardId = Def->CardId;
-	int32 Bonus = 0;
-
-	// 玩家远程多 → 盾卫/剑士冲锋贴脸（克制远程）
-	if (PlayerRangedCount >= 3
-		&& (CardId == TEXT("Unit_Shieldbearer") || CardId == TEXT("Unit_Swordsman")))
-	{
-		Bonus += 35;
-	}
-
-	// 玩家近战多 → 弓箭手/箭塔放风筝（克制近战）
-	if (PlayerMeleeCount >= 3)
-	{
-		if (CardId == TEXT("Unit_Archer") || CardId == TEXT("Building_ArrowTower"))
-		{
-			Bonus += 35;
-		}
-	}
-
-	return Bonus;
+    if (!AISettings.bEnableCounter || !Def || !GameMode.IsValid() || Def->CardType == ELKCardType::Spell) { return 0; }
+    const auto* Row = GameMode->GetUnitRow(Def->CardType == ELKCardType::Building ? Def->BuildingUnitId : Def->SpawnUnitId);
+    if (!Row || Row->bBasicAttackHeals) { return 0; }
+    if (PlayerRangedCount >= 3 && Row->AttackType == ELKAttackType::Melee && Row->MoveSpeed > 0.f) { return 1; }
+    if (PlayerMeleeCount >= 3 && Row->AttackType == ELKAttackType::Ranged) { return 1; }
+    return 0;
 }
 
 bool ALKOpponentBrain::TryPlayOneCard()
 {
     ALKBattleGameMode* GM = GameMode.Get();
     if (!GM || !Deck || !Silver || GM->GetPhase() != ELKGamePhase::Battle) { return false; }
-    TArray<int32> Candidates;
-    for (int32 i = 0; i < Deck->GetHandSize(); ++i)
+    RefreshObservation(); UpdateIntent();
+    // Counter composition is from this same current snapshot, never stale hidden units.
+    PlayerRangedCount = PlayerMeleeCount = 0;
+    for (const auto& U : Observation.Enemies)
+    { if (!U.bBuilding) { U.AttackType == ELKAttackType::Ranged ? ++PlayerRangedCount : ++PlayerMeleeCount; } }
+    FLKAIDecisionTrace Trace; Trace.SilverBefore = Silver->GetSilver();
+    TArray<FLKAICandidate> Candidates;
+    for (int32 I=0; I<Deck->GetHandSize(); ++I)
     {
-        const ULKCardDefinition* Card = GM->FindCard(Deck->GetHandCard(i));
-        if (Card && Card->Cost <= Silver->GetSilver()) { Candidates.Add(i); }
+        const auto* Card = GM->FindCard(Deck->GetHandCard(I));
+        if (!Card || Card->Cost < 0 || Card->Cost > Silver->GetSilver() || !Deck->CanPlayWithCooldown(I, Card->DrawCooldown)) { continue; }
+        if (Card->CardType == ELKCardType::Spell && Card->SpellEffect == ELKSpellEffect::SummonZone
+            && GM->GetActiveTacticalCircleCount() >= 1) { continue; }
+        const auto* Row = Card->CardType == ELKCardType::Spell ? nullptr
+            : GM->GetUnitRow(Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId);
+        const int32 Start = Candidates.Num();
+        LKAIDecision::Candidates(*Card, Row, Observation, Silver->GetSilver(), Intent, I, Candidates, GM->GetCardUpgradeScale(Card->CardId, ELKTeam::Enemy));
+        for (int32 J=Start; J<Candidates.Num(); ++J) { Candidates[J].Utility.Synergy += GetCounterBonus(Card); }
     }
-    Candidates.StableSort([this, GM](int32 A, int32 B)
+    Candidates.StableSort([](const auto& A, const auto& B)
     {
-        const ULKCardDefinition* Left = GM->FindCard(Deck->GetHandCard(A));
-        const ULKCardDefinition* Right = GM->FindCard(Deck->GetHandCard(B));
-        return (100 - Left->Cost * 10 + GetCounterBonus(Left)) > (100 - Right->Cost * 10 + GetCounterBonus(Right));
+        if (A.Utility.Total() != B.Utility.Total()) { return A.Utility.Total() > B.Utility.Total(); }
+        if (A.HandIndex != B.HandIndex) { return A.HandIndex < B.HandIndex; }
+        if (A.Location.X != B.Location.X) { return A.Location.X < B.Location.X; }
+        return A.Location.Y < B.Location.Y;
     });
-    for (int32 Index : Candidates)
+    Trace.Candidates = Candidates.Num();
+    for (int32 I=0; I<FMath::Min(3,Candidates.Num()); ++I) { Trace.Shortlist.Add(Candidates[I]); }
+    Trace.Result = TEXT("Wait:NoUsefulAffordableCandidate");
+    TMap<int32,int32> ChecksPerCard, CandidateCounts, CandidateRanks, CursorStarts;
+    for (const auto& C : Candidates) { ++CandidateCounts.FindOrAdd(C.HandIndex); }
+    for (const auto& C : Candidates)
+    { CursorStarts.FindOrAdd(C.HandIndex) = CandidateCursors.FindRef(C.CardId) % CandidateCounts.FindRef(C.HandIndex); }
+    for (const auto& C : Candidates)
     {
-        for (int32 Attempt = 0; Attempt < 8; ++Attempt)
-        {
-            FVector Location;
-            if (!PickTargetLocation(Deck->GetHandCard(Index), Location)) { break; }
-            if (GM->ValidateCardPlay(ELKTeam::Enemy, Index, Location) != ELKPlayResult::Success) { continue; }
-            if (GM->PlayCardForTeam(ELKTeam::Enemy, Index, Location) == ELKPlayResult::Success) { return true; }
-        }
+        // A blocked high-scoring card cannot consume the entire budget and starve the
+        // other hand slots. Continue its two-candidate window next decision instead of
+        // retrying the same blocked points forever. Recompute candidates from fresh
+        // observation; the cursor stores only an index, never a hidden/stale target.
+        const int32 Count = CandidateCounts.FindRef(C.HandIndex);
+        const int32 Rank = CandidateRanks.FindOrAdd(C.HandIndex)++;
+        const int32 Start = CursorStarts.FindRef(C.HandIndex);
+        // Do not wrap inside this decision: even if the global budget stops after one
+        // check, the next cursor follows the exact rank that was actually examined.
+        if (Rank < Start || Rank >= Start + 2) { continue; }
+        if (ChecksPerCard.FindRef(C.HandIndex) >= 2) { continue; }
+        if (Trace.ValidationChecks >= LKAIDecision::MaxValidationChecks) { Trace.Result = TEXT("Wait:ValidationBudget"); break; }
+        ++ChecksPerCard.FindOrAdd(C.HandIndex);
+        CandidateCursors.FindOrAdd(C.CardId) = (Start + ChecksPerCard.FindRef(C.HandIndex)) % Count;
+        ++Trace.ValidationChecks;
+        const ELKPlayResult Valid = GM->ValidateCardPlay(ELKTeam::Enemy, C.HandIndex, C.Location, C.Yaw);
+        if (Valid != ELKPlayResult::Success)
+        { Trace.Result = FString::Printf(TEXT("Rejected:%d"), int32(Valid)); continue; }
+        Trace.CardId = C.CardId; Trace.Location = C.Location; Trace.Utility = C.Utility;
+        // Fresh snapshot and synchronous transaction: no deferred payment or stale hand
+        // index/target transform crosses this boundary. Only the authority spends silver.
+        const ELKPlayResult Played = GM->PlayCardForTeam(ELKTeam::Enemy, C.HandIndex, C.Location, C.Yaw);
+        if (Played == ELKPlayResult::Success) { CandidateCursors.Remove(C.CardId); }
+        Trace.Result = Played == ELKPlayResult::Success ? TEXT("Succeeded") : FString::Printf(TEXT("Cancelled:%d"),int32(Played));
+        Trace.SilverAfter = Silver->GetSilver(); RecordDecision(MoveTemp(Trace));
+        return Played == ELKPlayResult::Success;
     }
-    return false;
+    Trace.SilverAfter = Silver->GetSilver(); RecordDecision(MoveTemp(Trace)); return false;
 }
 
 bool ALKOpponentBrain::PickTargetLocation(FName CardId, FVector& OutLocation) const
 {
-	ALKBattleGameMode* GM = GameMode.Get();
-	if (!GM || !GameData)
-	{
-		return false;
-	}
-
-	const ULKCardDefinition* Def = GM->FindCard(CardId);
-	const float HalfW = GameData->FieldHalfWidth;
-	const float HalfH = GameData->FieldHalfHeight;
-
-	// 法术：智能落点（聚集度最高的敌人堆）；找不到就随机瞄准玩家英雄
-	if (Def && Def->CardType == ELKCardType::Spell)
-	{
-        if (Def->SpellEffect == ELKSpellEffect::SummonZone)
-        { return FindTacticalSpellLocation(Def->Circle.Radius, 1, OutLocation); }
-        return GM->FindBestSpellTarget(ELKTeam::Enemy, Def->SpellRadius, OutLocation, Def->SpellEffect);
-    }
-
-	// 建筑：后场（Y 深处）；角色：前中场 —— 敌方右半侧（Y>0）
-	if (Def && Def->CardType == ELKCardType::Building)
-	{
-		OutLocation = FVector(GameMode->GetBattleRandom().FRandRange(-0.7f, 0.7f) * HalfW, GameMode->GetBattleRandom().FRandRange(0.65f, 0.9f) * HalfH, 0.f);
-	}
-	else
-	{
-		OutLocation = FVector(GameMode->GetBattleRandom().FRandRange(-0.8f, 0.8f) * HalfW, GameMode->GetBattleRandom().FRandRange(0.1f, 0.35f) * HalfH, 0.f);
-	}
-	return true;
+    const ALKBattleGameMode* GM = GameMode.Get();
+    const auto* Card = GM ? GM->FindCard(CardId) : nullptr;
+    if (!Card || !Silver) { return false; }
+    const auto* Row = Card->CardType == ELKCardType::Spell ? nullptr
+        : GM->GetUnitRow(Card->CardType == ELKCardType::Building ? Card->BuildingUnitId : Card->SpawnUnitId);
+    TArray<FLKAICandidate> Candidates;
+    LKAIDecision::Candidates(*Card,Row,Observation,Silver->GetSilver(),Intent,INDEX_NONE,Candidates,GM->GetCardUpgradeScale(CardId,ELKTeam::Enemy));
+    if (Candidates.IsEmpty()) { return false; }
+    OutLocation = Candidates[0].Location; return true;
 }

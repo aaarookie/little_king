@@ -146,14 +146,15 @@ bool FLKV082Research::RunTest(const FString&)
     TestFalse(TEXT("Repeated purchase rejected"),S.Run->PurchaseMarketOffer(1,{},E));
     TestTrue(TEXT("Buy blueprint"),S.Run->PurchaseMarketOffer(2,{},E));
     TestEqual(TEXT("Research purchases do not create combat cards"),S.Run->GetRunState().Cards.Num(),7);
-    TestEqual(TEXT("Wallet charged exact prices once"),S.Run->GetWalletGold(),530);
+    const int32 ResearchCost=LKResearchContent::Find("Spell_ResearchFireball_N2")->Price+LKResearchContent::Find("Building_SiegeCatapult")->Price;
+    TestEqual(TEXT("Wallet charged exact prices once"),S.Run->GetWalletGold(),1000-ResearchCost);
     TestTrue(TEXT("Market reload retains sold state"),S.Run->LoadExpeditionFromSlot(S.Base+TEXT("_Run"),true));
     TestTrue(TEXT("Both material offers stay sold"),S.Run->GetMarketOffers()[1].bSold && S.Run->GetMarketOffers()[2].bSold);
     TestFalse(TEXT("Sold after reload cannot be bought again"),S.Run->PurchaseMarketOffer(1,{},E));
     TestTrue(TEXT("Buy mercenary without removing when it fits"),S.Run->PurchaseMarketOffer(0,{},E));
     TestEqual(TEXT("Mercenary fills eighth slot"),S.Run->GetDeckCapacityUsed(),8);
     TestTrue(TEXT("Abandon outside battle carries all materials"),S.Run->AbandonCurrentRun());
-    TestEqual(TEXT("All unspent gold returned"),S.Profile->GetGold(),480);
+    TestEqual(TEXT("All unspent gold returned"),S.Profile->GetGold(),950-ResearchCost);
     TestEqual(TEXT("Book delivered to home"),S.Profile->GetProfile().ResearchMaterials.FindRef("Spell_ResearchFireball_N2"),1);
     TestEqual(TEXT("Blueprint delivered to home"),S.Profile->GetProfile().ResearchMaterials.FindRef("Building_SiegeCatapult"),1);
     TestTrue(TEXT("Settlement retry is idempotent"),S.Run->ApplyPendingSettlementToProfile());
@@ -196,7 +197,7 @@ bool FLKV082Rarity::RunTest(const FString&)
     TestTrue(TEXT("Blueprints remain rarer than books"),Blueprints>20 && Blueprints<Books);
     const auto* Low=LKResearchContent::Find("Spell_ResearchFireball_N2"); const auto* High=LKResearchContent::Find("Spell_ResearchFireball_A1");
     TestTrue(TEXT("Higher grade costs more and has lower weight"),High->Price>Low->Price && High->Weight<Low->Weight);
-    AddInfo(FString::Printf(TEXT("20,000 frozen markets: %d books, %d blueprints"),Books,Blueprints)); return true;
+    AddInfo(FString::Printf(TEXT("20,000 legacy frozen markets: %d books, %d blueprints"),Books,Blueprints)); return true;
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLKV082Resume,"LittleKing.V082.Resume.LockedRetryAndFailureSettlement",Flags)
@@ -343,7 +344,7 @@ bool FLKV082UI::RunTest(const FString&)
     TestTrue(TEXT("Actual rest upgrade button works"),Click(Map,*FString::Printf(TEXT("RestUpgrade%d"),SpellIndex)));
     TestFalse(TEXT("UI upgrade consumes rest"),S.Run->HasServiceNode());
     auto Market=ServiceFixture(S.Run->GetRunState(),ELKDungeonNodeType::Market); Market.WalletGold=1000;
-    auto* N=Market.Nodes.FindByPredicate([&](const auto& N){return N.NodeId==Market.CurrentNodeId;}); N->MarketOffers.Reset(); FLKMarketOffer O; O.OfferId=FGuid::NewGuid(); O.CardId="Unit_TrollWarrior"; O.Price=50; N->MarketOffers.Add(O);
+    auto* N=Market.Nodes.FindByPredicate([&](const auto& N){return N.NodeId==Market.CurrentNodeId;}); N->MarketOffers.Reset(); N->bMarketGenerated=true; FLKMarketOffer O; O.OfferId=FGuid::NewGuid(); O.CardId="Unit_TrollWarrior"; O.Price=50; N->MarketOffers.Add(O);
     TestTrue(TEXT("Restore UI market"),S.Restore(Market)); Map->RefreshNodeSelect(); TestTrue(TEXT("Select actual market product"),Click(Map,TEXT("MarketOffer0")));
     Render(TEXT("MarketReplacement"),Map);
     TestFalse(TEXT("Confirm unavailable until minimal replacement"),Click(Map,TEXT("ConfirmMarketPurchase")));

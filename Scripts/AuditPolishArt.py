@@ -13,7 +13,7 @@ catalog=read(BASE/'catalog.json');frames={r['id']:r for r in read(BASE/'frames.j
 images=[]
 doc=['# D 批实际生成提示词与来源','',
     '本页由 Scripts/AuditPolishArt.py 从逐项生成回执整理。图片原 PNG 不改像素；切帧矩形和整图坐标枢轴仅用于 UE 显示。生成图不标为 CC0，不编造工具未提供的模型版本或种子。',
-    '', '图片/字体哈希与许可见 [manifest](../ArtSource/StorybookV1/Polish/manifest.json)，整合及新手教程见 [42](42-PolishArtIntegration.md)。','']
+    '', '图片/字体哈希与许可见 [manifest](../../ArtSource/StorybookV1/Polish/manifest.json)，统一规范与来源见 [素材记录](../../docs/36-ArtAudioSources.md)。','']
 for category,folder in [('animations','Animations'),('buildings','Buildings')]:
     for row in catalog[category]:
         receipt=read(BASE/folder/(row['id']+'.receipt.json'))
@@ -75,7 +75,9 @@ manifest=dict(images=images,music=music,fonts=fonts,
     originalPromptFiles='Animations/*.receipt.json, Buildings/*.receipt.json, Music/Originals/*.json')
 (BASE/'catalog.json').write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 (BASE/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-(ROOT/'docs/43-PolishArtPrompts.md').write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
+prompt_export = ROOT/'Saved/Documentation/PolishArtPrompts.md'
+prompt_export.parent.mkdir(parents=True, exist_ok=True)
+prompt_export.write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
 result=dict(images=len(images),atlases=len(frames),frames=sum(len(r['frames']) for r in frames.values()),
             music=music_checks,fonts=len(fonts),originalImagesUnmodified=True)
 (ROOT/'Saved/PolishArtSourceAudit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

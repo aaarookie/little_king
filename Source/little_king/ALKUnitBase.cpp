@@ -690,7 +690,14 @@ FVector ALKUnitBase::GetChaseDestination(const ALKUnitBase* Target) const
     return Preferred;
 }
 
-void ALKUnitBase::CancelAttackWindup() { bWindupActive = false; WindupTarget = nullptr; WindupRemaining = 0.f; }
+void ALKUnitBase::CancelAttackWindup()
+{
+    const bool bWasWindingUp = bWindupActive;
+    bWindupActive = false; WindupTarget = nullptr; WindupRemaining = 0.f;
+    // A lost/changed target cancels the same presentation instance immediately. An
+    // already-committed strike may retain its recovery pose after its target dies.
+    if (bWasWindingUp && AnimationComponent) { AnimationComponent->CancelAttack(); }
+}
 void ALKUnitBase::ChangeTarget(AActor* NewTarget)
 {
     if (TargetActor.Get() != NewTarget) { CancelAttackWindup(); }
@@ -830,7 +837,8 @@ void ALKUnitBase::TryAttack(float DeltaSeconds)
     }
     if (WindupRemaining <= 0.f)
     {
-        CancelAttackWindup();
+        // Successful commitment is not cancellation: Impact continues this action instance.
+        bWindupActive = false; WindupTarget = nullptr; WindupRemaining = 0.f;
         PerformAttack(Target);
     }
 }

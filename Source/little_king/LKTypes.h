@@ -224,6 +224,12 @@ struct FLKTeamMatchStats
 	UPROPERTY(BlueprintReadOnly) int32 CardsPlayed = 0;
 	UPROPERTY(BlueprintReadOnly) float Damage = 0.f;
 	UPROPERTY(BlueprintReadOnly) float Healing = 0.f;
+	/** Observational metrics; zero/defaults remain compatible with older match history. */
+	UPROPERTY(BlueprintReadOnly) float SilverSpent = 0.f;
+	UPROPERTY(BlueprintReadOnly) float SilverOverflow = 0.f;
+	UPROPERTY(BlueprintReadOnly) float SilverAtCapSeconds = 0.f;
+	UPROPERTY(BlueprintReadOnly) float FirstHeroDeathSeconds = -1.f;
+	UPROPERTY(BlueprintReadOnly) int32 PeakUnits = 0;
 };
 
 USTRUCT(BlueprintType)

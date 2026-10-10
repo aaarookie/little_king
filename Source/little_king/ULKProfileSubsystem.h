@@ -23,6 +23,7 @@ class ULKProfileSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+    static constexpr int32 CurrentSchemaVersion = 3;
 	// ---------- 槽名 ----------
 	static FString GetSlotNameA();
 	static FString GetSlotNameB();
@@ -37,6 +38,8 @@ public:
 	static void SetPersistentProfileEnabledForTest(bool bEnabled);
 	/** 仅自动化测试：恢复默认槽名与开关（测试夹具析构时调用） */
 	static void ResetTestHooks();
+    /** Inject a transient read failure after a successful candidate write; instance-local. */
+    void FailNextReadBackForTest() { bFailNextReadBackForTest=true; }
 	/** 实例级存储路由；不同 GameInstance/PIE 互不共享当前存档选择。 */
 	void ConfigureStorage(const FString& BaseName);
 	FString GetStorageSlot(bool bSlotB) const;
@@ -56,6 +59,7 @@ public:
 	/** 最近一次错误说明（供 UI 诊断） */
 	const FString& GetLastError() const { return LastError; }
 	UFUNCTION(BlueprintPure, Category = "LK|Home") FLKProfileState GetProfile() const { return State; }
+    UFUNCTION(BlueprintPure, Category="LK|Home") TArray<FLKItemInstance> GetOwnedItems() const { return State.OwnedItems; }
 
 	// ---------- 查询 ----------
 	UFUNCTION(BlueprintPure, Category = "LK|Home") int32 GetGold() const { return State.Gold; }
@@ -114,6 +118,9 @@ private:
 	FString StorageBase;
 	bool bProfileUsable = false;
 	bool bAutoSaveEnabled = true;
+    bool bFailNextReadBackForTest = false;
+    /** A failed candidate cleanup leaves disk state uncertain; prevent further commits in this session. */
+    bool bStorageNeedsReview = false;
 	/** 最近一次成功写入/读取的槽下标（0 = A，1 = B）；-1 表示未知 */
 	int32 LastSlotIndex = -1;
 	FString LastError;

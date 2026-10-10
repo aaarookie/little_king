@@ -11,7 +11,23 @@ UENUM(BlueprintType)
 enum class ELKDungeonNodeType : uint8 { Battle, Elite, Rest, Event, Boss, Market };
 
 UENUM(BlueprintType)
-enum class ELKMarketOfferKind : uint8 { Mercenary, SpellBook, BuildingBlueprint };
+enum class ELKMarketOfferKind : uint8 { Mercenary = 0, SpellBook = 1, BuildingBlueprint = 2, TemporarySpell = 3, TemporaryBuilding = 4, Item = 5 };
+
+UENUM(BlueprintType)
+enum class ELKMarketCategory : uint8 { TemporaryCard, Item, Research };
+
+UENUM(BlueprintType)
+enum class ELKItemKind : uint8 { Accessory, Equipment };
+
+/** Stable content identity and owned instance identity are independent from card IDs. No combat attributes yet. */
+USTRUCT(BlueprintType)
+struct FLKItemInstance
+{
+    GENERATED_BODY()
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid InstanceId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FName ItemId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKQuality Quality = ELKQuality::Common;
+};
 
 USTRUCT(BlueprintType)
 struct FLKMarketOffer
@@ -20,6 +36,10 @@ struct FLKMarketOffer
     UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid OfferId;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKMarketOfferKind Kind = ELKMarketOfferKind::Mercenary;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) FName CardId;
+    /** Item offers must leave CardId empty; card/research offers must leave item identities empty. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FName ItemId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid ItemInstanceId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKQuality Quality = ELKQuality::Common;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Price = 0;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bSold = false;
 };
@@ -103,6 +123,7 @@ struct FLKSettlementReceipt
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 GoldAmount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) ELKRunPhase TerminalPhase = ELKRunPhase::Inactive;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> ResearchMaterials;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FLKItemInstance> Items;
 	/** 本轮是否参与家园金币结算（v0.6 旧档迁移标记为 false，避免追算与重复赠送） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bEligibleForHomeReward = true;
 	/** Profile 已完成入账（回执交接状态；重启按同一 SettlementId 重放） */
@@ -127,6 +148,8 @@ struct FLKRunCardState
     GENERATED_BODY()
     UPROPERTY(EditAnywhere, BlueprintReadWrite) FName CardId;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 UpgradeLevel = 0;
+    /** Acquired for this expedition, including spell/building rentals; never unlocks a profile card. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bTemporaryAcquisition = false;
 };
 
 /** H3：一次新远征的完整输入（家园大门组装，第一次 AutoSave 之前全部就位） */
@@ -149,6 +172,9 @@ struct FLKExpeditionStartRequest
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 StartingGold = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMinimum = 8;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMaximum = 8;
+    /** Permanent unlocks/materials frozen at departure for deterministic market eligibility. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FName> ResearchExclusions;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> MarketSilverCosts;
 	/** 本轮是否参与家园金币结算（独立测试/调试轮可关闭） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bEligibleForHomeReward = true;
 };
@@ -204,6 +230,8 @@ struct FLKDungeonNode
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Layer = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool bMarketGenerated = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FLKMarketOffer> MarketOffers;
+    /** 0 is the legacy snapshot format; new inventories use their explicit generator version. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 MarketGenerationVersion = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -255,7 +283,11 @@ USTRUCT(BlueprintType)
 struct FLKRunState
 {
     GENERATED_BODY()
-    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 10;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 11;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 MarketGenerationVersion = 2;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FName> ResearchExclusions;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> MarketSilverCosts;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FLKItemInstance> CarriedItems;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMinimum = 8;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DeckCapacityMaximum = 8;
     UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> CarriedResearchMaterials;

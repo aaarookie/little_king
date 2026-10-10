@@ -3,6 +3,8 @@
 #include "LKRunTypes.h"
 #include "ULKCardDefinition.h"
 #include "LKExpeditionMercenaryContent.h"
+#include "LKResearchContent.h"
+#include "LKItemContent.h"
 
 namespace
 {
@@ -12,7 +14,7 @@ namespace
 		ELKCardFaction Faction;
 	};
 
-	/** 规范身份表：与 docs/48 第 7 节一致；新增敌方专属卡只在此登记。 */
+	/** 规范身份表：获取边界见 docs/34-CardDevelopmentInterfaces.md；新增敌方专属卡只在此登记。 */
 	const TArray<FCanonicalFaction>& CanonicalFactions()
 	{
 		static const TArray<FCanonicalFaction> Rows = {
@@ -52,6 +54,12 @@ bool IsTemporaryMercenary(FName Id)
     for (const auto& D : LKExpeditionMercenaryContent::All())
     { if (D.Unit.UnitId==Id && D.Unit.UnitClass==ELKUnitClass::Soldier) { return true; } }
     return false;
+}
+bool IsRunMarketCard(FName Id)
+{
+    if (Id.IsNone() || !IsPlayerObtainable(Id)) { return false; }
+    if (IsTemporaryMercenary(Id) || LKResearchContent::Find(Id)) { return true; }
+    return Id=="Spell_Fireball" || Id=="Spell_HealWave" || Id=="Building_ArrowTower" || Id=="Building_Barracks";
 }
 bool ValidateReplacement(const TArray<FLKRunCardState>& Cards, FName Incoming,
     const TArray<FName>& Removed, int32 MinSlots, int32 MaxSlots, FString& Error)
@@ -105,8 +113,8 @@ ELKCardFaction FactionOf(FName CardId)
 }
 
 bool IsEnemyOnly(FName CardId) { return FactionOf(CardId) == ELKCardFaction::EnemyOnly; }
-bool IsPlayerObtainable(FName CardId) { return FactionOf(CardId) != ELKCardFaction::EnemyOnly; }
-bool IsEnemyUsable(FName CardId) { return FactionOf(CardId) != ELKCardFaction::PlayerOnly; }
+bool IsPlayerObtainable(FName CardId) { return !LKItemContent::Find(CardId) && FactionOf(CardId) != ELKCardFaction::EnemyOnly; }
+bool IsEnemyUsable(FName CardId) { return !LKItemContent::Find(CardId) && FactionOf(CardId) != ELKCardFaction::PlayerOnly; }
 
 const TArray<FName>& EnemyOnlyCardIds()
 {

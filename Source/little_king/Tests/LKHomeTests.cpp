@@ -579,7 +579,9 @@ bool FLKHomeWorldTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Barracks soldiers tab has three mercenaries"), Soldiers.Rows.Num(), 3);
 	TestEqual(TEXT("Barracks buildings tab has two combat buildings"), Buildings.Rows.Num(), 2);
 	TestTrue(TEXT("Barracks has no training action"), !Soldiers.Actions.ContainsByPredicate(
-		[](const FLKHomePanelAction& Action) { return Action.ActionId != TEXT("Close") && Action.ActionId != TEXT("Tab0") && Action.ActionId != TEXT("Tab1"); }));
+		[](const FLKHomePanelAction& Action) { return Action.ActionId != TEXT("Close") && Action.ActionId != TEXT("Tab0") && Action.ActionId != TEXT("Tab1") && Action.ActionId != TEXT("Tab2"); }));
+	TestTrue(TEXT("Barracks exposes persistent item warehouse"), Soldiers.Actions.ContainsByPredicate(
+		[](const FLKHomePanelAction& Action) { return Action.ActionId == TEXT("Tab2"); }));
 
 	// 大门：一个真实区域 + 出征按钮
 	const FLKHomePanelModel GatePanel = GM->BuildPanelModel(ELKHomePanel::Gate, FLKExpeditionLoadout(), NAME_None, 0);

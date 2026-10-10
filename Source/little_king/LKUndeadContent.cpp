@@ -16,7 +16,7 @@ const TMap<FName, FLKUnitRow>& Units()
             Row.PlaceholderColor = Color; Row.bSkeleton = true;
             return Row;
         };
-        // 第一版平衡（docs/48 第 3 节）：骷髅兵/骷髅射手主要提升生命；英雄与首领大幅提升生命并适度加攻击。
+        // 第一版平衡（docs/DevelopmentHistory.md）：骷髅兵/骷髅射手主要提升生命；英雄与首领大幅提升生命并适度加攻击。
         Add("Unit_Skeleton", TEXT("骷髅兵"), ELKUnitClass::Soldier, ELKAttackType::Melee, 240.f, 10.f, 150.f, 1.3f, 240.f, FLinearColor(0.8f, 0.8f, 0.65f));
         Add("Unit_SkeletonArcher", TEXT("骷髅射手"), ELKUnitClass::Soldier, ELKAttackType::Ranged, 160.f, 12.f, 400.f, 1.6f, 220.f, FLinearColor(0.45f, 0.7f, 0.75f));
         FLKUnitRow& Necro = Add("Hero_Necromancer", TEXT("死灵法师"), ELKUnitClass::Hero, ELKAttackType::Ranged, 18000.f, 26.f, 480.f, 1.8f, 190.f, FLinearColor(0.7f, 0.3f, 0.9f));

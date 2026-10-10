@@ -21,7 +21,7 @@ def main():
     expected = {i for i in old if not i.startswith('Building_') and i != 'Unit_TwoHeadedDragon'}
     rows = []
     doc = ['# 战斗显示修复：步行素材实际提示词', '',
-           '图片使用既有角色作身份参考，由内置 image_gen 生成。原 PNG 字节保留；只用 UE SourceUV/尺寸/枢轴裁取四个姿势。原始回执与哈希见 [manifest](../ArtSource/StorybookV1/MovementFix/manifest.json)。', '']
+           '图片使用既有角色作身份参考，由内置 image_gen 生成。原 PNG 字节保留；只用 UE SourceUV/尺寸/枢轴裁取四个姿势。原始回执与哈希见 [manifest](../../ArtSource/StorybookV1/MovementFix/manifest.json)。', '']
     for receipt in sorted(BASE.glob('*.receipt.json')):
         row = json.loads(receipt.read_text(encoding='utf-8-sig'))
         path = ROOT / row['file']
@@ -70,7 +70,9 @@ def main():
         assert {r['id'] for r in rows} == expected, sorted(expected-{r['id'] for r in rows})
     result = {'partial': args.partial, 'count': len(rows), 'expectedCount': len(expected), 'items': rows}
     (BASE/'manifest.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    (ROOT/'docs/46-MovementFixPrompts.md').write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
+    prompt_export = ROOT/'Saved/Documentation/MovementFixPrompts.md'
+    prompt_export.parent.mkdir(parents=True, exist_ok=True)
+    prompt_export.write_text('\n'.join(doc).rstrip()+'\n',encoding='utf-8')
     print('WALK_SOURCE_OK',len(rows),'/',len(expected),'partial='+str(args.partial))
 
 if __name__ == '__main__':

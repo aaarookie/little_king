@@ -383,6 +383,14 @@ namespace LKHomeContent
 		OutRequest.DeckCapacityMinimum=Data?Data->DeckCapacityMinimum:8;
 		OutRequest.DeckCapacityMaximum=Data?Data->DeckCapacityMaximum:8;
 		OutRequest.bEligibleForHomeReward = true;
+		OutRequest.ResearchExclusions = Profile.GetProfile().UnlockedCardIds;
+		for (const auto& Material : Profile.GetProfile().ResearchMaterials)
+		{ if (Material.Value > 0) { OutRequest.ResearchExclusions.AddUnique(Material.Key); } }
+		if (Data)
+		{
+			for (const ULKCardDefinition* Card : Data->CardLibrary)
+			{ if (Card && LKCardRules::IsPlayerObtainable(Card->CardId)) { OutRequest.MarketSilverCosts.Add(Card->CardId, Card->Cost); } }
+		}
 
 		for (FName HeroId : Loadout.HeroIds)
 		{

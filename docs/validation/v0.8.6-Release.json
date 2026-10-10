@@ -1,0 +1,168 @@
+{
+  "releaseDate": "2026-10-10",
+  "validationDate": "2026-10-10",
+  "version": "v0.8.6",
+  "projectVersion": "0.8.6",
+  "branch": "main",
+  "tag": "v0.8.6",
+  "baseline": "f256338e8d95731b0f46cd728d5dd7a48f530792",
+  "primaryFeature": "Research-driven market, item inventory, opponent AI and animation optimization",
+  "releaseNotes": "docs/OptimizationImplementation.md#v086-发布记录",
+  "developmentRecord": "docs/validation/ResearchOptimization-Validation.json",
+  "validationReuse": "Release preparation changes version metadata and documentation only; game source fingerprint is unchanged from the successful build and test run. Full tests were not repeated for this metadata-only step.",
+  "sourceFingerprint": {
+    "algorithm": "SHA-256 of sorted relative UTF-8 path + NUL + raw file bytes + NUL",
+    "files": 235,
+    "sha256": "2b185aaa7fef11e0d56d3c4b23db2897a99b59942d51b754cb299ffcb1a26e7a",
+    "scope": "All game C++ headers/sources; BattleDesigner JS/model tests/schema; telemetry summarizer"
+  },
+  "build": {
+    "engine": "UE 5.8.1",
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Optimization/Build-04.log"
+  },
+  "ueFullRegression": {
+    "report": "Saved/Automation/ResearchOptimization-Full02/index.json",
+    "total": 193,
+    "succeeded": 98,
+    "succeededWithWarnings": 95,
+    "failed": 0,
+    "notRun": 0,
+    "totalDuration": 221.62838745117188
+  },
+  "ueFocusedRegression": {
+    "report": "Saved/Automation/ResearchOptimization-Focused03/index.json",
+    "total": 43,
+    "succeeded": 15,
+    "succeededWithWarnings": 28,
+    "failed": 0,
+    "notRun": 0,
+    "totalDuration": 11.890892028808594
+  },
+  "javascript": {
+    "command": "node --test Tools/BattleDesigner/model.test.cjs",
+    "passed": 37,
+    "failed": 0
+  },
+  "marketAudit": {
+    "generations": 32000,
+    "regionDepths": 4,
+    "samplesPerDepthPerSilverCap": 4000,
+    "silverCaps": [
+      20,
+      5
+    ],
+    "fullResults": "docs/validation/ResearchOptimization-Validation.json",
+    "field": "marketAudit"
+  },
+  "battleSampling": {
+    "samples": 18,
+    "scope": "Real battle worlds with simple scripted player policy, two fixed decks, Treasury 1, full initial health; these do not estimate human win rates."
+  },
+  "visualVerification": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "method": "Actual UE offscreen rendering using editor-only -MarketPreview, isolated save namespace, real market transaction APIs and UMG button broadcasts. This is not a physical mouse/hardware test.",
+    "screenshots": [
+      "docs/images/ResearchOptimization/Market-1280x720.png",
+      "docs/images/ResearchOptimization/Mercenary-1280x720.png",
+      "docs/images/ResearchOptimization/Item-1280x720.png",
+      "docs/images/ResearchOptimization/Inventory-1280x720.png",
+      "docs/images/ResearchOptimization/Item-1920x1080.png"
+    ],
+    "screenshotSha256": {
+      "docs/images/ResearchOptimization/Market-1280x720.png": "9f138ab68a90085af0dba436bea8d21828280b31fd3082d11cfae31bc7bdc069",
+      "docs/images/ResearchOptimization/Mercenary-1280x720.png": "3a338aa7e4ee7f425f318db793ad764542f13455cf3644095b1fac4fcd1fd728",
+      "docs/images/ResearchOptimization/Item-1280x720.png": "61bc55d470fac9fc786c149931d4f1c8a66efbb713cdcf2edaed32a863daadf8",
+      "docs/images/ResearchOptimization/Inventory-1280x720.png": "88f101f53c5a724b2722a0ab931aaa06f156bff8bbc02493d37fd17c7828663e",
+      "docs/images/ResearchOptimization/Item-1920x1080.png": "2568b9dc9c01e5ba87b9b1f422388158206a80e2224a6c2e97609919cb919966"
+    }
+  },
+  "compatibility": {
+    "units": 46,
+    "cards": 48,
+    "spellResearch": 16,
+    "blueprintResearch": 8,
+    "itemDefinitions": 2,
+    "itemRarities": 5,
+    "runSchema": 11,
+    "profileSchema": 3,
+    "layoutSchema": 2,
+    "marketGeneration": 2
+  },
+  "existingSaveIntegrity": [
+    {
+      "file": "LittleKing_BalanceMig_Cards_8513C71046B0FFD771099894A9255333.sav",
+      "bytes": 93955,
+      "originalSha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "currentSha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_A.sav",
+      "bytes": 3608,
+      "originalSha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "currentSha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_B.sav",
+      "bytes": 3608,
+      "originalSha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "currentSha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_A.sav",
+      "bytes": 3736,
+      "originalSha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "currentSha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_B.sav",
+      "bytes": 3821,
+      "originalSha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "currentSha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Run.sav",
+      "bytes": 199893,
+      "originalSha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "currentSha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "unchanged": true
+    }
+  ],
+  "extraSaveFiles": [],
+  "documentation": "Superseded plans and tutorials consolidated; current topics, stage history, asset provenance and original validation reports preserved. Research report covers 24 GitHub projects.",
+  "limitations": [
+    "Placeholder items have identity, rarity and persistence only; no equipment slot or combat attributes.",
+    "No blanket HP/attack difficulty multiplier changes; scripted battles and forced outcomes do not establish human balance.",
+    "Save rollback covers observable write failure, not guaranteed power-loss atomic replacement.",
+    "Normal telemetry also includes cheat-forced endings; distinct authored layouts share an encounter group.",
+    "Schema alone cannot enforce all runtime/relational/date/rotation checks; UTF-16 and schema code-point length semantics differ.",
+    "Packaging, hardware acceptance, subjective sound assessment and automatic assignment of authored layouts to expedition nodes remain deferred."
+  ],
+  "gitDelivery": {
+    "note": "This record describes the release payload before commit. Remote main and the peeled annotated tag are verified after push; the commit cannot embed its own hash.",
+    "remote": "origin",
+    "repository": "https://github.com/aaarookie/little_king",
+    "refs": [
+      "refs/heads/main",
+      "refs/tags/v0.8.6"
+    ],
+    "commitLookup": "git rev-parse 'v0.8.6^{commit}'"
+  },
+  "releaseChecks": {
+    "sourceFingerprintMatchesTestedCode": true,
+    "originalSaveFilesUnchanged": 6,
+    "extraSaveFiles": 0,
+    "localDocumentationLinks": 294,
+    "brokenDocumentationLinks": 0,
+    "testSummariesMatchLocalReports": true
+  }
+}

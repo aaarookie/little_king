@@ -1,4 +1,4 @@
-"""Balance V1 (docs/48) read-only inventory dump.
+"""Balance V1 (docs/DevelopmentHistory.md) read-only inventory dump.
 
 Writes Saved/BalanceV1Delegation/inventory.json with the authored rows that matter
 for the balance pass: DT_Units, DT_Encounters and the DA_GameData fields we touch.

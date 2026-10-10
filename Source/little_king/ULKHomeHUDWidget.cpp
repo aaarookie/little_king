@@ -666,9 +666,9 @@ void ULKHomeHUDWidget::ExecuteAction(FName ActionId)
 		OpenPanel(ELKHomePanel::WarRoom);
 		return;
 	}
-	if (ActionId == TEXT("Tab0") || ActionId == TEXT("Tab1"))
+	if (ActionId == TEXT("Tab0") || ActionId == TEXT("Tab1") || ActionId == TEXT("Tab2"))
 	{
-		BarracksTab = ActionId == TEXT("Tab0") ? 0 : 1;
+		BarracksTab = ActionId == TEXT("Tab0") ? 0 : ActionId == TEXT("Tab1") ? 1 : 2;
 		SelectedRowId = NAME_None;
 		LastMessage = FText::GetEmpty();
 		RebuildPanel();

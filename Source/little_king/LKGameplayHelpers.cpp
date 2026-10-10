@@ -264,7 +264,7 @@ namespace LKGameplay
 		const TSoftObjectPtr<USoundBase>* Found = GameData->SoundMap.Find(SoundId);
 		if (!Found || Found->IsNull())
 		{
-			return; // 未配置的键静默跳过（不报错，教程 B 允许只配 3 个）
+			return; // 未配置的可选键静默跳过。
 		}
 
 		const ALKBattleGameMode* GM = World->GetAuthGameMode<ALKBattleGameMode>();

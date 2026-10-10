@@ -153,7 +153,7 @@ FText LKWorldMapContent::NodeDescription(ELKDungeonNodeType Type)
     case ELKDungeonNodeType::Boss:
         return FText::FromString(TEXT("1 名 Boss、2 名英雄及佣兵，胜利获得 40 金币。"));
     case ELKDungeonNodeType::Market:
-        return FText::FromString(TEXT("购买本轮临时佣兵；极少出现昂贵法术书或建筑图纸，终态带回家园研究。"));
+        return FText::FromString(TEXT("购入本轮佣兵、法术与建筑手牌；挑选道具及法术书／建筑图纸，远征结束后带回家园。"));
     case ELKDungeonNodeType::Rest:
         return FText::FromString(TEXT("选择全体英雄恢复 30% 最大生命，或升级一张法术／建筑的本轮数值 10%。"));
     default:
@@ -240,7 +240,10 @@ bool LKWorldMapContent::Generate(FLKRunState &State, FString &OutError)
                     LKBalanceRules::ApplySnapshot(Dynamic, Depth);
                     State.Encounters.Add(Dynamic);
                 }
-                LKResearchContent::GenerateMarket(Node,State.Seed,RegionDepths.FindRef(Region.RegionId));
+                // Current markets freeze on first visit so carried/permanent ownership can be filtered.
+                // Existing runs keep their serialized inventories and generation version.
+                if (State.MarketGenerationVersion<2)
+                { LKResearchContent::GenerateMarket(Node,State.Seed,RegionDepths.FindRef(Region.RegionId)); }
                 Indices.Add(State.Nodes.Add(Node));
             }
             Layers.Add(Indices);

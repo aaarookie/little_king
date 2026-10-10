@@ -12,7 +12,9 @@ namespace LKResearchContent
 {
 const TArray<FLKResearchDefinition>& All()
 {
-    static const TArray<FLKResearchDefinition> Rows={
+    static const TArray<FLKResearchDefinition> Rows=[]
+    {
+    TArray<FLKResearchDefinition> Result={
         {"Spell_ResearchFireball_N2",FText::FromString(TEXT("强化火球术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice2,0,120,100.f,2,ELKSpellEffect::Damage,110,250,0},
         {"Spell_ResearchFireball_M1",FText::FromString(TEXT("烈焰火球")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Intermediate1,1,260,30.f,3,ELKSpellEffect::Damage,210,280,0},
         {"Spell_ResearchFireball_A1",FText::FromString(TEXT("灼日火球")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Advanced1,2,480,6.f,4,ELKSpellEffect::Damage,380,320,0},
@@ -38,6 +40,12 @@ const TArray<FLKResearchDefinition>& All()
         {"Spell_Hurricane",FText::FromString(TEXT("飓风法术")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Novice3,0,180,80.f,3,ELKSpellEffect::Hurricane,0,350,0},
         {"Spell_DivineBlessing",FText::FromString(TEXT("神圣祝福")),ELKMarketOfferKind::SpellBook,ELKSpellGrade::Divine1,3,1000,1.f,8,ELKSpellEffect::DivineBlessing,1,0,.2f},
     };
+    // Current research prices are reachable within the ordinary expedition economy.
+    // Legacy inventories keep their saved prices, rather than being rewritten on load.
+    for (auto& Row:Result)
+    { Row.Price=FMath::Clamp(Row.Price/5,25+20*Row.MinimumRegionDepth,Row.MinimumRegionDepth==0?40:60+40*Row.MinimumRegionDepth); }
+    return Result;
+    }();
     return Rows;
 }
 const FLKResearchDefinition* Find(FName Id) { return All().FindByPredicate([Id](const auto& R){return R.CardId==Id;}); }

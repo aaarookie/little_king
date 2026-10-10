@@ -90,6 +90,7 @@ bool FLKLayoutParserTest::RunTest(const FString& Parameters)
         TestFalse(TEXT("Invalid document returns an actionable error"),Error.IsEmpty());
         TestEqual(TEXT("Failed parse preserves prior layout title"),Kept.Title,Good.Title);
         TestEqual(TEXT("Failed parse preserves prior object count"),Kept.Objects.Num(),Good.Objects.Num());
+        TestEqual(TEXT("Failed parse preserves prior wave count"),Kept.Encounter.Waves.Num(),Good.Encounter.Waves.Num());
     };
     Reject(TEXT("Future schema version rejected"),[](auto R){R->SetNumberField(TEXT("version"),3);});
     Reject(TEXT("Duplicate IDs compare case-insensitively"),[](auto R){auto A=R->GetArrayField(TEXT("objects")); A[1]->AsObject()->SetStringField(TEXT("id"),A[0]->AsObject()->GetStringField(TEXT("id")).ToUpper());});
@@ -108,12 +109,72 @@ bool FLKLayoutParserTest::RunTest(const FString& Parameters)
     Reject(TEXT("Starting silver cannot exceed capacity"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetNumberField(TEXT("startingSilver"),999);});
     Reject(TEXT("Enabled empty enemy hand rejected"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetArrayField(TEXT("cards"),{});});
     Reject(TEXT("Duplicate enemy cards rejected"),[](auto R){auto E=R->GetObjectField(TEXT("enemy"));auto A=E->GetArrayField(TEXT("cards"));const auto Duplicate=A[0];A.Add(Duplicate);E->SetArrayField(TEXT("cards"),A);});
+    // The Node mutation suite uses this same checked-in editor document and categories.
+    for (const FString Container : {TEXT("root"),TEXT("meta"),TEXT("field"),TEXT("settings"),TEXT("enemy"),TEXT("object"),TEXT("wave")})
+    {
+        Reject(*FString::Printf(TEXT("Unknown fields rejected in %s"),*Container),[Container](auto R)
+        {
+            auto Target=Container==TEXT("root") ? R : Container==TEXT("object") ? R->GetArrayField(TEXT("objects"))[0]->AsObject()
+                : Container==TEXT("wave") ? R->GetArrayField(TEXT("waves"))[0]->AsObject() : R->GetObjectField(Container);
+            Target->SetNumberField(TEXT("unknownField"),1);
+        });
+    }
+    for (const FString Id : {TEXT("None"),TEXT("nOnE"),TEXT("_leading"),TEXT("-leading"),TEXT("角色"),TEXT("space id")})
+    {
+        Reject(TEXT("Portable ASCII object identifier"),[Id](auto R){R->GetArrayField(TEXT("objects"))[0]->AsObject()->SetStringField(TEXT("id"),Id);});
+        Reject(TEXT("Portable ASCII map identifier"),[Id](auto R){R->GetObjectField(TEXT("meta"))->SetStringField(TEXT("id"),Id);});
+        Reject(TEXT("Portable ASCII wave identifier"),[Id](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("id"),Id);});
+    }
+    for (const FString Date : {TEXT("2026-02-30T00:00:00Z"),TEXT("2026-10-10"),TEXT("2026-10-10T12:00:00Zjunk"),TEXT("2026-10-10T24:00:00Z"),TEXT("0000-01-01T00:00:00Z"),TEXT("2026-10-10T12:00:00+25:00")})
+    { Reject(TEXT("Invalid timestamp rejected"),[Date](auto R){R->GetObjectField(TEXT("meta"))->SetStringField(TEXT("createdAt"),Date);}); }
+    Reject(TEXT("Unknown card rejected while parsing"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetArrayField(TEXT("cards"),{MakeShared<FJsonValueString>(TEXT("Card_Unknown"))});});
+    Reject(TEXT("Module casing is canonical"),[](auto R){R->GetArrayField(TEXT("objects"))[0]->AsObject()->SetStringField(TEXT("moduleId"),TEXT("Brush"));});
+    Reject(TEXT("Format casing is canonical"),[](auto R){R->SetStringField(TEXT("format"),TEXT("Little-King.Battle-Layout"));});
+    Reject(TEXT("Encounter casing is canonical"),[](auto R){R->GetObjectField(TEXT("settings"))->SetStringField(TEXT("encounterId"),TEXT("patrol"));});
+    Reject(TEXT("Card casing is canonical"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetArrayField(TEXT("cards"),{MakeShared<FJsonValueString>(TEXT("unit_skeleton"))});});
+    Reject(TEXT("Unit casing is canonical"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("unitId"),TEXT("unit_skeleton"));});
+    Reject(TEXT("Team casing is canonical"),[](auto R){R->GetArrayField(TEXT("objects"))[0]->AsObject()->SetStringField(TEXT("team"),TEXT("Neutral"));});
+    Reject(TEXT("Trigger casing is canonical"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("trigger"),TEXT("Time"));});
+    Reject(TEXT("Field name casing is canonical"),[](auto R){R->GetObjectField(TEXT("meta"))->SetStringField(TEXT("Title"),TEXT("Wrong case"));});
+    // TryGet* in UE performs coercion; import must reject it just like JS/schema.
+    Reject(TEXT("String version is not a JSON number"),[](auto R){R->SetStringField(TEXT("version"),TEXT("2"));});
+    Reject(TEXT("String field width is not a JSON number"),[](auto R){R->GetObjectField(TEXT("field"))->SetStringField(TEXT("width"),TEXT("40"));});
+    Reject(TEXT("Boolean grid is not a JSON number"),[](auto R){R->GetObjectField(TEXT("field"))->SetBoolField(TEXT("grid"),true);});
+    Reject(TEXT("String seed is not a JSON number"),[](auto R){R->GetObjectField(TEXT("settings"))->SetStringField(TEXT("seed"),TEXT("2026"));});
+    Reject(TEXT("Boolean object delay is not a JSON number"),[](auto R){R->GetArrayField(TEXT("objects"))[6]->AsObject()->SetBoolField(TEXT("spawnAtSeconds"),true);});
+    Reject(TEXT("String wave count is not a JSON number"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("count"),TEXT("2"));});
+    Reject(TEXT("Boolean wave time is not a JSON number"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetBoolField(TEXT("time"),false);});
+    Reject(TEXT("String card switch is not a JSON boolean"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetStringField(TEXT("usesCards"),TEXT("false"));});
+    Reject(TEXT("Numeric card switch is not a JSON boolean"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetNumberField(TEXT("usesCards"),1);});
+    Reject(TEXT("Numeric map ID is not a JSON string"),[](auto R){R->GetObjectField(TEXT("meta"))->SetNumberField(TEXT("id"),123);});
+    Reject(TEXT("Numeric title is not a JSON string"),[](auto R){R->GetObjectField(TEXT("meta"))->SetNumberField(TEXT("title"),123);});
+    Reject(TEXT("Boolean description is not a JSON string"),[](auto R){R->GetObjectField(TEXT("meta"))->SetBoolField(TEXT("description"),false);});
+    Reject(TEXT("Numeric wave label is not a JSON string"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetNumberField(TEXT("label"),123);});
+    Reject(TEXT("Card array entries must be JSON strings"),[](auto R){R->GetObjectField(TEXT("enemy"))->SetArrayField(TEXT("cards"),{MakeShared<FJsonValueNumber>(123)});});
+    Reject(TEXT("Timestamp cannot have trailing newline"),[](auto R){R->GetObjectField(TEXT("meta"))->SetStringField(TEXT("createdAt"),TEXT("2026-10-10T12:00:00Z\n"));});
+    Reject(TEXT("Missing wave label rejected"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->RemoveField(TEXT("label"));});
+    Reject(TEXT("Cross-object-wave IDs reject case variants"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("id"),R->GetArrayField(TEXT("objects"))[0]->AsObject()->GetStringField(TEXT("id")).ToUpper());});
+    Reject(TEXT("Time wave has no target"),[](auto R){R->GetArrayField(TEXT("waves"))[0]->AsObject()->SetStringField(TEXT("targetId"),TEXT("unrelated"));});
+    Reject(TEXT("Invalid grid rejected"),[](auto R){R->GetObjectField(TEXT("field"))->SetNumberField(TEXT("grid"),.75);});
+    Reject(TEXT("Legacy object delay matches 300 second editor bound"),[](auto R){R->GetArrayField(TEXT("objects"))[6]->AsObject()->SetNumberField(TEXT("spawnAtSeconds"),301);});
+    auto CaseReference=JsonRoot(Text);
+    auto Conditional=CaseReference->GetArrayField(TEXT("waves"))[1]->AsObject();
+    Conditional->SetStringField(TEXT("targetId"),Conditional->GetStringField(TEXT("targetId")).ToUpper());
+    FLKBattleLayout CaseLayout;
+    TestTrue(TEXT("Case-insensitive stable hero reference accepted"),LKBattleLayout::Parse(JsonText(CaseReference),CaseLayout,Error));
+    for (const FString Date : {TEXT("2024-02-29T23:59:59Z"),TEXT("2026-10-10T12:00:00.123456789+08:00"),TEXT("0001-01-01T00:00:00Z")})
+    {
+        auto ValidDate=JsonRoot(Text); ValidDate->GetObjectField(TEXT("meta"))->SetStringField(TEXT("createdAt"),Date);
+        TestTrue(TEXT("Portable timestamp legal boundaries accepted"),LKBattleLayout::Parse(JsonText(ValidDate),CaseLayout,Error));
+    }
     FLKBattleLayout Kept=Good;
     TestFalse(TEXT("Malformed JSON rejected without mutation"),LKBattleLayout::Parse(TEXT("{"),Kept,Error));
     TestEqual(TEXT("Malformed JSON retains old title"),Kept.Title,Good.Title);
     auto Legacy=JsonRoot(Text); Legacy->SetNumberField(TEXT("version"),1); Legacy->RemoveField(TEXT("enemy"));Legacy->RemoveField(TEXT("waves"));
     TestTrue(TEXT("Legacy v1 layout remains readable"),LKBattleLayout::Parse(JsonText(Legacy),Kept,Error));
     TestFalse(TEXT("Legacy preview does not silently enable enemy cards"),Kept.Encounter.bEnemyUsesCards);
+    Legacy->SetObjectField(TEXT("enemy"),JsonRoot(Text)->GetObjectField(TEXT("enemy")));
+    TestFalse(TEXT("V1 cannot smuggle unversioned v2 fields"),LKBattleLayout::Parse(JsonText(Legacy),Kept,Error));
     return true;
 }
 

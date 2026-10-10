@@ -1,5 +1,7 @@
 #include "ULKRunSubsystem.h"
 #include "LKResearchContent.h"
+#include "LKMarketContent.h"
+#include "LKItemContent.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "LKBalanceRules.h"
@@ -46,7 +48,7 @@ namespace
 	}
 
 	/**
-	 * docs/48 §3 之前的玩家英雄原生基础生命。
+	 * Balance V1 之前的玩家英雄原生基础生命。
 	 * 新原生值/旧原生值同比缩放 BaseMaxHealth/MaxHealth/Health；
 	 * 不在此表（旧档创建时不存在、或非玩家原生英雄）的自定义英雄没有旧基准，不迁移其数值。
 	 */
@@ -225,6 +227,14 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
 
 	if (!ValidateStartingParty(Request.Heroes, Request.Cards) || !ValidateEncounterCatalog(Request.Encounters)) { return false; }
 	if (Request.RegionId.IsNone()) { UE_LOG(LogLKBattle, Error, TEXT("[Run] 出征缺少 RegionId")); return false; }
+    if (Request.StartingGold<0 || Request.DeckCapacityMinimum<1 || Request.DeckCapacityMaximum<Request.DeckCapacityMinimum || Request.DeckCapacityMaximum>64
+        || LKCardRules::Used(Request.Cards)>Request.DeckCapacityMaximum
+        || (Request.bUseWorldMap && Request.Cards.Num()<LKCardRules::MinimumDepartureCards)) { return false; }
+    // Every caller must preserve the old terminal receipt, including recovery/debug restart paths.
+    // Validate the new request first; successful settlement becomes part of the rollback snapshot below.
+    if (bRestart && State.PendingSettlement.SettlementId.IsValid() && State.PendingSettlement.bEligibleForHomeReward
+        && !State.PendingSettlement.bProfileApplied && !ApplyPendingSettlementToProfile())
+    { UE_LOG(LogLKBattle,Warning,TEXT("[Run] 待结算回执未能安全交接，拒绝重开并保留原远征")); return false; }
 
 	const FLKRunState PreviousState = State;
 	const FGuid PreviousRunId = State.RunId;
@@ -243,9 +253,10 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
 	State.StartingGold = Request.StartingGold;
 	State.DeckCapacityMinimum=Request.DeckCapacityMinimum;
 	State.DeckCapacityMaximum=Request.DeckCapacityMaximum;
-    if (Request.DeckCapacityMinimum<1 || Request.DeckCapacityMaximum<Request.DeckCapacityMinimum || Request.DeckCapacityMaximum>64
-        || LKCardRules::Used(Request.Cards)>Request.DeckCapacityMaximum
-        || (Request.bUseWorldMap && Request.Cards.Num()<LKCardRules::MinimumDepartureCards)) { State=PreviousState; return false; }
+    State.MarketGenerationVersion=LKMarketContent::CurrentGenerationVersion;
+    State.MarketSilverCosts=Request.MarketSilverCosts;
+    for (FName Id:Request.ResearchExclusions)
+    { if (LKResearchContent::Find(Id)) { State.ResearchExclusions.AddUnique(Id); } }
 	State.WalletGold = Request.StartingGold;
 	State.PendingSettlement = FLKSettlementReceipt();
     State.Heroes = Request.Heroes;
@@ -284,6 +295,13 @@ bool ULKRunSubsystem::StartRunInternal(const FLKExpeditionStartRequest& Request,
     }
 	ULKProfileSubsystem* Profile = ProfileSubsystemOverrideForTest.Get();
 	if (!Profile && GetGameInstance()) { Profile = GetGameInstance()->GetSubsystem<ULKProfileSubsystem>(); }
+    if (Profile && Profile->HasProfile() && Profile->GetProfile().ProfileId==State.ProfileId)
+    {
+        const FLKProfileState Permanent=Profile->GetProfile();
+        for (FName Id:Permanent.UnlockedCardIds) { if (LKResearchContent::Find(Id)) { State.ResearchExclusions.AddUnique(Id); } }
+        for (const auto& Material:Permanent.ResearchMaterials) { State.ResearchExclusions.AddUnique(Material.Key); }
+    }
+    State.ResearchExclusions.Sort(FNameLexicalLess());
 	if (Request.StartingGold < 0 || (State.bHomeRewardEligible && (!Profile || Profile->GetProfile().ProfileId != State.ProfileId || !Profile->ReserveDepartureGold(State.RunId, Request.StartingGold))))
 	{ State = PreviousState; return false; }
 	if (bAutoSaveEnabled && !SaveExpedition())
@@ -709,7 +727,13 @@ ELKNodeSelectionResult ULKRunSubsystem::SelectNode(FName NodeId)
 		State.CurrentNodeId = NodeId; if (!Next->RegionId.IsNone()) { State.RegionId = Next->RegionId; }
 		State.Phase = ELKRunPhase::ResolvingNode; State.PendingBattle = FLKBattleContext();
         if (Next->Type==ELKDungeonNodeType::Market)
-        { LKResearchContent::GenerateMarket(*FindNode(NodeId),State.Seed,LKBalanceRules::ComputeRegionDepth(State.WorldRegions,State.RegionId)); }
+        {
+            const int32 Depth=LKBalanceRules::ComputeRegionDepth(State.WorldRegions,State.RegionId);
+            if (State.MarketGenerationVersion>=LKMarketContent::CurrentGenerationVersion)
+            { LKMarketContent::Generate(*FindNode(NodeId),State.Seed,Depth,State.BonusSnapshot.PlayerSilverCap,
+                State.ResearchExclusions,State.CarriedResearchMaterials,State.Cards,State.MarketSilverCosts,State.RunId); }
+            else { LKResearchContent::GenerateMarket(*FindNode(NodeId),State.Seed,Depth); }
+        }
 		if (bAutoSaveEnabled && !SaveExpedition()) { State = Before; return ELKNodeSelectionResult::Rejected; }
 		OnServiceNodeEntered.Broadcast(NodeId, Next->Type);
 		return ELKNodeSelectionResult::ServiceEntered;
@@ -873,6 +897,7 @@ void ULKRunSubsystem::FreezeTerminalSettlement()
 
     int32 Amount = State.WalletGold;
     Receipt.ResearchMaterials=State.CarriedResearchMaterials;
+    Receipt.Items=State.CarriedItems;
     if (State.Phase==ELKRunPhase::Failed) { Amount=int32((int64(Amount)*80)/100); }
     if (State.Phase == ELKRunPhase::Completed)
     {
@@ -1067,7 +1092,7 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
     TSet<FName> CardIds;
     for (const FLKRunCardState& Card : State.Cards)
     {
-        if (Card.CardId.IsNone() || Card.UpgradeLevel < 0 || CardIds.Contains(Card.CardId))
+        if (Card.CardId.IsNone() || LKItemContent::Find(Card.CardId) || Card.UpgradeLevel < 0 || CardIds.Contains(Card.CardId))
         {
             OutError = FString::Printf(TEXT("牌组含空/重复/非法卡 %s"), *Card.CardId.ToString());
             return false;
@@ -1148,8 +1173,13 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
             { OutError = TEXT("非战斗节点恢复点无效"); return false; }
         }
     }
+    if (State.SchemaVersion<11 && (!State.CarriedItems.IsEmpty() || !State.PendingSettlement.Items.IsEmpty()
+        || State.Nodes.ContainsByPredicate([](const auto& Node){return Node.MarketGenerationVersion!=0 || Node.MarketOffers.ContainsByPredicate([](const auto& Offer){return uint8(Offer.Kind)>2 || !Offer.ItemId.IsNone() || Offer.ItemInstanceId.IsValid();});})))
+    { OutError=TEXT("旧存档包含不支持的市场道具结构"); return false; }
     if (State.SchemaVersion>=10)
     {
+        if (State.SchemaVersion<11 && (!State.CarriedItems.IsEmpty() || !State.PendingSettlement.Items.IsEmpty()))
+        { OutError=TEXT("旧存档包含不支持的道具背包"); return false; }
         if (State.DeckCapacityMinimum<1 || State.DeckCapacityMaximum<State.DeckCapacityMinimum || State.DeckCapacityMaximum>64
             || !LKResearchContent::ValidateMaterials(State.CarriedResearchMaterials)
             || !LKResearchContent::ValidateMaterials(State.PendingSettlement.ResearchMaterials))
@@ -1157,13 +1187,13 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
         TSet<FGuid> OfferIds;
         for (const auto& Node:State.Nodes)
         {
+            if (State.SchemaVersion<11 && (Node.MarketGenerationVersion!=0 || Node.MarketOffers.ContainsByPredicate([](const auto& Offer){return uint8(Offer.Kind)>2 || !Offer.ItemId.IsNone() || Offer.ItemInstanceId.IsValid();})))
+            { OutError=TEXT("旧存档包含不支持的市场道具结构"); return false; }
             if (Node.MarketOffers.Num()>5 || (!Node.MarketOffers.IsEmpty() && (Node.Type!=ELKDungeonNodeType::Market || !Node.bMarketGenerated)))
             { OutError=TEXT("市场商品快照无效"); return false; }
             for (const auto& O:Node.MarketOffers)
             {
-                const auto* R=LKResearchContent::Find(O.CardId);
-                if (!O.OfferId.IsValid() || OfferIds.Contains(O.OfferId) || O.Price<1 || O.Price>1000000
-                    || (O.Kind==ELKMarketOfferKind::Mercenary?!LKCardRules::IsTemporaryMercenary(O.CardId):!R||R->Kind!=O.Kind))
+                if (OfferIds.Contains(O.OfferId) || !LKMarketContent::ValidateOffer(O,Node.MarketGenerationVersion,OutError))
                 { OutError=TEXT("市场商品身份或价格无效"); return false; }
                 OfferIds.Add(O.OfferId);
             }
@@ -1172,6 +1202,45 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
         { for (const auto& O:State.PendingRewardOffers)
             { if (O.Kind==ELKRunRewardKind::AddCard?!LKCardRules::IsTemporaryMercenary(O.CardId):LKCardRules::IsSpell(O.CardId)||LKCardRules::IsBuilding(O.CardId))
                 { OutError=TEXT("奖励不符合佣兵获取与休息升级规则"); return false; } } }
+    }
+    if (State.SchemaVersion>=11)
+    {
+        if (State.MarketGenerationVersion<1 || State.MarketGenerationVersion>LKMarketContent::CurrentGenerationVersion
+            || !LKItemContent::ValidateInstances(State.CarriedItems,OutError)
+            || !LKItemContent::ValidateInstances(State.PendingSettlement.Items,OutError))
+        { OutError=TEXT("市场版本或道具库存无效"); return false; }
+        TSet<FName> Exclusions;
+        for (FName Id:State.ResearchExclusions)
+        { if (!LKResearchContent::Find(Id) || Exclusions.Contains(Id)) { OutError=TEXT("研究资格快照无效"); return false; } Exclusions.Add(Id); }
+        for (const auto& Cost:State.MarketSilverCosts)
+        { if (Cost.Key.IsNone() || Cost.Value<0 || Cost.Value>1000000 || LKItemContent::Find(Cost.Key)) { OutError=TEXT("银币费用快照无效"); return false; } }
+        TSet<FGuid> Transactions;
+        for (const FGuid& Id:State.ProcessedWalletTransactions)
+        { if (!Id.IsValid() || Transactions.Contains(Id)) { OutError=TEXT("钱包事务身份无效"); return false; } Transactions.Add(Id); }
+        TSet<FGuid> ItemOffers;
+        for (const auto& Node:State.Nodes)
+        {
+            if (Node.MarketGenerationVersion<0 || Node.MarketGenerationVersion>State.MarketGenerationVersion
+                || (Node.MarketGenerationVersion>0 && (!Node.bMarketGenerated || Node.Type!=ELKDungeonNodeType::Market)))
+            { OutError=TEXT("节点市场生成版本无效"); return false; }
+            for (const auto& Offer:Node.MarketOffers)
+            {
+                if (Node.MarketGenerationVersion>=LKMarketContent::CurrentGenerationVersion && Offer.bSold!=Transactions.Contains(Offer.OfferId))
+                { OutError=TEXT("商品售出状态与事务回执不一致"); return false; }
+                if (Offer.Kind==ELKMarketOfferKind::Item)
+                {
+                    if (ItemOffers.Contains(Offer.ItemInstanceId)) { OutError=TEXT("市场含重复道具实例"); return false; }
+                    ItemOffers.Add(Offer.ItemInstanceId);
+                    const auto* Carried=State.CarriedItems.FindByPredicate([&](const auto& Item){return Item.InstanceId==Offer.ItemInstanceId;});
+                    if ((!Offer.bSold && Carried) || (Offer.bSold && (!Carried || Carried->ItemId!=Offer.ItemId || Carried->Quality!=Offer.Quality)))
+                    { OutError=TEXT("道具库存与市场购买回执不一致"); return false; }
+                }
+            }
+        }
+        for (const auto& Card:State.Cards)
+        { if (Card.bTemporaryAcquisition && !LKCardRules::IsRunMarketCard(Card.CardId)) { OutError=TEXT("临时卡身份未登记"); return false; } }
+        if (State.PendingSettlement.SettlementId.IsValid() && !LKItemContent::EqualInstances(State.PendingSettlement.Items,State.CarriedItems))
+        { OutError=TEXT("结算道具回执与携带快照不一致"); return false; }
     }
     // 战斗阶段要求待开战上下文完整可解析（恢复点语义）。
     if (State.Phase == ELKRunPhase::EnteringBattle || State.Phase == ELKRunPhase::InBattle)
@@ -1190,22 +1259,31 @@ bool ULKRunSubsystem::ValidateStoredRun(const FLKRunState& State, FString& OutEr
 
 bool ULKRunSubsystem::SaveExpeditionToSlot(const FString& SlotName) const
 {
+    FString ValidationError;
+    if (!ValidateStoredRun(State,ValidationError))
+    { UE_LOG(LogLKBattle,Warning,TEXT("[Run] 拒绝保存非法快照：%s"),*ValidationError); return false; }
+    const bool bHadPrevious=UGameplayStatics::DoesSaveGameExist(SlotName,0);
+    ULKRunSaveGame* Previous=bHadPrevious?Cast<ULKRunSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName,0)):nullptr;
+    if (bHadPrevious && (!Previous || Previous->SaveVersion!=1 || Previous->RunState.SchemaVersion>CurrentSchemaVersion))
+    { UE_LOG(LogLKBattle,Warning,TEXT("[Run] 原槽不可安全识别，保留原文件：%s"),*SlotName); return false; }
     ULKRunSaveGame* Save = NewObject<ULKRunSaveGame>();
     Save->SaveVersion = 1;
     Save->RunState = State;
     Save->SavedAtUtc = FDateTime::UtcNow();
-    if (!UGameplayStatics::SaveGameToSlot(Save, SlotName, 0))
+    const FString StagingSlot=SlotName+TEXT("_Pending");
+    if (!UGameplayStatics::SaveGameToSlot(Save, StagingSlot, 0))
     {
+        if (UGameplayStatics::DoesSaveGameExist(StagingSlot,0)) { UGameplayStatics::DeleteGameInSlot(StagingSlot,0); }
         UE_LOG(LogLKBattle, Warning, TEXT("[Run] 存档写入失败（槽 %s）；内存状态保留，可继续当前会话"), *SlotName);
         return false;
     }
     // 金币转入/节点消费只有在安全点确实落盘后才生效。
-    const ULKRunSaveGame* ReadBack = Cast<ULKRunSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+    const ULKRunSaveGame* ReadBack = Cast<ULKRunSaveGame>(UGameplayStatics::LoadGameFromSlot(StagingSlot, 0));
     auto SameCards = [](const TArray<FLKRunCardState>& A, const TArray<FLKRunCardState>& B)
     {
         if (A.Num() != B.Num()) { return false; }
         for (int32 Index = 0; Index < A.Num(); ++Index)
-        { if (A[Index].CardId != B[Index].CardId || A[Index].UpgradeLevel != B[Index].UpgradeLevel) { return false; } }
+        { if (A[Index].CardId != B[Index].CardId || A[Index].UpgradeLevel != B[Index].UpgradeLevel || A[Index].bTemporaryAcquisition!=B[Index].bTemporaryAcquisition) { return false; } }
         return true;
     };
     auto SameMarkets=[](const TArray<FLKDungeonNode>& A,const TArray<FLKDungeonNode>& B)
@@ -1213,27 +1291,54 @@ bool ULKRunSubsystem::SaveExpeditionToSlot(const FString& SlotName) const
         if (A.Num()!=B.Num()) { return false; }
         for (int32 I=0;I<A.Num();++I)
         {
-            if (A[I].NodeId!=B[I].NodeId || A[I].bResolved!=B[I].bResolved || A[I].bMarketGenerated!=B[I].bMarketGenerated || A[I].MarketOffers.Num()!=B[I].MarketOffers.Num()) { return false; }
+            if (A[I].NodeId!=B[I].NodeId || A[I].bResolved!=B[I].bResolved || A[I].bMarketGenerated!=B[I].bMarketGenerated || A[I].MarketGenerationVersion!=B[I].MarketGenerationVersion || A[I].MarketOffers.Num()!=B[I].MarketOffers.Num()) { return false; }
             for (int32 J=0;J<A[I].MarketOffers.Num();++J)
-            { const auto& X=A[I].MarketOffers[J]; const auto& Y=B[I].MarketOffers[J]; if (X.OfferId!=Y.OfferId || X.CardId!=Y.CardId || X.Kind!=Y.Kind || X.Price!=Y.Price || X.bSold!=Y.bSold) { return false; } }
+            { const auto& X=A[I].MarketOffers[J]; const auto& Y=B[I].MarketOffers[J]; if (X.OfferId!=Y.OfferId || X.CardId!=Y.CardId || X.Kind!=Y.Kind || X.Price!=Y.Price || X.bSold!=Y.bSold || X.ItemId!=Y.ItemId || X.ItemInstanceId!=Y.ItemInstanceId || X.Quality!=Y.Quality) { return false; } }
         } return true;
     };
-    if (!ReadBack || ReadBack->RunState.RunId != State.RunId || ReadBack->RunState.Phase != State.Phase
-        || ReadBack->RunState.CurrentNodeId != State.CurrentNodeId || ReadBack->RunState.WalletGold != State.WalletGold
-        || ReadBack->RunState.ProcessedWalletTransactions != State.ProcessedWalletTransactions
-        || !SameCards(ReadBack->RunState.Cards, State.Cards)
-        || !SameCards(ReadBack->RunState.PendingBattle.PlayerCards, State.PendingBattle.PlayerCards)
-        || !SameMarkets(ReadBack->RunState.Nodes,State.Nodes)
-        || ReadBack->RunState.PendingBattle.AttemptId!=State.PendingBattle.AttemptId
-        || ReadBack->RunState.PendingBattle.Seed!=State.PendingBattle.Seed
-        || ReadBack->RunState.PendingBattle.EnemyHeroIds!=State.PendingBattle.EnemyHeroIds
-        || ReadBack->RunState.PendingRewardBatchId != State.PendingRewardBatchId
-        || ReadBack->RunState.ClaimedRewardBatchIds != State.ClaimedRewardBatchIds
-        || ReadBack->RunState.PendingSettlement.bProfileApplied != State.PendingSettlement.bProfileApplied
-        || ReadBack->RunState.DeckCapacityMinimum!=State.DeckCapacityMinimum || ReadBack->RunState.DeckCapacityMaximum!=State.DeckCapacityMaximum
-        || !ReadBack->RunState.CarriedResearchMaterials.OrderIndependentCompareEqual(State.CarriedResearchMaterials)
-        || !ReadBack->RunState.PendingSettlement.ResearchMaterials.OrderIndependentCompareEqual(State.PendingSettlement.ResearchMaterials))
-    { UE_LOG(LogLKBattle, Warning, TEXT("[Run] 安全点读回校验失败（槽 %s）"), *SlotName); return false; }
+    auto Matches=[&](const ULKRunSaveGame* ReadBack)
+    {
+    FString ReadError;
+    return ReadBack && ReadBack->SaveVersion==1 && ValidateStoredRun(ReadBack->RunState,ReadError)
+        && ReadBack->RunState.SchemaVersion==State.SchemaVersion && ReadBack->RunState.RunId == State.RunId && ReadBack->RunState.Phase == State.Phase
+        && ReadBack->RunState.ProfileId==State.ProfileId && ReadBack->RunState.StartingGold==State.StartingGold
+        && ReadBack->RunState.bHomeRewardEligible==State.bHomeRewardEligible
+        && ReadBack->RunState.CurrentNodeId == State.CurrentNodeId && ReadBack->RunState.WalletGold == State.WalletGold
+        && ReadBack->RunState.ProcessedWalletTransactions == State.ProcessedWalletTransactions
+        && SameCards(ReadBack->RunState.Cards, State.Cards)
+        && SameCards(ReadBack->RunState.PendingBattle.PlayerCards, State.PendingBattle.PlayerCards)
+        && SameMarkets(ReadBack->RunState.Nodes,State.Nodes)
+        && ReadBack->RunState.PendingBattle.AttemptId==State.PendingBattle.AttemptId
+        && ReadBack->RunState.PendingBattle.Seed==State.PendingBattle.Seed
+        && ReadBack->RunState.PendingBattle.EnemyHeroIds==State.PendingBattle.EnemyHeroIds
+        && ReadBack->RunState.PendingRewardBatchId == State.PendingRewardBatchId
+        && ReadBack->RunState.ClaimedRewardBatchIds == State.ClaimedRewardBatchIds
+        && ReadBack->RunState.PendingSettlement.bProfileApplied == State.PendingSettlement.bProfileApplied
+        && ReadBack->RunState.PendingSettlement.SettlementId==State.PendingSettlement.SettlementId
+        && ReadBack->RunState.PendingSettlement.RunId==State.PendingSettlement.RunId
+        && ReadBack->RunState.PendingSettlement.ProfileId==State.PendingSettlement.ProfileId
+        && ReadBack->RunState.PendingSettlement.GoldAmount==State.PendingSettlement.GoldAmount
+        && ReadBack->RunState.PendingSettlement.bEligibleForHomeReward==State.PendingSettlement.bEligibleForHomeReward
+        && ReadBack->RunState.DeckCapacityMinimum==State.DeckCapacityMinimum && ReadBack->RunState.DeckCapacityMaximum==State.DeckCapacityMaximum
+        && ReadBack->RunState.MarketGenerationVersion==State.MarketGenerationVersion
+        && ReadBack->RunState.ResearchExclusions==State.ResearchExclusions
+        && ReadBack->RunState.MarketSilverCosts.OrderIndependentCompareEqual(State.MarketSilverCosts)
+        && LKItemContent::EqualInstances(ReadBack->RunState.CarriedItems,State.CarriedItems)
+        && LKItemContent::EqualInstances(ReadBack->RunState.PendingSettlement.Items,State.PendingSettlement.Items)
+        && ReadBack->RunState.CarriedResearchMaterials.OrderIndependentCompareEqual(State.CarriedResearchMaterials)
+        && ReadBack->RunState.PendingSettlement.ResearchMaterials.OrderIndependentCompareEqual(State.PendingSettlement.ResearchMaterials);
+    };
+    if (!Matches(ReadBack))
+    { UGameplayStatics::DeleteGameInSlot(StagingSlot,0); UE_LOG(LogLKBattle, Warning, TEXT("[Run] 安全点预写读回校验失败（原槽 %s 未改变）"), *SlotName); return false; }
+    if (!UGameplayStatics::SaveGameToSlot(Save,SlotName,0)
+        || !Matches(Cast<ULKRunSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName,0))))
+    {
+        const bool bRestored=Previous?UGameplayStatics::SaveGameToSlot(Previous,SlotName,0):(!UGameplayStatics::DoesSaveGameExist(SlotName,0)||UGameplayStatics::DeleteGameInSlot(SlotName,0));
+        UGameplayStatics::DeleteGameInSlot(StagingSlot,0);
+        UE_LOG(LogLKBattle,Warning,TEXT("[Run] 正式写入失败，恢复旧槽=%d（槽 %s）"),bRestored?1:0,*SlotName);
+        return false;
+    }
+    UGameplayStatics::DeleteGameInSlot(StagingSlot,0);
     UE_LOG(LogLKBattle, Log, TEXT("[Run] 安全节点已保存（槽 %s，Phase=%d，节点 %s）"),
         *SlotName, int32(State.Phase), *State.CurrentNodeId.ToString());
     return true;
@@ -1307,6 +1412,14 @@ bool ULKRunSubsystem::LoadExpeditionFromSlot(const FString& SlotName, bool bAllo
 void ULKRunSubsystem::MigrateStoredRun(FLKRunState& InOutState) const
 {
     const int32 PreviousSchema = InOutState.SchemaVersion;
+    if (PreviousSchema<11)
+    {
+        // Old inventories, IDs, prices, sold flags and random opportunities remain legacy snapshots.
+        InOutState.MarketGenerationVersion=1;
+        InOutState.CarriedItems.Reset(); InOutState.PendingSettlement.Items.Reset();
+        InOutState.ResearchExclusions.Reset(); InOutState.MarketSilverCosts.Reset();
+        for (auto& Node:InOutState.Nodes) { Node.MarketGenerationVersion=0; }
+    }
     if (PreviousSchema<10)
     {
         InOutState.DeckCapacityMinimum=InOutState.DeckCapacityMaximum=8;

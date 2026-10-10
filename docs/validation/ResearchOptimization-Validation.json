@@ -1,0 +1,1557 @@
+{
+  "validationDate": "2026-10-10",
+  "releaseBaseline": "v0.8.5",
+  "baselineCommit": "f256338e8d95731b0f46cd728d5dd7a48f530792",
+  "scope": "Unreleased working-tree implementation based on GitHub research; prior documentation consolidation preserved.",
+  "sourceFingerprint": {
+    "algorithm": "SHA-256 of sorted relative UTF-8 path + NUL + raw file bytes + NUL",
+    "files": 235,
+    "sha256": "2b185aaa7fef11e0d56d3c4b23db2897a99b59942d51b754cb299ffcb1a26e7a",
+    "scope": "All game C++ headers/sources; BattleDesigner JS/model tests/schema; telemetry summarizer"
+  },
+  "schemas": {
+    "run": 11,
+    "profile": 3,
+    "marketGeneration": 2
+  },
+  "build": {
+    "engine": "UE 5.8.1",
+    "target": "little_kingEditor Win64 Development",
+    "result": "Succeeded",
+    "log": "Saved/Optimization/Build-04.log"
+  },
+  "initialRegression": {
+    "report": "Saved/Automation/ResearchOptimization-Full01/index.json",
+    "total": 189,
+    "succeeded": 97,
+    "succeededWithWarnings": 87,
+    "failed": 5,
+    "notRun": 0,
+    "totalDuration": 220.391845703125
+  },
+  "focusedRegression": {
+    "report": "Saved/Automation/ResearchOptimization-Focused03/index.json",
+    "total": 43,
+    "succeeded": 15,
+    "succeededWithWarnings": 28,
+    "failed": 0,
+    "notRun": 0,
+    "totalDuration": 11.890892028808594
+  },
+  "finalRegression": {
+    "report": "Saved/Automation/ResearchOptimization-Full02/index.json",
+    "total": 193,
+    "succeeded": 98,
+    "succeededWithWarnings": 95,
+    "failed": 0,
+    "notRun": 0,
+    "totalDuration": 221.62838745117188
+  },
+  "javascript": {
+    "command": "node --test Tools/BattleDesigner/model.test.cjs",
+    "passed": 37,
+    "failed": 0
+  },
+  "marketAudit": {
+    "generationVersion": 2,
+    "seedStart": 100000,
+    "samplesPerDepth": 4000,
+    "unfilteredSilverCap": 20,
+    "filteredSilverCap": 5,
+    "scope": "Empty ownership pools; generation audit, not player win-rate evidence. Prices are gold; card affordability filter is battle silver cap.",
+    "stages": [
+      {
+        "regionDepth": 0,
+        "mercenaryCountsUncommonRareEpic": [
+          3200,
+          800,
+          0
+        ],
+        "mercenaryRates": [
+          0.800000011920929,
+          0.20000000298023224,
+          0
+        ],
+        "itemCountsCommonThroughLegendary": [
+          3205,
+          795,
+          0,
+          0,
+          0
+        ],
+        "itemRates": [
+          0.8012499809265137,
+          0.19875000417232513,
+          0,
+          0,
+          0
+        ],
+        "researchOffers": 4000,
+        "researchMinPrice": 25,
+        "researchMaxPrice": 40,
+        "temporaryMaxPrice": 40,
+        "silverCapFilterValid": true
+      },
+      {
+        "regionDepth": 1,
+        "mercenaryCountsUncommonRareEpic": [
+          2396,
+          1403,
+          201
+        ],
+        "mercenaryRates": [
+          0.5989999771118164,
+          0.35074999928474426,
+          0.05025000125169754
+        ],
+        "itemCountsCommonThroughLegendary": [
+          2199,
+          1401,
+          400,
+          0,
+          0
+        ],
+        "itemRates": [
+          0.5497499704360962,
+          0.3502500057220459,
+          0.10000000149011612,
+          0,
+          0
+        ],
+        "researchOffers": 4000,
+        "researchMinPrice": 52,
+        "researchMaxPrice": 96,
+        "temporaryMaxPrice": 80,
+        "silverCapFilterValid": true
+      },
+      {
+        "regionDepth": 2,
+        "mercenaryCountsUncommonRareEpic": [
+          1597,
+          1797,
+          606
+        ],
+        "mercenaryRates": [
+          0.39925000071525574,
+          0.4492500126361847,
+          0.15150000154972076
+        ],
+        "itemCountsCommonThroughLegendary": [
+          991,
+          1612,
+          1199,
+          198,
+          0
+        ],
+        "itemRates": [
+          0.24774999916553497,
+          0.40299999713897705,
+          0.2997500002384186,
+          0.0494999997317791,
+          0
+        ],
+        "researchOffers": 4000,
+        "researchMinPrice": 96,
+        "researchMaxPrice": 140,
+        "temporaryMaxPrice": 80,
+        "silverCapFilterValid": true
+      },
+      {
+        "regionDepth": 3,
+        "mercenaryCountsUncommonRareEpic": [
+          1000,
+          1996,
+          1004
+        ],
+        "mercenaryRates": [
+          0.25,
+          0.49900001287460327,
+          0.25099998712539673
+        ],
+        "itemCountsCommonThroughLegendary": [
+          391,
+          999,
+          1612,
+          800,
+          198
+        ],
+        "itemRates": [
+          0.09775000065565109,
+          0.24975000321865082,
+          0.40299999713897705,
+          0.20000000298023224,
+          0.0494999997317791
+        ],
+        "researchOffers": 4000,
+        "researchMinPrice": 160,
+        "researchMaxPrice": 180,
+        "temporaryMaxPrice": 80,
+        "silverCapFilterValid": true
+      }
+    ]
+  },
+  "battleSampling": {
+    "source": "Saved/BalanceV1Validation/battle-samples.csv",
+    "samples": 18,
+    "description": "Real battle worlds with simple scripted player policy, two fixed decks, Treasury 1, full initial health; these do not estimate human win rates.",
+    "groups": [
+      {
+        "depth": 0,
+        "rank": "Patrol",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 0,
+        "meanDuration": 183.38,
+        "maxEnemyUnits": 15
+      },
+      {
+        "depth": 0,
+        "rank": "Elite",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 0,
+        "meanDuration": 227.76,
+        "maxEnemyUnits": 19
+      },
+      {
+        "depth": 0,
+        "rank": "Boss",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 2,
+        "meanDuration": 332.54,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 9,
+        "rank": "Patrol",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 1,
+        "meanDuration": 278.85,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 9,
+        "rank": "Elite",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 2,
+        "meanDuration": 308.52,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 9,
+        "rank": "Boss",
+        "samples": 2,
+        "playerWins": 2,
+        "overtime": 2,
+        "meanDuration": 367.48,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 19,
+        "rank": "Patrol",
+        "samples": 2,
+        "playerWins": 0,
+        "overtime": 0,
+        "meanDuration": 182.13,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 19,
+        "rank": "Elite",
+        "samples": 2,
+        "playerWins": 1,
+        "overtime": 1,
+        "meanDuration": 240.13,
+        "maxEnemyUnits": 20
+      },
+      {
+        "depth": 19,
+        "rank": "Boss",
+        "samples": 2,
+        "playerWins": 0,
+        "overtime": 1,
+        "meanDuration": 266.82,
+        "maxEnemyUnits": 20
+      }
+    ],
+    "rows": [
+      {
+        "depth": "0",
+        "rank": "Patrol",
+        "deck": "0",
+        "seed": "41001",
+        "duration": "159.71",
+        "winner": "0",
+        "overtime": "0",
+        "cards_player": "20",
+        "circles": "8",
+        "damage_player": "33818.0",
+        "damage_enemy": "6386.0",
+        "kills_player": "116",
+        "kills_enemy": "21",
+        "max_enemy_units": "15",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "3272.0",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "0",
+        "rank": "Patrol",
+        "deck": "1",
+        "seed": "41098",
+        "duration": "207.06",
+        "winner": "0",
+        "overtime": "0",
+        "cards_player": "24",
+        "circles": "9",
+        "damage_player": "43480.0",
+        "damage_enemy": "6234.0",
+        "kills_player": "120",
+        "kills_enemy": "2",
+        "max_enemy_units": "12",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "5964.0",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "0",
+        "rank": "Elite",
+        "deck": "0",
+        "seed": "41195",
+        "duration": "227.16",
+        "winner": "0",
+        "overtime": "0",
+        "cards_player": "32",
+        "circles": "10",
+        "damage_player": "44392.0",
+        "damage_enemy": "10808.0",
+        "kills_player": "161",
+        "kills_enemy": "26",
+        "max_enemy_units": "19",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "5892.0",
+        "healing_enemy": "842.0"
+      },
+      {
+        "depth": "0",
+        "rank": "Elite",
+        "deck": "1",
+        "seed": "41292",
+        "duration": "228.36",
+        "winner": "0",
+        "overtime": "0",
+        "cards_player": "23",
+        "circles": "10",
+        "damage_player": "48667.0",
+        "damage_enemy": "11378.4",
+        "kills_player": "142",
+        "kills_enemy": "2",
+        "max_enemy_units": "17",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "11108.4",
+        "healing_enemy": "3577.0"
+      },
+      {
+        "depth": "0",
+        "rank": "Boss",
+        "deck": "0",
+        "seed": "41389",
+        "duration": "300.10",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "38",
+        "circles": "12",
+        "damage_player": "56119.2",
+        "damage_enemy": "16892.0",
+        "kills_player": "178",
+        "kills_enemy": "49",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "9782.0",
+        "healing_enemy": "8000.0"
+      },
+      {
+        "depth": "0",
+        "rank": "Boss",
+        "deck": "1",
+        "seed": "41486",
+        "duration": "364.98",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "46",
+        "circles": "12",
+        "damage_player": "52193.3",
+        "damage_enemy": "20796.0",
+        "kills_player": "169",
+        "kills_enemy": "17",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "22951.0",
+        "healing_enemy": "8000.0"
+      },
+      {
+        "depth": "9",
+        "rank": "Patrol",
+        "deck": "0",
+        "seed": "41583",
+        "duration": "207.71",
+        "winner": "0",
+        "overtime": "0",
+        "cards_player": "34",
+        "circles": "9",
+        "damage_player": "47329.6",
+        "damage_enemy": "19553.8",
+        "kills_player": "142",
+        "kills_enemy": "52",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "7134.5",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "9",
+        "rank": "Patrol",
+        "deck": "1",
+        "seed": "41680",
+        "duration": "349.99",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "47",
+        "circles": "9",
+        "damage_player": "44459.6",
+        "damage_enemy": "21867.8",
+        "kills_player": "142",
+        "kills_enemy": "24",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "11133.0",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "9",
+        "rank": "Elite",
+        "deck": "0",
+        "seed": "41777",
+        "duration": "301.55",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "37",
+        "circles": "10",
+        "damage_player": "59523.0",
+        "damage_enemy": "15278.9",
+        "kills_player": "164",
+        "kills_enemy": "37",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "9119.0",
+        "healing_enemy": "944.4"
+      },
+      {
+        "depth": "9",
+        "rank": "Elite",
+        "deck": "1",
+        "seed": "41874",
+        "duration": "315.50",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "40",
+        "circles": "10",
+        "damage_player": "59208.2",
+        "damage_enemy": "19436.3",
+        "kills_player": "149",
+        "kills_enemy": "15",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "17167.3",
+        "healing_enemy": "650.1"
+      },
+      {
+        "depth": "9",
+        "rank": "Boss",
+        "deck": "0",
+        "seed": "41971",
+        "duration": "369.98",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "49",
+        "circles": "12",
+        "damage_player": "56733.8",
+        "damage_enemy": "23930.8",
+        "kills_player": "136",
+        "kills_enemy": "75",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "6294.9",
+        "healing_enemy": "10991.7"
+      },
+      {
+        "depth": "9",
+        "rank": "Boss",
+        "deck": "1",
+        "seed": "42068",
+        "duration": "364.98",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "48",
+        "circles": "12",
+        "damage_player": "59131.5",
+        "damage_enemy": "28058.2",
+        "kills_player": "134",
+        "kills_enemy": "18",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "31856.0",
+        "healing_enemy": "10991.7"
+      },
+      {
+        "depth": "19",
+        "rank": "Patrol",
+        "deck": "0",
+        "seed": "42165",
+        "duration": "161.51",
+        "winner": "1",
+        "overtime": "0",
+        "cards_player": "26",
+        "circles": "8",
+        "damage_player": "34186.0",
+        "damage_enemy": "24440.0",
+        "kills_player": "69",
+        "kills_enemy": "17",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "5592.0",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "19",
+        "rank": "Patrol",
+        "deck": "1",
+        "seed": "42262",
+        "duration": "202.76",
+        "winner": "1",
+        "overtime": "0",
+        "cards_player": "26",
+        "circles": "9",
+        "damage_player": "39053.0",
+        "damage_enemy": "29248.7",
+        "kills_player": "82",
+        "kills_enemy": "21",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "9568.7",
+        "healing_enemy": "0.0"
+      },
+      {
+        "depth": "19",
+        "rank": "Elite",
+        "deck": "0",
+        "seed": "42359",
+        "duration": "316.65",
+        "winner": "0",
+        "overtime": "1",
+        "cards_player": "47",
+        "circles": "10",
+        "damage_player": "67120.0",
+        "damage_enemy": "29448.0",
+        "kills_player": "128",
+        "kills_enemy": "78",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "9735.0",
+        "healing_enemy": "1608.0"
+      },
+      {
+        "depth": "19",
+        "rank": "Elite",
+        "deck": "1",
+        "seed": "42456",
+        "duration": "163.61",
+        "winner": "1",
+        "overtime": "0",
+        "cards_player": "22",
+        "circles": "9",
+        "damage_player": "37190.0",
+        "damage_enemy": "23397.3",
+        "kills_player": "78",
+        "kills_enemy": "14",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "4786.9",
+        "healing_enemy": "240.0"
+      },
+      {
+        "depth": "19",
+        "rank": "Boss",
+        "deck": "0",
+        "seed": "42553",
+        "duration": "364.98",
+        "winner": "1",
+        "overtime": "1",
+        "cards_player": "59",
+        "circles": "12",
+        "damage_player": "61090.5",
+        "damage_enemy": "32924.0",
+        "kills_player": "105",
+        "kills_enemy": "90",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "9699.0",
+        "healing_enemy": "16000.0"
+      },
+      {
+        "depth": "19",
+        "rank": "Boss",
+        "deck": "1",
+        "seed": "42650",
+        "duration": "168.66",
+        "winner": "1",
+        "overtime": "0",
+        "cards_player": "22",
+        "circles": "12",
+        "damage_player": "34345.0",
+        "damage_enemy": "24603.5",
+        "kills_player": "75",
+        "kills_enemy": "17",
+        "max_enemy_units": "20",
+        "treasury_level": "1",
+        "initial_health_ratio": "1.00",
+        "healing_player": "5783.5",
+        "healing_enemy": "0.0"
+      }
+    ]
+  },
+  "telemetry": {
+    "script": "Scripts/SummarizeBalanceTelemetry.py",
+    "withAutomation": {
+      "version": 1,
+      "excludedAutomationMatches": 0,
+      "cohorts": [
+        {
+          "mode": "automation",
+          "encounterId": "Enc_Dyn_R1",
+          "regionId": "Region_UndeadFrontier",
+          "samples": 6,
+          "playerWinFraction": 1.0,
+          "overtimeFraction": 0.0,
+          "match": {
+            "duration": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "healing": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 0,
+              "mean": null,
+              "p50": null,
+              "p90": null
+            },
+            "peakUnits": {
+              "observed": 6,
+              "mean": 3.0,
+              "p50": 3.0,
+              "p90": 3.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "healing": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 6,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 0,
+              "mean": null,
+              "p50": null,
+              "p90": null
+            },
+            "peakUnits": {
+              "observed": 6,
+              "mean": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "Encounter_AuthoredLayout",
+          "regionId": "None",
+          "samples": 4,
+          "playerWinFraction": 1.0,
+          "overtimeFraction": 0.0,
+          "match": {
+            "duration": {
+              "observed": 4,
+              "mean": 1.01,
+              "p50": 1.01,
+              "p90": 1.01
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 4,
+              "mean": 28960.0,
+              "p50": 28960.0,
+              "p90": 28960.0
+            },
+            "healing": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 0,
+              "mean": null,
+              "p50": null,
+              "p90": null
+            },
+            "peakUnits": {
+              "observed": 4,
+              "mean": 3.0,
+              "p50": 3.0,
+              "p90": 3.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "healing": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "peakUnits": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "Encounter_SkeletonKing",
+          "regionId": "None",
+          "samples": 16,
+          "playerWinFraction": 0.75,
+          "overtimeFraction": 0.625,
+          "match": {
+            "duration": {
+              "observed": 16,
+              "mean": 241.712,
+              "p50": 332.542,
+              "p90": 367.484
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 16,
+              "mean": 32.75,
+              "p50": 42.0,
+              "p90": 54.0
+            },
+            "damage": {
+              "observed": 16,
+              "mean": 41951.667,
+              "p50": 54156.229,
+              "p90": 60111.023
+            },
+            "healing": {
+              "observed": 16,
+              "mean": 10795.797,
+              "p50": 7996.945,
+              "p90": 27403.495
+            },
+            "silverSpent": {
+              "observed": 16,
+              "mean": 73.125,
+              "p50": 87.0,
+              "p90": 119.5
+            },
+            "silverOverflow": {
+              "observed": 16,
+              "mean": 5.358,
+              "p50": 0.0,
+              "p90": 20.824
+            },
+            "silverAtCapSeconds": {
+              "observed": 16,
+              "mean": 16.09,
+              "p50": 0.0,
+              "p90": 62.533
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 6,
+              "mean": 204.816,
+              "p50": 155.055,
+              "p90": 344.989
+            },
+            "peakUnits": {
+              "observed": 16,
+              "mean": 12.5,
+              "p50": 14.0,
+              "p90": 20.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 16,
+              "mean": 9.0,
+              "p50": 12.0,
+              "p90": 12.0
+            },
+            "damage": {
+              "observed": 16,
+              "mean": 18400.56,
+              "p50": 22363.379,
+              "p90": 30491.109
+            },
+            "healing": {
+              "observed": 16,
+              "mean": 10747.922,
+              "p50": 10991.689,
+              "p90": 16000.0
+            },
+            "silverSpent": {
+              "observed": 16,
+              "mean": 45.0,
+              "p50": 60.0,
+              "p90": 60.0
+            },
+            "silverOverflow": {
+              "observed": 16,
+              "mean": 56.75,
+              "p50": 79.645,
+              "p90": 95.372
+            },
+            "silverAtCapSeconds": {
+              "observed": 16,
+              "mean": 126.121,
+              "p50": 177.001,
+              "p90": 211.953
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 14,
+              "mean": 183.067,
+              "p50": 231.91,
+              "p90": 320.415
+            },
+            "peakUnits": {
+              "observed": 16,
+              "mean": 16.5,
+              "p50": 20.0,
+              "p90": 20.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "Encounter_UndeadElite",
+          "regionId": "None",
+          "samples": 12,
+          "playerWinFraction": 0.8333333333333334,
+          "overtimeFraction": 0.5,
+          "match": {
+            "duration": {
+              "observed": 12,
+              "mean": 258.053,
+              "p50": 264.955,
+              "p90": 316.531
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 12,
+              "mean": 33.5,
+              "p50": 34.5,
+              "p90": 46.3
+            },
+            "damage": {
+              "observed": 12,
+              "mean": 52704.632,
+              "p50": 53937.623,
+              "p90": 66360.305
+            },
+            "healing": {
+              "observed": 12,
+              "mean": 9697.278,
+              "p50": 9427.018,
+              "p90": 16561.439
+            },
+            "silverSpent": {
+              "observed": 12,
+              "mean": 75.833,
+              "p50": 70.0,
+              "p90": 103.0
+            },
+            "silverOverflow": {
+              "observed": 12,
+              "mean": 6.341,
+              "p50": 4.999,
+              "p90": 19.939
+            },
+            "silverAtCapSeconds": {
+              "observed": 12,
+              "mean": 19.041,
+              "p50": 15.012,
+              "p90": 59.876
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 2,
+              "mean": 122.753,
+              "p50": 122.753,
+              "p90": 122.753
+            },
+            "peakUnits": {
+              "observed": 12,
+              "mean": 16.667,
+              "p50": 20.0,
+              "p90": 20.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 12,
+              "mean": 9.833,
+              "p50": 10.0,
+              "p90": 10.0
+            },
+            "damage": {
+              "observed": 12,
+              "mean": 18324.149,
+              "p50": 17357.598,
+              "p90": 28842.93
+            },
+            "healing": {
+              "observed": 12,
+              "mean": 1344.829,
+              "p50": 944.377,
+              "p90": 3380.1
+            },
+            "silverSpent": {
+              "observed": 12,
+              "mean": 49.167,
+              "p50": 50.0,
+              "p90": 50.0
+            },
+            "silverOverflow": {
+              "observed": 12,
+              "mean": 44.055,
+              "p50": 45.981,
+              "p90": 66.616
+            },
+            "silverAtCapSeconds": {
+              "observed": 12,
+              "mean": 110.14,
+              "p50": 114.957,
+              "p90": 166.545
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 10,
+              "mean": 224.913,
+              "p50": 220.109,
+              "p90": 273.057
+            },
+            "peakUnits": {
+              "observed": 12,
+              "mean": 19.333,
+              "p50": 20.0,
+              "p90": 20.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "Encounter_UndeadPatrol",
+          "regionId": "None",
+          "samples": 16,
+          "playerWinFraction": 0.75,
+          "overtimeFraction": 0.125,
+          "match": {
+            "duration": {
+              "observed": 16,
+              "mean": 160.925,
+              "p50": 182.132,
+              "p90": 278.848
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 16,
+              "mean": 22.438,
+              "p50": 25.5,
+              "p90": 40.5
+            },
+            "damage": {
+              "observed": 16,
+              "mean": 30282.714,
+              "p50": 36619.5,
+              "p90": 45894.605
+            },
+            "healing": {
+              "observed": 16,
+              "mean": 5345.278,
+              "p50": 5777.993,
+              "p90": 10350.855
+            },
+            "silverSpent": {
+              "observed": 16,
+              "mean": 51.75,
+              "p50": 58.5,
+              "p90": 92.0
+            },
+            "silverOverflow": {
+              "observed": 16,
+              "mean": 0.535,
+              "p50": 0.0,
+              "p90": 0.058
+            },
+            "silverAtCapSeconds": {
+              "observed": 16,
+              "mean": 1.608,
+              "p50": 0.0,
+              "p90": 0.173
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 4,
+              "mean": 119.078,
+              "p50": 119.078,
+              "p90": 124.603
+            },
+            "peakUnits": {
+              "observed": 16,
+              "mean": 10.875,
+              "p50": 7.0,
+              "p90": 20.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 16,
+              "mean": 6.562,
+              "p50": 8.5,
+              "p90": 9.0
+            },
+            "damage": {
+              "observed": 16,
+              "mean": 13503.655,
+              "p50": 13268.894,
+              "p90": 26844.349
+            },
+            "healing": {
+              "observed": 16,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 16,
+              "mean": 32.812,
+              "p50": 42.5,
+              "p90": 45.0
+            },
+            "silverOverflow": {
+              "observed": 16,
+              "mean": 17.386,
+              "p50": 13.14,
+              "p90": 42.599
+            },
+            "silverAtCapSeconds": {
+              "observed": 16,
+              "mean": 49.673,
+              "p50": 37.542,
+              "p90": 121.71
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 10,
+              "mean": 184.627,
+              "p50": 207.058,
+              "p90": 349.988
+            },
+            "peakUnits": {
+              "observed": 16,
+              "mean": 14.375,
+              "p50": 17.5,
+              "p90": 20.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "Encounter_World_R0_L1_N0",
+          "regionId": "World_Region0",
+          "samples": 7,
+          "playerWinFraction": 1.0,
+          "overtimeFraction": 0.0,
+          "match": {
+            "duration": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "healing": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 0,
+              "mean": null,
+              "p50": null,
+              "p90": null
+            },
+            "peakUnits": {
+              "observed": 7,
+              "mean": 3.0,
+              "p50": 3.0,
+              "p90": 3.0
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "damage": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "healing": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverOverflow": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 7,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 0,
+              "mean": null,
+              "p50": null,
+              "p90": null
+            },
+            "peakUnits": {
+              "observed": 7,
+              "mean": 1.286,
+              "p50": 1.0,
+              "p90": 2.0
+            }
+          }
+        },
+        {
+          "mode": "automation",
+          "encounterId": "None",
+          "regionId": "None",
+          "samples": 18,
+          "playerWinFraction": 1.0,
+          "overtimeFraction": 0.1111111111111111,
+          "match": {
+            "duration": {
+              "observed": 18,
+              "mean": 3.333,
+              "p50": 0.0,
+              "p90": 9.0
+            }
+          },
+          "player": {
+            "cards": {
+              "observed": 18,
+              "mean": 0.667,
+              "p50": 0.0,
+              "p90": 1.8
+            },
+            "damage": {
+              "observed": 18,
+              "mean": 1817.889,
+              "p50": 25.0,
+              "p90": 5060.0
+            },
+            "healing": {
+              "observed": 18,
+              "mean": 0.556,
+              "p50": 0.0,
+              "p90": 1.5
+            },
+            "silverSpent": {
+              "observed": 18,
+              "mean": 1.333,
+              "p50": 0.0,
+              "p90": 3.6
+            },
+            "silverOverflow": {
+              "observed": 18,
+              "mean": 0.444,
+              "p50": 0.0,
+              "p90": 1.2
+            },
+            "silverAtCapSeconds": {
+              "observed": 18,
+              "mean": 1.333,
+              "p50": 0.0,
+              "p90": 3.6
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "peakUnits": {
+              "observed": 18,
+              "mean": 3.889,
+              "p50": 3.0,
+              "p90": 6.8
+            }
+          },
+          "enemy": {
+            "cards": {
+              "observed": 18,
+              "mean": 0.444,
+              "p50": 0.0,
+              "p90": 1.2
+            },
+            "damage": {
+              "observed": 18,
+              "mean": 123.556,
+              "p50": 0.0,
+              "p90": 333.6
+            },
+            "healing": {
+              "observed": 18,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverSpent": {
+              "observed": 18,
+              "mean": 0.889,
+              "p50": 0.0,
+              "p90": 2.4
+            },
+            "silverOverflow": {
+              "observed": 18,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silverAtCapSeconds": {
+              "observed": 18,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "firstHeroDeathSeconds": {
+              "observed": 4,
+              "mean": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "peakUnits": {
+              "observed": 18,
+              "mean": 4.111,
+              "p50": 3.0,
+              "p90": 8.2
+            }
+          }
+        }
+      ],
+      "interpretation": "Descriptive local samples only. Forced outcomes, player skill, deck, upgrades and route selection are confounders; this is not a target win-rate estimate. Missing hero deaths are excluded from death-time averages."
+    },
+    "exclusionCheck": {
+      "version": 1,
+      "excludedAutomationMatches": 79,
+      "cohorts": [],
+      "interpretation": "Descriptive local samples only. Forced outcomes, player skill, deck, upgrades and route selection are confounders; this is not a target win-rate estimate. Missing hero deaths are excluded from death-time averages."
+    }
+  },
+  "originalSaves": [
+    {
+      "file": "LittleKing_BalanceMig_Cards_8513C71046B0FFD771099894A9255333.sav",
+      "bytes": 93955,
+      "originalSha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "currentSha256": "6b9382aed75be417da9b7d6dce3f357289035dc7c8a294665ccfe534a980fe4a",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_A.sav",
+      "bytes": 3608,
+      "originalSha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "currentSha256": "e3652ece276cf97744bd0d2f1b413593d3be6be460dc52c260d46d045bd14448",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Profile_B.sav",
+      "bytes": 3608,
+      "originalSha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "currentSha256": "70ec42bcbda5a80b01ea41450fdd9f878d6e8f2959a14c5bbe8922471c56c379",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_A.sav",
+      "bytes": 3736,
+      "originalSha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "currentSha256": "cda93bdd79e9181f69d65afe6fff1099768c435396e45ee76eb5bd8eda4d8791",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Profile_B.sav",
+      "bytes": 3821,
+      "originalSha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "currentSha256": "c2b57eb1ffc867fe55eab1a053687d2736dd8b0961688d1a791228839afc173c",
+      "unchanged": true
+    },
+    {
+      "file": "LittleKing_Save02_Run.sav",
+      "bytes": 199893,
+      "originalSha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "currentSha256": "14ab9033583951910578834be8a152d486ce83af9649190827a59fe54cd9271f",
+      "unchanged": true
+    }
+  ],
+  "extraSaveFiles": [],
+  "visualVerification": {
+    "resolutions": [
+      "1280x720",
+      "1920x1080"
+    ],
+    "method": "Actual UE offscreen rendering using editor-only -MarketPreview, isolated save namespace, real market transaction APIs and UMG button broadcasts. This is not a physical mouse/hardware test.",
+    "screenshots": [
+      "docs/images/ResearchOptimization/Market-1280x720.png",
+      "docs/images/ResearchOptimization/Mercenary-1280x720.png",
+      "docs/images/ResearchOptimization/Item-1280x720.png",
+      "docs/images/ResearchOptimization/Inventory-1280x720.png",
+      "docs/images/ResearchOptimization/Item-1920x1080.png"
+    ],
+    "screenshotSha256": {
+      "docs/images/ResearchOptimization/Market-1280x720.png": "9f138ab68a90085af0dba436bea8d21828280b31fd3082d11cfae31bc7bdc069",
+      "docs/images/ResearchOptimization/Mercenary-1280x720.png": "3a338aa7e4ee7f425f318db793ad764542f13455cf3644095b1fac4fcd1fd728",
+      "docs/images/ResearchOptimization/Item-1280x720.png": "61bc55d470fac9fc786c149931d4f1c8a66efbb713cdcf2edaed32a863daadf8",
+      "docs/images/ResearchOptimization/Inventory-1280x720.png": "88f101f53c5a724b2722a0ab931aaa06f156bff8bbc02493d37fd17c7828663e",
+      "docs/images/ResearchOptimization/Item-1920x1080.png": "2568b9dc9c01e5ba87b9b1f422388158206a80e2224a6c2e97609919cb919966"
+    }
+  },
+  "limitations": [
+    "Placeholder items have identity, rarity and persistence only; no equipment slot or combat attributes.",
+    "No blanket HP/attack difficulty multiplier changes; scripted battles and forced outcomes do not establish human balance.",
+    "Save rollback covers observable write failure, not guaranteed power-loss atomic replacement.",
+    "Normal telemetry also includes cheat-forced endings; distinct authored layouts share an encounter group.",
+    "Schema alone cannot enforce all runtime/relational/date/rotation checks; UTF-16 and schema code-point length semantics differ.",
+    "Packaging, hardware acceptance, subjective sound assessment and automatic assignment of authored layouts to expedition nodes remain deferred."
+  ],
+  "documentationChecks": {
+    "localLinksChecked": 289,
+    "brokenLinks": 0,
+    "gitDiffCheck": "passed"
+  },
+  "commands": {
+    "build": "Build.bat little_kingEditor Win64 Development -Project=E:/little_hero/little_king/little_king.uproject -WaitMutex -NoHotReloadFromIDE",
+    "full": "UnrealEditor-Cmd.exe little_king.uproject -unattended -NullRHI -nosplash -nop4 \"-ExecCmds=Automation RunTests LittleKing; Quit\" \"-TestExit=Automation Test Queue Empty\" -ReportExportPath=Saved/Automation/ResearchOptimization-Full02",
+    "focusedFilter": "LittleKing.Animation+LittleKing.Opponent+LittleKing.Scenario+LittleKing.Market+LittleKing.H+LittleKing.Balance.SilverOverflow",
+    "render": "UnrealEditor.exe little_king.uproject -game -MarketPreview -unattended -nosplash -windowed -RenderOffscreen -ResX=1280 -ResY=720; second render uses -ForceRes -ResX=1920 -ResY=1080",
+    "telemetry": "py -X utf8 Scripts/SummarizeBalanceTelemetry.py Saved/Telemetry/Battles-Automation.json --include-automation --output Saved/Optimization/BalanceSummary.json; also run without --include-automation"
+  }
+}

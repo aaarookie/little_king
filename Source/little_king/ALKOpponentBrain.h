@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "LKDataTypes.h"
+#include "LKAIDecision.h"
 #include "ALKOpponentBrain.generated.h"
 
 class ULKSilverComponent;
@@ -13,18 +14,15 @@ class ALKBattleGameMode;
 class ALKUnitBase;
 
 /**
- * 敌方 AI：脚本波次（DT_Waves）+ 打牌脑。
- * S4 战术升级：
- *  ① 集火：周期（AIFocusIntervalMin~Max）对玩家血量最低英雄发起 AIFocusDuration 秒集火；
- *  ② 反制：每 AICounterCheckInterval 评估玩家近战/远程构成，出牌给"克制卡"加分；
- *  ③ 爆发：银币达标 + 兵力不劣时，一波连打 AIPushMaxCards 张；
- *  ④ 法术：用 GameMode 的聚集度评估找最优落点，不再乱扔。
+ * Enemy observation -> intent -> utility -> authoritative card transaction.
+ * Scripted free waves remain an independent scenario channel.
  * 索敌优先级（单位侧）：嘲讽者 > ForcedTarget > 最近敌人。
  */
 UCLASS()
 class ALKOpponentBrain : public AActor
 {
 	GENERATED_BODY()
+	friend struct FLKOpponentTestAccess;
 
 public:
 	ALKOpponentBrain();
@@ -55,6 +53,11 @@ public:
 
 	ULKSilverComponent* GetSilver() const { return Silver; }
 	ULKDeckState* GetDeck() const { return Deck; }
+	const FLKAIObservation& GetObservation() const { return Observation; }
+	const TArray<FLKAIDecisionTrace>& GetDecisionHistory() const { return DecisionHistory; }
+	ELKAIIntent GetIntent() const { return Intent; }
+	/** Bounded (128 decisions, top three alternatives) overwrite in Saved/Telemetry. */
+	bool ExportDecisionTelemetry() const;
 
 private:
 	UPROPERTY()
@@ -103,7 +106,23 @@ private:
 	int32 TacticalSpellCasts = 0;
 
 	float ThinkTimer = 0.f;
-	float ThinkInterval = 1.f;
+	float ThinkInterval = .5f;
+	FRandomStream DecisionRandom;
+	FLKAIObservation Observation;
+	float ObservationTimer = 0.f;
+	float CurrentBattleTime = 0.f;
+	ELKAIIntent Intent = ELKAIIntent::Hold;
+	FName IntentTarget;
+	float IntentRemaining = 0.f;
+	TArray<FLKAIDecisionTrace> DecisionHistory;
+	uint32 DecisionCount = 0;
+	// Continue past blocked placements next decision without increasing the eight-check budget.
+	TMap<FName,int32> CandidateCursors;
+	void ResetDecisions();
+	void RefreshObservation();
+	void UpdateIntent();
+	void ResolveFocus();
+	void RecordDecision(FLKAIDecisionTrace Trace);
 
 	// ---------- S4 战术状态 ----------
 	float FocusTimer = 20.f;			// 距下次集火的倒计时（InitBrain 里按配置随机初值）

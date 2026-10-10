@@ -3,6 +3,8 @@
 #include "ULKJourneyPresentationSubsystem.h"
 #include "LKCardPresentation.h"
 #include "LKResearchContent.h"
+#include "LKItemContent.h"
+#include "LKMarketPresentation.h"
 
 #include "Engine/World.h"
 #include "Engine/StaticMeshActor.h"
@@ -677,6 +679,28 @@ FLKHomePanelModel ALKHomeGameMode::BuildBarracksPanel(FName SelectedRowId, int32
 	const ULKProfileSubsystem* Profile = GetProfileSubsystem();
 	TArray<FName> Unlocked = (Profile && Profile->HasProfile()) ? Profile->GetProfile().UnlockedCardIds : LKHomeContent::DefaultUnlockedCards();
 
+	if (TabIndex == 2)
+	{
+		Model.Subtitle = FText::FromString(TEXT("道具仓库 · 远征带回的饰品与装备"));
+		Model.Status = FText::FromString(TEXT("占位道具暂无属性，不能装备或提供战斗加成；不占出征手牌容量。"));
+		if (Profile && Profile->HasProfile())
+		{
+			for (const auto& Item : Profile->GetOwnedItems())
+			{
+				FLKHomePanelRow Row;
+				Row.RowId = FName(*(TEXT("ItemInstance_") + Item.InstanceId.ToString(EGuidFormats::Digits)));
+				Row.bSelectable = true; Row.Label = LKMarketPresentation::ItemName(Item);
+				const auto* Definition = LKItemContent::Find(Item.ItemId);
+				Row.Value = FText::FromString(LKCardPresentation::QualityName(Item.Quality).ToString()
+					+ (Definition && Definition->Kind == ELKItemKind::Equipment ? TEXT(" · 装备") : TEXT(" · 饰品"))
+					+ (Definition && Definition->bPlaceholder ? TEXT(" · 暂无属性") : TEXT("")));
+				Row.Detail = LKMarketPresentation::ItemDetail(Item); Model.Rows.Add(Row);
+			}
+		}
+		if (Model.Rows.IsEmpty()) { Model.Status = FText::FromString(TEXT("仓库为空。远征市场购入的道具会在结束后带回这里。")); }
+	}
+	else
+	{
 	for (FName CardId : Unlocked)
 	{
 		const ULKCardDefinition* Card = FindCard(CardId);
@@ -699,11 +723,12 @@ FLKHomePanelModel ALKHomeGameMode::BuildBarracksPanel(FName SelectedRowId, int32
 		Row.Detail = BuildCardDetail(CardId);
 		Model.Rows.Add(Row);
 	}
+	}
 
 	const FLKHomePanelRow* Selected = Model.Rows.FindByPredicate(
 		[SelectedRowId](const FLKHomePanelRow& Row) { return Row.RowId == SelectedRowId; });
 	if (Selected && !Selected->Detail.IsEmpty()) { Model.Status = Selected->Detail; }
-	else { Model.Status = FText::FromString(TEXT("点击条目查看详情")); }
+	else if (TabIndex != 2) { Model.Status = FText::FromString(TEXT("点击条目查看详情")); }
 
 	FLKHomePanelAction TabSoldiers;
 	TabSoldiers.Label = FText::FromString(TEXT("佣兵"));
@@ -716,6 +741,11 @@ FLKHomePanelModel ALKHomeGameMode::BuildBarracksPanel(FName SelectedRowId, int32
 	TabBuildings.ActionId = TEXT("Tab1");
 	TabBuildings.bEnabled = TabIndex != 1;
 	Model.Actions.Add(TabBuildings);
+
+	FLKHomePanelAction TabItems;
+	TabItems.Label = FText::FromString(TEXT("道具仓库"));
+	TabItems.ActionId = TEXT("Tab2"); TabItems.bEnabled = TabIndex != 2;
+	Model.Actions.Add(TabItems);
 
 	FLKHomePanelAction Close;
 	Close.Label = FText::FromString(TEXT("关闭"));
@@ -773,7 +803,7 @@ FLKHomePanelModel ALKHomeGameMode::BuildGatePanel(FName SelectedRowId) const
     else
     {
         AddAction(TEXT("Start"), TEXT("出发"), IsProfileUsable());
-        Model.Status = FText::FromString(TEXT("下方设置携带金币；胜利、失败或主动结束都全额带回剩余金币。"));
+        Model.Status = FText::FromString(TEXT("下方设置携带金币；通关或主动放弃带回全部余额，失败保留 80%。已购道具与研究材料全部带回。"));
     }
     AddAction(TEXT("OpenWarRoom"), TEXT("前往战备处")); AddAction(TEXT("Close"), TEXT("关闭"));
     return Model;
@@ -1033,7 +1063,7 @@ ELKSettlementResult ALKHomeGameMode::ApplyPendingSettlement()
 	if (!Run->HasRun() || !Run->IsTerminal()) { return ELKSettlementResult::NoPendingSettlement; }
 
 	const FLKSettlementReceipt Receipt = Run->GetPendingSettlement();
-	if (!Receipt.SettlementId.IsValid()) { return ELKSettlementResult::NoPendingSettlement; }
+	if (!Receipt.SettlementId.IsValid() || !Receipt.bEligibleForHomeReward) { return ELKSettlementResult::NoPendingSettlement; }
 	if (Receipt.bProfileApplied) { return ELKSettlementResult::AlreadyApplied; }
 
 	const ELKSettlementResult Result = Profile->ApplySettlement(Receipt);

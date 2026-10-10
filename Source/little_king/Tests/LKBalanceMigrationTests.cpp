@@ -15,7 +15,7 @@
 #include "../ULKRunSubsystem.h"
 
 /**
- * Balance V1 存档迁移行为回归（docs/48 第 7 节）。
+ * Balance V1 存档迁移行为回归（docs/DevelopmentHistory.md）。
  *
  * 只使用唯一的临时槽创建/删除本测试自己的文件，不读写 Saved/SaveGames 里既有存档，
  * 也不使用真实玩家档作为输入；不启动任何引擎构建或命令行流程。
@@ -210,7 +210,7 @@ bool FLKBalanceHealthMigrationTest::RunTest(const FString& Parameters)
 	FLKRunState Legacy;
 	if (!TestTrue(TEXT("Seed run starts"), MakeLegacyRunState(Seed, 6101, Legacy))) { return false; }
 
-	// 旧原生基准：骑士 450 / 法师 300 / 游侠 350（docs/48 §3 之前）。
+	// 旧原生基准：骑士 450 / 法师 300 / 游侠 350（Balance V1 之前）。
 	FLKRunHeroState* Knight = FindHeroMutable(Legacy, "Hero_Knight");
 	FLKRunHeroState* Mage = FindHeroMutable(Legacy, "Hero_Mage");
 	FLKRunHeroState* Ranger = FindHeroMutable(Legacy, "Hero_Ranger");

@@ -90,9 +90,10 @@ def main():
     table = record('Content/Data/DT_Units.uasset')
     assert table['sha256'] == '5bd2282930b84cf9430bd2a2d86e5a6ccc500b0ab1be4487784181a5e576b782'
 
-    docs = ['README.md', 'README.en.md', 'docs/03-TaskList.md', 'docs/05-BugLog.md',
-            'docs/07-ArtStyleGuide.md', 'docs/12-AssetRequest.md', 'docs/29-OptimizationChangeLog.md',
-            'docs/36-ArtAudioSources.md', 'docs/45-BattlePresentationFixes.md', 'docs/46-MovementFixPrompts.md']
+    docs = ['README.md', 'README.en.md', 'docs/64-ProjectHandoff.md',
+            'docs/01-GDD.md', 'docs/02-BattlePrototypeDesign.md',
+            'docs/19-ContentCatalog.md', 'docs/34-CardDevelopmentInterfaces.md',
+            'docs/36-ArtAudioSources.md', 'docs/DevelopmentHistory.md']
     links = 0
     for path in docs:
         text = (ROOT/path).read_text(encoding='utf-8-sig')

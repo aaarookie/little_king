@@ -36,6 +36,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LK|Economy")
 	float GetPerSecond() const { return PerSecond; }
+	/** Lost passive production only; scripted grants/refunds are intentionally excluded. */
+	float GetOverflow() const { return Overflow; }
+	float GetAtCapSeconds() const { return AtCapSeconds; }
 
 	void SetPerSecond(float NewValue) { PerSecond = FMath::Max(0.f, NewValue); }
 	void SetCap(float NewValue) { Cap = FMath::Max(1.f, NewValue); Silver = FMath::Min(Silver, Cap); }
@@ -44,6 +47,8 @@ private:
 	float Silver = 0.f;
 	float PerSecond = 1.5f;
 	float Cap = 12.f;
+	float Overflow = 0.f;
+	float AtCapSeconds = 0.f;
 
 	void Broadcast(float Delta) const;
 };

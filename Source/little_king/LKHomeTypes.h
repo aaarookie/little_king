@@ -7,7 +7,7 @@
 /**
  * 阶段 3 家园（H0~H5）数据契约。
  *
- * 三层数据严格分离（见 docs/26-HomeDevelopmentPlan.md 第 1 节）：
+ * 三层数据严格分离（见 docs/02-BattlePrototypeDesign.md）：
  *  - 永久进度：FLKProfileState（金币、建筑等级、永久解锁、已保存战备、已处理事务）
  *  - 本次远征：FLKRunState 新增字段（区域、出征快照、加成快照、金币结算回执，见 LKRunTypes.h）
  *  - 当前战斗：银币/手牌/场上单位，每房重建（不进入本文件）
@@ -126,7 +126,9 @@ struct FLKProfileState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 SchemaVersion = 3;
+	/** Items are viewable inventory only; they do not equip or alter combat attributes. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FLKItemInstance> OwnedItems;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName,int32> ResearchMaterials;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FGuid ProfileId;
 	/** 每次成功写入 +1；A/B 双槽按最大有效修订选择 */
